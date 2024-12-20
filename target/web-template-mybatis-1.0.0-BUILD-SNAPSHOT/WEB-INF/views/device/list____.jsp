@@ -1,0 +1,1621 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ include file="/WEB-INF/views/common/tagLib.jsp" %>
+<script type="text/javascript">
+$( document ).ready( function() 
+{	
+	    $('#submitBtn').click( function() {
+	    	$('#searchForm').submit();	    	
+	    });
+	    
+	    $('input[type="checkbox"][name="targetDeivceCk"]').click(function(){
+    		if($(this).prop('checked')){
+	    	$('input[type="checkbox"][name="targetDeivceCk"]').prop('checked',false);
+	    	$(this).prop('checked',true);
+	    	}
+	    });
+	    
+	    getConstructionName();
+	    getPileTypeList();
+	    calcSum();
+	    getSpareDeviceCount();
+	    getTestReportSet();
+	    
+});
+
+function getTestReportSet(){
+		
+	var conIdx = ${param.constructionIdx};
+	jQuery.ajax({
+		type : "POST",
+		url  : "${pageContext.request.contextPath}/device/get/list",
+		data : {
+			constructionIdx : conIdx
+		}, 
+		dataType : "JSON",
+		success : function(data) {
+			$.each(data, function (i, item) {
+				$("#select2").append("<option class='text-success text-center' value='"+item.lavelNo+"'>"+item.machineNumber+"( " + item.lavelNo + " )</option>");
+			});
+		},
+		complete : function(data) {
+		},
+		error : function(xhr, status, error) {
+		}
+	});
+}
+
+function fileChangeSelect2(value){
+	var root = '${pageContext.request.contextPath}';
+	TestReportFileDownload(root , root + '/treport/download/test/report?sn=' + value, value);
+	
+}
+
+function getSpareDeviceCount(){
+	
+	var idx = ${param.constructionIdx};
+	jQuery.ajax({
+		type : "POST",
+		url : "${pageContext.request.contextPath}/spare/device/use/quantity",
+		async : false,  // 요청 시 동기화 여부. 기본은 비동기(asynchronous) 요청 (default: true)
+		data: {
+			constructionIdx : idx
+		}, 
+		dataType : "JSON", // 옵션이므로 JSON으로 받을게 아니면 안써도 됨
+		success : function(data) {	
+			$('#spareDeviceUseQuantity').text(data.spareDeviceCount);
+			$('#triUseQuantity').text(data.tripodCount);
+			$('#chgDvcQuantity').text(data.changeDeviceCount);
+		},
+		complete : function(data) {
+		},
+		error : function(xhr, status, error) {
+			$('#spareDeviceUseQuantity').text("0");
+			$('#triUseQuantity').text("0");
+			$('#chgDvcQuantity').text("0");
+		}
+	}); 
+}
+
+function calcSum(){
+	
+	var totalSum = 0;
+	var todaySum = 0;
+	var yesterdaySum = 0;
+	var conIdx = ${param.constructionIdx}	
+	$('#userListTable tr').each( function( idx, obj ) {
+		if(idx > 0 && idx != $('#userListTable tr').length){
+			var tr = $(this);
+			var td = tr.children();
+			
+			var total;
+			var today;
+			var yesterday;
+			
+			if(conIdx == 588 || conIdx == 613 || conIdx == 627){
+				total = td.eq(2).text();
+				today = td.eq(3).text();
+				yesterday = td.eq(4).text();
+			}else{
+				total = td.eq(1).text();
+				today = td.eq(2).text();
+				yesterday = td.eq(3).text();
+			}
+			
+			totalSum += Number(total.replace('공', ''));
+			todaySum += Number(today.replace('공', ''));
+			yesterdaySum += Number(yesterday.replace('공', ''));
+		}
+	});
+	$('#totalSum').text(totalSum + "공");
+	$('#todaySum').text(todaySum + "공");
+	$('#yesterdaySum').text(yesterdaySum + "공");
+}
+
+function doDelete(idx){
+	var result = confirm("삭제하시겠습니까?");
+	if(result){
+		jQuery.ajax({
+			type : "POST",
+			url : "${pageContext.request.contextPath}/device/doDelete",
+			data: {
+				id : idx
+			}, 
+			dataType : "JSON", // 옵션이므로 JSON으로 받을게 아니면 안써도 됨
+			success : function(data) {
+				if(data == true){
+					alert('삭제되었습니다.');
+					history.go(0);
+				}
+			},
+			complete : function(data) {
+			},
+			error : function(xhr, status, error) {
+			}
+		}); 
+		return;
+	}
+	return;
+}
+
+function onClickChangeInfo(id){
+	jQuery.ajax({
+		type : "POST",
+		url : "${pageContext.request.contextPath}/device/get/info",
+		async : false,  // 요청 시 동기화 여부. 기본은 비동기(asynchronous) 요청 (default: true)
+		dataType : "JSON", // 옵션이므로 JSON으로 받을게 아니면 안써도 됨
+		data:  {
+			id : id
+		},
+		success : function(data) {	
+			$("#regForm input[name='name']").val(data.name);
+			$("#regForm input[name='constructionIdx']").val(data.constructionIdx);
+			$("#regForm input[name='id']").val(data.id);
+			$("#regForm input[name='lavelNo']").val(data.lavelNo);
+			$("#regForm input[name='bluetoothNo']").val(data.bluetoothNo);
+			$("#regForm input[name='machineNumber']").val(data.machineNumber);
+			$("#regForm input[name='tabletManager']").val(data.tabletManager);
+			$("#regForm input[name='weContact']").val(data.weContact);
+			$("#regForm input[name='tabletNo']").val(data.tabletNo);
+			$("#regForm input[name='startDate']").val(data.startDate);
+			$("#regForm input[name='endDate']").val(data.endDate);
+		},
+		complete : function(data) {
+			closePop();
+		},
+		error : function(xhr, status, error) {
+			closePop();
+		}
+	}); 
+	
+	//location.href='${pageContext.request.contextPath}/device/update?id=' + id
+	//예비용장비 목록을 가져온다.
+	getPopInSpareDeviceList(id);
+}
+
+function getConstructionName(){
+	var idx = ${param.constructionIdx};
+	jQuery.ajax({
+		type : "POST",
+		contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+		url : "${pageContext.request.contextPath}/construction/get/name",
+		data: {
+			id : idx
+		}, 
+		success : function(data) {
+			$('.h1Tit').text(data);
+		},
+		complete : function(data) {
+		},
+		error : function(xhr, status, error) {
+		}
+	}); 
+}
+function getPileTypeList(){
+	
+	var idx = ${param.constructionIdx};
+	jQuery.ajax({
+		type : "POST",
+		contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+		url : "${pageContext.request.contextPath}/fileinventory/get/pile/type/list",
+		data: {
+			constructionIdx : idx
+		}, 
+		success : function(data) {				
+			 $.each(data, function (i, item) {
+				 if(item.pileType == "PHC"){
+					 var option = item.pileType + " " + item.pileStandard;
+				 }else{
+					 var option = item.pileType + " " + item.fileWeight + " " + item.pileStandard;
+				 }
+                 $("#select1").append("<option class='text-success text-center' value='"+option+"'>"+option+"</option>")
+			 });
+		},
+		complete : function(data) {
+		},
+		error : function(xhr, status, error) {
+		}
+	}); 
+}
+function fileChange(value){
+	var constructionIdx = ${param.constructionIdx};
+	location.href = '${pageContext.request.contextPath}/file/using/chart/download/excel?constructionIdx=' + constructionIdx + '&pile=' + value + '&dateTime=' + value;
+	$('#select1 option:eq(0)').prop('selected', true);
+}
+
+
+
+
+function conductSel(idx, selectVal){
+	
+	var alertMsg = "";
+	if(selectVal == '0'){
+		alertMsg = "본사";
+	}else if(selectVal == '1'){
+		alertMsg = "종료";
+	}else if(selectVal == '2'){
+		alertMsg = "가맹";
+	}
+
+	var result = confirm(alertMsg +  ' 상태로 변경하시겠습니까?');
+	if(result){
+		jQuery.ajax({
+			type : "POST",
+			url : "${pageContext.request.contextPath}/device/update/conduct",
+			data: {
+				id : idx
+				, conduct : selectVal
+			}, 
+			dataType : "JSON", // 옵션이므로 JSON으로 받을게 아니면 안써도 됨
+			success : function(data) {
+				if(data){
+					alert('변경이 완료되었습니다.');
+				}
+			},
+			complete : function(data) {
+			},
+			error : function(xhr, status, error) {
+			}
+		}); 	
+	}
+}
+
+function setQuantity(){
+	var cIdx = ${param.constructionIdx};
+	var value = $('#quantity').val();
+	jQuery.ajax({
+		type : "POST",
+		url : "${pageContext.request.contextPath}/quantity/set",
+		async : false,  // 요청 시 동기화 여부. 기본은 비동기(asynchronous) 요청 (default: true)
+		data: {
+			constructionIdx : cIdx
+			, quantity : value
+		}, 
+		success : function(data) {				
+			 if(data > 0){
+				// alert(data);
+				 $('#searchForm').submit();	
+				 alert('저장되었습니다.');
+			 }else{
+				 alert('저장에 실패했습니다. 관리자에게 문의하세요.');
+			 }
+		},
+		complete : function(data) {
+		},
+		error : function(xhr, status, error) {
+		}
+	}); 
+}
+
+function getQuantity(){
+	var cIdx = ${param.constructionIdx};
+	jQuery.ajax({
+		type : "POST",
+		url : "${pageContext.request.contextPath}/quantity/get",
+		async : false,  // 요청 시 동기화 여부. 기본은 비동기(asynchronous) 요청 (default: true)
+		data: {
+			constructionIdx : cIdx
+		}, 
+		success : function(data) {				
+			 if(data.constructionIdx = 'undefined'){
+				 $('#workSummary').html('공정률 0%&nbsp;&nbsp;&nbsp;남은수량 0 본 &nbsp;&nbsp;&nbsp;총 작업수량 <input type="text" class="input01" style="width: 100px;">&nbsp;본&nbsp;<input type="button" value="저장" onclick="javascript:setQuantity();">');
+			 }
+		},
+		complete : function(data) {
+			
+		},
+		error : function(xhr, status, error) {
+			
+		}
+	}); 
+}
+
+
+function getQuantityResult(){
+	var cIdx = ${param.constructionIdx};
+	
+	jQuery.ajax({
+		type : "POST",
+		url : "${pageContext.request.contextPath}/quantity/get",
+		async : false,  // 요청 시 동기화 여부. 기본은 비동기(asynchronous) 요청 (default: true)
+		data: {
+			constructionIdx : cIdx
+		}, 
+		success : function(data) {	
+			//alert(data);
+			 if(data.constructionIdx = 'undefined'){
+				 return false;
+			 }else{
+				 return true;
+			 }
+		},
+		complete : function(data) {
+			
+		},
+		error : function(xhr, status, error) {
+			
+		}
+	}); 
+	return false;
+}
+
+
+
+function downloadAllReport(conId){
+	var result = confirm("전체 출력하시겠습니까?");
+	if(result){
+		if(conId <= 0){
+			alert('에러가 발생했습니다.');
+			return;
+		}
+		location.href = '${pageContext.request.contextPath}/report/download/all/excel?constructionIdx=' + conId;
+	}	
+}
+
+function formCheck(){
+	//숫자와 문자 포함 형태의 6~12자리 이내의 암호 정규식
+	var passwordRegex = /^[A-Za-z0-9]{6,12}$/;
+	if($("#regForm input[name='constructionIdx']").val() == 0){
+		alert('시공사를 선택하세요.');
+		return;
+	}else if($("#regForm input[name='bluetoothNo']").val() == ''){
+		alert('블루투스 번호를 입력하세요.');
+		return;
+	}else if($("#regForm input[name='lavelNo']").val() == ''){
+		alert('자동특정기 번호를 입력하세요.');
+		return;
+	}else if($("#regForm input[name='machineNumber']").val() == ''){
+		alert('호기번호를 입력하세요.');
+		return;
+	}else if($("#regForm input[name='tabletManager']").val() == ''){
+		alert('WE매니저 이름을 입력하세요.');
+		return;
+	}else if($("#regForm input[name='weContact']").val() == ''){
+		alert('매니저 연락처를 입력하세요.');
+		return;
+	}else if($("#regForm input[name='startDate']").val() == ''){
+		alert('시작일을 입력하세요.');
+		return;
+	}else if($("#regForm input[name='endDate']").val() == ''){
+		alert('종료일을 입력하세요.');
+		return;
+	}else if($("#regForm input[name='startDate']").val() > $("#regForm input[name='endDate']").val() || $("#regForm input[name='startDate']").val() == $("#regForm input[name='endDate']").val()){
+		alert('종료일자가 잘못되었습니다.');
+		$("#regForm input[name='endDate']").val("");
+		return;
+	}
+	 if($("#regForm input[name='password']").val() != '' && $("#regForm input[name='confirmPassword']").val() != '' ){
+			//비밀번호가 입력되었다면
+			if(!passwordRegex.test($("#regForm input[name='password']").val())){
+				alert('숫자와 문자 포함  6~12자리 비밀번호를 입력하세요.');
+				return ;
+			}else if(!passwordRegex.test($("#regForm input[name='confirmPassword']").val())){
+				alert('숫자와 문자 포함  6~12자리 비밀번호를 입력하세요.');
+				$('#confirmPassword').focus();
+				return;
+			}else if($("#regForm input[name='password']").val() != $("#regForm input[name='confirmPassword']").val()){
+				alert('비밀번호를 다름니다. 비밀번호를 확인하세요.');
+				$("#regForm input[name='confirmPassword']").focus();
+				return;
+			}
+		}else{
+			if($("#regForm input[name='password']").val() != ''){
+				alert('확인 비밀번호를 입력하세요.');
+				$("#regForm input[name='confirmPassword']").focus();
+				return;
+			}else if($("#regForm input[name='confirmPassword']").val() != ''){
+				alert('비밀번호를 입력하세요.');
+				$("#regForm input[name='password']").focus();
+				return;
+			}
+		}
+		
+	 	var myObject = new Object(); 
+	 	myObject.id = new Number($("#regForm input[name='id']").val());
+		myObject.constructionIdx = new Number($("#regForm input[name='constructionIdx']").val());
+		myObject.lavelNo = $("#regForm input[name='lavelNo']").val();
+		myObject.bluetoothNo = $("#regForm input[name='bluetoothNo']").val();
+		myObject.tabletNo = $("#regForm input[name='tabletNo']").val();
+		myObject.password = $("#regForm input[name='password']").val();
+		myObject.tabletManager = $("#regForm input[name='tabletManager']").val();
+		myObject.weContact = $("#regForm input[name='weContact']").val();
+		myObject.startDate = $("#regForm input[name='startDate']").val();
+		myObject.endDate = $("#regForm input[name='endDate']").val();
+		myObject.machineNumber = $("#regForm input[name='machineNumber']").val();
+		myObject.name = '';
+		myObject.conduct = new Number(0);
+		myObject.totalCnt = new Number(0);
+		myObject.todayCnt = new Number(0);
+		myObject.yesterdayCnt = new Number(0);
+		
+		var myString = JSON.stringify(myObject); 
+		jQuery.ajax({
+			type : "POST",
+			url : "${pageContext.request.contextPath}/device/updateOfAjax",
+		    contentType : "application/json",
+			async : false,  // 요청 시 동기화 여부. 기본은 비동기(asynchronous) 요청 (default: true)
+			data:  JSON.stringify(myObject),
+			success : function(data) {	
+				result = data;
+			},
+			complete : function(data) {
+				if(result == 1){
+					$('.popUp').hide();
+					$('.popLayer').hide();
+					$('body').css('overflow', 'auto');
+					$('#searchForm').submit();
+				}
+			},
+			error : function(xhr, status, error) {
+				alert('error');
+				$('.popUp').hide();
+				$('.popLayer').hide();
+				$('body').css('overflow', 'auto');
+			}
+		}); 
+		return;
+}
+
+
+function spareDeviceTypeOnChange(value){
+	if(value == 1){
+		$('#tripodArea').show();
+		$('#spareArea').hide();
+	}else{
+		$('#tripodArea').hide();
+		$('#spareArea').show();
+	}
+}
+
+
+function getPopInSpareDeviceList(deviceIdx){
+	
+	var conIdx = ${param.constructionIdx};
+	jQuery.ajax({
+		type : "POST",
+		contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+		url : "${pageContext.request.contextPath}/spare/device/not/change/list",
+		data: {
+			constructionIdx : conIdx,
+			type : 0
+		}, 
+		success : function(data) {
+			//alert(data.length);
+			if(data.length == 0){
+				$("#reFormInSprDvcTb tr").remove();
+				$("#reFormInSprDvcTb").append(
+						 '<thead>'
+					     +   '<tr>'
+					     +     '<th>등록된 예비용 장비가 없습니다.</th>'
+					     +   '</tr>'
+					     +'</thead>');
+			}else{
+				$("#reFormInSprDvcTb tr").remove();
+				$("#reFormInSprDvcTb").append(	
+				 '<thead>'
+			     +   '<tr>'
+			     +     '<th>블루투스No</th>'
+			     +     '<th>측정기S/N</th>'
+			     +     '<th>교체</th>'
+			     +   '</tr>'
+			     +'</thead>');
+				$.each(data, function (i, item) {
+					
+					$("#reFormInSprDvcTb").append(
+						 '<tr>'
+						+	'<td style="text-align: center;">' + item.bluetoothNo + '</td>'
+						+   '<td style="text-align: center;">' + item.lavelNo + '</td>'
+						+   '<td style="text-align: center;"><div class="compareBtn" onClick="javascript:changeSpareDevice(' + deviceIdx + ',' + item.id + ',' + item.constructionIdx  + ');">정보변경</div></td>'
+						+'</tr>');
+				});
+			}
+		},
+		complete : function(data) {
+		},
+		error : function(xhr, status, error) {
+		}
+	}); 
+}
+
+function changeSpareDevice(targetId, changeId, constructionIdx){
+	var result = confirm('기기를 교체하시겠습니까?');
+	if(result){
+		jQuery.ajax({
+			type : "POST",
+			url : "${pageContext.request.contextPath}/spare/device/change",
+			async : false,  // 요청 시 동기화 여부. 기본은 비동기(asynchronous) 요청 (default: true)
+			data: {
+				constructionIdx : constructionIdx,
+				targetId : targetId, 
+				changeId : changeId
+			}, 
+			success : function(data) {
+				getSpareDeviceCount();
+				getPopInSpareDeviceList(targetId);
+				closePop();
+				location.reload();
+				
+			},
+			complete : function(data) {
+			},
+			error : function(xhr, status, error) {
+			}
+		}); 
+	}
+}
+
+</script>
+
+		<!--컨텐츠-->
+<div class="section-right">
+
+	<div class="TopContArea">
+		<div class="titArea mb-40">
+			<p class="h1Tit"></p>
+			<div class="titBtnArea" style="">
+				
+				<c:choose>
+					<c:when test="${sessionInfo.role < 4}">
+							<select id="select2" name="select2" onchange="javascript:fileChangeSelect2(this.value);" style="background-color: #0a4b76;">
+								<option value="">시험성적표 출력 ▼</option>
+							</select>	
+							
+							<select id="select1" name="select1" onchange="javascript:fileChange(this.value);">
+								<option selected disabled value="">파일현황 출력 ▼</option>
+							</select> 
+					</c:when>
+				</c:choose>
+			 
+				
+				<c:choose>
+					<c:when test="${sessionInfo.role == 0}">
+						<div class="printBtn" onclick="javascript:downloadAllReport(${param.constructionIdx});">기록지 전체 출력</div>
+					</c:when>
+					<c:when test="${sessionInfo.role == 2 or sessionInfo.role == 3 or sessionInfo.role == 4}">
+						<div class="printBtn" onclick="javascript:downloadAllReport(${param.constructionIdx});">기록지 전체 출력</div>
+					</c:when>
+					<c:otherwise>
+						<div class="printBtn" onclick="javascript:downloadAllReport(${sessionInfo.constructionIdx});">기록지 전체 출력</div>
+					</c:otherwise>
+				</c:choose>
+				
+				<form:form id="searchForm" commandName="domainParam" method="POST">
+					<form:hidden path="currentPage"/>
+				</form:form>
+				
+			</div>
+		</div>
+		
+		<c:choose>
+			<c:when test="${sessionInfo.role < 4}">
+				<div class="listinputArea" style="margin-bottom: 10px;">
+					<div class="innerInputArea">
+						
+						
+						<c:choose>
+							<c:when test="${param.constructionIdx == 751 or sessionInfo.constructionIdx == 751}">
+								<!-- HJ중공업 성우이앤씨 보령신복합1호기건설공사 -->
+								<p><span>남은수량</span>&nbsp;&nbsp;${totalWorkQuantity.quantityLeft - 71}&nbsp;&nbsp;공</p>
+								<p><span>시공수량</span>&nbsp;&nbsp;${totalWorkQuantity.executedQuantity + 71}&nbsp;&nbsp;공</p>
+							</c:when>
+							<c:otherwise>
+								<p><span>공정률</span>&nbsp;&nbsp;${totalWorkQuantity.processRate}&nbsp;&nbsp;%</p>
+								<p><span>남은수량</span>&nbsp;&nbsp;${totalWorkQuantity.quantityLeft}&nbsp;&nbsp;공</p>
+								<p><span>시공수량</span>&nbsp;&nbsp;${totalWorkQuantity.executedQuantity}&nbsp;&nbsp;공</p>
+							</c:otherwise>
+						</c:choose>
+						<c:choose>
+							<c:when test="${sessionInfo.role == 0}">
+								<p><span>NG</span>&nbsp;&nbsp;${totalWorkQuantity.ngQuantity}&nbsp;&nbsp;공</p>
+							</c:when>
+							<c:otherwise>
+								<c:choose>
+									<c:when test="${sessionInfo.constructionIdx == 696 or sessionInfo.constructionIdx == 650 or sessionInfo.constructionIdx == 644 or sessionInfo.constructionIdx == 599}">
+										<p><span>NG</span>&nbsp;&nbsp;${totalWorkQuantity.ngQuantity}&nbsp;&nbsp;공</p>
+									</c:when>
+								</c:choose>
+							</c:otherwise>
+						</c:choose>
+						<p><span>총 작업수량</span><input type="text" name="" id="quantity" value="${totalWorkQuantity.quantity}" class="input03" />공</p>
+					</div>
+		
+					<input type="button" name="" value="저장" class="saveBtn" onclick="javascript:setQuantity();"/>
+				</div>
+			</c:when>
+		</c:choose>
+		
+		<c:choose>
+			<c:when test="${sessionInfo.role < 4}">
+			
+				<c:choose>
+					<c:when test="${sessionInfo.role == 0 || sessionInfo.role == 3}">
+						<div class="listinputArea"  style="margin-bottom: 10px;">
+					</c:when>
+					
+					<c:otherwise>
+						<div class="listinputArea" >
+					</c:otherwise>
+				</c:choose>
+				
+					<div class="innerInputArea">
+						<p><span>예비용</span>&nbsp;&nbsp;<font id="spareDeviceUseQuantity">0</font>&nbsp;&nbsp;대</p>
+						<p><span>삼각대</span>&nbsp;&nbsp;<font id="triUseQuantity">0</font>&nbsp;&nbsp;대</p>
+						<p><span>교체</span>&nbsp;&nbsp;<font id="chgDvcQuantity">0</font>&nbsp;&nbsp;대</p>
+					</div>
+					<c:choose>
+						<c:when test="${sessionInfo.role == 0}">
+							<input type="button" name="" value="예비용 기기관리" class="saveBtn" style="width: 140px;" onclick="javascript:openSparePop();" />
+							<!-- <input type="button" name="" value="측정기 기기교체" class="saveBtn" style="width: 140px;" onclick="javascript:openChgDvcPopup();" /> -->
+						</c:when>
+					</c:choose>
+				</div>
+			</c:when>
+		</c:choose>
+		<c:choose>
+			<c:when test="${sessionInfo.role == 0 || sessionInfo.role == 3}">
+				<div class="listinputArea">
+					<div class="innerInputArea">
+						<p><span>가맹점&nbsp;&nbsp;&nbsp;&nbsp;: </span>&nbsp;&nbsp;${conOptionCondition.fcName}&nbsp;</p>
+						<p><span>보안코드 : </span>&nbsp;&nbsp;${conOptionCondition.secretCode}&nbsp;</p>
+						<p><span>시간출력 : </span>&nbsp;&nbsp;${conOptionCondition.longCalYn}&nbsp;</p>
+						<p><span>극한출력 : </span>&nbsp;&nbsp;${conOptionCondition.ubcYn}&nbsp;</p>
+						<p><span>원데이터 : </span>&nbsp;&nbsp;${conOptionCondition.originDataYn}&nbsp;</p>
+						<p><span>PDF출력 : </span>&nbsp;&nbsp;${conOptionCondition.showPdfYn}&nbsp;</p>
+					</div>
+				</div>
+			</c:when>
+		</c:choose>
+	</div>
+	
+	<div class="min531">
+		<div class="tableArea">
+			<div class="viewTable viewTable01">
+				<div class="tableScroll">
+					<table id="userListTable">
+						<tr class="viewTh">
+							<c:choose>
+								<c:when test="${param.constructionIdx == 588 or param.constructionIdx == 613 or param.constructionIdx == 627}">
+									<th style="width: 8%;">Zone</th>
+								</c:when>
+							</c:choose>
+							<th style="width: 3%; font-size: 15px; padding: 15px 0px 15px 0px;">호기</th>
+							<th style="width: 3%; font-size: 15px;">총작업</th>
+							<th style="width: 4%; font-size: 15px;">금일작업</th>
+							<th style="width: 4%; font-size: 15px;">전일작업</th>
+							<th style="width: 8%; font-size: 15px;">태블릿 ID</th>
+							<th style="width: 8%; font-size: 15px;">블루투스 No</th>
+							<th style="width: 8%; font-size: 15px;">측정기 S/N</th>
+							<th style="width: 8%; font-size: 15px;">We매니저</th>
+							<th style="width: 12%; font-size: 15px;">연락처</th>
+							<th style="width: 9%; font-size: 15px;">시작일</th>
+							<th style="width: 10%; font-size: 15px;">종료일</th>
+							<c:choose>
+								<c:when test="${sessionInfo.role == 0}">
+									<th style="width: 5%; font-size: 15px;">정보변경</th>
+									<th style="width: 5%; font-size: 15px;">상태</th>
+								</c:when>
+							</c:choose>
+						</tr>
+						<c:forEach var="domain" items="${domainList}" varStatus="status">
+							<c:choose>
+								<c:when test="${sessionInfo.role == 0}">
+									<tr>
+										<c:choose>
+											<c:when test="${param.constructionIdx == 588 or param.constructionIdx == 613 or param.constructionIdx == 627}">
+												<td  class="c1">
+												<c:choose>
+													<c:when test="${domain.zone eq 'ept'}">
+														타워 및 존외<br>
+													</c:when>
+													<c:otherwise>
+														${domain.zone}<br>
+													</c:otherwise>
+												</c:choose>
+												<c:choose>
+													<c:when test="${domain.zone != ''}">
+														( ${domain.totalCountByZone} 공 ) 
+													</c:when>
+												</c:choose> 
+											</td>
+											</c:when>
+										</c:choose>
+										<td><a class="viewGo" href='${pageContext.request.contextPath}/report/list?id=${domain.id}&constructionIdx=${domain.constructionIdx}&type=date&mode=simple'>${domain.machineNumber}</a></td>
+										<c:choose>
+											<c:when test="${param.constructionIdx == 588 or param.constructionIdx == 613 or param.constructionIdx == 627}">
+												<td>${domain.countByZone}공</td>
+											</c:when>
+											<c:otherwise>
+												<td>${domain.totalCnt}공</td>
+											</c:otherwise>
+										</c:choose>
+										<td>${domain.todayCnt}공</td>
+										<td>${domain.yesterdayCnt}공</td>
+										<td>${domain.tabletNo}</td>
+										<td>${domain.bluetoothNo}</td>
+										<td><a class="viewGo"  href="javascript:TestReportFileDownload('${pageContext.request.contextPath}' , '${pageContext.request.contextPath}/treport/download/test/report?sn=${domain.lavelNo}', '${domain.lavelNo}');">${domain.lavelNo}</a></td>
+										<td>${domain.tabletManager}</td>
+										<td>${domain.weContact}</td>
+										<td>${domain.startDate}</td>
+										<td>${domain.endDate}</td>
+										<td><div class="tableChange" onclick="javascript:onClickChangeInfo('${domain.id}');">정보변경</div></td>
+										<td>
+											<select id="conductSel" class="state" onchange="conductSel('${domain.id}', this.value)">
+												<option value="0" ${domain.conduct == 0 ? 'selected="selected"' : '' }>본사</option>
+												<option value="2" ${domain.conduct == 2 ? 'selected="selected"' : '' }>가맹</option>
+												<option value="1" ${domain.conduct == 1 ? 'selected="selected"' : '' }>종료</option>
+											</select>
+										</td>
+										<%-- <td><a href="javascript:doDelete('${domain.id}')">[삭제]</a></td> --%>
+									</tr>
+								</c:when>
+								<c:when test="${sessionInfo.role == 2 or sessionInfo.role == 3 or sessionInfo.role == 4}">
+									<tr>
+										<c:choose>
+											<c:when test="${param.constructionIdx == 588 or param.constructionIdx == 613 or param.constructionIdx == 627}">
+												<td  class="c1">
+													<c:choose>
+														<c:when test="${domain.zone eq 'ept'}">
+															타워 및 존외<br>
+														</c:when>
+														<c:otherwise>
+															${domain.zone}<br>
+														</c:otherwise>
+													</c:choose>
+													<c:choose>
+														<c:when test="${domain.zone != ''}">
+															( ${domain.totalCountByZone} 공 ) 
+														</c:when>
+													</c:choose>
+												</td>
+											</c:when>
+										</c:choose>
+										<td><a class="viewGo" href='${pageContext.request.contextPath}/report/list?id=${domain.id}&constructionIdx=${param.constructionIdx}&type=date&mode=simple'>${domain.machineNumber}</a></td>
+										<c:choose>
+											<c:when test="${param.constructionIdx == 588 or param.constructionIdx == 613 or param.constructionIdx == 627}">
+												<td>${domain.countByZone}공</td>
+											</c:when>
+											<c:otherwise>
+												<td>${domain.totalCnt}공</td>
+											</c:otherwise>
+										</c:choose>
+										<td>${domain.todayCnt}공</td>
+										<td>${domain.yesterdayCnt}공</td>
+										<td>${domain.tabletNo}</td>
+										<td>${domain.bluetoothNo}</td>
+										<td><a class="viewGo"  href="javascript:TestReportFileDownload('${pageContext.request.contextPath}' , '${pageContext.request.contextPath}/treport/download/test/report?sn=${domain.lavelNo}', '${domain.lavelNo}');">${domain.lavelNo}</a></td>
+										<td>${domain.tabletManager}</td>
+										<td>${domain.weContact}</td>
+										<td>${domain.startDate}</td>
+										<td>${domain.endDate}</td>
+										<%-- <td><a href="javascript:doDelete('${domain.id}')">[삭제]</a></td> --%>
+									</tr>
+								</c:when>
+								<c:otherwise>
+									<tr>
+										<c:choose>
+											<c:when test="${param.constructionIdx == 588 or param.constructionIdx == 613 or param.constructionIdx == 627}">
+												<td  class="c1"><c:choose>
+													<c:when test="${domain.zone eq 'ept'}">
+														타워 및 존외<br>
+													</c:when>
+													<c:otherwise>
+														${domain.zone}<br>
+													</c:otherwise>
+												</c:choose>
+												<c:choose>
+													<c:when test="${domain.zone != ''}">
+														( ${domain.totalCountByZone} 공 ) 
+													</c:when>
+												</c:choose> 
+											</td>
+											</c:when>
+										</c:choose>
+										<td><a class="viewGo" href='${pageContext.request.contextPath}/report/list?id=${domain.id}&type=date&mode=simple'>${domain.machineNumber}</a></td>
+										<c:choose>
+											<c:when test="${param.constructionIdx == 588 or param.constructionIdx == 613 or param.constructionIdx == 627}">
+												<td>${domain.countByZone}공</td>
+											</c:when>
+											<c:otherwise>
+												<td>${domain.totalCnt}공</td>
+											</c:otherwise>
+										</c:choose>
+										<td>${domain.todayCnt}공</td>
+										<td>${domain.yesterdayCnt}공</td>
+										<td>${domain.tabletNo}</td>
+										<td>${domain.bluetoothNo}</td>
+										<td><a class="viewGo"  href="javascript:TestReportFileDownload('${pageContext.request.contextPath}' , '${pageContext.request.contextPath}/treport/download/test/report?sn=${domain.lavelNo}', '${domain.lavelNo}');">${domain.lavelNo}</a></td>
+										<td>${domain.tabletManager}</td>
+										<td>${domain.weContact}</td>
+										<td>${domain.startDate}</td>
+										<td>${domain.endDate}</td>
+									</tr>
+								</c:otherwise>
+							</c:choose>
+						</c:forEach>
+						<!--//데이터가 없을 경우-->
+						
+						<c:choose>
+						<c:when test="${fn:length(domainList) == 0}">
+							<tr>
+								<c:choose>
+									<c:when test="${sessionInfo.role == 0}">
+										<td colspan="13">등록된 데이터가 없습니다.</td>
+									</c:when>
+									<c:otherwise>
+										<td colspan="11">등록된 데이터가 없습니다.</td>
+									</c:otherwise>
+								</c:choose>
+							</tr>
+						</c:when>
+						<c:otherwise>
+							<c:choose>
+									<c:when test="${sessionInfo.role == 0}">
+										<tr style="background-color: #e6e6e6;">
+											<td>합계</td>
+											<c:choose>
+												<c:when test="${param.constructionIdx == 588 or param.constructionIdx == 613 or param.constructionIdx == 627}">
+													<td></td>
+												</c:when>
+											</c:choose>
+											<td id="totalSum"></td>
+											<td id="todaySum"></td>
+											<td id="yesterdaySum"></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+										</tr>
+									</c:when>
+									<c:otherwise>
+										<c:choose>
+											<c:when test="${sessionInfo.role == 1}">
+												<tr style="background-color: #e6e6e6;">
+													<td>합계</td>
+													<c:choose>
+														<c:when test="${param.constructionIdx == 588 or param.constructionIdx == 613 or param.constructionIdx == 627}">
+															<td></td>
+														</c:when>
+													</c:choose>
+													<td id="totalSum"></td>
+													<td id="todaySum"></td>
+													<td id="yesterdaySum"></td>
+													<td></td>
+													<td></td>
+													<td></td>
+													<td></td>
+													<td></td>
+													<td></td>
+													<td></td>
+												</tr>
+											</c:when>
+											<c:otherwise>
+												<tr style="background-color: #e6e6e6;">
+													<td>합계</td>
+													<c:choose>
+														<c:when test="${param.constructionIdx == 588 or param.constructionIdx == 613 or param.constructionIdx == 627}">
+															<td></td>
+														</c:when>
+													</c:choose>
+													<td id="totalSum"></td>
+													<td id="todaySum"></td>
+													<td id="yesterdaySum"></td>
+													<td></td>
+													<td></td>
+													<td></td>
+													<td></td>
+													<td></td>
+													<td></td>
+													<td></td>
+												</tr>
+											</c:otherwise>
+										</c:choose>
+								</c:otherwise>
+							</c:choose>
+						</c:otherwise>
+					</c:choose>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!--페이징-->			
+	<%@ include file="/WEB-INF/views/common/pagination.jsp" %>
+	<!--//페이징-->
+	
+</div>
+<!--//컨텐츠-->
+
+<!--정보 변경 팝업-->
+	<form id="regForm" name="regForm" method="POST">
+	<div class="popUp">
+		<div class="popTit">
+			<p>정보변경</p>
+			<img class="popClose" src="${pageContext.request.contextPath}/new/img/popclose.png" />
+		</div>
+		<div class="popCont">
+			<div class="inputArea02 mb-20">
+				예비용 장비 등록 현황
+				<table id="reFormInSprDvcTb" class="reFormInSprDvcTb" style="width: 100%; margin-top: 10px; margin-bottom: 10px;" border="1">
+				</table>
+			</div>
+			<div class="inputArea02 mb-20">
+				<p class="inputTxt02">협력사</p>
+				<input type="text" disabled="disabled" class="Input02" id="name" name="name">
+				<input type="hidden" id="constructionIdx" name="constructionIdx">
+				<input type="hidden" id="id" name="id">
+			</div>
+			<div class="inputArea02 mb-20">
+				<p class="inputTxt02">PDAM 테블릿 번호</p>
+				<input type="text" autocomplete="off"  class="Input02" name="tabletNo" id="tabletNo" disabled="true" onkeypress="javascript:pressContact();">
+			</div>
+			<div class="inputArea02 mb-20">
+				<p class="inputTxt02">호기번호</p>
+				<input type="text" autocomplete="off" class="Input02" name="machineNumber" id="machineNumber">
+			</div>
+			<div class="inputArea02 mb-20">
+				<p class="inputTxt02">블루투스 No</p>
+				<input type="text" autocomplete="off"  class="Input02" name="bluetoothNo" id="bluetoothNo">
+			</div>
+			<div class="inputArea02 mb-20">
+				<p class="inputTxt02">측정기 S/N</p>
+				<input type="text" autocomplete="off"  class="Input02" name="lavelNo" id="lavelNo">
+			</div>
+			<div class="inputArea02 mb-20">
+				<p class="inputTxt02">WE매니저</p>
+				<input type="text" autocomplete="off"  class="Input02" name="tabletManager" id="tabletManager">
+			</div>
+			<div class="inputArea02 mb-20">
+				<p class="inputTxt02">매니저 연락처</p>
+				<input type="text" autocomplete="off"  class="Input02" name="weContact" id="weContact">
+			</div>
+			<div class="inputArea02 mb-20">
+				<p class="inputTxt02">비밀번호</p>
+				<input type="password" autocomplete="new-password"  class="Input02" name="password" id="password">
+			</div>
+			<div class="inputArea02 mb-20">
+				<p class="inputTxt02">비밀번호 확인</p>
+				<input type="password" autocomplete="new-password" class="Input02" name="confirmPassword" id="confirmPassword">
+			</div>
+			<div class="inputArea02 mb-20">
+				<p class="inputTxt02">시작일</p>
+				<input type="text" autocomplete="off"  class="inputDate datepicker Input02" name="startDate" id="startDate" >
+			</div>
+			<div class="inputArea02 mb-20">
+				<p class="inputTxt02">종료일</p>
+				<input type="text" autocomplete="off" class="inputDate datepicker Input02" name="endDate" id="endDate" >
+			</div>
+			
+			<div class="popAdd" onclick="return formCheck();">변경</div>
+		</div>
+	</div>
+	</form>
+	<div class="popLayer" style=""></div>
+	
+	
+	<!-- 예비용 기기관리 팝업 -->
+	<div class="popup_layer" id="popup_layer" style="display: none;">
+		<div class="popup_box">
+		    <div class="popup_cont">
+				<div class="popup_head">
+					<div class="popup_text">
+						<font>등록현황</font>
+						<select id="spareDeviceSearchType" onchange="getSpareDeviceList();">
+							<option value="0">예비용장비</option>
+				  			<option value="1">삼각대</option>
+				  			<option value="2">교체장비</option>
+						</select>
+					</div>
+					<div class="popup_close">
+						<a href="javascript:closeSparePop();">닫기</a>
+					</div>
+			  	</div>
+			  	<div class="input_area" id="spareDeviceControllBtnArea">
+			  		<div style="width: 100%; text-align: right;">
+			  			<input class="plus" type="button" value="추가" style="cursor: pointer;" onclick="spareListTableAddRow();">
+			  			<!-- <input class="minus" type="button" value="-"  style="cursor: pointer;" onclick="spareListTableDeleteRow();"> -->
+			  		</div>
+			  	</div>
+			    <div class="table_list">
+				  	<table class="display" id="spareListTable" border="1" style="width: 100%;"></table>
+			    </div>
+		    	<div class="input_area" id="spareDeviceControllSaveArea" style="text-align: center;">
+		  			<input class="save" type="button" value="저장"  style="cursor: pointer;" onclick="doSaveSpareDevice();">
+		  		</div>
+		    </div>
+		</div>
+	</div>
+	
+	<!-- 예비용 기기관리 팝업  끝 -->
+	<div class="popup_layer" id="chg_dvc_popup_layer" style="display: none;">
+		<div class="popup_box">
+		    <div class="popup_cont" style="height : 100%;">
+				<div class="popup_head" style="margin-bottom: 10px;">
+					<div class="popup_text">
+						<font>측정기 기기교체</font>
+					</div>
+					<div class="popup_close">
+						<a href="javascript:closeChgDvcPopup();">닫기</a>
+					</div>
+			  	</div>
+			  	<div class="input_area">
+			  		<div style="width: 45%; height:100%;">
+			  			<div>
+			  				<div>
+			  					<h2>등록기기</h2>
+			  				</div>
+			  				<div>
+			  					<table class="display" id="deviceListTable" border="1" style="width: 100%;">
+				  				</table>
+			  				</div>
+			  			</div>
+			  		</div>
+			  		<div class="cross">
+			  			<img alt="" onclick="javasciprt:onDoRepare();" src="${pageContext.request.contextPath}/new/img/repare2.png" style="">
+			  		</div>
+			  		<div style="width: 45%; float: right;">
+			  			<div>
+			  				<div>
+			  					<h2>예비용기기</h2>
+			  				</div>
+			  				<div>
+			  					<table class="display" id="repareDeviceListTable" border="1" style="width: 100%; float: right;">
+				  				</table>
+			  				</div>
+			  			</div>
+			  		</div>
+			  	</div>
+		    </div>
+		</div>
+	</div>
+<script>
+
+function onDoRepare(){
+	var conIdx = ${param.constructionIdx};
+	var targetCheckedCount = $('input:checkbox[name=targetDeivceCk]:checked').length;
+	var changeCheckedCount = $('input:checkbox[name=changeDeivceCk]:checked').length;
+	if(targetCheckedCount == 0){
+		alert('교체할 기기를 선택하세요.');
+		return;
+	}else if(changeCheckedCount == 0){
+		alert('교체할 예비용 기기를 선택하세요.');
+		return;
+	}else{
+		var targetId = $('input:checkbox[name=targetDeivceCk]:checked').eq(0).val();
+		var changeId = $('input:checkbox[name=changeDeivceCk]:checked').eq(0).val();
+		
+		var result = confirm('기기를 교체하시겠습니까?');
+		if(result){
+			jQuery.ajax({
+				type : "POST",
+				url : "${pageContext.request.contextPath}/spare/device/change",
+				async : false,  // 요청 시 동기화 여부. 기본은 비동기(asynchronous) 요청 (default: true)
+				data: {
+					constructionIdx : conIdx,
+					targetId : targetId, 
+					changeId : changeId
+				}, 
+				success : function(data) {
+					getDeviceList();
+					getSpareDeviceCount();
+					closeChgDvcPopup();
+				},
+				complete : function(data) {
+				},
+				error : function(xhr, status, error) {
+				}
+			}); 
+		}
+	}
+}
+
+//기기교체 팝업 시작
+function openChgDvcPopup() {
+   document.getElementById("chg_dvc_popup_layer").style.display = "block";
+   getDeviceList();
+
+  // getRepareDeviceList();
+}
+//팝업 닫기
+function closeChgDvcPopup() {
+   document.getElementById("chg_dvc_popup_layer").style.display = "none";
+}
+
+function getDeviceList(){
+	
+	var conIdx = ${param.constructionIdx};
+	jQuery.ajax({
+		type : "POST",
+		url  : "${pageContext.request.contextPath}/device/get/list",
+		data : {
+			constructionIdx : conIdx
+		}, 
+		dataType : "JSON", // 옵션이므로 JSON으로 받을게 아니면 안써도 됨
+		//contentType : "application/json",
+		success : function(data) {
+			$("#deviceListTable tr").remove();
+			$("#deviceListTable").append(	
+			 '<thead>'
+		     +   '<tr>'
+		     +     '<th>선택</th>'
+		     +     '<th>호기</th>'
+		     +     '<th>블루투스No</th>'
+		     +     '<th>측정기S/N</th>'
+		     +   '</tr>'
+		     +'</thead>');
+			$.each(data, function (i, item) {
+				
+				 $("#deviceListTable").append(
+					 '<tr>'
+					+	'<td>'
+		 			+		'<input type="checkbox" id="targetDeivceCk" name="targetDeivceCk" value="' + item.id + '"/>'
+		 			+		'<input type="hidden" id="constructionIdx" name="constructionIdx" value="' + item.constructionIdx + '"/>'
+		 			+	'</td>'
+		 			+	'<td>' + item.machineNumber + '</td>'
+					+	'<td>' + item.bluetoothNo + '</td>'
+					+   '<td>' + item.lavelNo + '</td>'
+					+'</tr>');
+			});
+		},
+		complete : function(data) {
+			//alert('>><<' + data);
+		},
+		error : function(xhr, status, error) {
+			//alert('>><<111' + error);
+		}
+	});
+	
+	jQuery.ajax({
+		type : "POST",
+		contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+		url : "${pageContext.request.contextPath}/spare/device/not/change/list",
+		data: {
+			constructionIdx : conIdx,
+			type : 0
+		}, 
+		success : function(data) {
+			$("#repareDeviceListTable tr").remove();
+			$("#repareDeviceListTable").append(	
+			 '<thead>'
+		     +   '<tr>'
+		     +     '<th>선택</th>'
+		     +     '<th>블루투스No</th>'
+		     +     '<th>측정기S/N</th>'
+		     +     '<th>상태</th>'
+		     +   '</tr>'
+		     +'</thead>');
+			$.each(data, function (i, item) {
+				
+				$("#repareDeviceListTable").append(
+					 '<tr>'
+					+	'<td>'
+		 			+		'<input type="checkbox"  id="changeDeivceCk" name="changeDeivceCk" value="' + item.id + '"/>'
+		 			+		'<input type="hidden" id="constructionIdx" name="constructionIdx" value="' + item.constructionIdx + '"/>'
+		 			+	'</td>'
+					+	'<td>' + item.bluetoothNo + '</td>'
+					+   '<td>' + item.lavelNo + '</td>'
+					+   '<td>' + spareStatusToLang(item.status) + '</td>'
+					+'</tr>');
+
+			});
+		},
+		complete : function(data) {
+		},
+		error : function(xhr, status, error) {
+		}
+	}); 
+}
+
+function spareStatusToLang(status){
+	if(status == 0){
+		return "예비용";
+	}else if(status == 1){
+		return "교체";
+	}
+}
+
+function doSaveSpareDevice(){
+	
+	if($('#spareListTable tr').length <= 1){
+		return;
+	}
+	
+	for (var i = 1; i < $('#spareListTable tr').length; i++) {
+		if($("#spareDeviceSearchType option:selected").val() == '0'){
+			if($('#spareListTable tr').eq(i).find('#bluetoothNo').val() == ''){
+				alert(i + '번째 줄 블루투스 번호를 입력하세요.');
+				$('#spareListTable tr').eq(i).find('#bluetoothNo').focus();
+				return;
+			}else if($('#spareListTable tr').eq(i).find('#lavelNo').val() == ''){
+				alert(i + '번째 줄 측정기S/N를 입력하세요.');
+				$('#spareListTable tr').eq(i).find('#tabletNo').focus();
+				return;
+			}
+		}else{
+			if($('#spareListTable tr').eq(i).find('#quantity').val() == ''){
+				alert(i + '번째 줄 수량을 입력하세요.');
+				$('#spareListTable tr').eq(i).find('#quantity').focus();
+				return;
+			}
+		}
+	}
+	
+	var reports = [];
+	for (var i = 1; i < $('#spareListTable tr').length; i++) {
+		var data;
+		if($("#spareDeviceSearchType option:selected").val() == '0'){
+			data = {
+					type : Number(($('#spareListTable tr').eq(i).find('td').eq(1).text() == '예비용기기' ? 0 : 1)), 
+					constructionIdx : $('#spareListTable tr').eq(i).find('#constructionIdx').val(),
+					bluetoothNo: $('#spareListTable tr').eq(i).find('#bluetoothNo').val(), 
+					lavelNo: $('#spareListTable tr').eq(i).find('#lavelNo').val(), 
+					status: Number($('#spareListTable tr').eq(i).find('#status').find(":selected").val()), 
+					bigo: $('#spareListTable tr').eq(i).find('#bigo').val()
+			}
+		}else{
+			data = {
+					type : Number(($('#spareListTable tr').eq(i).find('td').eq(1).text() == '예비용기기' ? 0 : 1)), 
+					constructionIdx : $('#spareListTable tr').eq(i).find('#constructionIdx').val(),
+					quantity: $('#spareListTable tr').eq(i).find('#quantity').val(), 
+					status: 0,
+					bigo: $('#spareListTable tr').eq(i).find('#bigo').val()
+			}
+			
+		}
+		reports.push(data); 
+	}
+	
+	var paramConstructionIdx = ${param.constructionIdx};	
+	var paramType = new Number($("#spareDeviceSearchType option:selected").val());
+	var paramStatus = new Number((paramType == '2' ? '1' : '0'));
+	
+	var result = confirm("저장하시겠습니까?");
+	if(result){
+		jQuery.ajax({
+			type : "POST",
+			url : "${pageContext.request.contextPath}/spare/device/update/multi?constructionIdx=" + paramConstructionIdx + "&type=" + paramType  + "&status=" + paramStatus,
+			data: JSON.stringify(reports), 
+			dataType : "JSON", // 옵션이므로 JSON으로 받을게 아니면 안써도 됨
+			contentType : "application/json",
+			success : function(data) {
+				if(data){
+					getSpareDeviceList();
+				}else{
+					alert('ERROR가 발생했습니다. 관리자에게 문의하시기 바랍니다.');
+				}
+			},
+			complete : function(data) {
+			},
+			error : function(xhr, status, error) {
+			}
+		});
+		closeSparePop();
+		return; 
+	}else{
+		return;
+	}
+}
+
+function doOpenCheck(chk, rowindex) {
+	
+	if($(chk).is(":checked")){
+		
+		 if($("#spareDeviceSearchType option:selected").val() == '0'){
+				$('#spareListTable tr').eq(rowindex).find('#bluetoothNo').attr('disabled', false);
+				$('#spareListTable tr').eq(rowindex).find('#lavelNo').attr('disabled', false);
+				$('#spareListTable tr').eq(rowindex).find('#status').attr('disabled', false);
+				$('#spareListTable tr').eq(rowindex).find('#bigo').attr('disabled', false);
+		 }else{
+				$('#spareListTable tr').eq(rowindex).find('#quantity').attr('disabled', false);
+				$('#spareListTable tr').eq(rowindex).find('#bigo').attr('disabled', false);
+		 }
+		 
+	}else{
+		
+		 if($("#spareDeviceSearchType option:selected").val() == '0'){
+				$('#spareListTable tr').eq(rowindex).find('#bluetoothNo').attr('disabled', true);
+				$('#spareListTable tr').eq(rowindex).find('#lavelNo').attr('disabled', true);
+				$('#spareListTable tr').eq(rowindex).find('#status').attr('disabled', true);
+				$('#spareListTable tr').eq(rowindex).find('#bigo').attr('disabled', true);
+		 }else{
+				$('#spareListTable tr').eq(rowindex).find('#quantity').attr('disabled', true);
+				$('#spareListTable tr').eq(rowindex).find('#bigo').attr('disabled', true);
+		 }
+	}
+}
+
+
+
+function openSparePop() {
+   document.getElementById("popup_layer").style.display = "block";
+   getSpareDeviceList();
+}
+
+//팝업 닫기
+function closeSparePop() {
+   document.getElementById("popup_layer").style.display = "none";
+
+}
+
+function deleteSpareOneByIndex(index){
+	$('#spareListTable tr').eq(index).remove();
+}	
+
+function deleteSpareOneById(id){
+	
+	var result = confirm("삭제하시겠습니까?");
+	if(result){
+		jQuery.ajax({
+			type : "POST",
+			url : "${pageContext.request.contextPath}/spare/device/delete",
+			data: {
+				id : id
+			}, 
+			dataType : "JSON", // 옵션이므로 JSON으로 받을게 아니면 안써도 됨
+			success : function(data) {
+				if(data == true){
+					getSpareDeviceList();
+				}
+			},
+			complete : function(data) {
+			},
+			error : function(xhr, status, error) {
+			}
+		}); 
+		return;
+	}
+	return;
+}
+
+function spareListTableDeleteRow(){
+	var total = $("input[name=selectOne]").length;
+	var checked = $("input[name=selectOne]:checked").length;
+	
+	if(checked < 1){
+		alert('선택된 항목이 없습니다.');
+		return;
+	}
+	for (var i = 0; i < $('#spareListTable tr').length; i++) {
+		if ($('#spareListTable tr').eq(i).find('#selectOne').is(':checked')) {
+			$('#spareListTable tr').eq(i).remove();
+		}
+	}
+}
+function spareListTableAddRow(){
+	 var conIdx = ${param.constructionIdx};
+	 if($("#spareDeviceSearchType option:selected").val() == '0' || $("#spareDeviceSearchType option:selected").val() == '2'){
+		 $("#spareListTable").append('<tr>'
+									+	'<td>'
+						 			+		'<input type="checkbox" id="selectOne" name="selectOne" onclick="doOpenCheck(this, this.parentNode.parentNode.rowIndex);"/>'
+						 			+		'<input type="hidden" id="constructionIdx" name="constructionIdx" value="' + conIdx + '"/>'
+						 			+	'</td>'
+		 							+	'<td>예비용기기</td>'
+		 							+	'<td><input type="text" id="bluetoothNo" name="bluetoothNo" class="tdInput" value=""/></td>'
+		 							+   '<td><input type="text" id="lavelNo" name="lavelNo" class="tdInput"  value=""/></td>'
+		 							+	'<td>'
+		 							+   '   <select disabled id="status" name="status" class="tdInput">'
+		 							+   '	    <option value="0" selected>예비용</option>'
+		 							+   '	    <option value="1">교체</option>'
+		 							+   '   </select>'
+		 							+   '</td>'
+		 							+	'<td><input type="text" id="bigo" name="bigo" class="tdInput"  value=""/></td>'
+		 							+   '<td><div class="deleteRow" onclick="deleteSpareOneByIndex(this.parentNode.parentNode.rowIndex);">삭제</div></td>'
+	 								+'</tr>');
+	 }else{
+		 $("#spareListTable").append('<tr>'
+									+	'<td>'
+						 			+		'<input type="checkbox" id="selectOne" name="selectOne" onclick="doOpenCheck(this, this.parentNode.parentNode.rowIndex);"/>'
+						 			+		'<input type="hidden" id="constructionIdx" name="constructionIdx" value="' + conIdx + '"/>'
+						 			+		'<input type="hidden" id="status" name="status" value="0"/>'
+						 			+	'</td>'
+									+	'<td>삼각대</td>'
+									+	'<td><input type="text" id="quantity" name="quantity" class="tdInput"  value=""/></td>'
+									+	'<td><input type="text" id="bigo" name="bigo" class="tdInput" value=""/></td>'
+									+   '<td><div class="deleteRow" onclick="deleteSpareOneByIndex(this.parentNode.parentNode.rowIndex);">삭제</div></td>'
+									+'</tr>');
+	 }
+}
+
+function getSpareDeviceList(){
+	
+	
+	var conIdx = ${param.constructionIdx};
+	var type = $("#spareDeviceSearchType option:selected").val();
+	if(type == '2'){
+		$('#spareDeviceControllBtnArea').css('display', 'none');
+		$('#spareDeviceControllSaveArea').css('display', 'none');
+	}else{
+		$('#spareDeviceControllBtnArea').css('display', 'block');
+		$('#spareDeviceControllSaveArea').css('display', 'block');
+	}
+	
+	jQuery.ajax({
+		type : "POST",
+		contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+		url : "${pageContext.request.contextPath}/spare/device/get/list",
+		data: {
+			constructionIdx : conIdx,
+			type : type
+		}, 
+		success : function(data) {
+			$("#spareListTable tr").remove();
+			if($("#spareDeviceSearchType option:selected").val() == '0' || $("#spareDeviceSearchType option:selected").val() == '2'){
+				$("#spareListTable").append('<thead>'
+											+ 	'<tr>'
+											+ 		'<th style="width: 8%;">선택</th>'
+											+ 		'<th style="width: 15%;">종류</th>'
+											+ 		'<th style="width: 15%;">블루투스No</th>'
+											+ 		'<th style="width: 15%;">측정기S/N</th>'
+											+ 		'<th style="width: 12%;">상태</th>'
+											+ 		'<th style="width: *%;";>비고</th>'
+											+ 		'<th style="width: 15%;";>삭제</th>'
+											+ 	'</tr>'
+											+ '</thead>');
+			 }else{
+				 $("#spareListTable").append('<thead>'
+				 							+	'<tr>'
+				 							+ 		'<th style="width: 10%;">선택</th>'
+				 							+		'<th style="width: 30%;">종류</th>'
+				 							+		'<th style="width: 30%;">수량</th>'
+				 							+		'<th style="width: *%;">비고</th>'
+				 							+ 		'<th style="width: 15%;";>삭제</th>'
+			 								+	'</tr>'
+		 									+'</thead>');
+			 }
+			 $.each(data, function (i, item) {
+				 if($("#spareDeviceSearchType option:selected").val() == '0' || $("#spareDeviceSearchType option:selected").val() == '2'){
+					 $("#spareListTable").append('<tr>'
+							 					+	'<td>'
+							 					+		'<input type="checkbox" id="selectOne" name="selectOne" onclick="doOpenCheck(this, this.parentNode.parentNode.rowIndex);"/>'
+					 							+		'<input type="hidden" id="constructionIdx" name="constructionIdx" value="' + conIdx + '"/>'
+					 							+	'</td>'
+					 							+	'<td>' + (item.type == 0 ? (item.status == 0 ? '예비용기기' : '교체장비') : '삼각대') + '</td>'
+					 							+	'<td><input type="text" id="bluetoothNo" name="bluetoothNo" class="tdInput" disabled value="' + item.bluetoothNo + '"/></td>'
+					 							+   '<td><input type="text" id="lavelNo" name="lavelNo" class="tdInput" disabled value="' + item.lavelNo + '"/></td>'
+					 							+   '<td>'
+					 							+   '    <select disabled id="status" name="status" class="tdInput">'
+					 							+   '	    <option value="0"  '+  (item.status == 0 ? 'selected' : '') +'>예비용</option>'
+					 							+   '	    <option value="1"  '+  (item.status == 1 ? 'selected' : '') +'>교체</option>'
+					 							+   '   </select>'
+					 							+   '</td>'
+					 							+	'<td><input type="text" id="bigo" name="bigo" class="tdInput" disabled value="' + item.bigo + '"/></td>'
+					 							+   '<td><div class="deleteRow" onclick="deleteSpareOneById(' + item.id + ');">삭제</div></td>'
+				 								+'</tr>');
+				 }else{
+					 $("#spareListTable").append('<tr>'
+											 	+	'<td>'
+							 					+		'<input type="checkbox" id="selectOne" name="selectOne" onclick="doOpenCheck(this, this.parentNode.parentNode.rowIndex);"/>'
+					 							+		'<input type="hidden" id="constructionIdx" name="constructionIdx" value="' + conIdx + '"/>'
+					 							+		'<input type="hidden" id="status" name="status" value="0"/>'
+					 							+	'</td>'
+					 							+	'<td>' + (item.type == 0 ? '예비용기기' : '삼각대') + '</td>'
+					 							+	'<td><input type="text" id="quantity" name="quantity" class="tdInput" disabled value="' +  + item.quantity + '"/></td>'
+					 							+	'<td><input type="text" id="bigo" name="bigo" class="tdInput" disabled value="' + item.bigo + '"/></td>'
+					 							+   '<td><div class="deleteRow" onclick="deleteSpareOneById(' + item.id + ');">삭제</div></td>'
+				 								+'</tr>');
+				 }
+       		});
+		},
+		complete : function(data) {
+			getSpareDeviceCount();
+		},
+		error : function(xhr, status, error) {
+		}
+	}); 
+}
+
+
+$('.popUp').hide();
+$('.popLayer').hide();
+
+$('.tableChange').on('click', function(e){
+	openPop();
+});
+
+$('.popClose').on('click', function(e){
+	closePop();
+});
+
+
+function openPop(){
+	$('.popUp').show();
+	$('.popLayer').show();
+	$('body').css('overflow', 'hidden');
+}
+
+function closePop(){
+	$('.popUp').hide();
+	$('.popLayer').hide();
+	$('body').css('overflow', 'auto');
+}
+
+$( function() {
+   $(".datepicker").datepicker();
+});
+
+$(document).ready(function() {
+	$(".navBtn").click(function() {
+		$(".left-menu").animate({
+			"left": "0%"
+		}, 500);
+	});
+	$(".m-closeBtn").click(function() {
+		$(".left-menu").animate({
+			"left": "-150%"
+		}, 500);
+	});
+	
+	$(".c1").each(function(){
+		var tempString = $(this).text();
+		var c1_rows = $(".c1").filter(function(){
+			return $(this).text() == tempString;
+		});
+		if(c1_rows.length > 1){
+			c1_rows.eq(0).attr("rowspan", c1_rows.length);
+			c1_rows.not(":eq(0)").remove();
+		}
+	});
+	
+	$(".c2").each(function(){
+		var tempString = $(this).text();
+		var c2_rows = $(".c2").filter(function(){
+			return $(this).text() == tempString;
+		});
+		if(c2_rows.length > 1){
+			c2_rows.eq(0).attr("rowspan", c2_rows.length);
+			c2_rows.not(":eq(0)").remove();
+		}
+	});
+});
+
+$('.mlist a').on('click', function(e){
+	var tg = $(this).next('.sub-menu');
+	if(tg.length>0){
+	if($(this).hasClass('isOpen')){
+		tg.slideUp('fast');
+	$(this).removeClass('isOpen');
+	} else{
+		if($('.mlist a.isOpen').length>0){
+		$('.mlist a.isOpen').next().slideUp('fast');
+		$('.mlist a.isOpen').removeClass('isOpen');
+	}
+		tg.slideDown('fast');
+		$(this).addClass('isOpen');
+	}
+		e.preventDefault();
+	}
+});
+  	
+$(document).on('click', "input[type='checkbox'][name='targetDeivceCk']", function(){
+    if(this.checked) {
+        const checkboxes = $("input[type='checkbox'][name='targetDeivceCk']");
+        for(let ind = 0; ind < checkboxes.length; ind++){
+            checkboxes[ind].checked = false;
+        }
+        this.checked = true;
+    } else {
+        this.checked = false;
+    }
+});
+$(document).on('click', "input[type='checkbox'][name='changeDeivceCk']", function(){
+    if(this.checked) {
+        const checkboxes = $("input[type='checkbox'][name='changeDeivceCk']");
+        for(let ind = 0; ind < checkboxes.length; ind++){
+            checkboxes[ind].checked = false;
+        }
+        this.checked = true;
+    } else {
+        this.checked = false;
+    }
+}); 	
+  	
+  	
+
+
+  	
+
+</script>

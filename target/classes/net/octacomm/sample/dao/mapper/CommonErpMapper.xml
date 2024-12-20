@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.octacomm.sample.dao.mapper.CommonErpMapper">
+
+	<sql id="condition">
+        <where>
+        	<if test="param.searchField != null and param.searchField != '' and param.searchWord != null and param.searchWord != ''">
+       			and ${param.searchField} like '%${param.searchWord}%'
+       		</if>
+       		<if test="param.erpDiv != null and param.erpDiv != ''">
+       			and erpDiv = #{param.erpDiv}
+       		</if>
+       		<if test="param.operDate == null or param.operDate == ''">
+       			and operDate = DATE_FORMAT(NOW(), '%Y%m%d')
+       		</if>
+       		<if test="param.operDate != null and param.operDate != ''">
+       			and operDate = #{param.operDate}
+       		</if>
+       			<if test="param.deviceIdx != null and param.deviceIdx != ''">
+       			and deviceIdx = #{param.deviceIdx}
+       		</if>
+       </where>
+	</sql>
+	
+	<select id="getCountByParam" resultType="_int">
+        SELECT COUNT(*) FROM TB_COMMON_ERP
+    	<include refid="condition"/>
+    </select>
+   
+    <select id="getListByParam" resultType="CommonErp">
+    	SELECT 
+   		  *
+    	FROM TB_COMMON_ERP
+    	<include refid="condition"/>
+    	ORDER BY id DESC
+        LIMIT #{pageSize} OFFSET #{startRow}
+    </select>   
+    
+</mapper>

@@ -1,0 +1,177 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ include file="/WEB-INF/views/common/tagLib.jsp" %>
+<%
+	response.setHeader("Cache-Control", "no-store");
+	response.setHeader("Pragma", "no-cache");
+	response.setDateHeader("Expires", 0);
+	if (request.getProtocol().equals("HTTP/1.1"))
+		response.setHeader("Cache-Control", "no-cache");
+%>
+<script type="text/javascript">
+
+function getTenYears(year){
+	var preYear = year - 10;
+	for(var i = year; i >= preYear; i--){		
+		if(year == i){
+			$("#dinYear").append("<option selected value='"+i+"'>"+i+"</option>")
+		}else{
+			$("#dinYear").append("<option value='"+i+"'>"+i+"</option>")
+		}
+	}
+}
+
+function getTenMonth(month){
+	for(var i = 1; i <= 12; i++){
+		if(i == month){
+			$("#dinMonth").append("<option selected value='"+numFormat(i)+"'>"+numFormat(i)+"</option>")
+		}else{
+			$("#dinMonth").append("<option value='"+numFormat(i)+"'>"+numFormat(i)+"</option>")
+		}
+	}
+}
+
+function getCurrentDay(year, month, day){
+
+	var last = new Date( year, month ); 
+    last = new Date( last - 1 ); 
+    var lastD = last.getDate();
+	for(var i = 1; i <= lastD; i++){
+		if(i == day){
+			$("#dinDay").append("<option selected value='"+numFormat(i)+"'>"+numFormat(i)+"</option>")
+		}else{
+			$("#dinDay").append("<option value='"+numFormat(i)+"'>"+numFormat(i)+"</option>")
+		}
+	}
+}
+
+function formCheck(){
+	return true;
+}
+
+function onDelete(id){
+	
+	var result =  confirm('정말 삭제하시겠습니까?');
+	if(result){
+		document.location.href = '${pageContext.request.contextPath}/mis/delete?id=' + id;
+	}
+}
+
+
+$( document ).ready( function() {
+	
+	var operDate = '${domain.operDate}';
+	var year = operDate.substr(0 , 4);
+	var month = operDate.substr(4 , 2);
+	var day = operDate.substr(6 , 2);
+	
+	getTenYears(year);
+	getTenMonth(month);
+	getCurrentDay(year, month, day);
+	
+	$("#dinYear").attr('disabled', true);
+	$("#dinMonth").attr('disabled', true);
+	$("#dinDay").attr('disabled', true);
+	
+ });
+ 
+ function numFormat(variable) {
+ 	var variable = Number(variable).toString();
+ 	if (Number(variable) < 10 && variable.length == 1)
+ 		variable = "0" + variable;
+ 	return variable;
+ }
+ 
+ function onClickBackButton(){
+	 history.back();
+	 document.location.href = "${pageContext.request.contextPath}/mis/list?deviceIdx=${param.deviceIdx}&constructionIdx=${param.constructionIdx}&erpDiv=${param.erpDiv}";
+ }
+ 
+</script>
+<div class="right_content">
+	<div class="tab_menu">
+		<ul>
+			<li>
+				<a href="${pageContext.request.contextPath}/report/list?id=${param.deviceIdx}&constructionIdx=${param.constructionIdx}&type=date&mode=simple">
+					시공현황
+				</a>
+			</li>
+			<li>
+				<a  href="${pageContext.request.contextPath}/ips/list?deviceIdx=${param.deviceIdx}&constructionIdx=${param.constructionIdx}">
+					투입인원현황
+				</a>
+			</li>
+			<li>
+				<a href="${pageContext.request.contextPath}/eus/list?deviceIdx=${param.id}&constructionIdx=${param.constructionIdx}&erpDiv=1">
+					장비사용현황
+				</a>
+			</li>
+			<li>
+				<a href="${pageContext.request.contextPath}/oiluse/list?deviceIdx=${param.id}&constructionIdx=${param.constructionIdx}&erpDiv=2">
+					유류사용현황
+				</a>
+			</li>
+			<li>
+				<a class="on"   href="${pageContext.request.contextPath}/mis/list?deviceIdx=${param.id}&constructionIdx=${param.constructionIdx}&erpDiv=3">
+					자재투입현황
+				</a>
+			</li>
+		</ul>
+	</div>
+	<!--table01_content-->
+	<div class="table01_content">
+		<!--sub_title-->
+		<div class="sub_title">
+			관리자등록
+		</div>
+		<!--sub_title end-->
+		<!--table_white-->
+		<form:form method="POST" id="dataForm" commandName="domain" >
+		<div class="table_white_form">		
+			<table class="table_white">
+				<tr>
+					<td>날짜</td>
+					<td>
+						<select class="select01" id="dinYear" name="dinYear" style="width: 100px; height: 40px;">
+					
+						</select>
+						<select class="select01" id="dinMonth" name="dinMonth" style="width: 100px; height: 40px;">
+						
+						</select>
+						<select class="select01" id="dinDay" name="dinDay" style="width: 100px; height: 40px;">
+						
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td>구분</td>
+					<td><form:input path="dmiCol" class="input01"/></td>
+				</tr>
+				<tr>
+					<td>전일</td>
+					<td><form:input path="preDay" class="input01"/></td>
+				</tr>
+				<tr>
+					<td>당일</td>
+					<td><form:input path="today" class="input01"/></td>
+				</tr>
+				<tr>
+					<td>비고</td>
+					<td>
+						<form:input path="bigo" class="input01"/>
+						<form:hidden path="constructionIdx" value="${param.constructionIdx}"/>
+						<form:hidden path="deviceIdx" value="${param.constructionIdx}"/>
+						<form:hidden path="operDate" value="${domain.operDate}"/>
+						<form:hidden path="erpDiv" value="3"/>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<!--table_white-->
+		<div class="btn_box">
+			<input type="submit" class="button041" value="수정하기" onclick="return formCheck();">
+			<input type="button" class="button04" value="뒤로가기" onclick="return onClickBackButton();">
+		</div>
+		</form:form>
+	</div>
+	<!--table01_content end-->
+</div>

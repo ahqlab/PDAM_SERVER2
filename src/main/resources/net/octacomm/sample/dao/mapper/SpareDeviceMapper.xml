@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.octacomm.sample.dao.mapper.SpareDeviceMapper">
+	
+	<select id="leftToRight">
+		INSERT INTO TB_SPARE_DEVICE
+		SELECT
+			null as id
+			, #{constructionIdx} AS constructionIdx
+			, 0 as type
+			, #{status} as status
+			, 0 as quantity
+			, A.lavelNo
+			, A.bluetoothNo
+			, '' as tabletNo
+			, '' as bigo
+			, now()
+		 FROM TB_DEVICE A 
+		WHERE 1=1 
+		  AND A.id = #{targetId} 
+		  AND A.isDel = 0
+    </select>
+  
+</mapper>

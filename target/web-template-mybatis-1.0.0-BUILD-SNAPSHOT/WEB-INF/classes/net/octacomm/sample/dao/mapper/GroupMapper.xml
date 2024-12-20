@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.octacomm.sample.dao.mapper.GroupMapper">
+
+	<sql id="condition">
+        <where>
+        	isDel = 0 and role = 2  and idx <![CDATA[<>]]> 174
+        	<if test="param.searchField != null and param.searchField != '' and param.searchWord != null and param.searchWord != ''">
+       			and ${param.searchField} like '%${param.searchWord}%'
+       		</if>
+       </where>
+	</sql>
+	
+	<select id="getCountByParam" resultType="_int">
+        SELECT COUNT(*) FROM TB_GROUP
+    	<include refid="condition"/>
+    </select>
+   
+    <select id="getListByParam" resultType="Group">
+		SELECT 
+		   idx,
+	       groupName,
+	       deviceAmount,
+	       franchAmount,
+	       cprtCompanyAmount,
+	       spareDeviceAmount,
+	       isDel,
+	       createDate,
+	       lastModifiedDate,
+	       concat(cprtCompanyAmount, deviceAmount, franchAmount) AS fieldSort,
+	       TIMESTAMPDIFF(MINUTE, createDate, now()) AS timdDiff,
+	       (CASE
+			 	WHEN TIMESTAMPDIFF(MINUTE, createDate, now()) <![CDATA[<]]> 5
+				THEN 0
+				ELSE 1
+			END) as newContent
+		FROM (SELECT idx,
+		             groupName,
+		             (SELECT COUNT(*)
+		              FROM (SELECT *
+		                    FROM TB_CONSTRUCTION
+		                    WHERE isDel = 0 AND conduct = 0) A,
+		                   TB_DEVICE B
+		              WHERE     A.ID = B.constructionIdx
+		                    AND A.groupIdx = idx
+		                    AND B.isDel = 0
+		                    AND B.conduct = 0)
+		                AS deviceAmount,
+		             (SELECT COUNT(*)
+		              FROM (SELECT *
+		                    FROM TB_CONSTRUCTION
+		                    WHERE isDel = 0 AND conduct = 0) A,
+		                   TB_DEVICE B
+		              WHERE     A.ID = B.constructionIdx
+		                    AND A.groupIdx = idx
+		                    AND B.isDel = 0
+		                    AND B.conduct = 2)
+		                AS franchAmount,
+		             (SELECT COUNT(*)
+		              FROM TB_CONSTRUCTION A
+		              WHERE A.groupIdx = idx AND A.conduct = 0 AND A.isDel = 0)
+		                AS cprtCompanyAmount,
+		             (  SELECT COUNT(*) 
+		                  FROM TB_SPARE_DEVICE TSD 
+		                 WHERE TSD.constructionIdx in ( 
+							SELECT TC.id 
+							  FROM TB_CONSTRUCTION TC 
+							 WHERE  TC.groupIdx = TB_GROUP.idx 
+							   AND TC.conduct = 0 
+							   AND TC.isDel = 0)
+						   AND TSD.type = 0 and TSD.status = 0
+					 ) as spareDeviceAmount,   
+		             isDel,
+		             createDate,
+		             lastModifiedDate
+		      FROM TB_GROUP
+		      <include refid="condition"/>
+		      ORDER BY idx DESC
+		     ) NN
+		ORDER BY	 
+			CASE
+			 	WHEN timdDiff <![CDATA[<]]> 5
+				THEN 0
+				ELSE 1
+			END asc , FIELD(idx, 161, 10000, idx) ASC , FIELD(fieldSort, '000') ASC, idx DESC
+			LIMIT #{pageSize} OFFSET #{startRow}
+    </select>   
+    
+</mapper>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.octacomm.sample.dao.mapper.PileQntPlanMngMapper">
+
+	<sql id="condition">
+        <where>
+        	<if test="param.searchField != null and param.searchField != '' and param.searchWord != null and param.searchWord != ''">
+       			and ${param.searchField} like '%${param.searchWord}%'
+       		</if>
+       		
+       		<if test="param.constructionIdx != null and param.constructionIdx != ''">
+       			and constructionIdx = #{param.constructionIdx}
+       		</if>
+       </where>
+	</sql>
+	
+    <select id="getCountByParam" resultType="_int">
+        SELECT COUNT(*) FROM TB_PILE_QNT_PLAN_MNG
+    	<include refid="condition"/>
+    </select>
+   
+    <select id="getListByParam" resultType="PileQntPlanMng">
+    	SELECT 
+   		  *
+    	FROM TB_PILE_QNT_PLAN_MNG
+    	<include refid="condition"/>
+    	ORDER BY id ASC
+        LIMIT #{pageSize} OFFSET #{startRow}
+    </select>   
+    
+    
+    <insert id="insertMulti" parameterType="java.util.List" >
+	    INSERT INTO TB_PILE_QNT_PLAN_MNG(
+	          constructionIdx
+	        , localName
+	        , planCount
+	        , localReport
+	        , createDate
+	        , lastModifiedDate
+	    ) VALUES 
+	    <foreach collection="list" item="item" separator=",">
+	    (
+	          #{item.constructionIdx}
+	        , #{item.localName}
+	        , #{item.planCount}
+	        , #{item.localReport}
+	        , now()
+	        , now()
+	    )
+    </foreach>
+</insert>
+       
+</mapper>
