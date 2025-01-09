@@ -35,6 +35,8 @@ public interface ReportMapper extends CRUDMapper<Report, ReportParam, Integer> {
 			+ "pileNo = #{pileNo} ,"
 			+ "pileStandard = #{pileStandard} , "
 			+ "drillingDepth = #{drillingDepth} , "
+			+ "sdDrillingDepth = #{sdDrillingDepth} , "
+			+ "stDrillingDepth = #{stDrillingDepth} , "
 			+ "intrusionDepth = #{intrusionDepth}  , "  
 			+ "balance = #{balance}  ,"
 			+ "connectLength = #{connectLength}  , "

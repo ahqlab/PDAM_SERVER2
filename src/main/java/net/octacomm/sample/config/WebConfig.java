@@ -6,6 +6,7 @@ import net.octacomm.sample.interceptor.LoginInterceptor;
 import net.octacomm.sample.view.ReportTenAll;
 import net.octacomm.sample.view.ReportTenAllJh;
 import net.octacomm.sample.view.ReportFiveAll;
+import net.octacomm.sample.view.ReportFiveAllBy;
 import net.octacomm.sample.view.ReportFiveAllJh;
 import net.octacomm.sample.view.ReportTen;
 import net.octacomm.sample.view.ReportTenJh;
@@ -72,6 +73,12 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 		return new ReportFiveAll();
 	}
 	
+	//5회용 전체출력
+	@Bean
+	public AbstractExcelView reportFiveAllBy() {
+		return new ReportFiveAllBy();
+	}
+
 	
 	//5회용 전체출력 중흥용 (관입량 미출력)
 	@Bean

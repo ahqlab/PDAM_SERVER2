@@ -476,6 +476,12 @@ public class ReportController{
 			return "reportFiveAllJh";
 		}
 		
+		if(constructionIdx == 1082 || param.getConstructionIdx() == 1082) {
+			System.err.println("reportFiveAllBy");
+			System.err.println("reportFiveAllBy");
+			return "reportFiveAllBy";
+		}
+		
 		System.err.println("reportFiveAll");
 		System.err.println("reportFiveAll");
 		return "reportFiveAll";
@@ -620,6 +626,13 @@ public class ReportController{
 			return "reportFiveAllJh";
 		}
 		
+		if(constructionIdx == 1082 || param.getConstructionIdx() == 1082) {
+			
+			System.err.println("reportFiveAllBy");
+			System.err.println("reportFiveAllBy");
+			return "reportFiveAllBy";
+			
+		}
 		System.err.println("reportFiveAll");
 		System.err.println("reportFiveAll");
 		return "reportFiveAll";

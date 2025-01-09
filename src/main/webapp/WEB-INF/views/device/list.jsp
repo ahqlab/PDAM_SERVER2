@@ -1035,7 +1035,8 @@ function changeSpareDevice(targetId, changeId, constructionIdx){
 							<c:choose>
 									<c:when test="${sessionInfo.role == 0}">
 										<tr style="background-color: #e6e6e6; height: 49px;" >
-											<td><a class="viewGo" href='${pageContext.request.contextPath}/report/all/list?&constructionIdx=${param.constructionIdx}'>합계</a></td>
+											<%-- <td><a class="viewGo" href='${pageContext.request.contextPath}/report/all/list?&constructionIdx=${param.constructionIdx}'>합계</a></td> --%>
+											 <td>합계</td>
 											<c:choose>
 												<c:when test="${param.constructionIdx == 588 or param.constructionIdx == 613 or param.constructionIdx == 627}">
 													<td></td>
@@ -1060,7 +1061,8 @@ function changeSpareDevice(targetId, changeId, constructionIdx){
 										<c:choose>
 											<c:when test="${sessionInfo.role == 1}">
 												<tr style="background-color: #e6e6e6; height: 49px;">
-													<td><a class="viewGo" href='${pageContext.request.contextPath}/report/all/list?&constructionIdx=${param.constructionIdx}'>합계</a></td>
+													<%-- <td><a class="viewGo" href='${pageContext.request.contextPath}/report/all/list?&constructionIdx=${param.constructionIdx}'>합계</a></td> --%>
+													<td>합계</td>
 													<c:choose>
 														<c:when test="${param.constructionIdx == 588 or param.constructionIdx == 613 or param.constructionIdx == 627}">
 															<td></td>
@@ -1080,7 +1082,8 @@ function changeSpareDevice(targetId, changeId, constructionIdx){
 											</c:when>
 											<c:otherwise>
 												<tr style="background-color: #e6e6e6; height: 49px;">
-													<td><a class="viewGo" href='${pageContext.request.contextPath}/report/all/list?&constructionIdx=${param.constructionIdx}'>합계</a></td>
+													<%-- <td><a class="viewGo" href='${pageContext.request.contextPath}/report/all/list?&constructionIdx=${param.constructionIdx}'>합계</a></td> --%>
+													<td>합계</td>
 													<c:choose>
 														<c:when test="${param.constructionIdx == 588 or param.constructionIdx == 613 or param.constructionIdx == 627}">
 															<td></td>

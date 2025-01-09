@@ -185,6 +185,8 @@
 			AA.pileNo ,
 			AA.pileStandard ,
 			AA.drillingDepth ,
+			AA.stDrillingDepth ,
+			AA.sdDrillingDepth ,
 			AA.intrusionDepth ,
 			AA.balance ,
 			AA.connectLength ,
@@ -236,6 +238,8 @@
 			pileNo , 
 			pileStandard , 
 			drillingDepth , 
+			stDrillingDepth , 
+            sdDrillingDepth , 
 			intrusionDepth , 
 			balance , 
 			connectLength , 
@@ -288,6 +292,8 @@
 		            A.pileNo , 
 		            A.pileStandard , 
 		            A.drillingDepth , 
+		            A.stDrillingDepth , 
+		            A.sdDrillingDepth , 
 		            A.intrusionDepth , 
 		            A.balance , 
 		            A.connectLength , 
@@ -374,6 +380,8 @@
 			AA.pileNo ,
 			AA.pileStandard ,
 			AA.drillingDepth ,
+			AA.stDrillingDepth ,
+			AA.sdDrillingDepth ,
 			AA.intrusionDepth ,
 			AA.balance ,
 			AA.connectLength ,
@@ -446,6 +454,8 @@
 			pileNo , 
 			pileStandard , 
 			drillingDepth , 
+			stDrillingDepth , 
+			sdDrillingDepth , 
 			intrusionDepth , 
 			balance , 
 			connectLength , 
@@ -518,6 +528,8 @@
 		            A.pileNo , 
 		            A.pileStandard , 
 		            A.drillingDepth , 
+		            A.stDrillingDepth , 
+		            A.sdDrillingDepth , 
 		            A.intrusionDepth , 
 		            A.balance , 
 		            A.connectLength , 
@@ -663,6 +675,8 @@
 			pileNo ,
 			pileStandard ,
 			drillingDepth ,
+			stDrillingDepth ,
+			sdDrillingDepth ,
 			intrusionDepth ,
 			balance ,
 			connectLength ,
@@ -727,6 +741,8 @@
 				A.location , A.pileNo ,
 				A.pileStandard ,
 				A.drillingDepth ,
+				A.stDrillingDepth ,
+				A.sdDrillingDepth ,
 				A.intrusionDepth ,
 				A.balance ,
 				A.connectLength ,
@@ -883,6 +899,8 @@
 			pileNo ,
 			pileStandard ,
 			drillingDepth ,
+			stDrillingDepth ,
+			sdDrillingDepth ,
 			intrusionDepth ,
 			balance ,
 			connectLength ,
@@ -942,6 +960,8 @@
 				A.location , A.pileNo ,
 				A.pileStandard ,
 				A.drillingDepth ,
+				A.stDrillingDepth ,
+				A.sdDrillingDepth ,
 				A.intrusionDepth ,
 				A.balance ,
 				A.connectLength ,
@@ -1085,6 +1105,8 @@
 			pileNo ,
 			pileStandard ,
 			drillingDepth ,
+			stDrillingDepth ,
+			sdDrillingDepth ,
 			intrusionDepth ,
 			balance ,
 			connectLength ,
@@ -1117,6 +1139,8 @@
 				A.location , A.pileNo ,
 				A.pileStandard ,
 				A.drillingDepth ,
+				A.stDrillingDepth ,
+				A.sdDrillingDepth ,
 				A.intrusionDepth ,
 				A.balance ,
 				A.connectLength ,
@@ -1185,6 +1209,8 @@
 		    AA.pileNo ,
 		    AA.pileStandard ,
 		    AA.drillingDepth ,
+		    AA.stDrillingDepth ,
+		    AA.sdDrillingDepth ,
 		    AA.intrusionDepth ,
 		    AA.balance ,
 		    AA.connectLength ,
@@ -1233,6 +1259,8 @@
 		    pileNo ,
 		    pileStandard ,
 		    drillingDepth ,
+		    stDrillingDepth ,
+		    sdDrillingDepth ,
 		    intrusionDepth ,
 		    balance ,
 		    connectLength ,
@@ -1281,6 +1309,8 @@
 		            A.pileNo , 
 		            A.pileStandard , 
 		            A.drillingDepth , 
+		            A.stDrillingDepth , 
+		            A.sdDrillingDepth , 
 		            A.intrusionDepth , 
 		            A.balance , 
 		            A.connectLength , 
@@ -1357,6 +1387,8 @@
 		    AA.pileNo ,
 		    AA.pileStandard ,
 		    AA.drillingDepth ,
+		    AA.stDrillingDepth ,
+		    AA.sdDrillingDepth ,
 		    AA.intrusionDepth ,
 		    AA.balance ,
 		    AA.connectLength ,
@@ -1400,6 +1432,8 @@
 		    pileNo ,
 		    pileStandard ,
 		    drillingDepth ,
+		    stDrillingDepth ,
+		    sdDrillingDepth ,
 		    intrusionDepth ,
 		    balance ,
 		    connectLength ,
@@ -1443,6 +1477,8 @@
 		            A.pileNo , 
 		            A.pileStandard , 
 		            A.drillingDepth , 
+		            A.stDrillingDepth , 
+		            A.sdDrillingDepth , 
 		            A.intrusionDepth , 
 		            A.balance , 
 		            A.connectLength , 
@@ -1515,6 +1551,8 @@
 		    AA.pileNo ,
 		    AA.pileStandard ,
 		    AA.drillingDepth ,
+		    AA.stDrillingDepth ,
+		    AA.sdDrillingDepth ,
 		    AA.intrusionDepth ,
 		    AA.balance ,
 		    AA.connectLength ,
@@ -1563,6 +1601,8 @@
 		    pileNo ,
 		    pileStandard ,
 		    drillingDepth ,
+		    stDrillingDepth ,
+		    sdDrillingDepth ,
 		    intrusionDepth ,
 		    balance ,
 		    connectLength ,
@@ -1611,6 +1651,8 @@
 		            A.pileNo , 
 		            A.pileStandard , 
 		            A.drillingDepth , 
+		            A.stDrillingDepth , 
+		            A.sdDrillingDepth , 
 		            A.intrusionDepth , 
 		            A.balance , 
 		            A.connectLength , 
@@ -1688,6 +1730,8 @@
 		    AA.pileNo ,
 		    AA.pileStandard ,
 		    AA.drillingDepth ,
+		    AA.stDrillingDepth ,
+		    AA.sdDrillingDepth ,
 		    AA.intrusionDepth ,
 		    AA.balance ,
 		    AA.connectLength ,
@@ -1731,6 +1775,8 @@
 		    pileNo ,
 		    pileStandard ,
 		    drillingDepth ,
+		    stDrillingDepth ,
+		    sdDrillingDepth ,
 		    intrusionDepth ,
 		    balance ,
 		    connectLength ,
@@ -1774,6 +1820,8 @@
 		            A.pileNo , 
 		            A.pileStandard , 
 		            A.drillingDepth , 
+		            A.stDrillingDepth , 
+		            A.sdDrillingDepth , 
 		            A.intrusionDepth , 
 		            A.balance , 
 		            A.connectLength , 
@@ -1834,8 +1882,38 @@
     
     <insert id="insert" parameterType="Report">
 	    INSERT INTO TB_REPORT
-	    ( deviceIdx, currentDateTime, location, pileNo , pileStandard, drillingDepth , intrusionDepth, balance, connectLength, managedStandard, avgPenetrationValue, totalPenetrationValue, hammaT, fallMeter, pileType, method, totalConnectWidth, ultimateBearingCapacity, crossSection , hammaEfficiency , modulusElasticity 
-	    	
+	    ( 
+	    	deviceIdx,
+	    	currentDateTime,
+	    	location,
+	    	pileNo,
+	    	pileStandard,
+	    	drillingDepth,
+	    	<choose>
+	    		<when test="stDrillingDepth != null and stDrillingDepth != '' and stDrillingDepth != null and stDrillingDepth != ''">
+	    			stDrillingDepth , 
+	    		</when>
+	    	</choose>
+	    	<choose>
+	    		<when test="sdDrillingDepth != null and sdDrillingDepth != '' and sdDrillingDepth != null and sdDrillingDepth != ''">
+	    			sdDrillingDepth , 
+	    		</when>
+	    	</choose>
+	    	intrusionDepth,
+	    	balance,
+	    	connectLength,
+	    	managedStandard,
+	    	avgPenetrationValue,
+	    	totalPenetrationValue,
+	    	hammaT,
+	    	fallMeter,
+	    	pileType,
+	    	method,
+	    	totalConnectWidth,
+	    	ultimateBearingCapacity,
+	    	crossSection,
+	    	hammaEfficiency,
+	    	modulusElasticity 
 	    	<choose>
 	    		<when test="bigo != null and bigo != '' and bigo != null and bigo != ''">
 	    		, bigo 
@@ -1844,14 +1922,43 @@
 	    	
 	    	, createDate  )
 	     VALUES 
-	     ( #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo} , #{pileStandard},  #{drillingDepth} , #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter},  #{pileType}, #{method}, #{totalConnectWidth},  #{ultimateBearingCapacity} , #{crossSection} , #{hammaEfficiency} , #{modulusElasticity} 
-	     	
+	     ( 
+	     	#{deviceIdx},
+	     	#{currentDateTime},
+	     	#{location},
+	     	#{pileNo},
+	     	#{pileStandard},
+	     	#{drillingDepth},
+	     	<choose>
+	    		<when test="stDrillingDepth != null and stDrillingDepth != '' and stDrillingDepth != null and stDrillingDepth != ''">
+	    			#{stDrillingDepth} , 
+	    		</when>
+	    	</choose>
+	    	<choose>
+	    		<when test="sdDrillingDepth != null and sdDrillingDepth != '' and sdDrillingDepth != null and sdDrillingDepth != ''">
+	    			#{sdDrillingDepth} ,
+	    		</when>
+	    	</choose>
+	     	#{intrusionDepth},
+	     	#{balance},
+	     	#{connectLength},
+	     	#{managedStandard},
+	     	#{avgPenetrationValue},
+	     	#{totalPenetrationValue},
+	     	#{hammaT},
+	     	#{fallMeter},
+	     	#{pileType},
+	     	#{method},
+	     	#{totalConnectWidth},
+	     	#{ultimateBearingCapacity},
+	     	#{crossSection},
+	     	#{hammaEfficiency},
+	     	#{modulusElasticity} 
 	     	<choose>
 	    		<when test="bigo != null and bigo != '' and bigo != null and bigo != ''">
 	    		,  #{bigo} 
 	    		</when>
 	    	</choose>
-	     	
 	     	, now() )
 	    <selectKey resultType="int" keyProperty="id" order="AFTER">
         SELECT LAST_INSERT_ID()
@@ -1860,18 +1967,81 @@
     
     <insert id="insertOrigin" parameterType="Report">
 	    INSERT INTO TB_REPORT_ORIGIN
-	    ( id, deviceIdx, currentDateTime, location, pileNo , pileStandard, drillingDepth , intrusionDepth, balance, connectLength, managedStandard, avgPenetrationValue, totalPenetrationValue, hammaT, fallMeter, pileType, method, totalConnectWidth, ultimateBearingCapacity, crossSection , hammaEfficiency , modulusElasticity 
-	    	
+	    ( 
+	    	id, 
+	    	deviceIdx, 
+	    	currentDateTime, 
+	    	location, 
+	    	pileNo , 
+	    	pileStandard, 
+	    	drillingDepth , 
+	    	<choose>
+	    		<when test="stDrillingDepth != null and stDrillingDepth != '' and stDrillingDepth != null and stDrillingDepth != ''">
+	    			stDrillingDepth , 
+	    		</when>
+	    	</choose>
+	    	<choose>
+	    		<when test="sdDrillingDepth != null and sdDrillingDepth != '' and sdDrillingDepth != null and sdDrillingDepth != ''">
+	    			sdDrillingDepth , 
+	    		</when>
+	    	</choose>
+	    	intrusionDepth, 
+	    	balance, 
+	    	connectLength, 
+	    	managedStandard, 
+	    	avgPenetrationValue, 
+	    	totalPenetrationValue, 
+	    	hammaT, 
+	    	fallMeter, 
+	    	pileType, 
+	    	method, 
+	    	totalConnectWidth, 
+	    	ultimateBearingCapacity, 
+	    	crossSection , 
+	    	hammaEfficiency , 
+	    	modulusElasticity 
 	    	<choose>
 	    		<when test="bigo != null and bigo != '' and bigo != null and bigo != ''">
 	    		, bigo 
 	    		</when>
 	    	</choose>
 	    	
-	    	, createDate  )
-	     VALUES 
-	     ( #{id}, #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo} , #{pileStandard},  #{drillingDepth} , #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter},  #{pileType}, #{method}, #{totalConnectWidth},  #{ultimateBearingCapacity} , #{crossSection} , #{hammaEfficiency} , #{modulusElasticity} 
-	     	
+	    	, createDate  
+	    )
+	    VALUES 
+	    ( 
+     		#{id}, 
+	     	#{deviceIdx}, 
+	     	#{currentDateTime}, 
+	     	#{location}, 
+	     	#{pileNo} , 
+	     	#{pileStandard},  
+	     	#{drillingDepth} ,
+	     	<choose>
+	    		<when test="stDrillingDepth != null and stDrillingDepth != '' and stDrillingDepth != null and stDrillingDepth != ''">
+	    			#{stDrillingDepth} , 
+	    		</when>
+	    	</choose>
+	    	<choose>
+	    		<when test="sdDrillingDepth != null and sdDrillingDepth != '' and sdDrillingDepth != null and sdDrillingDepth != ''">
+	    			#{sdDrillingDepth} ,
+	    		</when>
+	    	</choose> 
+	     	#{intrusionDepth}, 
+	     	#{balance}, 
+	     	#{connectLength}, 
+	     	#{managedStandard}, 
+	     	#{avgPenetrationValue}, 
+	     	#{totalPenetrationValue}, 
+	     	#{hammaT}, 
+	     	#{fallMeter},  
+	     	#{pileType}, 
+	     	#{method}, 
+	     	#{totalConnectWidth},  
+	     	#{ultimateBearingCapacity} , 
+	     	#{crossSection} , 
+	     	#{hammaEfficiency} , 
+	     	#{modulusElasticity} 
 	     	<choose>
 	    		<when test="bigo != null and bigo != '' and bigo != null and bigo != ''">
 	    		,  #{bigo} 
@@ -1883,15 +2053,78 @@
     
     <insert id="insert2" parameterType="Report">
 	    INSERT INTO TB_REPORT
-	    ( deviceIdx, currentDateTime, location, pileNo , pileStandard, drillingDepth , intrusionDepth, balance, connectLength, managedStandard, avgPenetrationValue, totalPenetrationValue, hammaT, fallMeter, pileType, method, totalConnectWidth, ultimateBearingCapacity , crossSection , hammaEfficiency , modulusElasticity 
+	    ( 
+	    	deviceIdx,
+	      	currentDateTime,
+	      	location,
+	      	pileNo,
+	      	pileStandard,
+	      	drillingDepth,
+	      	<choose>
+	    		<when test="stDrillingDepth != null and stDrillingDepth != '' and stDrillingDepth != null and stDrillingDepth != ''">
+	    			stDrillingDepth , 
+	    		</when>
+	    	</choose>
+	    	<choose>
+	    		<when test="sdDrillingDepth != null and sdDrillingDepth != '' and sdDrillingDepth != null and sdDrillingDepth != ''">
+	    			sdDrillingDepth , 
+	    		</when>
+	    	</choose>
+	      	intrusionDepth,
+	      	balance,
+	      	connectLength,
+	      	managedStandard,
+	      	avgPenetrationValue,
+	      	totalPenetrationValue,
+	      	hammaT,
+	      	fallMeter,
+	      	pileType, 
+	      	method, 
+	      	totalConnectWidth, 
+	      	ultimateBearingCapacity, 
+	      	crossSection, 
+	      	hammaEfficiency, 
+	      	modulusElasticity 
 	    	<choose>
 	    		<when test="bigo != null and bigo != '' and bigo != null and bigo != ''">
 	    		, bigo 
 	    		</when>
 	    	</choose>
-	    	, createDate  )
-	     VALUES 
-	     ( #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo} , #{pileStandard},  #{drillingDepth} , #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter},  #{pileType}, #{method}, #{totalConnectWidth},   #{ultimateBearingCapacity}, #{crossSection} , #{hammaEfficiency} , #{modulusElasticity} 
+	    	, createDate  
+	    )
+	    VALUES 
+	    ( 
+	     	#{deviceIdx}, 
+	     	#{currentDateTime}, 
+	     	#{location}, 
+	     	#{pileNo} , 
+	     	#{pileStandard},  
+	     	#{drillingDepth} , 
+	     	<choose>
+	    		<when test="stDrillingDepth != null and stDrillingDepth != '' and stDrillingDepth != null and stDrillingDepth != ''">
+	    			#{stDrillingDepth} , 
+	    		</when>
+	    	</choose>
+	    	<choose>
+	    		<when test="sdDrillingDepth != null and sdDrillingDepth != '' and sdDrillingDepth != null and sdDrillingDepth != ''">
+	    			#{sdDrillingDepth} ,
+	    		</when>
+	    	</choose>
+	     	#{intrusionDepth}, 
+	     	#{balance}, 
+	     	#{connectLength}, 
+	     	#{managedStandard}, 
+	     	#{avgPenetrationValue}, 
+	     	#{totalPenetrationValue}, 
+	     	#{hammaT}, 
+	     	#{fallMeter},  
+	     	#{pileType}, 
+	     	#{method}, 
+	     	#{totalConnectWidth},   
+	     	#{ultimateBearingCapacity}, 
+	     	#{crossSection} , 
+	     	#{hammaEfficiency} , 
+	     	#{modulusElasticity} 
 	     	<choose>
 	    		<when test="bigo != null and bigo != '' and bigo != null and bigo != ''">
 	    		,  #{bigo} 
@@ -1906,15 +2139,80 @@
     
      <insert id="insert2Origin" parameterType="Report">
 	    INSERT INTO TB_REPORT_ORIGIN
-	    ( id, deviceIdx, currentDateTime, location, pileNo , pileStandard, drillingDepth , intrusionDepth, balance, connectLength, managedStandard, avgPenetrationValue, totalPenetrationValue, hammaT, fallMeter, pileType, method, totalConnectWidth, ultimateBearingCapacity , crossSection , hammaEfficiency , modulusElasticity 
+	    ( 
+	    	id, 
+	    	deviceIdx, 
+	    	currentDateTime, 
+	    	location, 
+	    	pileNo , 
+	    	pileStandard, 
+	    	drillingDepth , 
+	    	<choose>
+	    		<when test="stDrillingDepth != null and stDrillingDepth != '' and stDrillingDepth != null and stDrillingDepth != ''">
+	    		, stDrillingDepth 
+	    		</when>
+	    	</choose>
+	    	<choose>
+	    		<when test="sdDrillingDepth != null and sdDrillingDepth != '' and sdDrillingDepth != null and sdDrillingDepth != ''">
+	    		, sdDrillingDepth 
+	    		</when>
+	    	</choose>
+	    	intrusionDepth, 
+	    	balance, 
+	    	connectLength, 
+	    	managedStandard, 
+	    	avgPenetrationValue, 
+	    	totalPenetrationValue, 
+	    	hammaT, 
+	    	fallMeter, 
+	    	pileType, 
+	    	method, 
+	    	totalConnectWidth, 
+	    	ultimateBearingCapacity , 
+	    	crossSection , 
+	    	hammaEfficiency , 
+	    	modulusElasticity 
 	    	<choose>
 	    		<when test="bigo != null and bigo != '' and bigo != null and bigo != ''">
 	    		, bigo 
 	    		</when>
 	    	</choose>
-	    	, createDate  )
-	     VALUES 
-	     ( #{id}, #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo} , #{pileStandard},  #{drillingDepth} , #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter},  #{pileType}, #{method}, #{totalConnectWidth},   #{ultimateBearingCapacity}, #{crossSection} , #{hammaEfficiency} , #{modulusElasticity} 
+	    	, createDate  
+	    ) 
+	    VALUES 
+	    ( 
+	    	#{id}, 
+	    	#{deviceIdx}, 
+	    	#{currentDateTime}, 
+	    	#{location}, 
+	    	#{pileNo} , 
+	    	#{pileStandard},  
+	    	#{drillingDepth} ,
+	    	<choose>
+	    		<when test="stDrillingDepth != null and stDrillingDepth != '' and stDrillingDepth != null and stDrillingDepth != ''">
+	    			#{stDrillingDepth} , 
+	    		</when>
+	    	</choose>
+	    	<choose>
+	    		<when test="sdDrillingDepth != null and sdDrillingDepth != '' and sdDrillingDepth != null and sdDrillingDepth != ''">
+	    			#{sdDrillingDepth} ,
+	    		</when>
+	    	</choose> 
+	    	#{intrusionDepth}, 
+	    	#{balance}, 
+	    	#{connectLength}, 
+	    	#{managedStandard}, 
+	    	#{avgPenetrationValue}, 
+	    	#{totalPenetrationValue}, 
+	    	#{hammaT}, 
+	    	#{fallMeter},  
+	    	#{pileType}, 
+	    	#{method}, 
+	    	#{totalConnectWidth},   
+	    	#{ultimateBearingCapacity}, 
+	    	#{crossSection} , 
+	    	#{hammaEfficiency} , 
+	    	#{modulusElasticity} 
 	     	<choose>
 	    		<when test="bigo != null and bigo != '' and bigo != null and bigo != ''">
 	    		,  #{bigo} 

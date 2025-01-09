@@ -433,18 +433,37 @@ $(function () {
 			
 				currentDrillingDepth = $('#reportTable tr').eq(index).find('#drillingDepth').val();
 				currentIntrusionDepth = $('#reportTable tr').eq(index).find('#intrusionDepth').val();
-				currentBalance = $('#reportTable tr').eq(index).find('td:eq(17)').text().trim();
-				currentGongSac = $('#reportTable tr').eq(index).find('td:eq(18)').text().trim();
-				currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
-				currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
-				currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
-				if(isBig){
-					currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(32)').text().trim();
-					currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(33)').text().trim();
+				
+				if(constructionIdx == 1082){
+					currentBalance = $('#reportTable tr').eq(index).find('td:eq(19)').text().trim();
+					currentGongSac = $('#reportTable tr').eq(index).find('td:eq(20)').text().trim();
+					currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
+					currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
+					currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
+					if(isBig){
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(34)').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(35)').text().trim();
+					}else{
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(29)').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(30)').text().trim();
+					}
 				}else{
-					currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(27)').text().trim();
-					currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(28)').text().trim();
+					currentBalance = $('#reportTable tr').eq(index).find('td:eq(17)').text().trim();
+					currentGongSac = $('#reportTable tr').eq(index).find('td:eq(18)').text().trim();
+					currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
+					currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
+					currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
+					if(isBig){
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(32)').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(33)').text().trim();
+					}else{
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(27)').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(28)').text().trim();
+					}
 				}
+				
+				
+				
 				
 				
 			}else{
@@ -459,19 +478,41 @@ $(function () {
 			
 				currentDrillingDepth = $('#reportTable tr').eq(index).find('#drillingDepth').val();
 				currentIntrusionDepth = $('#reportTable tr').eq(index).find('#intrusionDepth').val();
-				currentBalance = $('#reportTable tr').eq(index).find('td:eq(16)').text().trim();
-				currentGongSac = $('#reportTable tr').eq(index).find('td:eq(17)').text().trim();
-				currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
-				currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
-				currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
 				
-				if(isBig){
-					currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(31)').text().trim();
-					currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(32)').text().trim();
+				
+				
+				if(constructionIdx == 1082){
+					currentBalance = $('#reportTable tr').eq(index).find('td:eq(18)').text().trim();
+					currentGongSac = $('#reportTable tr').eq(index).find('td:eq(19)').text().trim();
+					currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
+					currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
+					currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
+					
+					if(isBig){
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(33)').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(34)').text().trim();
+					}else{
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(28)').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(29)').text().trim();
+					}
 				}else{
-					currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(26)').text().trim();
-					currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(27)').text().trim();
+					currentBalance = $('#reportTable tr').eq(index).find('td:eq(16)').text().trim();
+					currentGongSac = $('#reportTable tr').eq(index).find('td:eq(17)').text().trim();
+					currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
+					currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
+					currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
+					
+					if(isBig){
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(31)').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(32)').text().trim();
+					}else{
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(26)').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(27)').text().trim();
+					}
 				}
+				
+				
+				
 			}
 			   
 		    var allPiece = '';

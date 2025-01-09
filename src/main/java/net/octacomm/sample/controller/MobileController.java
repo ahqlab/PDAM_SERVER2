@@ -82,7 +82,7 @@ public class MobileController {
 	
 	
 	
-	
+	//PDAM에서 온라인 에서 다이렉트로 보내는 곳
 	@ResponseBody
 	@RequestMapping(value = "/regist/report", method = RequestMethod.POST)
 	public CommonResponse<Boolean> registReport(@RequestBody Report report, BindingResult result){
@@ -143,15 +143,11 @@ public class MobileController {
 	}
 
 	
-	
-	
-	
-	
-	
-
+	//PDAM에서 오프라인에서 쌓았던것을 한번에 쭉 보내는 곳
 	@ResponseBody
 	@RequestMapping(value = "/regist/report2", method = RequestMethod.POST)
 	public CommonResponse<Boolean> registReport2(@RequestBody List<Report> report, BindingResult result){
+		System.err.println("report2 : " + report);
 		System.err.println("report : " + report.size());
 		CommonResponse<Boolean> response = new CommonResponse<Boolean>();
 		for (Report report2 : report) {
@@ -207,7 +203,7 @@ public class MobileController {
 		return response;
 	}
 	
-	
+	//판단 안됨... 어디서 보내는거지....???
 	@ResponseBody
 	@RequestMapping(value = "/regist/report3", method = RequestMethod.POST)
 	public CommonResponse<Boolean> registReport3(@RequestBody GReport report, BindingResult result){
@@ -265,6 +261,8 @@ public class MobileController {
 		return response;
 	}
 	
+	
+	//낙하고 자동 측정 INSERT용
 	@ResponseBody
 	@RequestMapping(value = "/regist/report4", method = RequestMethod.POST)
 	public CommonResponse<Boolean> registReport4(@RequestBody ReportWithFallMeter report, BindingResult result){
@@ -341,6 +339,8 @@ public class MobileController {
 		return response;
 	}
 	
+	
+	//낙하고 자동 측정 INSERT용
 	@ResponseBody
 	@RequestMapping(value = "/regist/report5", method = RequestMethod.POST)
 	public CommonResponse<Boolean> registReport5(@RequestBody List<ReportWithFallMeter> report, BindingResult result){
@@ -469,8 +469,6 @@ public class MobileController {
 			}
 		}
 	}
-	
-	
 	
 	
 	private void copyOfPiece(int reportIdx) {

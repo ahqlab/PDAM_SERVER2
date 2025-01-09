@@ -38,6 +38,10 @@ public class Report implements Domain {
 	private String pileNo;
 	//천공깊이
 	private String drillingDepth;
+	//전석층천공
+	private String stDrillingDepth;
+	//토사천공
+	private String sdDrillingDepth;
 	//관잎깊이
 	private String intrusionDepth;
 	//조각

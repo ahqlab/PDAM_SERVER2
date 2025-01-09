@@ -25,7 +25,6 @@
     </select>
    
     <select id="getListByParam" resultType="DeviceTestReport">
-		
 		SELECT
 			@rownum := @rownum + 1 AS no ,  
 		 	a.*
