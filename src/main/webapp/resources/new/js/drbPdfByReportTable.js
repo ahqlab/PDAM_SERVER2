@@ -405,6 +405,10 @@ $(function () {
 			var currentPileSum;
 		
 			var currentDrillingDepth;
+			
+			var currentSdDrillingDepth;
+			var currentStDrillingDepth;
+			
 			var currentIntrusionDepth;
 			var currentBalance;
 			var currentGongSac;
@@ -435,6 +439,10 @@ $(function () {
 				currentIntrusionDepth = $('#reportTable tr').eq(index).find('#intrusionDepth').val();
 				
 				if(constructionIdx == 1082){
+					
+					var currentSdDrillingDepth = $('#reportTable tr').eq(index).find('#sdDrillingDepth').val();
+					var currentStDrillingDepth = $('#reportTable tr').eq(index).find('#stDrillingDepth').val();
+					
 					currentBalance = $('#reportTable tr').eq(index).find('td:eq(19)').text().trim();
 					currentGongSac = $('#reportTable tr').eq(index).find('td:eq(20)').text().trim();
 					currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
@@ -482,6 +490,10 @@ $(function () {
 				
 				
 				if(constructionIdx == 1082){
+					
+					var currentSdDrillingDepth = $('#reportTable tr').eq(index).find('#sdDrillingDepth').val();
+					var currentStDrillingDepth = $('#reportTable tr').eq(index).find('#stDrillingDepth').val();
+					
 					currentBalance = $('#reportTable tr').eq(index).find('td:eq(18)').text().trim();
 					currentGongSac = $('#reportTable tr').eq(index).find('td:eq(19)').text().trim();
 					currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
@@ -525,9 +537,9 @@ $(function () {
 			    	allPieceValue += Number(piece[y].value);
 		    	}
 			}
-			
-			row.push({ c1: '시공장비', c2: machineNumber	     , c3: (constructionIdx == 944 ? '경타길이(M)' : '천공깊이(M)'), c4: currentDrillingDepth });        
-		    row.push({ c1: '파일종류', c2: currentPileType 	 , c3: (constructionIdx == 944 ? '천공깊이(M)' : '관입깊이(M)'), c4:currentIntrusionDepth}); 
+		   
+			row.push({ c1: '시공장비', c2: machineNumber	     , c3: (constructionIdx == 944 ? '경타길이(M)' : '천공깊이(M)'), c4: (constructionIdx == 1082 ? Number(currentDrillingDepth) + Number(currentSdDrillingDepth) + Number(currentStDrillingDepth) : currentDrillingDepth)  });        
+		    row.push({ c1: '파일종류', c2: currentPileType 	 , c3: (constructionIdx == 944 ? '천공깊이(M)' : (constructionIdx == 1082 ? '경타깊이(M)' : '관입깊이(M)')), c4: currentIntrusionDepth}); 
 		    row.push({ c1: '파일규격', c2: currentPileStandard , c3:'잔여길이(M)', c4:currentBalance }); 
 		    row.push({ c1: '시공공법', c2: currentMethod       , c3:'공삭공(M)', c4:currentGongSac}); 
 		    row.push({ c1: '위     치', c2: currentLocation     , c3:'해머무게(Ton)', c4:currentHammaT }); 

@@ -1026,7 +1026,7 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
 				if (Integer.parseInt(strings[strings.length - 1]) > 1) {
 					cell.setCellStyle(pupleStyle);
 				} else {
-					if (Float.parseFloat(strings[21]) < Float.parseFloat(strings[27])) {
+					if (Float.parseFloat(strings[23]) < Float.parseFloat(strings[29])) {
 						cell.setCellStyle(orangeStyle);
 					} else {
 						if (!emptyPenetrationCheck(strings)) {
@@ -1038,7 +1038,7 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
 				}
 			}
 
-			if ((i == 27) && (Float.parseFloat(strings[21]) < Float.parseFloat(strings[27])))
+			if ((i == 29) && (Float.parseFloat(strings[23]) < Float.parseFloat(strings[29])))
 				cell.setCellStyle(redStyle);
 				/*if (Integer.parseInt(strings[strings.length - 2]) > 1) {
 					cell.setCellStyle(blueStyle);
@@ -1049,11 +1049,11 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
 	}
 
 	private boolean emptyPenetrationCheck(String[] strings) {
-		if((strings[22] != null && !strings[22].trim().equals("0") && !strings[22].trim().equals("")) 
-				&& (strings[23] != null && !strings[23].trim().equals("0") && !strings[23].trim().equals("")) 
-				&& (strings[24] != null && !strings[24].trim().equals("0") && !strings[24].trim().equals("")) 
+		if((strings[24] != null && !strings[24].trim().equals("0") && !strings[24].trim().equals("")) 
 				&& (strings[25] != null && !strings[25].trim().equals("0") && !strings[25].trim().equals("")) 
-				&& (strings[26] != null && !strings[26].trim().equals("0") && !strings[26].trim().equals(""))) {
+				&& (strings[26] != null && !strings[26].trim().equals("0") && !strings[26].trim().equals("")) 
+				&& (strings[27] != null && !strings[27].trim().equals("0") && !strings[27].trim().equals("")) 
+				&& (strings[28] != null && !strings[28].trim().equals("0") && !strings[28].trim().equals(""))) {
 			return true;
 		}
 		return false;

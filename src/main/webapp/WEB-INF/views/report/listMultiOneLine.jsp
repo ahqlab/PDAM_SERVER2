@@ -206,6 +206,9 @@ $(document).ready( function() {
 		var currentPileSum;
 	
 		var currentDrillingDepth;
+		var currentSdDrillingDepth;
+		var currentStDrillingDepth;
+		
 		var currentIntrusionDepth;
 		var currentBalance;
 		var currentGongSac;
@@ -231,6 +234,9 @@ $(document).ready( function() {
 			currentIntrusionDepth = $('#reportTable tr').eq(index).find('#intrusionDepth').val();
 			
 			if(constructionIdx == 1082 || conIdx == 1082){
+				
+				var currentSdDrillingDepth = $('#reportTable tr').eq(index).find('#sdDrillingDepth').val();
+				var currentStDrillingDepth = $('#reportTable tr').eq(index).find('#stDrillingDepth').val();
 				
 				currentBalance = $('#reportTable tr').eq(index).find('td:eq(19)').text().trim();
 				currentGongSac = $('#reportTable tr').eq(index).find('td:eq(20)').text().trim();
@@ -281,6 +287,9 @@ $(document).ready( function() {
 			
 			if(constructionIdx == 1082 || conIdx == 1082){
 				
+				var currentSdDrillingDepth = $('#reportTable tr').eq(index).find('#sdDrillingDepth').val();
+				var currentStDrillingDepth = $('#reportTable tr').eq(index).find('#stDrillingDepth').val();
+				
 				currentBalance = $('#reportTable tr').eq(index).find('td:eq(18)').text().trim();
 				currentGongSac = $('#reportTable tr').eq(index).find('td:eq(19)').text().trim();
 				currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
@@ -328,7 +337,12 @@ $(document).ready( function() {
 		$('#curPileStandard').text(currentPileStandard);
 		$('#curPileSum').text(currentPileSum);
 		
-		$('#curDrillingDepth').text(currentDrillingDepth);
+		if(constructionIdx == 1082 || conIdx == 1082){
+			var total = Number(currentDrillingDepth) + Number(currentSdDrillingDepth) + Number(currentStDrillingDepth);
+			$('#curDrillingDepth').text(total);
+		}else{
+			$('#curDrillingDepth').text(currentDrillingDepth);
+		}
 		$('#curIntrusionDepth').text(currentIntrusionDepth);
 		$('#curBalance').text(currentBalance);
 		$('#curGongSac').text(currentGongSac);
@@ -354,7 +368,13 @@ $(document).ready( function() {
 		$('#mCurPileStandard').text(currentPileStandard);
 		$('#mCurPileSum').text(currentPileSum);
 		
-		$('#mCurDrillingDepth').text(currentDrillingDepth);
+		if(constructionIdx == 1082 || conIdx == 1082){
+			var total = Number(currentDrillingDepth) + Number(currentSdDrillingDepth) + Number(currentStDrillingDepth);
+			$('#mCurDrillingDepth').text(total);
+		}else{
+			$('#mCurDrillingDepth').text(currentDrillingDepth);
+		}
+		
 		$('#mCurIntrusionDepth').text(currentIntrusionDepth);
 		$('#mCurBalance').text(currentBalance);
 		$('#mCurGongSac').text(currentGongSac);
@@ -2498,7 +2518,14 @@ $(document).ready( function() {
 						</c:when>
 						<c:otherwise>
 							<td class="sumGrpTbTh">천공<br>깊이</td>
-							<td class="sumGrpTbTh">관입<br>깊이</td>
+							<c:choose>
+								<c:when test="${sessionInfo.constructionIdx == 1082 or param.constructionIdx == 1082}">
+									<td class="sumGrpTbTh">경타<br>깊이</td>
+								</c:when>
+								<c:otherwise>
+									<td class="sumGrpTbTh">관입<br>깊이</td>
+								</c:otherwise>
+							</c:choose>
 						</c:otherwise>
 					</c:choose>
 				
@@ -2587,7 +2614,16 @@ $(document).ready( function() {
 							<td class="sumGrpTbTh">천공<br>깊이</td>
 						</c:when>
 						<c:otherwise>
-							<td class="sumGrpTbTh">관입<br>깊이</td>
+						
+							<c:choose>
+								<c:when test="${sessionInfo.constructionIdx == 1082 or param.constructionIdx == 1082}">
+									<td class="sumGrpTbTh">경타<br>깊이</td>
+								</c:when>
+								<c:otherwise>
+									<td class="sumGrpTbTh">관입<br>깊이</td>
+								</c:otherwise>
+							</c:choose>
+							
 						</c:otherwise>
 					</c:choose>
 					<td class="sumGrpTbTh">파일<br>잔량</td>

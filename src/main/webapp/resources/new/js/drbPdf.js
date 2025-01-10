@@ -347,6 +347,38 @@ function createFileName(){
 	
 }
 
+
+function getBalance1082(item){
+	var totalConnectWidth = Number(item.totalConnectWidth);
+	var drillingDepth = Number(item.drillingDepth);
+	var sdDrillingDepth = Number(item.sdDrillingDepth);
+	var stDrillingDepth = Number(item.stDrillingDepth);
+	var intrusionDepth = Number(item.intrusionDepth);
+	var total =  totalConnectWidth - drillingDepth - sdDrillingDepth - intrusionDepth;
+	return total.toFixed(1);
+	
+	
+}
+
+function balanceFixExp1082(balance) {
+	  
+  if(balance < 0){
+	return 0;
+  }else{
+	return balance;
+  }
+}
+
+function gongSacFixExp1082(balance) {
+	  
+  if(balance < 0){
+	return balance;
+  }else{
+	return 0;
+  }
+}
+
+
 function gongSacFixExp(balance, gongSac, constructionIdx){
 	if(constructionIdx == 783){
 		if(balance > 0 && gongSac == 0){
@@ -391,10 +423,17 @@ function downloadDrivingRecoredBook(root, constructionIdx, machineNumber, curren
 						var currentPileStandard = item.pileStandard;
 					
 						var currentDrillingDepth = item.drillingDepth;
+						var currentSdDrillingDepth = item.sdDrillingDepth;
+						var currentStDrillingDepth = item.stDrillingDepth;
 						var currentIntrusionDepth = item.intrusionDepth;
 						var currentBalance = item.balance;
-						console.log('item.gongSac : ' + calGongSac(item.totalConnectWidth, item.intrusionDepth, item.drillingDepth, constructionIdx));
+						if(constructionIdx == '1082'){
+							currentBalance = balanceFixExp1082(getBalance1082(item));
+						}
 						var currentGongSac = gongSacFixExp(item.balance, calGongSac(item.totalConnectWidth, item.intrusionDepth, item.drillingDepth, constructionIdx), constructionIdx);
+						if(constructionIdx == '1082'){
+							currentGongSac = gongSacFixExp1082(currentBalance);
+						}
 						var currentHammaT = item.hammaT;
 						var currentFallMeter = item.fallMeter;
 						var currentManagedStandard = item.managedStandard;
@@ -424,9 +463,9 @@ function downloadDrivingRecoredBook(root, constructionIdx, machineNumber, curren
 						
 						var col = [];   
 						var row = [];
-						
-						row.push({ c1: '시공장비', c2: machineNumber	     , c3: (constructionIdx == 944 ? '경타길이(M)' : '천공깊이(M)'), c4: currentDrillingDepth });        
-					    row.push({ c1: '파일종류', c2: currentPileType 	 , c3: (constructionIdx == 944 ? '천공깊이(M)' : '관입깊이(M)'), c4:currentIntrusionDepth}); 
+							
+						row.push({ c1: '시공장비', c2: machineNumber	     , c3: (constructionIdx == 944 ? '경타길이(M)' : '천공깊이(M)'), c4: (constructionIdx == '1082' ? Number(currentDrillingDepth) + Number(currentSdDrillingDepth) + Number(currentStDrillingDepth) : currentDrillingDepth) });        
+					    row.push({ c1: '파일종류', c2: currentPileType 	 , c3: (constructionIdx == 944 ? '천공깊이(M)' : (constructionIdx == '1082' ? '경타깊이(M)' : '관입깊이(M)')), c4:currentIntrusionDepth}); 
 					    row.push({ c1: '파일규격', c2: currentPileStandard , c3:'잔여길이(M)', c4:currentBalance }); 
 					    row.push({ c1: '시공공법', c2: currentMethod       , c3:'공삭공(M)', c4:currentGongSac}); 
 					    row.push({ c1: '위     치', c2: currentLocation     , c3:'해머무게(Ton)', c4:currentHammaT }); 
