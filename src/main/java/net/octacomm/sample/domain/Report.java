@@ -38,6 +38,8 @@ public class Report implements Domain {
 	private String pileNo;
 	//천공깊이
 	private String drillingDepth;
+	//직타깊이
+	private String directDrillingDepth;
 	//전석층천공
 	private String stDrillingDepth;
 	//토사천공
@@ -134,7 +136,7 @@ public class Report implements Domain {
 	public float getBalance() {
 		float value;
 		try {
-			if(getConstructionIdx() == 944){
+			if(getConstructionIdx() == 944 || getConstructionIdx() == 1136){
 				value = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0") - Float.parseFloat(getDrillingDepth() != "" ? getDrillingDepth() : "0");;
 			}else {
 				value = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0");
@@ -149,7 +151,7 @@ public class Report implements Domain {
 		}
 		float result;
 		try {
-			if(getConstructionIdx() == 944) {
+			if(getConstructionIdx() == 944 || getConstructionIdx() == 1136) {
 				result = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0") - Float.parseFloat(getDrillingDepth() != "" ? getDrillingDepth() : "0");
 			}else {
 				result = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0");

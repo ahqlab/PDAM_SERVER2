@@ -405,7 +405,7 @@ $(function () {
 			var currentPileSum;
 		
 			var currentDrillingDepth;
-			
+			var currentDirectDrillingDepth;
 			var currentSdDrillingDepth;
 			var currentStDrillingDepth;
 			
@@ -436,6 +436,11 @@ $(function () {
 				currentPileSum = $('#reportTable tr').eq(index).find('td:eq(13)').text().trim();
 			
 				currentDrillingDepth = $('#reportTable tr').eq(index).find('#drillingDepth').val();
+				
+				if(constructionIdx == 1269){
+					//중흥토건 나라기초 부산 에코델타시티 공동4블럭 중흥S-클래스 아파트
+					currentDirectDrillingDepth = $('#reportTable tr').eq(index).find('#directDrillingDepth').val();
+				}
 				currentIntrusionDepth = $('#reportTable tr').eq(index).find('#intrusionDepth').val();
 				
 				if(constructionIdx == 1082){
@@ -455,6 +460,21 @@ $(function () {
 						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(29)').text().trim();
 						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(30)').text().trim();
 					}
+				}else if(constructionIdx == 1269){
+					
+					currentBalance = $('#reportTable tr').eq(index).find('td:eq(18)').text().trim();
+					currentGongSac = $('#reportTable tr').eq(index).find('td:eq(19)').text().trim();
+					currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
+					currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
+					currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
+					if(isBig){
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(33)').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(34)').text().trim();
+					}else{
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(28)').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(29)').text().trim();
+					}
+					
 				}else{
 					currentBalance = $('#reportTable tr').eq(index).find('td:eq(17)').text().trim();
 					currentGongSac = $('#reportTable tr').eq(index).find('td:eq(18)').text().trim();
@@ -538,14 +558,31 @@ $(function () {
 		    	}
 			}
 		   
-			row.push({ c1: '시공장비', c2: machineNumber	     , c3: (constructionIdx == 944 ? '경타길이(M)' : '천공깊이(M)'), c4: (constructionIdx == 1082 ? Number(currentDrillingDepth) + Number(currentSdDrillingDepth) + Number(currentStDrillingDepth) : currentDrillingDepth)  });        
-		    row.push({ c1: '파일종류', c2: currentPileType 	 , c3: (constructionIdx == 944 ? '천공깊이(M)' : (constructionIdx == 1082 ? '경타깊이(M)' : '관입깊이(M)')), c4: currentIntrusionDepth}); 
-		    row.push({ c1: '파일규격', c2: currentPileStandard , c3:'잔여길이(M)', c4:currentBalance }); 
-		    row.push({ c1: '시공공법', c2: currentMethod       , c3:'공삭공(M)', c4:currentGongSac}); 
-		    row.push({ c1: '위     치', c2: currentLocation     , c3:'해머무게(Ton)', c4:currentHammaT }); 
-		    row.push({ c1: '파일번호', c2: currentPileNo       , c3:'낙하높이(M)', c4:currentFallMeter }); 
-		    row.push({ c1: '파일길이(M)', c2: allPiece.substring(2, allPiece.length).trim()       , c3:'평균관입(mm)', c4:currentAvgPenetrationValue}); 
-		    row.push({ c1: '파일합계(M)', c2: allPieceValue       , c3:'최종관입(mm)', c4:currentTotalPenetrationValue}); 
+		    if(constructionIdx == '1252'){
+		    	row.push({ c1: '시공장비', c2: machineNumber	     , c3:'해머무게(Ton)', c4:currentHammaT  });        
+			    row.push({ c1: '파일종류', c2: currentPileType 	 , c3:'낙하높이(M)', c4:currentFallMeter}); 
+			    row.push({ c1: '파일규격', c2: currentPileStandard , c3:'평균관입(mm)', c4:currentAvgPenetrationValue }); 
+			    row.push({ c1: '시공공법', c2: currentMethod       , c3:'최종관입(mm)', c4:currentTotalPenetrationValue}); 
+			    row.push({ c1: '위     치', c2: currentLocation     , c3:'', c4: ''}); 
+			    row.push({ c1: '파일번호', c2: currentPileNo       , c3:'', c4: '' }); 
+			    row.push({ c1: '파일길이(M)', c2: allPiece.substring(2, allPiece.length).trim()       , c3:'', c4: '' }); 
+			    row.push({ c1: '파일합계(M)', c2: allPieceValue       , c3:'', c4: '' }); 
+		    }else{
+		    	if(constructionIdx == '1269'){
+					row.push({ c1: '시공장비', c2: machineNumber	     , c3: '천공 + 직타 깊이 (M)' , c4: currentDrillingDepth + " + " + currentDirectDrillingDepth});        
+				}else{
+					row.push({ c1: '시공장비', c2: machineNumber	     , c3: (constructionIdx == 944 || constructionIdx == 1136  ? '경타길이(M)' : '천공깊이(M)'), c4: (constructionIdx == '1082' ? Number(currentDrillingDepth) + Number(currentSdDrillingDepth) + Number(currentStDrillingDepth) : currentDrillingDepth) });        
+				}
+		    	row.push({ c1: '파일종류', c2: currentPileType 	 , c3: (constructionIdx == 944 || constructionIdx == 1136 ? '천공깊이(M)' : (constructionIdx == '1082' ? '경타깊이(M)' : '관입깊이(M)')), c4:currentIntrusionDepth}); 
+		    	row.push({ c1: '파일규격', c2: currentPileStandard , c3:'잔여길이(M)', c4:currentBalance }); 
+			    row.push({ c1: '시공공법', c2: currentMethod       , c3:'공삭공(M)', c4:currentGongSac}); 
+			    row.push({ c1: '위     치', c2: currentLocation     , c3:'해머무게(Ton)', c4:currentHammaT }); 
+			    row.push({ c1: '파일번호', c2: currentPileNo       , c3:'낙하높이(M)', c4:currentFallMeter }); 
+			    row.push({ c1: '파일길이(M)', c2: allPiece.substring(2, allPiece.length).trim()       , c3:'평균관입(mm)', c4:currentAvgPenetrationValue}); 
+			    row.push({ c1: '파일합계(M)', c2: allPieceValue       , c3:'최종관입(mm)', c4:currentTotalPenetrationValue}); 
+		    }
+		    
+			
 			
 		    
 	    	var pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();

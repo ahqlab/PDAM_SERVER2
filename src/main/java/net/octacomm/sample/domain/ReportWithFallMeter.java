@@ -136,7 +136,7 @@ public class ReportWithFallMeter implements Domain {
 	public float getBalance() {
 		float value;
 		try {
-			if(getConstructionIdx() == 944){
+			if(getConstructionIdx() == 944 || getConstructionIdx() == 1136){
 				value = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0") - Float.parseFloat(getDrillingDepth() != "" ? getDrillingDepth() : "0");;
 			}else {
 				value = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0");
@@ -151,7 +151,7 @@ public class ReportWithFallMeter implements Domain {
 		}
 		float result;
 		try {
-			if(getConstructionIdx() == 944) {
+			if(getConstructionIdx() == 944 || getConstructionIdx() == 1136) {
 				result = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0") - Float.parseFloat(getDrillingDepth() != "" ? getDrillingDepth() : "0");
 			}else {
 				result = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0");

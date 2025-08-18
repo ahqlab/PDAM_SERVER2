@@ -67,8 +67,7 @@ public interface ConstructionMapper extends CRUDMapper<Construction, Constructio
 
 	@Update("UPDATE " + TABLE_NAME + " SET conduct = #{conduct} where id = #{id}")
 	int updateConduct(@Param("id") int id, @Param("conduct") int conduct);
-	
-	
+		
 	@Select("\r\n" + 
 			"SELECT \r\n" + 
 			"	IFNULL((SELECT fcName FROM TB_FRANCHISE WHERE idx =  A.fcIdx ), '없음') AS fcName\r\n" + 

@@ -13,6 +13,7 @@ import net.octacomm.sample.utils.DateUtil;
 import net.octacomm.sample.utils.ExcelColor;
 import net.octacomm.sample.utils.ExcelTitleUtil;
 import net.octacomm.sample.utils.ExcelTitleUtilForBooyoung;
+import net.octacomm.sample.utils.ExcelTitleUtilForDirectDrilling;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
@@ -64,6 +65,13 @@ public class ReportFiveAll extends AbstractExcelView
     longCalYn = (int) model.get("longCalYn");
     isHiddenManager = (boolean) model.get("isHiddenManager");
     constructionIdx = (int) model.get("constructionIdx");
+    System.err.println("constructionIdx : " + constructionIdx);
+    //강제로 이 현장에 대해서 일반 유저도 엑셀 시간이 보여지게 한다.
+    if(constructionIdx == 1363) {
+    	longCalYn = 1;
+    	isHiddenManager = true;
+    }
+    
     param = (ReportParam) model.get("param");
     signRoomList = (List<ExcelSignroom>) model.get("signRoomList");
     constructionName = (String) model.get("constructionName");
@@ -833,8 +841,11 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
     if(ubcYn > 0) {
     	if((constructionIdx == 692 || param.getConstructionIdx() == 692) || (constructionIdx ==  720 || param.getConstructionIdx() == 720)) {
     		setColumnLabels(workbook, row1, ExcelTitleUtil.FIVE_TOP_UBC_ES );
-    	}else if(constructionIdx == 944){
+    	}else if(constructionIdx == 944 || constructionIdx == 1136){
     		setColumnLabels(workbook, row1, ExcelTitleUtilForBooyoung.FIVE_TOP_UBC );
+    	}else if(constructionIdx == 1269 || param.getConstructionIdx() == 1269){
+    		//중흥토건 나라기초 부산 에코델타시티 공동4블럭 중흥S-클래스 아파트
+    		setColumnLabels(workbook, row1, ExcelTitleUtilForDirectDrilling.FIVE_TOP_UBC );
     	}else {
     		setColumnLabels(workbook, row1, ExcelTitleUtil.FIVE_TOP_UBC );
     	}
@@ -842,8 +853,11 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
     }else {
     	if((constructionIdx == 692 || param.getConstructionIdx() == 692) || (constructionIdx ==  720 || param.getConstructionIdx() == 720)) {
     		setColumnLabels(workbook, row1, ExcelTitleUtil.FIVE_TOP_ES );
-    	}else if(constructionIdx == 944){
+    	}else if(constructionIdx == 944 || constructionIdx == 1136){
     		setColumnLabels(workbook, row1, ExcelTitleUtilForBooyoung.FIVE_TOP );
+    	}else if(constructionIdx == 1269 || param.getConstructionIdx() == 1269){
+    		//중흥토건 나라기초 부산 에코델타시티 공동4블럭 중흥S-클래스 아파트
+    		setColumnLabels(workbook, row1, ExcelTitleUtilForDirectDrilling.FIVE_TOP );
     	}else {
     		setColumnLabels(workbook, row1, ExcelTitleUtil.FIVE_TOP );
     	}
@@ -855,16 +869,22 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
     if(ubcYn > 0) {
     	if((constructionIdx == 692 || param.getConstructionIdx() == 692) || (constructionIdx ==  720 || param.getConstructionIdx() == 720)) {
     		setColumnLabels(workbook, row2,  ExcelTitleUtil.FIVE_BOTTOM_UBC_ES );
-    	}else if(constructionIdx == 944) {
+    	}else if(constructionIdx == 944 || constructionIdx == 1136) {
     		setColumnLabels(workbook, row2,  ExcelTitleUtilForBooyoung.FIVE_BOTTOM_UBC );
+    	}else if(constructionIdx == 1269 || param.getConstructionIdx() == 1269) {
+    		//중흥토건 나라기초 부산 에코델타시티 공동4블럭 중흥S-클래스 아파트
+    		setColumnLabels(workbook, row2,  ExcelTitleUtilForDirectDrilling.FIVE_BOTTOM_UBC );
     	}else {
     		setColumnLabels(workbook, row2,  ExcelTitleUtil.FIVE_BOTTOM_UBC );
     	}
     }else {
     	if((constructionIdx == 692 || param.getConstructionIdx() == 692) || (constructionIdx ==  720 || param.getConstructionIdx() == 720)) {
     		setColumnLabels(workbook, row2,  ExcelTitleUtil.FIVE_BOTTOM_ES ); 
-    	}else if(constructionIdx == 944) {
+    	}else if(constructionIdx == 944 || constructionIdx == 1136) {
     		setColumnLabels(workbook, row2,  ExcelTitleUtilForBooyoung.FIVE_BOTTOM ); 
+    	}else if(constructionIdx == 1269 || param.getConstructionIdx() == 1269) {
+    		//중흥토건 나라기초 부산 에코델타시티 공동4블럭 중흥S-클래스 아파트
+    		setColumnLabels(workbook, row2,  ExcelTitleUtilForDirectDrilling.FIVE_BOTTOM ); 
     	}else {
     		setColumnLabels(workbook, row2,  ExcelTitleUtil.FIVE_BOTTOM ); 
     	}

@@ -698,7 +698,7 @@ $(document).ready( function() {
 						
 						
 						<c:choose>
-							<c:when test="${sessionInfo.constructionIdx == 944 or param.constructionIdx == 944}">
+							<c:when test="${sessionInfo.constructionIdx == 944 or param.constructionIdx == 944  or sessionInfo.constructionIdx == 1136 or param.constructionIdx == 1136}">
 								<td rowspan="2">경타길이(M)</td>
 								<td rowspan="2">천공깊이(M)</td>
 							</c:when>

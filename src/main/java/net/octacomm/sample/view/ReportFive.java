@@ -606,13 +606,13 @@ public class ReportFive extends AbstractExcelView
 		HSSFRow row1 = sheet.createRow(tableLabelStartIndex);
 
 		if (ubcYn > 0) {
-			if(constructionIdx == 944) {
+			if(constructionIdx == 944 || constructionIdx == 1136) {
 				setColumnLabels(workbook, row1, ExcelTitleUtilForBooyoung.FIVE_TOP_UBC );
 			}else {
 				setColumnLabels(workbook, row1, ExcelTitleUtil.FIVE_TOP_UBC);
 			}
 		} else {
-			if(constructionIdx == 944) {
+			if(constructionIdx == 944 || constructionIdx == 1136) {
 				setColumnLabels(workbook, row1, ExcelTitleUtilForBooyoung.FIVE_TOP);
 			}else {
 				setColumnLabels(workbook, row1, ExcelTitleUtil.FIVE_TOP);
@@ -622,14 +622,14 @@ public class ReportFive extends AbstractExcelView
 		HSSFRow row2 = sheet.createRow(tableLabelEndIndex);
 
 		if (ubcYn > 0) {
-			if(constructionIdx == 944) {
+			if(constructionIdx == 944 || constructionIdx == 1136) {
 				setColumnLabels(workbook, row2, ExcelTitleUtilForBooyoung.FIVE_BOTTOM_UBC );
 			}else {
 				setColumnLabels(workbook, row2, ExcelTitleUtil.FIVE_BOTTOM_UBC);
 			}
 		} else {
 			
-			if(constructionIdx == 944) {
+			if(constructionIdx == 944 || constructionIdx == 1136) {
 				setColumnLabels(workbook, row2, ExcelTitleUtilForBooyoung.FIVE_BOTTOM);
 			}else {
 				setColumnLabels(workbook, row2, ExcelTitleUtil.FIVE_BOTTOM);

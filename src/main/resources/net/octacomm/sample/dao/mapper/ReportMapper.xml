@@ -111,6 +111,7 @@
 				A.currentDateTime ,
 				A.location , A.pileNo ,
 				A.pileStandard ,
+				A.directDrillingDepth ,
 				A.drillingDepth ,
 				A.intrusionDepth ,
 				A.balance ,
@@ -185,6 +186,7 @@
 			AA.pileNo ,
 			AA.pileStandard ,
 			AA.drillingDepth ,
+			AA.directDrillingDepth ,
 			AA.stDrillingDepth ,
 			AA.sdDrillingDepth ,
 			AA.intrusionDepth ,
@@ -238,6 +240,7 @@
 			pileNo , 
 			pileStandard , 
 			drillingDepth , 
+			directDrillingDepth ,
 			stDrillingDepth , 
             sdDrillingDepth , 
 			intrusionDepth , 
@@ -292,6 +295,7 @@
 		            A.pileNo , 
 		            A.pileStandard , 
 		            A.drillingDepth , 
+		            A.directDrillingDepth , 
 		            A.stDrillingDepth , 
 		            A.sdDrillingDepth , 
 		            A.intrusionDepth , 
@@ -380,6 +384,7 @@
 			AA.pileNo ,
 			AA.pileStandard ,
 			AA.drillingDepth ,
+			AA.directDrillingDepth ,
 			AA.stDrillingDepth ,
 			AA.sdDrillingDepth ,
 			AA.intrusionDepth ,
@@ -454,6 +459,7 @@
 			pileNo , 
 			pileStandard , 
 			drillingDepth , 
+			directDrillingDepth ,
 			stDrillingDepth , 
 			sdDrillingDepth , 
 			intrusionDepth , 
@@ -528,6 +534,7 @@
 		            A.pileNo , 
 		            A.pileStandard , 
 		            A.drillingDepth , 
+		            A.directDrillingDepth ,
 		            A.stDrillingDepth , 
 		            A.sdDrillingDepth , 
 		            A.intrusionDepth , 
@@ -675,6 +682,7 @@
 			pileNo ,
 			pileStandard ,
 			drillingDepth ,
+			directDrillingDepth ,
 			stDrillingDepth ,
 			sdDrillingDepth ,
 			intrusionDepth ,
@@ -741,6 +749,7 @@
 				A.location , A.pileNo ,
 				A.pileStandard ,
 				A.drillingDepth ,
+				A.directDrillingDepth ,
 				A.stDrillingDepth ,
 				A.sdDrillingDepth ,
 				A.intrusionDepth ,
@@ -899,6 +908,7 @@
 			pileNo ,
 			pileStandard ,
 			drillingDepth ,
+			directDrillingDepth ,
 			stDrillingDepth ,
 			sdDrillingDepth ,
 			intrusionDepth ,
@@ -960,6 +970,7 @@
 				A.location , A.pileNo ,
 				A.pileStandard ,
 				A.drillingDepth ,
+				A.directDrillingDepth ,
 				A.stDrillingDepth ,
 				A.sdDrillingDepth ,
 				A.intrusionDepth ,
@@ -1105,6 +1116,7 @@
 			pileNo ,
 			pileStandard ,
 			drillingDepth ,
+			directDrillingDepth ,
 			stDrillingDepth ,
 			sdDrillingDepth ,
 			intrusionDepth ,
@@ -1139,6 +1151,7 @@
 				A.location , A.pileNo ,
 				A.pileStandard ,
 				A.drillingDepth ,
+				A.directDrillingDepth ,
 				A.stDrillingDepth ,
 				A.sdDrillingDepth ,
 				A.intrusionDepth ,
@@ -1209,6 +1222,7 @@
 		    AA.pileNo ,
 		    AA.pileStandard ,
 		    AA.drillingDepth ,
+		    AA.directDrillingDepth ,
 		    AA.stDrillingDepth ,
 		    AA.sdDrillingDepth ,
 		    AA.intrusionDepth ,
@@ -1259,6 +1273,7 @@
 		    pileNo ,
 		    pileStandard ,
 		    drillingDepth ,
+		    directDrillingDepth ,
 		    stDrillingDepth ,
 		    sdDrillingDepth ,
 		    intrusionDepth ,
@@ -1309,6 +1324,7 @@
 		            A.pileNo , 
 		            A.pileStandard , 
 		            A.drillingDepth , 
+		            A.directDrillingDepth ,
 		            A.stDrillingDepth , 
 		            A.sdDrillingDepth , 
 		            A.intrusionDepth , 
@@ -1387,6 +1403,7 @@
 		    AA.pileNo ,
 		    AA.pileStandard ,
 		    AA.drillingDepth ,
+		    AA.directDrillingDepth ,
 		    AA.stDrillingDepth ,
 		    AA.sdDrillingDepth ,
 		    AA.intrusionDepth ,
@@ -1432,6 +1449,7 @@
 		    pileNo ,
 		    pileStandard ,
 		    drillingDepth ,
+		    directDrillingDepth ,
 		    stDrillingDepth ,
 		    sdDrillingDepth ,
 		    intrusionDepth ,
@@ -1477,6 +1495,7 @@
 		            A.pileNo , 
 		            A.pileStandard , 
 		            A.drillingDepth , 
+		            A.directDrillingDepth ,
 		            A.stDrillingDepth , 
 		            A.sdDrillingDepth , 
 		            A.intrusionDepth , 
@@ -1551,6 +1570,7 @@
 		    AA.pileNo ,
 		    AA.pileStandard ,
 		    AA.drillingDepth ,
+		    AA.directDrillingDepth ,
 		    AA.stDrillingDepth ,
 		    AA.sdDrillingDepth ,
 		    AA.intrusionDepth ,
@@ -1601,6 +1621,7 @@
 		    pileNo ,
 		    pileStandard ,
 		    drillingDepth ,
+		    directDrillingDepth ,
 		    stDrillingDepth ,
 		    sdDrillingDepth ,
 		    intrusionDepth ,
@@ -1651,6 +1672,7 @@
 		            A.pileNo , 
 		            A.pileStandard , 
 		            A.drillingDepth , 
+		            A.directDrillingDepth ,
 		            A.stDrillingDepth , 
 		            A.sdDrillingDepth , 
 		            A.intrusionDepth , 
@@ -1730,6 +1752,7 @@
 		    AA.pileNo ,
 		    AA.pileStandard ,
 		    AA.drillingDepth ,
+		    AA.directDrillingDepth ,
 		    AA.stDrillingDepth ,
 		    AA.sdDrillingDepth ,
 		    AA.intrusionDepth ,
@@ -1775,6 +1798,7 @@
 		    pileNo ,
 		    pileStandard ,
 		    drillingDepth ,
+		    directDrillingDepth ,
 		    stDrillingDepth ,
 		    sdDrillingDepth ,
 		    intrusionDepth ,
@@ -1820,6 +1844,7 @@
 		            A.pileNo , 
 		            A.pileStandard , 
 		            A.drillingDepth , 
+		            A.directDrillingDepth ,
 		            A.stDrillingDepth , 
 		            A.sdDrillingDepth , 
 		            A.intrusionDepth , 
@@ -1890,6 +1915,11 @@
 	    	pileStandard,
 	    	drillingDepth,
 	    	<choose>
+	    		<when test="directDrillingDepth != null and directDrillingDepth != '' and directDrillingDepth != null and directDrillingDepth != ''">
+	    			directDrillingDepth , 
+	    		</when>
+	    	</choose>
+	    	<choose>
 	    		<when test="stDrillingDepth != null and stDrillingDepth != '' and stDrillingDepth != null and stDrillingDepth != ''">
 	    			stDrillingDepth , 
 	    		</when>
@@ -1929,6 +1959,11 @@
 	     	#{pileNo},
 	     	#{pileStandard},
 	     	#{drillingDepth},
+	     	<choose>
+	    		<when test="directDrillingDepth != null and directDrillingDepth != '' and directDrillingDepth != null and directDrillingDepth != ''">
+	    			#{directDrillingDepth} , 
+	    		</when>
+	    	</choose>
 	     	<choose>
 	    		<when test="stDrillingDepth != null and stDrillingDepth != '' and stDrillingDepth != null and stDrillingDepth != ''">
 	    			#{stDrillingDepth} , 
@@ -1974,7 +2009,12 @@
 	    	location, 
 	    	pileNo , 
 	    	pileStandard, 
-	    	drillingDepth , 
+	    	drillingDepth ,
+   			<choose>
+	    		<when test="directDrillingDepth != null and directDrillingDepth != '' and directDrillingDepth != null and directDrillingDepth != ''">
+	    			directDrillingDepth , 
+	    		</when>
+	    	</choose>
 	    	<choose>
 	    		<when test="stDrillingDepth != null and stDrillingDepth != '' and stDrillingDepth != null and stDrillingDepth != ''">
 	    			stDrillingDepth , 
@@ -2017,6 +2057,11 @@
 	     	#{pileNo} , 
 	     	#{pileStandard},  
 	     	#{drillingDepth} ,
+	     	<choose>
+	    		<when test="directDrillingDepth != null and directDrillingDepth != '' and directDrillingDepth != null and directDrillingDepth != ''">
+	    			#{directDrillingDepth} , 
+	    		</when>
+	    	</choose>
 	     	<choose>
 	    		<when test="stDrillingDepth != null and stDrillingDepth != '' and stDrillingDepth != null and stDrillingDepth != ''">
 	    			#{stDrillingDepth} , 
@@ -2061,6 +2106,11 @@
 	      	pileStandard,
 	      	drillingDepth,
 	      	<choose>
+	    		<when test="directDrillingDepth != null and directDrillingDepth != '' and directDrillingDepth != null and directDrillingDepth != ''">
+	    			directDrillingDepth , 
+	    		</when>
+	    	</choose>
+	      	<choose>
 	    		<when test="stDrillingDepth != null and stDrillingDepth != '' and stDrillingDepth != null and stDrillingDepth != ''">
 	    			stDrillingDepth , 
 	    		</when>
@@ -2100,6 +2150,11 @@
 	     	#{pileNo} , 
 	     	#{pileStandard},  
 	     	#{drillingDepth} , 
+	     	<choose>
+	    		<when test="directDrillingDepth != null and directDrillingDepth != '' and directDrillingDepth != null and directDrillingDepth != ''">
+	    			#{directDrillingDepth} , 
+	    		</when>
+	    	</choose>
 	     	<choose>
 	    		<when test="stDrillingDepth != null and stDrillingDepth != '' and stDrillingDepth != null and stDrillingDepth != ''">
 	    			#{stDrillingDepth} , 
@@ -2148,13 +2203,18 @@
 	    	pileStandard, 
 	    	drillingDepth , 
 	    	<choose>
+	    		<when test="directDrillingDepth != null and directDrillingDepth != '' and directDrillingDepth != null and directDrillingDepth != ''">
+	    			directDrillingDepth , 
+	    		</when>
+	    	</choose>
+	    	<choose>
 	    		<when test="stDrillingDepth != null and stDrillingDepth != '' and stDrillingDepth != null and stDrillingDepth != ''">
-	    		, stDrillingDepth 
+	    		 	stDrillingDepth , 
 	    		</when>
 	    	</choose>
 	    	<choose>
 	    		<when test="sdDrillingDepth != null and sdDrillingDepth != '' and sdDrillingDepth != null and sdDrillingDepth != ''">
-	    		, sdDrillingDepth 
+	    			sdDrillingDepth , 
 	    		</when>
 	    	</choose>
 	    	intrusionDepth, 
@@ -2188,6 +2248,11 @@
 	    	#{pileNo} , 
 	    	#{pileStandard},  
 	    	#{drillingDepth} ,
+	    	<choose>
+	    		<when test="directDrillingDepth != null and directDrillingDepth != '' and directDrillingDepth != null and directDrillingDepth != ''">
+	    			#{directDrillingDepth} , 
+	    		</when>
+	    	</choose>
 	    	<choose>
 	    		<when test="stDrillingDepth != null and stDrillingDepth != '' and stDrillingDepth != null and stDrillingDepth != ''">
 	    			#{stDrillingDepth} , 
@@ -2252,6 +2317,7 @@
 		    , pileNo 
 		    , pileStandard 
 		    , drillingDepth 
+		    , directDrillingDepth 
 		    , intrusionDepth 
 		    , balance 
 		    , connectLength 
@@ -2297,6 +2363,7 @@
                 , A.pileNo 
                 , A.pileStandard 
                 , A.drillingDepth 
+                , A.directDrillingDepth 
                 , A.intrusionDepth 
                 , A.balance 
                 , A.connectLength 
@@ -2378,6 +2445,7 @@
 		    , pileNo 
 		    , pileStandard 
 		    , drillingDepth 
+		    , directDrillingDepth
 		    , intrusionDepth 
 		    , balance 
 		    , connectLength 
@@ -2423,6 +2491,7 @@
                 , A.pileNo 
                 , A.pileStandard 
                 , A.drillingDepth 
+                , A.directDrillingDepth 
                 , A.intrusionDepth 
                 , A.balance 
                 , A.connectLength 

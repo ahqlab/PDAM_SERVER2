@@ -32,6 +32,8 @@ public class UpdateReport implements Domain {
 	private String pileNo;
 	//천공깊이
 	private String drillingDepth;
+	//천공깊이
+	private String directDrillingDepth;
 	//전석층천공
 	private String stDrillingDepth;
 	//토사천공

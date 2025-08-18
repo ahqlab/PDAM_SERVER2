@@ -200,7 +200,7 @@ public class ReportTenAll extends AbstractExcelView
   		      null, 
   		      null, 
   		      String.valueOf(String.format("%.2f", new Object[] { Double.valueOf(sumTotalConnectWidth) })), 
-  		      String.valueOf(String.format("%.2", new Object[] { Double.valueOf(sumConnectLength) })), 
+  		      String.valueOf(String.format("%.2f", new Object[] { Double.valueOf(sumConnectLength) })), 
   		      String.valueOf(String.format("%.2f", new Object[] { Double.valueOf(sumDrillingDepth) })), 
   		      String.valueOf(String.format("%.2f", new Object[] { Double.valueOf(sumIntrusionDepth) })), 
   		      String.valueOf(String.format("%.2f", new Object[] { Double.valueOf(sumBlance) })), 
@@ -908,10 +908,14 @@ public class ReportTenAll extends AbstractExcelView
 
   private void createColumnLabels(HSSFSheet sheet, HSSFWorkbook workbook)
   {
+	  
+	  System.err.println("ubcYn : " + ubcYn);
+	  System.err.println("constructionIdx : " + constructionIdx);
+	  
     HSSFRow row1 = sheet.createRow(tableLabelStartIndex);
     if(ubcYn > 0) {
     	setColumnLabels(workbook, row1, ExcelTitleUtil.TEN_TOP_UBC);
-	}else if(constructionIdx == 944) {
+	}else if(constructionIdx == 944 || constructionIdx == 1136) {
 		setColumnLabels(workbook, row1, ExcelTitleUtilForBooyoung.TEN_TOP);
     }else {
     	setColumnLabels(workbook, row1, ExcelTitleUtil.TEN_TOP);
@@ -922,7 +926,7 @@ public class ReportTenAll extends AbstractExcelView
 
     if(ubcYn > 0) {
     	setColumnLabels(workbook, row2, ExcelTitleUtil.TEN_BOTTOM_UBC);
-	}else if(constructionIdx == 944) {
+	}else if(constructionIdx == 944 || constructionIdx == 1136) {
 		setColumnLabels(workbook, row2, ExcelTitleUtilForBooyoung.TEN_BOTTOM);
     } else {
     	setColumnLabels(workbook, row2, ExcelTitleUtil.TEN_BOTTOM);

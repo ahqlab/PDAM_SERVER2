@@ -4,9 +4,11 @@ import net.octacomm.logger.LoggerBeanPostProcessor;
 import net.octacomm.sample.interceptor.LogInterceptor;
 import net.octacomm.sample.interceptor.LoginInterceptor;
 import net.octacomm.sample.view.ReportTenAll;
+import net.octacomm.sample.view.ReportTenAllFor1269;
 import net.octacomm.sample.view.ReportTenAllJh;
 import net.octacomm.sample.view.ReportFiveAll;
 import net.octacomm.sample.view.ReportFiveAllBy;
+import net.octacomm.sample.view.ReportFiveAllFor1269;
 import net.octacomm.sample.view.ReportFiveAllJh;
 import net.octacomm.sample.view.ReportTen;
 import net.octacomm.sample.view.ReportTenJh;
@@ -97,6 +99,18 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 	public AbstractExcelView reportFiveJh() {
 		return new ReportFiveJh();
 	}
+	
+	
+	@Bean
+	public AbstractExcelView reportFiveAllFor1269() {
+		return new ReportFiveAllFor1269();
+	}
+	
+	@Bean
+	public AbstractExcelView reportTenAllFor1269() {
+		return new ReportTenAllFor1269();
+	}
+	
 	
 	
 	@Bean

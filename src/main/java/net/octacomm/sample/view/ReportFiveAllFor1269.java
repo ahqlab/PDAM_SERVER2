@@ -13,6 +13,7 @@ import net.octacomm.sample.utils.DateUtil;
 import net.octacomm.sample.utils.ExcelColor;
 import net.octacomm.sample.utils.ExcelTitleUtil;
 import net.octacomm.sample.utils.ExcelTitleUtilForBooyoung;
+import net.octacomm.sample.utils.ExcelTitleUtilForDirectDrilling;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
@@ -27,7 +28,7 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.web.servlet.view.document.AbstractExcelView;
 
-public class ReportFiveAllBy extends AbstractExcelView
+public class ReportFiveAllFor1269 extends AbstractExcelView
 {
   private static final int COLUNM_HEIGHT = 480;
   
@@ -67,6 +68,7 @@ public class ReportFiveAllBy extends AbstractExcelView
     param = (ReportParam) model.get("param");
     signRoomList = (List<ExcelSignroom>) model.get("signRoomList");
     constructionName = (String) model.get("constructionName");
+    
     
 
     if(role == 0) {
@@ -166,8 +168,7 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
     double sumTotalConnectWidth = 0.0D;
     double sumConnectLength = 0.0D;
     double sumDrillingDepth = 0.0D;
-    double sumSdDrillingDepth = 0.0D;
-    double sumStDrillingDepth = 0.0D;
+    double sumDirectDrillingDepth = 0.0D;
     double sumIntrusionDepth = 0.0D;
     double sumBlance = 0.0D;
     double sumGongSac = 0.0D;
@@ -176,12 +177,10 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
       sumTotalConnectWidth += Double.parseDouble(report.getTotalConnectWidth().isEmpty() ? "0" : report.getTotalConnectWidth());
       sumConnectLength += Double.parseDouble(report.getConnectLength().isEmpty() ? "0" : report.getConnectLength());
       sumDrillingDepth += Double.parseDouble(report.getDrillingDepth().isEmpty() ? "0" : report.getDrillingDepth());
-      sumSdDrillingDepth += Double.parseDouble(report.getSdDrillingDepth().isEmpty() ? "0" : report.getSdDrillingDepth());
-      sumStDrillingDepth += Double.parseDouble(report.getStDrillingDepth().isEmpty() ? "0" : report.getStDrillingDepth());
+      sumDirectDrillingDepth += Double.parseDouble(report.getDirectDrillingDepth().isEmpty() ? "0" : report.getDirectDrillingDepth());
       sumIntrusionDepth += Double.parseDouble(report.getIntrusionDepth().isEmpty() ? "0" : report.getIntrusionDepth());
-      //sumIntrusionDepth += 0; 
-      sumBlance += balanceFixExp(Double.parseDouble(report.getTotalConnectWidth().isEmpty() ? "0" : report.getTotalConnectWidth()) - Double.parseDouble(report.getDrillingDepth().isEmpty() ? "0" : report.getDrillingDepth()) - Double.parseDouble(report.getSdDrillingDepth().isEmpty() ? "0" : report.getSdDrillingDepth()) - Double.parseDouble(report.getStDrillingDepth().isEmpty() ? "0" : report.getStDrillingDepth()) - Double.parseDouble(report.getIntrusionDepth().isEmpty() ? "0" : report.getIntrusionDepth()));
-      sumGongSac += gongSacFixExp(Double.parseDouble(report.getTotalConnectWidth().isEmpty() ? "0" : report.getTotalConnectWidth()) - Double.parseDouble(report.getDrillingDepth().isEmpty() ? "0" : report.getDrillingDepth()) - Double.parseDouble(report.getSdDrillingDepth().isEmpty() ? "0" : report.getSdDrillingDepth()) - Double.parseDouble(report.getStDrillingDepth().isEmpty() ? "0" : report.getStDrillingDepth()) - Double.parseDouble(report.getIntrusionDepth().isEmpty() ? "0" : report.getIntrusionDepth()));
+      sumBlance += report.getBalance();
+      sumGongSac += gongSacFixExp(report.getBalance(), report.getGongSac(), param.getConstructionIdx());
     }
 
     HSSFRow row = sheet.createRow(tableValueStartIndex + reportList.size());
@@ -204,8 +203,7 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
 	      String.valueOf(String.format("%.2f", new Object[] { Double.valueOf(sumTotalConnectWidth) })), 
 	      String.valueOf(String.format("%.2f", new Object[] { Double.valueOf(sumConnectLength) })), 
 	      String.valueOf(String.format("%.2f", new Object[] { Double.valueOf(sumDrillingDepth) })), 
-	      String.valueOf(String.format("%.2f", new Object[] { Double.valueOf(sumSdDrillingDepth) })), 
-	      String.valueOf(String.format("%.2f", new Object[] { Double.valueOf(sumStDrillingDepth) })), 
+	      String.valueOf(String.format("%.2f", new Object[] { Double.valueOf(sumDirectDrillingDepth) })), 
 	      String.valueOf(String.format("%.2f", new Object[] { Double.valueOf(sumIntrusionDepth) })), 
 	      String.valueOf(String.format("%.2f", new Object[] { Double.valueOf(sumBlance) })), 
 	      String.valueOf(String.format("%.2f", new Object[] { Double.valueOf(sumGongSac) })), 
@@ -246,8 +244,7 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
 	      String.valueOf(String.format("%.2f", new Object[] { Double.valueOf(sumTotalConnectWidth) })), 
 	      String.valueOf(String.format("%.2f", new Object[] { Double.valueOf(sumConnectLength) })), 
 	      String.valueOf(String.format("%.2f", new Object[] { Double.valueOf(sumDrillingDepth) })), 
-	      String.valueOf(String.format("%.2f", new Object[] { Double.valueOf(sumSdDrillingDepth) })), 
-	      String.valueOf(String.format("%.2f", new Object[] { Double.valueOf(sumStDrillingDepth) })), 
+	      String.valueOf(String.format("%.2f", new Object[] { Double.valueOf(sumDirectDrillingDepth) })), 
 	      String.valueOf(String.format("%.2f", new Object[] { Double.valueOf(sumIntrusionDepth) })), 
 	      String.valueOf(String.format("%.2f", new Object[] { Double.valueOf(sumBlance) })), 
 	      String.valueOf(String.format("%.2f", new Object[] { Double.valueOf(sumGongSac) })), 
@@ -436,14 +433,17 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
       String[] strings = null;
       if(ubcYn > 0) {
     	  
+    	  
     	  piOneSum += Double.parseDouble(((ReportOneLine)reportList.get(i)).getPiOne().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getPiOne());
     	  piTwoSum += Double.parseDouble(((ReportOneLine)reportList.get(i)).getPiTwo().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getPiTwo());
     	  piThreeSum += Double.parseDouble(((ReportOneLine)reportList.get(i)).getPiThree().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getPiThree());
     	  piFourSum += Double.parseDouble(((ReportOneLine)reportList.get(i)).getPiFour().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getPiFour());
     	  piFiveSum += Double.parseDouble(((ReportOneLine)reportList.get(i)).getPiFive().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getPiFive());
     	  connectLengthSum += Double.parseDouble(((ReportOneLine)reportList.get(i)).getConnectLength().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getConnectLength());
-    	  gongSacSum +=  (double) Math.abs(gongSacFixExp(Double.parseDouble(((ReportOneLine)reportList.get(i)).getTotalConnectWidth().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getTotalConnectWidth()) - Double.parseDouble(((ReportOneLine)reportList.get(i)).getDrillingDepth().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getDrillingDepth()) - Double.parseDouble(((ReportOneLine)reportList.get(i)).getSdDrillingDepth().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getSdDrillingDepth()) - Double.parseDouble(((ReportOneLine)reportList.get(i)).getStDrillingDepth().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getStDrillingDepth()) - Double.parseDouble(((ReportOneLine)reportList.get(i)).getIntrusionDepth().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getIntrusionDepth())));
-    	  System.err.println("1 gongSacSum : " + gongSacSum);
+    	  ((ReportOneLine)reportList.get(i)).getBalance();
+    	  //gongSacSum +=  (double) Math.abs(((ReportOneLine)reportList.get(i)).getGongSac());
+    	  gongSacSum +=  (double) Math.abs(gongSacFixExp(((ReportOneLine)reportList.get(i)).getBalance(), ((ReportOneLine)reportList.get(i)).getGongSac(), param.getConstructionIdx()));
+    	  
     	  
     	  strings = new String[]{ String.valueOf(i + 1), 
     			    setDinamicDate(role, isHiddenManager, longCalYn, ((ReportOneLine)reportList.get(i)).getCurrentDateTime(), ((ReportOneLine)reportList.get(i)).getCreateDate()),
@@ -461,11 +461,10 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
     		        ((ReportOneLine)reportList.get(i)).getTotalConnectWidth().isEmpty() ? null : ((ReportOneLine)reportList.get(i)).getTotalConnectWidth(),
     		        ((ReportOneLine)reportList.get(i)).getConnectLength(), 
     		        ((ReportOneLine)reportList.get(i)).getDrillingDepth(), 
-    		        ((ReportOneLine)reportList.get(i)).getSdDrillingDepth(), 
-    		        ((ReportOneLine)reportList.get(i)).getStDrillingDepth(), 
+    		        ((ReportOneLine)reportList.get(i)).getDirectDrillingDepth(), 
     		        ((ReportOneLine)reportList.get(i)).getIntrusionDepth(), 
-    		        String.format("%.1f", balanceFixExp(Double.parseDouble(((ReportOneLine)reportList.get(i)).getTotalConnectWidth().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getTotalConnectWidth()) - Double.parseDouble(((ReportOneLine)reportList.get(i)).getDrillingDepth().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getDrillingDepth()) - Double.parseDouble(((ReportOneLine)reportList.get(i)).getSdDrillingDepth().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getSdDrillingDepth()) - Double.parseDouble(((ReportOneLine)reportList.get(i)).getStDrillingDepth().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getStDrillingDepth()) - Double.parseDouble(((ReportOneLine)reportList.get(i)).getIntrusionDepth().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getIntrusionDepth()))), 
-    		        String.format("%.1f", gongSacFixExp(Double.parseDouble(((ReportOneLine)reportList.get(i)).getTotalConnectWidth().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getTotalConnectWidth()) - Double.parseDouble(((ReportOneLine)reportList.get(i)).getDrillingDepth().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getDrillingDepth()) - Double.parseDouble(((ReportOneLine)reportList.get(i)).getSdDrillingDepth().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getSdDrillingDepth()) - Double.parseDouble(((ReportOneLine)reportList.get(i)).getStDrillingDepth().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getStDrillingDepth()) - Double.parseDouble(((ReportOneLine)reportList.get(i)).getIntrusionDepth().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getIntrusionDepth()))), 
+    		        String.valueOf(((ReportOneLine)reportList.get(i)).getBalance()), 
+    		        String.valueOf( gongSacFixExp(((ReportOneLine)reportList.get(i)).getBalance(), ((ReportOneLine)reportList.get(i)).getGongSac(), param.getConstructionIdx())), 
     		        ((ReportOneLine)reportList.get(i)).getHammaT(), 
     		        ((ReportOneLine)reportList.get(i)).getFallMeter(), 
     		        ((ReportOneLine)reportList.get(i)).getManagedStandard(), 
@@ -494,9 +493,9 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
     	  piFourSum += Double.parseDouble(((ReportOneLine)reportList.get(i)).getPiFour().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getPiFour());
     	  piFiveSum += Double.parseDouble(((ReportOneLine)reportList.get(i)).getPiFive().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getPiFive());
     	  connectLengthSum += Double.parseDouble(((ReportOneLine)reportList.get(i)).getConnectLength().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getConnectLength());
-    	  gongSacSum +=  (double) Math.abs(gongSacFixExp(Double.parseDouble(((ReportOneLine)reportList.get(i)).getTotalConnectWidth().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getTotalConnectWidth()) - Double.parseDouble(((ReportOneLine)reportList.get(i)).getDrillingDepth().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getDrillingDepth()) - Double.parseDouble(((ReportOneLine)reportList.get(i)).getSdDrillingDepth().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getSdDrillingDepth()) - Double.parseDouble(((ReportOneLine)reportList.get(i)).getStDrillingDepth().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getStDrillingDepth()) - Double.parseDouble(((ReportOneLine)reportList.get(i)).getIntrusionDepth().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getIntrusionDepth())));
-    	  
-    	  System.err.println("1 gongSacSum : " + gongSacSum);
+    	  ((ReportOneLine)reportList.get(i)).getBalance();
+    	  //gongSacSum +=  (double) Math.abs(((ReportOneLine)reportList.get(i)).getGongSac());
+    	  gongSacSum +=  (double) Math.abs(gongSacFixExp(((ReportOneLine)reportList.get(i)).getBalance(), ((ReportOneLine)reportList.get(i)).getGongSac(), param.getConstructionIdx()));
     	  
     	  strings = new String[]{ String.valueOf(i + 1), 
 			setDinamicDate(role, isHiddenManager, longCalYn, ((ReportOneLine)reportList.get(i)).getCurrentDateTime(), ((ReportOneLine)reportList.get(i)).getCreateDate()),
@@ -514,11 +513,10 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
 	        ((ReportOneLine)reportList.get(i)).getTotalConnectWidth().isEmpty() ? null : ((ReportOneLine)reportList.get(i)).getTotalConnectWidth(),
 	        ((ReportOneLine)reportList.get(i)).getConnectLength(), 
 	        ((ReportOneLine)reportList.get(i)).getDrillingDepth(), 
-	        ((ReportOneLine)reportList.get(i)).getSdDrillingDepth(), 
-	        ((ReportOneLine)reportList.get(i)).getStDrillingDepth(), 
+	        ((ReportOneLine)reportList.get(i)).getDirectDrillingDepth(), 
 	        ((ReportOneLine)reportList.get(i)).getIntrusionDepth(), 
-	        String.format("%.1f", balanceFixExp(Double.parseDouble(((ReportOneLine)reportList.get(i)).getTotalConnectWidth().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getTotalConnectWidth()) - Double.parseDouble(((ReportOneLine)reportList.get(i)).getDrillingDepth().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getDrillingDepth()) - Double.parseDouble(((ReportOneLine)reportList.get(i)).getSdDrillingDepth().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getSdDrillingDepth()) - Double.parseDouble(((ReportOneLine)reportList.get(i)).getStDrillingDepth().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getStDrillingDepth()) - Double.parseDouble(((ReportOneLine)reportList.get(i)).getIntrusionDepth().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getIntrusionDepth()))), 
-	        String.format("%.1f", gongSacFixExp(Double.parseDouble(((ReportOneLine)reportList.get(i)).getTotalConnectWidth().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getTotalConnectWidth()) - Double.parseDouble(((ReportOneLine)reportList.get(i)).getDrillingDepth().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getDrillingDepth()) - Double.parseDouble(((ReportOneLine)reportList.get(i)).getSdDrillingDepth().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getSdDrillingDepth()) - Double.parseDouble(((ReportOneLine)reportList.get(i)).getStDrillingDepth().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getStDrillingDepth()) - Double.parseDouble(((ReportOneLine)reportList.get(i)).getIntrusionDepth().isEmpty() ? "0" : ((ReportOneLine)reportList.get(i)).getIntrusionDepth()))),
+	        String.valueOf(((ReportOneLine)reportList.get(i)).getBalance()), 
+	        String.valueOf( gongSacFixExp(((ReportOneLine)reportList.get(i)).getBalance(), ((ReportOneLine)reportList.get(i)).getGongSac(), param.getConstructionIdx())), 
 	        ((ReportOneLine)reportList.get(i)).getHammaT(), 
 	        ((ReportOneLine)reportList.get(i)).getFallMeter(), 
 	        ((ReportOneLine)reportList.get(i)).getManagedStandard(), 
@@ -548,13 +546,13 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
 		sheet.setColumnHidden(11, piFourSum == 0 ? true : false);
 		sheet.setColumnHidden(12, piFiveSum == 0 ? true : false);
 		sheet.setColumnHidden(14, connectLengthSum == 0 ? true : false);
-		sheet.setColumnHidden(20, (double) gongSacSum == 0.0 ? true : false);
+		sheet.setColumnHidden(18, (double) gongSacSum == 0.0 ? true : false);
 		
-		//메모를 지운다.
+		//비고를 지운다.
 		if (ubcYn > 0) {
-			sheet.setColumnHidden(36, true);
+			sheet.setColumnHidden(34, true);
 		}else {
-			sheet.setColumnHidden(32, true);
+			sheet.setColumnHidden(30, true);
 		}
 	}
 
@@ -575,60 +573,54 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
 	private void  setExcelSignroomLayoutSetting(HSSFSheet sheet, HSSFWorkbook workbook, List<ExcelSignroom> signRoomList) {
 		createExcelSignroom(sheet, workbook, signRoomList);
 		
-		//천공 추가로 인덱스를 업한다.
 		if (ubcYn > 0) { // 현장명
 
 			if (getSignRoomApproverName(0, signRoomList) != "") {
-				sheet.addMergedRegion(new CellRangeAddress(0, 0, 33, 35));
-				sheet.addMergedRegion(new CellRangeAddress(1, 1, 33, 35));
+				sheet.addMergedRegion(new CellRangeAddress(0, 0, 32, 34));
+				sheet.addMergedRegion(new CellRangeAddress(1, 1, 32, 34));
 			}
 
 			if (getSignRoomApproverName(1, signRoomList) != "") {
-				sheet.addMergedRegion(new CellRangeAddress(0, 0, 30, 32));
-				sheet.addMergedRegion(new CellRangeAddress(1, 1, 30, 32));
+				sheet.addMergedRegion(new CellRangeAddress(0, 0, 29, 31));
+				sheet.addMergedRegion(new CellRangeAddress(1, 1, 29, 31));
 			}
 
 			if (getSignRoomApproverName(2, signRoomList) != "") {
-				sheet.addMergedRegion(new CellRangeAddress(0, 0, 27, 29));
-				sheet.addMergedRegion(new CellRangeAddress(1, 1, 27, 29));
+				sheet.addMergedRegion(new CellRangeAddress(0, 0, 26, 28));
+				sheet.addMergedRegion(new CellRangeAddress(1, 1, 26, 28));
 			}
 
 			if (getSignRoomApproverName(3, signRoomList) != "") {
-				sheet.addMergedRegion(new CellRangeAddress(0, 0, 24, 26));
-				sheet.addMergedRegion(new CellRangeAddress(1, 1, 24, 26));
+				sheet.addMergedRegion(new CellRangeAddress(0, 0, 23, 25));
+				sheet.addMergedRegion(new CellRangeAddress(1, 1, 23, 25));
 			}
 
 		} else { // 현장명
 
 			if (getSignRoomApproverName(0, signRoomList) != "") {
-				sheet.addMergedRegion(new CellRangeAddress(0, 0, 29, 31));
-				sheet.addMergedRegion(new CellRangeAddress(1, 1, 29, 31));
+				sheet.addMergedRegion(new CellRangeAddress(0, 0, 28, 30));
+				sheet.addMergedRegion(new CellRangeAddress(1, 1, 28, 30));
 			}
 
 			if (getSignRoomApproverName(1, signRoomList) != "") {
-				sheet.addMergedRegion(new CellRangeAddress(0, 0, 26, 28));
-				sheet.addMergedRegion(new CellRangeAddress(1, 1, 26, 28));
+				sheet.addMergedRegion(new CellRangeAddress(0, 0, 25, 27));
+				sheet.addMergedRegion(new CellRangeAddress(1, 1, 25, 27));
 			}
 
 			if (getSignRoomApproverName(2, signRoomList) != "") {
-				sheet.addMergedRegion(new CellRangeAddress(0, 0, 23, 25));
-				sheet.addMergedRegion(new CellRangeAddress(1, 1, 23, 25));
+				sheet.addMergedRegion(new CellRangeAddress(0, 0, 22, 24));
+				sheet.addMergedRegion(new CellRangeAddress(1, 1, 22, 24));
 			}
 
 			if (getSignRoomApproverName(3, signRoomList) != "") {
-				sheet.addMergedRegion(new CellRangeAddress(0, 0, 20, 22));
-				sheet.addMergedRegion(new CellRangeAddress(1, 1, 20, 22));
+				sheet.addMergedRegion(new CellRangeAddress(0, 0, 19, 21));
+				sheet.addMergedRegion(new CellRangeAddress(1, 1, 19, 21));
 			}
 		}
-		
-		//천공 추가로 인덱스를 업한다.
-		//완료
 
 	}
 	
 	 private void createExcelSignroom(HSSFSheet sheet, HSSFWorkbook workbook, List<ExcelSignroom> signRoomList) {
-		 
-		//천공 추가로 인덱스를 업한다.
 		 
 		 HSSFRow secondRow = sheet.getRow(0);
 		 HSSFRow thirdRow = sheet.createRow(1);
@@ -637,7 +629,7 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
 			 setSignRoomHeader(workbook, secondRow, new String[] { 
 	    			"","","","","","","","","","",
 	    			"","","","","","","","","","",
-	    			"","","",""
+	    			"","",""
 	    			, getSignRoomApproverName(3, signRoomList)
 	    			, getSignRoomApproverName(3, signRoomList)
 	    			, getSignRoomApproverName(3, signRoomList)
@@ -654,7 +646,7 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
 			 setSignThirdrowRoomHeader(workbook, thirdRow, new String[] { 
 					 "","","","","","","","","","",
 					 "","","","","","","","","","",
-					 "","", "",""
+					 "","",""
 					 , getSignRoomApproverName(3, signRoomList)
 					 , getSignRoomApproverName(3, signRoomList)
 					 , getSignRoomApproverName(3, signRoomList)
@@ -671,7 +663,7 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
 	    }else {
 	    	 setSignRoomHeader(workbook, secondRow, new String[] { 
 	    			"","","","","","","","","","",
-	    			"","","","","","","","","",""
+	    			"","","","","","","","",""
 	    			, getSignRoomApproverName(3, signRoomList)
 	    			, getSignRoomApproverName(3, signRoomList)
 	    			, getSignRoomApproverName(3, signRoomList)
@@ -687,7 +679,7 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
 		    });
 	    	 setSignThirdrowRoomHeader(workbook, thirdRow, new String[] { 
 	    			 "","","","","","","","","","",
-	    			 "","","","","","","","","",""
+	    			 "","","","","","","","",""
 	    			 , getSignRoomApproverName(3, signRoomList)
 	    			 , getSignRoomApproverName(3, signRoomList)
 	    			 , getSignRoomApproverName(3, signRoomList)
@@ -702,8 +694,6 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
 	    			 , getSignRoomApproverName(0, signRoomList)
 	    	 });
 	    }
-		 
-		//완료
 	 }
 	 
  private String getSignRoomApproverName(int index , List<ExcelSignroom> signRoomList) {
@@ -848,155 +838,55 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
     
 
     if(ubcYn > 0) {
-    	setColumnLabels(workbook, row1, new String[] { "번호"
-				 , "시공일"
-				 , "시공장비"
-				 , "파일종류"
-				 , "시공공법"
-				 , "시공위치"
-				 , "파일\n번호"
-				 , "파일\n규격 \n( D )"
-				 , "파일구분"
-				 , ""
-				 , ""
-				 , ""
-				 , ""
-				 , ""
-				 , "이음\n개소\n( EA )"
-				 , "천공\n깊이\n( M )"
-				 , "토사\n천공\n( M )"
-				 , "전석층\n천공\n( M )"
-				 , "경타\n깊이\n( M )"
-				 , "파일\n잔량\n( M )"
-				 , "공삭공\n( M )"
-				 , "해머\n무게\n( Ton )"
-				 , "낙하\n높이\n( M )"
-				 , "관리\n기준\n( mm )"
-				 , "관입량 자동 측정( mm )"
-				 , ""
-				 , ""
-				 , ""
-				 , ""
-				 , ""
-				 , ""
-				 , "극한\n지지력\n( kN )"
-				 , "해머효율\n( % )"
-				 , "탄성계수\n( t/cm2 )"
-				 , "파일\n단면적\n( cm2 )" 
-				 , "비고"
-				 , "메모" });
+    	if((constructionIdx == 692 || param.getConstructionIdx() == 692) || (constructionIdx ==  720 || param.getConstructionIdx() == 720)) {
+    		setColumnLabels(workbook, row1, ExcelTitleUtil.FIVE_TOP_UBC_ES );
+    	}else if(constructionIdx == 944 || constructionIdx == 1136){
+    		setColumnLabels(workbook, row1, ExcelTitleUtilForBooyoung.FIVE_TOP_UBC );
+    	}else if(constructionIdx == 1269 || param.getConstructionIdx() == 1269){
+    		//중흥토건 나라기초 부산 에코델타시티 공동4블럭 중흥S-클래스 아파트
+    		setColumnLabels(workbook, row1, ExcelTitleUtilForDirectDrilling.FIVE_TOP_UBC );
+    	}else {
+    		setColumnLabels(workbook, row1, ExcelTitleUtil.FIVE_TOP_UBC );
+    	}
     	
     }else {
-    	setColumnLabels(workbook, row1, new String[] { "번호"
-				 , "시공일"
-				 , "시공장비"
-				 , "파일종류"
-				 , "시공공법"
-				 , "시공위치"
-				 , "파일\n번호"
-				 , "파일\n규격 \n( D )"
-				 , "파일구분"
-				 , ""
-				 , ""
-				 , ""
-				 , ""
-				 , ""
-				 , "이음\n개소\n( EA )"
-				 , "천공\n깊이\n( M )"
-				 , "토사\n천공\n( M )"
-				 , "전석층\n천공\n( M )"
-				 , "경타\n깊이\n( M )"
-				 , "파일\n잔량\n( M )"
-				 , "공삭공\n( M )"
-				 , "해머\n무게\n( Ton )"
-				 , "낙하\n높이\n( M )"
-				 , "관리\n기준\n( mm )"
-				 , "관입량 자동 측정( mm )"
-				 , ""
-				 , ""
-				 , ""
-				 , ""
-				 , ""
-				 , ""
-				 , "비고"
-				 , "메모" } );
+    	if((constructionIdx == 692 || param.getConstructionIdx() == 692) || (constructionIdx ==  720 || param.getConstructionIdx() == 720)) {
+    		setColumnLabels(workbook, row1, ExcelTitleUtil.FIVE_TOP_ES );
+    	}else if(constructionIdx == 944 || constructionIdx == 1136){
+    		setColumnLabels(workbook, row1, ExcelTitleUtilForBooyoung.FIVE_TOP );
+    	}else if(constructionIdx == 1269 || param.getConstructionIdx() == 1269){
+    		//중흥토건 나라기초 부산 에코델타시티 공동4블럭 중흥S-클래스 아파트
+    		setColumnLabels(workbook, row1, ExcelTitleUtilForDirectDrilling.FIVE_TOP );
+    	}else {
+    		setColumnLabels(workbook, row1, ExcelTitleUtil.FIVE_TOP );
+    	}
     }
     
 
     HSSFRow row2 = sheet.createRow(tableLabelEndIndex);
 
     if(ubcYn > 0) {
-    	setColumnLabels(workbook, row2,  new String[] {  "번호"
-				 , "시공일"
-				 , "시공장비"
-				 , "파일종류"
-				 , "시공공법"
-				 , "시공위치"
-				 , "파일\n번호"
-				 , "파일\n규격 \n( D )"
-				 , "단본"
-				 , "하단"
-				 , "중단"
-				 , "중단"
-				 , "상단"
-				 , "합계"
-				 , "이음\n개소\n( EA )"
-				 , "천공\n깊이\n( M )"
-				 , "토사\n천공\n( M )"
-				 , "전석층\n천공\n( M )"
-				 , "경타\n깊이\n( M )"
-				 , "파일\n잔량\n( M )"
-				 , "공삭공\n( M )"
-				 , "해머\n무게\n( Ton )"
-				 , "낙하\n높이\n( M )"
-				 , "관리\n기준\n( mm )"
-				 , "1회"
-				 , "2회"
-				 , "3회"
-				 , "4회"
-				 , "5회"
-				 , "평균관입"
-				 , "총관입량"
-				 , "극한\n지지력\n( kN )"
-				 , "해머효율\n( % )"
-				 , "탄성계수\n( t/cm2 )"
-				 , "파일\n단면적\n( cm2 )" 
-				 , "비고"
-				 , "메모" } );
+    	if((constructionIdx == 692 || param.getConstructionIdx() == 692) || (constructionIdx ==  720 || param.getConstructionIdx() == 720)) {
+    		setColumnLabels(workbook, row2,  ExcelTitleUtil.FIVE_BOTTOM_UBC_ES );
+    	}else if(constructionIdx == 944 || constructionIdx == 1136) {
+    		setColumnLabels(workbook, row2,  ExcelTitleUtilForBooyoung.FIVE_BOTTOM_UBC );
+    	}else if(constructionIdx == 1269 || param.getConstructionIdx() == 1269) {
+    		//중흥토건 나라기초 부산 에코델타시티 공동4블럭 중흥S-클래스 아파트
+    		setColumnLabels(workbook, row2,  ExcelTitleUtilForDirectDrilling.FIVE_BOTTOM_UBC );
+    	}else {
+    		setColumnLabels(workbook, row2,  ExcelTitleUtil.FIVE_BOTTOM_UBC );
+    	}
     }else {
-    	setColumnLabels(workbook, row2,  new String[] {  "번호"
-				 , "시공일"
-				 , "시공장비"
-				 , "파일종류"
-				 , "시공공법"
-				 , "시공위치"
-				 , "파일\n번호"
-				 , "파일\n규격 \n( D )"
-				 , "단본"
-				 , "하단"
-				 , "중단"
-				 , "중단"
-				 , "상단"
-				 , "합계"
-				 , "이음\n개소\n( EA )"
-				 , "천공\n깊이\n( M )"
-				 , "토사\n천공\n( M )"
-				 , "전석층\n천공\n( M )"
-				 , "경타\n깊이\n( M )"
-				 , "파일\n잔량\n( M )"
-				 , "공삭공\n( M )"
-				 , "해머\n무게\n( Ton )"
-				 , "낙하\n높이\n( M )"
-				 , "관리\n기준\n( mm )"
-				 , "1회"
-				 , "2회"
-				 , "3회"
-				 , "4회"
-				 , "5회"
-				 , "평균관입"
-				 , "총관입량"
-				 , "비고"
-		 		 , "메모" } ); 
+    	if((constructionIdx == 692 || param.getConstructionIdx() == 692) || (constructionIdx ==  720 || param.getConstructionIdx() == 720)) {
+    		setColumnLabels(workbook, row2,  ExcelTitleUtil.FIVE_BOTTOM_ES ); 
+    	}else if(constructionIdx == 944 || constructionIdx == 1136) {
+    		setColumnLabels(workbook, row2,  ExcelTitleUtilForBooyoung.FIVE_BOTTOM ); 
+    	}else if(constructionIdx == 1269 || param.getConstructionIdx() == 1269) {
+    		//중흥토건 나라기초 부산 에코델타시티 공동4블럭 중흥S-클래스 아파트
+    		setColumnLabels(workbook, row2,  ExcelTitleUtilForDirectDrilling.FIVE_BOTTOM ); 
+    	}else {
+    		setColumnLabels(workbook, row2,  ExcelTitleUtil.FIVE_BOTTOM ); 
+    	}
     }
   }
 
@@ -1027,7 +917,7 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
 				if (Integer.parseInt(strings[strings.length - 1]) > 1) {
 					cell.setCellStyle(pupleStyle);
 				} else {
-					if (Float.parseFloat(strings[23]) < Float.parseFloat(strings[29])) {
+					if (Float.parseFloat(strings[22]) < Float.parseFloat(strings[28])) {
 						cell.setCellStyle(orangeStyle);
 					} else {
 						if (!emptyPenetrationCheck(strings)) {
@@ -1039,7 +929,7 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
 				}
 			}
 
-			if ((i == 29) && (Float.parseFloat(strings[23]) < Float.parseFloat(strings[29])))
+			if ((i == 28) && (Float.parseFloat(strings[22]) < Float.parseFloat(strings[28])))
 				cell.setCellStyle(redStyle);
 				/*if (Integer.parseInt(strings[strings.length - 2]) > 1) {
 					cell.setCellStyle(blueStyle);
@@ -1050,11 +940,11 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
 	}
 
 	private boolean emptyPenetrationCheck(String[] strings) {
-		if((strings[24] != null && !strings[24].trim().equals("0") && !strings[24].trim().equals("")) 
+		if((strings[23] != null && !strings[23].trim().equals("0") && !strings[23].trim().equals("")) 
+				&& (strings[24] != null && !strings[24].trim().equals("0") && !strings[24].trim().equals("")) 
 				&& (strings[25] != null && !strings[25].trim().equals("0") && !strings[25].trim().equals("")) 
 				&& (strings[26] != null && !strings[26].trim().equals("0") && !strings[26].trim().equals("")) 
-				&& (strings[27] != null && !strings[27].trim().equals("0") && !strings[27].trim().equals("")) 
-				&& (strings[28] != null && !strings[28].trim().equals("0") && !strings[28].trim().equals(""))) {
+				&& (strings[27] != null && !strings[27].trim().equals("0") && !strings[27].trim().equals(""))) {
 			return true;
 		}
 		return false;
@@ -1148,6 +1038,12 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
     sheet.addMergedRegion(new CellRangeAddress(
       tableLabelStartIndex, 
       tableLabelEndIndex, 
+      18, 
+      18));
+
+    sheet.addMergedRegion(new CellRangeAddress(
+      tableLabelStartIndex, 
+      tableLabelEndIndex, 
       19, 
       19));
 
@@ -1164,48 +1060,40 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
       21));
     
     sheet.addMergedRegion(new CellRangeAddress(
-      tableLabelStartIndex, 
-      tableLabelEndIndex, 
-      21, 
-      21));
-    
-    sheet.addMergedRegion(new CellRangeAddress(
-      tableLabelStartIndex, 
-      tableLabelEndIndex, 
-      22, 
-      22));
-    
-    sheet.addMergedRegion(new CellRangeAddress(
-      tableLabelStartIndex, 
-      tableLabelEndIndex, 
-      23, 
-      23));
+	  tableLabelStartIndex, 
+	  tableLabelEndIndex, 
+	  22, 
+	  22));
     
     sheet.addMergedRegion(new CellRangeAddress(
       tableLabelStartIndex, 
       tableLabelEndIndex - 1, 
-      24, 
-      30));
+      23, 
+      29));
     
     sheet.addMergedRegion(new CellRangeAddress(
       tableLabelStartIndex, 
       tableLabelEndIndex, 
       //추가   
       
+      30,    
+      30)); 
+    sheet.addMergedRegion(new CellRangeAddress(
+      tableLabelStartIndex, 
+      tableLabelEndIndex, 
+      //추가   
       31,    
-      31)); 
+      31));  
     
-    sheet.addMergedRegion(new CellRangeAddress(
-      tableLabelStartIndex, 
-      tableLabelEndIndex, 
-      //추가   
-      
-      32,    
-      32)); 
-      
     
     if(ubcYn > 0) {
-    	
+    	sheet.addMergedRegion(new CellRangeAddress(
+		        tableLabelStartIndex, 
+		        tableLabelEndIndex, 
+		        //추가   
+		      
+		        32,    
+		        32));  
     	sheet.addMergedRegion(new CellRangeAddress(
     			tableLabelStartIndex, 
     			tableLabelEndIndex, 
@@ -1220,22 +1108,13 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
     			
     			34,    
     			34));  
-    	
     	sheet.addMergedRegion(new CellRangeAddress(
     			tableLabelStartIndex, 
     			tableLabelEndIndex, 
     			//추가   
     			
     			35,    
-    			35)); 
-    	
-    	sheet.addMergedRegion(new CellRangeAddress(
-    			tableLabelStartIndex, 
-    			tableLabelEndIndex, 
-    			//추가   
-    			
-    			36,    
-    			36));  
+    			35));  
     }
  
   }
@@ -1290,22 +1169,19 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
 	  }
   }
   
-  private double balanceFixExp(double balance) {
+  private float gongSacFixExp(float balance, float gongSac, int constructionIdx) {
 	  
-	  if(balance < 0){
-		return 0;
-	  }else{
-		return balance;
-	  }
-  }
-  
-  private float gongSacFixExp(double balance) {
+	  if(constructionIdx == 783){
+			if(balance > 0 && gongSac == 0){
+				return gongSac;
+			}else{
+				gongSac = (float) (gongSac + -0.3);
+				return gongSac;
+			}
+		}else{
+			return gongSac;
+		}
 	  
-	  if(balance < 0){
-		return (float) balance;
-	  }else{
-		return 0;
-	  }
   }
  
 }

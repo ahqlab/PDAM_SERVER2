@@ -423,6 +423,7 @@ function downloadDrivingRecoredBook(root, constructionIdx, machineNumber, curren
 						var currentPileStandard = item.pileStandard;
 					
 						var currentDrillingDepth = item.drillingDepth;
+						var currentDirectDrillingDepth = item.directDrillingDepth;
 						var currentSdDrillingDepth = item.sdDrillingDepth;
 						var currentStDrillingDepth = item.stDrillingDepth;
 						var currentIntrusionDepth = item.intrusionDepth;
@@ -464,14 +465,37 @@ function downloadDrivingRecoredBook(root, constructionIdx, machineNumber, curren
 						var col = [];   
 						var row = [];
 							
-						row.push({ c1: '시공장비', c2: machineNumber	     , c3: (constructionIdx == 944 ? '경타길이(M)' : '천공깊이(M)'), c4: (constructionIdx == '1082' ? Number(currentDrillingDepth) + Number(currentSdDrillingDepth) + Number(currentStDrillingDepth) : currentDrillingDepth) });        
-					    row.push({ c1: '파일종류', c2: currentPileType 	 , c3: (constructionIdx == 944 ? '천공깊이(M)' : (constructionIdx == '1082' ? '경타깊이(M)' : '관입깊이(M)')), c4:currentIntrusionDepth}); 
-					    row.push({ c1: '파일규격', c2: currentPileStandard , c3:'잔여길이(M)', c4:currentBalance }); 
-					    row.push({ c1: '시공공법', c2: currentMethod       , c3:'공삭공(M)', c4:currentGongSac}); 
-					    row.push({ c1: '위     치', c2: currentLocation     , c3:'해머무게(Ton)', c4:currentHammaT }); 
-					    row.push({ c1: '파일번호', c2: currentPileNo       , c3:'낙하높이(M)', c4:currentFallMeter }); 
-					    row.push({ c1: '파일길이(M)', c2: allPiece.substring(2, allPiece.length).trim()       , c3:'평균관입(mm)', c4:currentAvgPenetrationValue}); 
-					    row.push({ c1: '파일합계(M)', c2: allPieceValue       , c3:'최종관입(mm)', c4:currentTotalPenetrationValue}); 
+						/**
+						 * 반도건설 고향창릉S-6BL아파트
+						 * **/
+						if(constructionIdx == '1252'){
+							row.push({ c1: '시공장비', c2: machineNumber	     , c3: '해머무게(Ton)', c4:currentHammaT });        
+						    row.push({ c1: '파일종류', c2: currentPileType 	 , c3: '낙하높이(M)', c4:currentFallMeter }); 
+						    row.push({ c1: '파일규격', c2: currentPileStandard , c3:'평균관입(mm)', c4:currentAvgPenetrationValue }); 
+						    row.push({ c1: '시공공법', c2: currentMethod       , c3:'최종관입(mm)', c4:currentTotalPenetrationValue }); 
+						    row.push({ c1: '위     치', c2: currentLocation     , c3:'', c4:'' }); 
+						    row.push({ c1: '파일번호', c2: currentPileNo       , c3:'', c4:'' }); 
+						    row.push({ c1: '파일길이(M)', c2: allPiece.substring(2, allPiece.length).trim()       , c3:'', c4:''}); 
+						    row.push({ c1: '파일합계(M)', c2: allPieceValue       , c3:'', c4:''}); 
+						}else{
+							
+							/**
+							 * 그 외
+							 * **/
+							if(constructionIdx == '1269'){
+								row.push({ c1: '시공장비', c2: machineNumber	     , c3: '천공 + 직타 깊이(M)' , c4: currentDrillingDepth + " + " + currentDirectDrillingDepth});        
+							}else{
+								row.push({ c1: '시공장비', c2: machineNumber	     , c3: (constructionIdx == 944 || constructionIdx == 1136  ? '경타길이(M)' : '천공깊이(M)'), c4: (constructionIdx == '1082' ? Number(currentDrillingDepth) + Number(currentSdDrillingDepth) + Number(currentStDrillingDepth) : currentDrillingDepth) });        
+							}
+						    row.push({ c1: '파일종류', c2: currentPileType 	 , c3: (constructionIdx == 944 || constructionIdx == 1136 ? '천공깊이(M)' : (constructionIdx == '1082' ? '경타깊이(M)' : '관입깊이(M)')), c4:currentIntrusionDepth}); 
+						    row.push({ c1: '파일규격', c2: currentPileStandard , c3:'잔여길이(M)', c4:currentBalance }); 
+						    row.push({ c1: '시공공법', c2: currentMethod       , c3:'공삭공(M)', c4:currentGongSac}); 
+						    row.push({ c1: '위     치', c2: currentLocation     , c3:'해머무게(Ton)', c4:currentHammaT }); 
+						    row.push({ c1: '파일번호', c2: currentPileNo       , c3:'낙하높이(M)', c4:currentFallMeter }); 
+						    row.push({ c1: '파일길이(M)', c2: allPiece.substring(2, allPiece.length).trim()       , c3:'평균관입(mm)', c4:currentAvgPenetrationValue}); 
+						    row.push({ c1: '파일합계(M)', c2: allPieceValue       , c3:'최종관입(mm)', c4:currentTotalPenetrationValue}); 
+						}
+						
 						
 					    
 				    	var pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
@@ -536,7 +560,7 @@ function downloadDrivingRecoredBook(root, constructionIdx, machineNumber, curren
 
 function calGongSac(totalConnectWidth, intrusionDepth, drillingDepth, constructionIdx){
 	var value = 0;
-	if(constructionIdx == 944){
+	if(constructionIdx == 944 || constructionIdx == 2043){
 		value = Number(totalConnectWidth) - Number(intrusionDepth != '' ? intrusionDepth : 0) - Number(drillingDepth != '' ? drillingDepth : 0);
 	}else{
 		value = Number(totalConnectWidth) - Number(intrusionDepth != '' ? intrusionDepth : 0);
@@ -608,8 +632,8 @@ function downloadDrivingAllRecoredBook(root, constructionIdx, machineNumber){
 						var col = [];   
 						var row = [];
 						
-						row.push({ c1: '시공장비', c2: machineNumber	     , c3:(constructionIdx == 944 ? '경타길이(M)' : '천공깊이(M)'), c4: currentDrillingDepth });        
-					    row.push({ c1: '파일종류', c2: currentPileType 	 , c3:(constructionIdx == 944 ? '천공깊이(M)' : '관입깊이(M)'), c4:currentIntrusionDepth}); 
+						row.push({ c1: '시공장비', c2: machineNumber	     , c3:(constructionIdx == 944 || constructionIdx == 1136 ? '경타길이(M)' : '천공깊이(M)'), c4:currentDrillingDepth });        
+					    row.push({ c1: '파일종류', c2: currentPileType 	 , c3:(constructionIdx == 944 || constructionIdx == 1136 ? '천공깊이(M)' : '관입깊이(M)'), c4:currentIntrusionDepth }); 
 					    row.push({ c1: '파일규격', c2: currentPileStandard , c3:'잔여길이(M)', c4:currentBalance }); 
 					    row.push({ c1: '시공공법', c2: currentMethod       , c3:'공삭공(M)', c4:currentGongSac}); 
 					    row.push({ c1: '위     치', c2: currentLocation     , c3:'해머무게(Ton)', c4:currentHammaT }); 

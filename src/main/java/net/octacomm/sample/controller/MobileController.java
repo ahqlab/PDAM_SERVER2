@@ -268,6 +268,10 @@ public class MobileController {
 	public CommonResponse<Boolean> registReport4(@RequestBody ReportWithFallMeter report, BindingResult result){
 		System.err.println("/regist/report report sTring : "  + report);
 		System.err.println("/regist/report report : " + report.getGongSac() + " balance : " + report.getBalance());
+		
+		report.setBigo("");
+		report.setDrillingDepth(report.getIntrusionDepth());
+		
 		CommonResponse<Boolean> response = new CommonResponse<Boolean>();
 		try{
 			if(report.getCreateDate() != null) {

@@ -11,6 +11,7 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -433,6 +434,13 @@ public class ReportController{
 				System.err.println("reportTenAllJh");
 				return "reportTenAllJh";
 			}
+			
+			if(constructionIdx == 1269 || param.getConstructionIdx() == 1269) {
+				System.err.println("reportTenAllFor1269");
+				System.err.println("reportTenAllFor1269");
+				return "reportTenAllFor1269";
+			}
+			
 			System.err.println("reportTenAll");
 			System.err.println("reportTenAll");
 			return "reportTenAll";
@@ -480,6 +488,12 @@ public class ReportController{
 			System.err.println("reportFiveAllBy");
 			System.err.println("reportFiveAllBy");
 			return "reportFiveAllBy";
+		}
+		
+		if(constructionIdx == 1269 || param.getConstructionIdx() == 1269) {
+			System.err.println("reportFiveAllFor1269");
+			System.err.println("reportFiveAllFor1269");
+			return "reportFiveAllFor1269";
 		}
 		
 		System.err.println("reportFiveAll");
@@ -583,6 +597,14 @@ public class ReportController{
 				return "reportTenAllJh";
 			}
 			
+
+			if(constructionIdx == 1269 || param.getConstructionIdx() == 1269) {
+				System.err.println("reportTenAllFor1269");
+				System.err.println("reportTenAllFor1269");
+				return "reportTenAllFor1269";
+			}
+			
+			
 			System.err.println("reportTenAll");
 			System.err.println("reportTenAll");
 			return "reportTenAll";
@@ -627,12 +649,18 @@ public class ReportController{
 		}
 		
 		if(constructionIdx == 1082 || param.getConstructionIdx() == 1082) {
-			
 			System.err.println("reportFiveAllBy");
 			System.err.println("reportFiveAllBy");
 			return "reportFiveAllBy";
-			
 		}
+		
+		if(constructionIdx == 1269 || param.getConstructionIdx() == 1269) {
+			System.err.println("reportTenAllFor1269");
+			System.err.println("reportTenAllFor1269");
+			return "reportTenAllFor1269";
+		}
+		
+		
 		System.err.println("reportFiveAll");
 		System.err.println("reportFiveAll");
 		return "reportFiveAll";
@@ -791,21 +819,6 @@ public class ReportController{
 	}
 	
 	@ResponseBody
-	@RequestMapping(value = "/update/reportMulti", method = RequestMethod.POST)
-	public boolean updateReportMulti(@RequestBody List<UpdateReport> report) {
-		try {
-			for (UpdateReport updateReport : report) {  
-				updateReportOne(updateReport);
-			}
-		}catch (Exception e) {
-			return false;
-		}
-		return true;
-	}
-	
-	
-	
-	@ResponseBody
 	@RequestMapping(value = "/update/report", method = RequestMethod.POST)
 	public boolean updateReport(@RequestBody UpdateReport report) {
 		
@@ -835,24 +848,83 @@ public class ReportController{
 		return true;
 	}
 	
+	/**@ResponseBody
+	@RequestMapping(value = "/update/reportMulti", method = RequestMethod.POST)
+	public boolean updateReportMulti(@RequestBody List<UpdateReport> report) {
+		try {
+			for (UpdateReport updateReport : report) {  
+				updateReportOne(updateReport);
+			}
+		}catch (Exception e) {
+			return false;
+		}
+		return true;
+	}*/
 	
+	
+	@ResponseBody
+	@RequestMapping(value = "/update/reportMulti", method = RequestMethod.POST)
+	public boolean updateReportMulti(@RequestBody List<UpdateReport> reports) {
+	    try {
+	        for (UpdateReport report : reports) {
+	            updateReportOne(report); // 실패하면 예외 발생
+	        }
+	        return true;
+	    } catch (Exception e) {
+	        // 에러 로그는 남기되 사용자에겐 false만
+	        e.printStackTrace();
+	        return false;
+	    }
+	}
+	
+	
+	@Transactional
 	public boolean updateReportOne(UpdateReport report) {
-		//원상태값
-		//Report rp = mapper.get(report.getId());
+	    // 1. 계산값 설정
+	    report.setUltimateBearingCapacity(String.valueOf(calDanish(report)));
+
+	    // 2. 메인 report update
+	    int result = mapper.update(report);
+	    if (result <= 0) {
+	        System.out.println("Report update 실패: ID = " + report.getId());
+	        return false;
+	    }
+
+	    // 3. 기존 piece 삭제
+	    int deletedCount = pieceMapper.deleteByReportIdx(report.getId());
+	    if (deletedCount < 0) {
+	        System.out.println("Piece 삭제 실패: report ID = " + report.getId());
+	        throw new RuntimeException("Delete failed for report ID: " + report.getId());
+	    }
+
+	    // 4. piece 재삽입
+	    if (report.getPiece() != null) {
+	        for (Piece piece : report.getPiece()) {
+	            if (pieceMapper.insert(piece) == 0) {
+	                throw new RuntimeException("Insert failed for piece in report ID: " + report.getId());
+	            }
+	        }
+	    }
+
+	    // 5. penetration 처리
+	    if(report.getPenetrations() != null) {
+			for (Penetration penetration : report.getPenetrations()) {
+				if(penetrationMapper.get(penetration.getId()) != null) {
+					penetrationMapper.update(penetration);
+				}else {
+					penetrationMapper.insert(penetration);
+				}
+			}
+		}
+
+	    return true;
+	}
+	
+	/**@Transactional
+	public boolean updateReportOne(UpdateReport report) {
+	
 		report.setUltimateBearingCapacity(String.valueOf(calDanish(report)));
-		//report.setUltimateBearingCapacity(report.getUltimateBearingCapacity());
-		int result = mapper.update(report);
-//		List<Report> rp2 = mapper.getDuplicationRepotsAllReport(report);
-//		if(rp2.size() > 1) {
-//			for (int i = 0; i < rp2.size(); i++) {
-//				if(i == 0) {
-//					mapper.updateDupl2(rp2.get(i));
-//				} else {
-//					mapper.updateDupl(rp2.get(i));
-//				}
-//			}
-//		}
-		
+		int result = mapper.update(report);	
 		if(result > 0) {
 			//전체를 다 삭제하고.
 			pieceMapper.deleteByReportIdx(report.getId());
@@ -874,7 +946,7 @@ public class ReportController{
 			}
 		}
 		return true;
-	}
+	}**/
 	
 	
 	@ResponseBody

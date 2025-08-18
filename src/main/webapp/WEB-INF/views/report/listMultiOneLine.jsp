@@ -254,22 +254,35 @@ $(document).ready( function() {
 				
 			}else{
 				
-				currentBalance = $('#reportTable tr').eq(index).find('td:eq(17)').text().trim();
-				currentGongSac = $('#reportTable tr').eq(index).find('td:eq(18)').text().trim();
-				currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
-				currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
-				currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
-				if(isBig > 0){
-					currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(32)').text().trim();
-					currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(33)').text().trim();
+				if(constructionIdx == 1269 || conIdx == 1269){
+					currentBalance = $('#reportTable tr').eq(index).find('td:eq(18)').text().trim();
+					currentGongSac = $('#reportTable tr').eq(index).find('td:eq(19)').text().trim();
+					currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
+					currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
+					currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
+					if(isBig > 0){
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(33)').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(34)').text().trim();
+					}else{
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(28)').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(29)').text().trim();
+					}
+					
 				}else{
-					currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(27)').text().trim();
-					currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(28)').text().trim();
+					currentBalance = $('#reportTable tr').eq(index).find('td:eq(17)').text().trim();
+					currentGongSac = $('#reportTable tr').eq(index).find('td:eq(18)').text().trim();
+					currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
+					currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
+					currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
+					if(isBig > 0){
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(32)').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(33)').text().trim();
+					}else{
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(27)').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(28)').text().trim();
+					}
 				}
-				
 			}
-			
-			
 			
 		}else{
 			
@@ -307,18 +320,34 @@ $(document).ready( function() {
 				
 			}else{
 				
-				currentBalance = $('#reportTable tr').eq(index).find('td:eq(16)').text().trim();
-				currentGongSac = $('#reportTable tr').eq(index).find('td:eq(17)').text().trim();
-				currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
-				currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
-				currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
-				
-				if(isBig > 0){
-					currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(31)').text().trim();
-					currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(32)').text().trim();
+				if(constructionIdx == 1269 || conIdx == 1269){
+					currentBalance = $('#reportTable tr').eq(index).find('td:eq(17)').text().trim();
+					currentGongSac = $('#reportTable tr').eq(index).find('td:eq(18)').text().trim();
+					currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
+					currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
+					currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
+					
+					if(isBig > 0){
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(32)').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(33)').text().trim();
+					}else{
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(27)').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(28)').text().trim();
+					}
 				}else{
-					currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(26)').text().trim();
-					currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(27)').text().trim();
+					currentBalance = $('#reportTable tr').eq(index).find('td:eq(16)').text().trim();
+					currentGongSac = $('#reportTable tr').eq(index).find('td:eq(17)').text().trim();
+					currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
+					currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
+					currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
+					
+					if(isBig > 0){
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(31)').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(32)').text().trim();
+					}else{
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(26)').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(27)').text().trim();
+					}
 				}
 			}
 			
@@ -341,6 +370,9 @@ $(document).ready( function() {
 		if(constructionIdx == 1082 || conIdx == 1082){
 			var total = Number(currentDrillingDepth) + Number(currentSdDrillingDepth) + Number(currentStDrillingDepth);
 			$('#curDrillingDepth').text(total);
+		}else if(constructionIdx == 1269 || conIdx == 1269){
+			var directDrillingDepth = $('#reportTable tr').eq(index).find('#directDrillingDepth').val();
+			$('#curDrillingDepth').text(currentDrillingDepth + " + " + directDrillingDepth);
 		}else{
 			$('#curDrillingDepth').text(currentDrillingDepth);
 		}
@@ -384,7 +416,6 @@ $(document).ready( function() {
 		$('#mCurManagedStandard').text(currentManagedStandard);
 		$('#mCurAvgPenetrationValue').text(currentAvgPenetrationValue);
 		$('#mCurTotalPenetrationValue').text(currentTotalPenetrationValue);
-		
 		
 		setTrActiviEffect(index);
 		
@@ -625,6 +656,7 @@ $(document).ready( function() {
 						piece: pieces, 
 						penetrations : penetrationss, 
 						drillingDepth: $('#reportTable tr').eq(i).find('#drillingDepth').val() != "" ? $('#reportTable tr').eq(i).find('#drillingDepth').val()  : "0", 
+						directDrillingDepth: $('#reportTable tr').eq(i).find('#directDrillingDepth').val() != "" ? $('#reportTable tr').eq(i).find('#directDrillingDepth').val()  : "0", 
 						sdDrillingDepth: $('#reportTable tr').eq(i).find('#sdDrillingDepth').val() != "" ? $('#reportTable tr').eq(i).find('#sdDrillingDepth').val()  : "0", 
 						stDrillingDepth: $('#reportTable tr').eq(i).find('#stDrillingDepth').val() != "" ? $('#reportTable tr').eq(i).find('#stDrillingDepth').val()  : "0", 
 						intrusionDepth: $('#reportTable tr').eq(i).find('#intrusionDepth').val() != "" ? $('#reportTable tr').eq(i).find('#intrusionDepth').val()  : "0", 
@@ -651,6 +683,7 @@ $(document).ready( function() {
 						pileStandard: $('#reportTable tr').eq(i).find('#pileStandard').val() != "" ? $('#reportTable tr').eq(i).find('#pileStandard').val() : "null", 
 						piece: pieces, 
 						drillingDepth: $('#reportTable tr').eq(i).find('#drillingDepth').val() != "" ? $('#reportTable tr').eq(i).find('#drillingDepth').val()  : "0", 
+						directDrillingDepth: $('#reportTable tr').eq(i).find('#directDrillingDepth').val() != "" ? $('#reportTable tr').eq(i).find('#directDrillingDepth').val()  : "0", 
 						sdDrillingDepth: $('#reportTable tr').eq(i).find('#sdDrillingDepth').val() != "" ? $('#reportTable tr').eq(i).find('#sdDrillingDepth').val()  : "0", 
 						stDrillingDepth: $('#reportTable tr').eq(i).find('#stDrillingDepth').val() != "" ? $('#reportTable tr').eq(i).find('#stDrillingDepth').val()  : "0", 
 						intrusionDepth: $('#reportTable tr').eq(i).find('#intrusionDepth').val() != "" ? $('#reportTable tr').eq(i).find('#intrusionDepth').val()  : "0", 
@@ -766,9 +799,14 @@ $(document).ready( function() {
 			intrusionDepth[index].disabled = true;
 		}
 		
+		
 		if(constructionIdx == 1082 || conIdx == 1082 ){
 			document.getElementsByName("sdDrillingDepth")[index].disabled = true;
 			document.getElementsByName("stDrillingDepth")[index].disabled = true;
+		}
+		
+		if(constructionIdx == 1269 || conIdx == 1269 ){
+			document.getElementsByName("directDrillingDepth")[index].disabled = true;
 		}
 		
 		hammaT[index].disabled = true;
@@ -806,6 +844,7 @@ $(document).ready( function() {
 		var pileStandard = document.getElementsByName("pileStandard");
 
 		var drillingDepth = document.getElementsByName("drillingDepth");
+		//var directDrillingDepth = document.getElementsByName("directDrillingDepth");
 		var intrusionDepth = document.getElementsByName("intrusionDepth");
 		var hammaT = document.getElementsByName("hammaT");
 		var fallMeter = document.getElementsByName("fallMeter");
@@ -856,6 +895,10 @@ $(document).ready( function() {
 			document.getElementsByName("stDrillingDepth")[index].disabled = false;
 		}
 		
+		if(constructionIdx == 1269 || conIdx == 1269 ){
+			document.getElementsByName("directDrillingDepth")[index].disabled = false;
+		}
+		
 		
 		hammaT[index].disabled = false;
 		fallMeter[index].disabled = false;
@@ -901,6 +944,7 @@ $(document).ready( function() {
 		var pileStandard = document.getElementsByName("pileStandard");
 
 		var drillingDepth = document.getElementsByName("drillingDepth");
+		//var directDrillingDepth = document.getElementsByName("directDrillingDepth");
 		var intrusionDepth = document.getElementsByName("intrusionDepth");
 		var hammaT = document.getElementsByName("hammaT");
 		var fallMeter = document.getElementsByName("fallMeter");
@@ -945,6 +989,7 @@ $(document).ready( function() {
 				//drillingDepth[index].disabled = false;
 				//intrusionDepth[index].disabled = false;
 			}else{
+				//directDrillingDepth[index].disabled = false;
 				drillingDepth[index].disabled = false;
 				intrusionDepth[index].disabled = false;
 			}
@@ -953,6 +998,9 @@ $(document).ready( function() {
 			if(constructionIdx == 1082 || conIdx == 1082 ){
 				document.getElementsByName("sdDrillingDepth")[index].disabled = false;
 				document.getElementsByName("stDrillingDepth")[index].disabled = false;
+			}
+			if(constructionIdx == 1269 || conIdx == 1269 ){
+				document.getElementsByName("directDrillingDepth")[index].disabled = false;
 			}
 			
 			hammaT[index].disabled = false;
@@ -998,6 +1046,7 @@ $(document).ready( function() {
 				//drillingDepth[index].disabled = false;
 				//intrusionDepth[index].disabled = false;
 			}else{
+				//directDrillingDepth[index].disabled = true;
 				drillingDepth[index].disabled = true;
 				intrusionDepth[index].disabled = true;
 			}
@@ -1005,6 +1054,10 @@ $(document).ready( function() {
 			if(constructionIdx == 1082 || conIdx == 1082 ){
 				document.getElementsByName("sdDrillingDepth")[index].disabled = true;
 				document.getElementsByName("stDrillingDepth")[index].disabled = true;
+			}
+			
+			if(constructionIdx == 1269 || conIdx == 1269 ){
+				document.getElementsByName("directDrillingDepth")[index].disabled = true;
 			}
 			
 			hammaT[index].disabled = true;
@@ -1464,12 +1517,18 @@ $(document).ready( function() {
 						<td rowspan="2">이음(개소)</td>
 						
 						<c:choose>
-							<c:when test="${sessionInfo.constructionIdx == 944 or param.constructionIdx == 944}">
+							<c:when test="${sessionInfo.constructionIdx == 944 or param.constructionIdx == 944  or sessionInfo.constructionIdx == 1136 or param.constructionIdx == 1136}">
 								<td rowspan="2">경타길이(M)</td>
 								<td rowspan="2">천공깊이(M)</td>
 							</c:when>
 							<c:otherwise>
 								<td rowspan="2">천공깊이(M)</td>
+								<c:choose>
+									<c:when test="${param.constructionIdx == 1269 or sessionInfo.constructionIdx == 1269}">
+										<td rowspan="2">직타깊이(M)</td>
+									</c:when>
+								</c:choose>
+								
 								<c:choose>
 									<c:when test="${sessionInfo.constructionIdx == 1082 or param.constructionIdx == 1082}">
 										<td rowspan="2">토사천공(M)</td>
@@ -1481,6 +1540,7 @@ $(document).ready( function() {
 										<td rowspan="2">경타깊이(M)</td>
 									</c:when>
 									<c:otherwise>
+										
 										<td rowspan="2">관입깊이(M)</td>
 									</c:otherwise>
 								</c:choose>
@@ -1664,7 +1724,21 @@ $(document).ready( function() {
 														 <c:otherwise>
 														 	<c:choose>
 														 		<c:when test="${domain.peLength < 5 }">
-																	<tr class="lampOn-l" onclick="javascript:onRowClick(${status.index});" style="background-color: #F0DDA4;">
+														 			<c:choose>
+														 				<c:when test="${domain.deviceIdx == 2061}">
+														 					<c:choose>
+														 						<c:when test="${domain.peLength < 3}">
+														 							<tr class="lampOn-l" onclick="javascript:onRowClick(${status.index});" style="background-color: #F0DDA4;">		
+														 						</c:when>
+														 						<c:otherwise>
+														 							<tr onclick="javascript:onRowClick(${status.index});">	
+														 						</c:otherwise>
+														 					</c:choose>
+														 				</c:when>
+														 				<c:otherwise>
+														 					<tr class="lampOn-l" onclick="javascript:onRowClick(${status.index});" style="background-color: #F0DDA4;">		
+														 				</c:otherwise>
+														 			</c:choose>
 																</c:when>
 																<c:otherwise>
 																	<tr onclick="javascript:onRowClick(${status.index});">
@@ -1721,7 +1795,7 @@ $(document).ready( function() {
 											</c:when>
 											<c:otherwise>
 												<c:choose>
-													<c:when test="${sessionInfo.constructionIdx == 657 or sessionInfo.constructionIdx ==  169 or sessionInfo.constructionIdx ==  170}">
+													<c:when test="${sessionInfo.constructionIdx == 657 or sessionInfo.constructionIdx ==  169 or sessionInfo.constructionIdx ==  170  or sessionInfo.constructionIdx ==  1117  or sessionInfo.constructionIdx == 1363}">
 														<c:set var = "dateTime" value = "${domain.createDate}"/>
 													    <c:set var = "length" value = "${fn:length(dateTime)}"/>
 													    <c:set var = "newDateTime" value = "${fn:substring(dateTime, 0, length -2)}" />
@@ -1850,6 +1924,13 @@ $(document).ready( function() {
 									</c:otherwise>
 								</c:choose>
 							</td>
+							<c:choose>
+								<c:when test="${param.constructionIdx == 1269 or sessionInfo.constructionIdx == 1269}">
+									<td>
+										<input type="text" id="directDrillingDepth" name="directDrillingDepth" disabled="disabled"  class="tdInput" value="${domain.directDrillingDepth}"/>
+									</td>
+								</c:when>
+							</c:choose>
 							<c:choose>
 								<c:when test="${sessionInfo.constructionIdx == 1082 or param.constructionIdx == 1082}">
 									<td><input type="text" id="sdDrillingDepth" name="sdDrillingDepth" disabled="disabled"  class="tdInput" value="${domain.sdDrillingDepth}"/></td>
@@ -2513,12 +2594,21 @@ $(document).ready( function() {
 					<td class="sumGrpTbTh">파일<br>합계</td>
 						
 					<c:choose>
-						<c:when test="${sessionInfo.constructionIdx == 944 or param.constructionIdx == 944}">
+						<c:when test="${sessionInfo.constructionIdx == 944 or param.constructionIdx == 944 or sessionInfo.constructionIdx == 1136 or param.constructionIdx == 1136}">
 							<td class="sumGrpTbTh">경타<br>길이</td>
 							<td class="sumGrpTbTh">천공<br>깊이</td>
 						</c:when>
 						<c:otherwise>
-							<td class="sumGrpTbTh">천공<br>깊이</td>
+							
+							
+							<c:choose>
+								<c:when test="${sessionInfo.constructionIdx == 1269 or param.constructionIdx == 1269}">
+									<td class="sumGrpTbTh">천공 +<br>직타</td>
+								</c:when>
+								<c:otherwise>
+									<td class="sumGrpTbTh">천공<br>깊이</td>
+								</c:otherwise>
+							</c:choose>
 							<c:choose>
 								<c:when test="${sessionInfo.constructionIdx == 1082 or param.constructionIdx == 1082}">
 									<td class="sumGrpTbTh">경타<br>깊이</td>
@@ -2587,7 +2677,7 @@ $(document).ready( function() {
 					<td class="sumGrpTbTh">파일<br>규격</td>
 					<td class="sumGrpTbTh">파일<br>합계</td>
 					<c:choose>
-						<c:when test="${sessionInfo.constructionIdx == 944 or param.constructionIdx == 944}">
+						<c:when test="${sessionInfo.constructionIdx == 944 or param.constructionIdx == 944 or sessionInfo.constructionIdx == 1136 or param.constructionIdx == 1136}">
 							<td class="sumGrpTbTh">경타<br>길이</td>
 						</c:when>
 						<c:otherwise>
@@ -2611,7 +2701,7 @@ $(document).ready( function() {
 						<img  src="${pageContext.request.contextPath}/new/img/report_down.png" onclick="javascript:onClickReportNext();">
 					</td>
 					<c:choose>
-						<c:when test="${sessionInfo.constructionIdx == 944 or param.constructionIdx == 944}">
+						<c:when test="${sessionInfo.constructionIdx == 944 or param.constructionIdx == 944 or sessionInfo.constructionIdx == 1136 or param.constructionIdx == 1136}">
 							<td class="sumGrpTbTh">천공<br>깊이</td>
 						</c:when>
 						<c:otherwise>

@@ -33,8 +33,9 @@ public interface ReportMapper extends CRUDMapper<Report, ReportParam, Integer> {
 			+ "method = #{method} , "
 			+ "location = #{location}, "
 			+ "pileNo = #{pileNo} ,"
-			+ "pileStandard = #{pileStandard} , "
+			+ "pileStandard = #{pileStandard} , " 
 			+ "drillingDepth = #{drillingDepth} , "
+			+ "directDrillingDepth = #{directDrillingDepth} , "
 			+ "sdDrillingDepth = #{sdDrillingDepth} , "
 			+ "stDrillingDepth = #{stDrillingDepth} , "
 			+ "intrusionDepth = #{intrusionDepth}  , "  
@@ -127,6 +128,7 @@ public interface ReportMapper extends CRUDMapper<Report, ReportParam, Integer> {
 		    " A.pileNo AS '파일번호', " +
 		    " A.pileStandard AS '파일규격', " +
 		    " A.drillingDepth AS '천공깊이', "+
+		    " A.directDrillingDepth AS '직타깊이', "+
 		    " A.intrusionDepth AS '관입깊이', "+
 		    " A.balance AS '파일잔량', "+
 		    " A.connectLength AS '이음개소', "+

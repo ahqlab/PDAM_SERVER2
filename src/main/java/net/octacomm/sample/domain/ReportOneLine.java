@@ -38,6 +38,8 @@ public class ReportOneLine implements Domain {
 	private String pileNo;
 	//천공깊이
 	private String drillingDepth;
+	//직타깊이
+	private String directDrillingDepth;
 	//전석층천공
 	private String stDrillingDepth;
 	//토사천공
@@ -197,7 +199,7 @@ public class ReportOneLine implements Domain {
 		float value;
 		try {
 			//System.err.println("시공사 아이디 : " + getConstructionIdx());
-			if(getConstructionIdx() == 944){
+			if(getConstructionIdx() == 944 || getConstructionIdx() == 1136){
 				value = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0") - Float.parseFloat(getDrillingDepth() != "" ? getDrillingDepth() : "0");;
 			}else {
 				value = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0");
@@ -213,7 +215,7 @@ public class ReportOneLine implements Domain {
 		float result;
 		try {
 			//System.err.println("시공사 아이디 : " + getConstructionIdx());
-			if(getConstructionIdx() == 944) {
+			if(getConstructionIdx() == 944 || getConstructionIdx() == 1136) {
 				result = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0") - Float.parseFloat(getDrillingDepth() != "" ? getDrillingDepth() : "0");
 			}else {
 				result = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0");

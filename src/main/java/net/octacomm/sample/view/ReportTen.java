@@ -596,14 +596,14 @@ public class ReportTen extends AbstractExcelView
 
 		if (ubcYn > 0) {
 			
-			if(constructionIdx == 944) {
+			if(constructionIdx == 944 || constructionIdx == 1136) {
 				setColumnLabels(workbook, row1, ExcelTitleUtilForBooyoung.TEN_TOP_UBC);
 			}else {
 				setColumnLabels(workbook, row1, ExcelTitleUtil.TEN_TOP_UBC);
 			}
 			
 		} else {
-			if(constructionIdx == 944) {
+			if(constructionIdx == 944 || constructionIdx == 1136) {
 				setColumnLabels(workbook, row1, ExcelTitleUtilForBooyoung.TEN_TOP);
 			}else {
 				setColumnLabels(workbook, row1, ExcelTitleUtil.TEN_TOP);
@@ -613,13 +613,13 @@ public class ReportTen extends AbstractExcelView
 		HSSFRow row2 = sheet.createRow(tableLabelEndIndex);
 
 		if (ubcYn > 0) {
-			if(constructionIdx == 944) {
+			if(constructionIdx == 944 || constructionIdx == 1136) {
 				setColumnLabels(workbook, row2, ExcelTitleUtilForBooyoung.TEN_BOTTOM_UBC);
 			}else {
 				setColumnLabels(workbook, row2, ExcelTitleUtil.TEN_BOTTOM_UBC);
 			}
 		} else {
-			if(constructionIdx == 944) {
+			if(constructionIdx == 944 || constructionIdx == 1136) {
 				setColumnLabels(workbook, row2, ExcelTitleUtilForBooyoung.TEN_BOTTOM);
 			}else {
 				setColumnLabels(workbook, row2, ExcelTitleUtil.TEN_BOTTOM);
