@@ -29,7 +29,6 @@ public class DesignDepthController extends AbstractCRUDController<DesignDepthMap
 	private DesignDepthService designDepthService;
 	
 	@Autowired
-	@Override
 	public void setCRUDMapper(DesignDepthMapper mapper) {
 		this.mapper = mapper;	
 	}

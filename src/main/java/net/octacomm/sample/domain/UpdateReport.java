@@ -97,15 +97,11 @@ public class UpdateReport implements Domain {
 		int length = -1;
 		for (Piece list : piece) {
 			if(list.getValue() != "" && !list.getValue().equals("0")) {
-				//System.err.println("list.getValue() :"  + list.getValue() );
-				if(list.getName().equals("단본")) {
-					length++;
-				}else {
+				if(list.getName() != null) {
 					length++;
 				}
 			}
 		}
-		//System.err.println("XXXXXXXXXXXXXXXXXXXXXXXXX : " + length);
 		return String.valueOf(length == -1 ? 0 : length);
 	}
 	//이음계소

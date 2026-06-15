@@ -34,6 +34,6 @@ public interface AuthCodeMapper {
 	int insert(@Param("userId") String userId, @Param("authCode") String authCode);
 
 	@Select("SELECT * FROM TB_AUTH_CODE WHERE userId = #{userId} and authCode = #{authCode}")
-	AuthCode getAuthCode(AuthCode authCode);
+	AuthCode getAuthCodeByCode(AuthCode authCode);
 	
 }

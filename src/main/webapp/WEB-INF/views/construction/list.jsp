@@ -96,6 +96,7 @@ function setGroupName(){
 .postit .memoRow {
     padding: 5px;
     border-bottom: 1px solid gray;
+    word-break: break-all;
 }.postit .memoRow p{
    font-size: 12px;
 }.postit .memoContent:hover{
@@ -119,17 +120,243 @@ function setGroupName(){
     border-bottom: 15px solid gray;
     border-left: 15px solid rgba(0, 0, 0, 0);
 }
-</style>		
+
+.actionGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+}
+.actionBtn {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 8px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    box-sizing: border-box;
+    text-align: center;
+    cursor: pointer;
+}
+.actionBtn .btnLabel {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+.actionBtn img {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+.actionBtn .btnIcon {
+    font-size: 14px;
+    line-height: 1;
+}
+.actionBtn.full {
+    grid-column: 1 / -1;
+}
+.actionBtn.c-device { background: #077b9c; color: #fff; }
+.actionBtn.c-device img { filter: brightness(10); }
+.actionBtn.c-info { background: #337ab7; color: #fff; }
+.actionBtn.c-info img { filter: brightness(10); }
+.actionBtn.c-memo { background: #FFE699; color: #333; }
+.actionBtn.c-contract { background: #004058; color: #fff; }
+.actionBtn.c-contract img { filter: brightness(10); }
+.actionBtn.c-block { background: #888; color: #fff; }
+.actionBtn.c-block.on { background: #d9534f; }
+.actionBtn.c-block img { filter: brightness(10); }
+
+.actionBadge {
+    font-size: 14px;
+    line-height: 1.6;
+    padding: 2px 10px;
+    border-radius: 8px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+.actionBadge.green { background: #28a745; color: #fff; }
+.actionBadge.orange { background: #f0ad4e; color: #333; }
+.actionBadge.gray { background: #ccc; color: #333; }
+.actionBadge.red { background: #d9534f; color: #fff; }
+
+/* 협력사 카드 (관리자) - 4분할 가로 배치 */
+.company .listArea .listUl li.ccard {
+    display: flex;
+    align-items: stretch;
+    gap: 20px;
+}
+.listArea .listUl li.ccard:hover {
+    background: #fff !important;
+    box-shadow: 0 4px 16px rgb(0 0 0 / 12%);
+}
+.listArea .listUl.two li.ccard:nth-of-type(even) {
+    background: #fff;
+}
+.ccard-head,
+.ccard .postit,
+.ccard-infoArea,
+.ccard-actionArea {
+    flex: 1 1 0;
+    min-width: 0;
+}
+.ccard-head {
+    flex: 6.5 1 0;
+}
+.ccard .postit {
+    flex: 3.5 1 0;
+}
+.ccard-infoArea,
+.ccard-actionArea {
+    flex: 5 1 0;
+}
+.ccard-head,
+.ccard .postit,
+.ccard-infoArea {
+    padding-right: 20px;
+    border-right: 1px solid #f0f0f0;
+}
+.ccard-head {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+}
+.ccard-name {
+    font-size: 22px;
+    font-weight: 700;
+    color: #077b9c;
+    text-decoration: underline;
+}
+.ccard-date {
+    align-self: flex-start;
+    font-size: 14px;
+    color: #888;
+    background: #f5f5f5;
+    padding: 3px 12px;
+    border-radius: 10px;
+}
+.ccard-addr {
+    font-size: 16px;
+    color: #777;
+    margin: 0;
+}
+.ccard .postit {
+    width: auto;
+    min-height: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+.ccard-infoArea {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.ccard-infoRow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+.ccard-infoLabel {
+    font-size: 15px;
+    color: #999;
+    width: 90px;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: left;
+}
+.ccard-infoValue {
+    font-size: 19px;
+    font-weight: 700;
+    color: #333;
+}
+.ccard-infoTel {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 16px;
+    color: #555;
+}
+.ccard-infoTel img {
+    width: 16px;
+    height: 16px;
+}
+.ccard-account {
+    padding-top: 10px;
+    border-top: 1px dashed #e5e5e5;
+}
+.ccard-actionArea {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.company .listArea .listUl li.ccard .ccard-select select.state {
+    width: 100%;
+    height: 44px;
+    line-height: 42px;
+    padding: 0 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    text-align: center;
+    text-align-last: center;
+    color: #333;
+    cursor: pointer;
+    background: #fff;
+    box-sizing: border-box;
+}
+@media (max-width: 1400px) {
+    .company .listArea .listUl li.ccard {
+        flex-wrap: wrap;
+    }
+    .ccard-head,
+    .ccard .postit,
+    .ccard-infoArea,
+    .ccard-actionArea {
+        flex: 1 1 100%;
+        padding-right: 0;
+        padding-bottom: 14px;
+        border-right: none;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .ccard-actionArea {
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+    .company .TopContArea .searchArea {
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    .company .TopContArea .searchArea01,
+    .company .TopContArea .searchArea02 {
+        width: 100%;
+        margin-right: 0;
+    }
+    .company .TopContArea .searchArea02 .inputDate {
+        width: calc(50% - 53px);
+    }
+}
+</style>
 
 		<!--컨텐츠-->
 		<div class="section-right" >
+			<%@ include file="/WEB-INF/views/common/welcomeMsg.jsp" %>
 			<div class="TopContArea" >
 				<div class="titArea">
 					<p id="listTitle" class="h1Tit">전체 협력사 리스트</p>
 					<c:choose>
-							<c:when test="${sessionInfo.role == 0 or sessionInfo.role == 3}">
-									<div class="popBtn popBtn01">협력사 등록</div>
-							</c:when>
+						<c:when test="${sessionInfo.role == 0 or sessionInfo.role == 3}">
+								<div class="popBtn popBtn01">협력사 등록</div>
+						</c:when>
 					</c:choose>
 				</div>
 				<!--검색-->
@@ -141,6 +368,7 @@ function setGroupName(){
 		                	<form:option value="location">현장명</form:option>
 		                    <form:option value="manager">현장 담당자 & 소장</form:option>
 		                    <form:option value="address">현장주소</form:option>
+		                    <form:option value="groupName">시공사</form:option>
 						</form:select>
 						<form:input path="searchWord" class="searchin"  placeholder="검색어를 입력하세요."/>
 						<form:hidden path="currentPage"/>
@@ -158,7 +386,6 @@ function setGroupName(){
 					</div>
 				</div>
 				</form:form>
-			
 			</div>
 			
 			<!--검색된 리스트 5개씩 노출-->
@@ -167,8 +394,152 @@ function setGroupName(){
 				
 				<ul class="listUl two">
 					<c:forEach var="domain" items="${domainList}"  varStatus="status">
+					<c:choose>
+						<c:when test="${sessionInfo.role == 0}">
+						<li class="ccard">
+							<div class="ccard-head">
+								<span class="ccard-date">${domain.createDate}</span>
+								<a class="ccard-name" href="${pageContext.request.contextPath}/device/list?constructionIdx=${domain.id}">
+									<c:choose>
+										<c:when test="${sessionInfo.userId eq 'ji2177'}">
+											${domain.location}
+										</c:when>
+										<c:otherwise>
+											[${domain.name}] ${domain.location}
+										</c:otherwise>
+									</c:choose>
+								</a>
+								<p class="ccard-addr">${domain.address}</p>
+							</div>
+
+							<div id="postit" name="postit" class="postit" style="display: none;">
+								<input type="hidden" name="constructionIdx" value="${domain.id}">
+								<input type="hidden" name="userId" value="${domain.userId}">
+								<div name="memoArea">
+								</div>
+							</div>
+
+							<div class="ccard-infoArea">
+									<div class="ccard-infoRow">
+										<span class="ccard-infoLabel" style="letter-spacing: 2px;">협력사 소장</span>
+										<span class="ccard-infoValue">${domain.conManager}</span>
+										<span class="ccard-infoTel">
+											<img src="${pageContext.request.contextPath}/new/img/call.png" />${domain.conContact}
+										</span>
+									</div>
+									<div class="ccard-infoRow">
+										<span class="ccard-infoLabel" style="letter-spacing: 2px;">협력사 담당</span>
+										<span class="ccard-infoValue">${domain.manager}</span>
+										<span class="ccard-infoTel">
+											<img src="${pageContext.request.contextPath}/new/img/call.png" />${domain.contact}
+										</span>
+									</div>
+									<div class="ccard-infoRow ccard-account">
+										<span class="ccard-infoLabel" style="letter-spacing: 16.35px;">아이디</span>
+										<span class="ccard-infoValue">${domain.userId}</span>
+									</div>
+									<div class="ccard-infoRow">
+										<span class="ccard-infoLabel" style="letter-spacing: 8px;">비밀번호</span>
+										<span class="ccard-infoValue">
+											<c:choose>
+												<c:when test="${domain.userId == 'admin'}">
+													*******
+												</c:when>
+												<c:otherwise>
+													${domain.password}
+												</c:otherwise>
+											</c:choose>
+										</span>
+									</div>
+								</div>
+
+								<div class="ccard-actionArea">
+									<div class="actionGrid">
+										<a class="actionBtn c-device" href="javascript:registDeviceInfo('${domain.id}')">
+											<span class="btnLabel">
+												<img src="${pageContext.request.contextPath}/new/img/machin.png" />
+												기기등록
+											</span>
+										</a>
+										<a class="actionBtn c-info" href="javascript:getConstructionInfo('${domain.id}','${domain.fcIdx}');">
+											<span class="btnLabel">
+												<img src="${pageContext.request.contextPath}/new/img/user.png" />
+												정보변경
+											</span>
+										</a>
+										<a class="actionBtn c-memo" href="javascript:showMemoPop('${domain.id}', '${domain.userId}', '${status.index}');">
+											<span class="btnLabel">
+												<img src="${pageContext.request.contextPath}/new/img/memo_icon.png" />
+												메모등록
+											</span>
+										</a>
+										<a class="actionBtn c-contract" href="${pageContext.request.contextPath}/contract/manage?constructionIdx=${domain.id}">
+											<span class="btnLabel">
+												<span class="btnIcon">&#128196;</span>
+												계약서 관리
+											</span>
+											<c:choose>
+												<c:when test="${domain.contractRequired == 0}">
+													<span class="actionBadge gray">대상아님</span>
+												</c:when>
+												<c:when test="${domain.contractCount > 0}">
+													<span class="actionBadge green">등록됨</span>
+												</c:when>
+												<c:otherwise>
+													<span class="actionBadge orange">미등록</span>
+												</c:otherwise>
+											</c:choose>
+										</a>
+										<a class="actionBtn c-block ${domain.blockedYn == 1 ? 'on' : ''}" href="javascript:toggleBlocked('${domain.id}', ${domain.blockedYn});">
+											<span class="btnLabel">
+												<img src="${pageContext.request.contextPath}/new/img/alertIcon.png" />
+												<c:choose>
+													<c:when test="${domain.blockedYn == 1}">이용제한 해제</c:when>
+													<c:otherwise>이용제한 설정</c:otherwise>
+												</c:choose>
+											</span>
+											<c:choose>
+												<c:when test="${domain.blockedYn == 1}">
+													<span class="actionBadge red">제한중</span>
+												</c:when>
+												<c:otherwise>
+													<span class="actionBadge green">정상</span>
+												</c:otherwise>
+											</c:choose>
+										</a>
+										<div class="selectArea ccard-select">
+											<select id="conductSel" class="state" onchange="conductSel('${domain.id}', this.value)">
+												<option value="0" ${domain.conduct == 0 ? 'selected="selected"' : '' }>시행</option>
+												<option value="1" ${domain.conduct == 1 ? 'selected="selected"' : '' }>종료</option>
+											</select>
+										</div>
+									</div>
+								</div>
+						</li>
+						</c:when>
+						<c:otherwise>
 					<li>
-						<div class="listLeft">
+						
+						
+						<c:choose>
+							<c:when test="${sessionInfo.role == 3}">
+								<div class="listLeft">
+									<p class="date">${domain.createDate}</p>
+									<p class="" style="margin: 0px;">
+										[${domain.groupName}] ${domain.name}
+									</p>
+									<p class="addr" style="font-size: 20px; color: #999999; margin-top: 0px;" >
+										<a  class="name" href="${pageContext.request.contextPath}/device/list?constructionIdx=${domain.id}" >
+										 ${domain.location}
+										</a>
+									</p>
+									<p class="addr">
+										${domain.address} 
+									</p>
+								</div>
+							</c:when>
+							<c:otherwise>
+								<div class="listLeft">
 							<p class="date">${domain.createDate}</p>
 							<p class="name">
 								<a  class="name" href="${pageContext.request.contextPath}/device/list?constructionIdx=${domain.id}" >
@@ -180,16 +551,14 @@ function setGroupName(){
 											[${domain.name}] ${domain.location}
 										</c:otherwise>
 									</c:choose>
-									
 								</a>
-								<!--  <a href="javascript:showMemoPop();">
-									
-								</a> -->
 							</p>
 							<p class="addr">
 								${domain.address} 
 							</p>
 						</div>
+							</c:otherwise>
+						</c:choose>
 						<c:choose>
 							<c:when test="${sessionInfo.role == 0 or sessionInfo.role == 3 }">
 								<div id="postit" name="postit" class="postit" style="margin-left: 20px; display: none;">
@@ -262,18 +631,58 @@ function setGroupName(){
 							
 							<c:choose>
 								<c:when test="${sessionInfo.role == 0}">
-									<div class="BtnArea">
-										<a class="addBtn popBtn02" href="javascript:registDeviceInfo('${domain.id}')">
-											<img src="${pageContext.request.contextPath}/new/img/machin.png" />
-											기기 등록하기
+									<div class="actionGrid">
+										<a class="actionBtn c-device" href="javascript:registDeviceInfo('${domain.id}')">
+											<span class="btnLabel">
+												<img src="${pageContext.request.contextPath}/new/img/machin.png" />
+												기기등록
+											</span>
 										</a>
-										 <a class="changeBtn popBtn03" href="javascript:getConstructionInfo('${domain.id}','${domain.fcIdx}');">
-											<img src="${pageContext.request.contextPath}/new/img/user.png" />
-											정보 변경하기
+										<a class="actionBtn c-info" href="javascript:getConstructionInfo('${domain.id}','${domain.fcIdx}');">
+											<span class="btnLabel">
+												<img src="${pageContext.request.contextPath}/new/img/user.png" />
+												정보변경
+											</span>
 										</a>
-										 <a class="changeBtn popBtn04" style="margin-top: 5px; background-color: #FFE699; color:black;" href="javascript:showMemoPop('${domain.id}', '${domain.userId}', '${status.index}');">
-											<img src="${pageContext.request.contextPath}/new/img/memo_icon.png" style="width: 17px; height: 17px;"/>
-											메모 등록하기
+										<a class="actionBtn c-memo" href="javascript:showMemoPop('${domain.id}', '${domain.userId}', '${status.index}');">
+											<span class="btnLabel">
+												<img src="${pageContext.request.contextPath}/new/img/memo_icon.png" />
+												메모등록
+											</span>
+										</a>
+										<a class="actionBtn c-contract" href="${pageContext.request.contextPath}/contract/manage?constructionIdx=${domain.id}">
+											<span class="btnLabel">
+												<span class="btnIcon">&#128196;</span>
+												계약서 관리
+											</span>
+											<c:choose>
+												<c:when test="${domain.contractRequired == 0}">
+													<span class="actionBadge gray">대상아님</span>
+												</c:when>
+												<c:when test="${domain.contractCount > 0}">
+													<span class="actionBadge green">등록됨</span>
+												</c:when>
+												<c:otherwise>
+													<span class="actionBadge orange">미등록</span>
+												</c:otherwise>
+											</c:choose>
+										</a>
+										<a class="actionBtn c-block full ${domain.blockedYn == 1 ? 'on' : ''}" href="javascript:toggleBlocked('${domain.id}', ${domain.blockedYn});">
+											<span class="btnLabel">
+												<img src="${pageContext.request.contextPath}/new/img/alertIcon.png" />
+												<c:choose>
+													<c:when test="${domain.blockedYn == 1}">이용제한 해제</c:when>
+													<c:otherwise>이용제한 설정</c:otherwise>
+												</c:choose>
+											</span>
+											<c:choose>
+												<c:when test="${domain.blockedYn == 1}">
+													<span class="actionBadge red">제한중</span>
+												</c:when>
+												<c:otherwise>
+													<span class="actionBadge green">정상</span>
+												</c:otherwise>
+											</c:choose>
 										</a>
 									</div>
 									
@@ -295,6 +704,8 @@ function setGroupName(){
 							</c:choose>
 						</div>
 					</li>
+					</c:otherwise>
+					</c:choose>
 					</c:forEach>
 				</ul>
 			</div>
@@ -1660,10 +2071,43 @@ function conductSel(idx, selectVal){
 			},
 			error : function(xhr, status, error) {
 			}
-		}); 	
+		});
 	}
 }
-	
+
+function toggleBlocked(idx, currentBlockedYn){
+
+	var newVal = currentBlockedYn == 1 ? 0 : 1;
+	var msg = newVal == 1
+		? '이 협력사를 이용요금 미납 상태로 설정하시겠습니까?\n로그인 시 접속이 차단됩니다.'
+		: '이 협력사의 이용제한을 해제하시겠습니까?';
+
+	var result = confirm(msg);
+	if(result){
+
+		jQuery.ajax({
+			type : "POST",
+			url : "${pageContext.request.contextPath}/construction/update/blocked",
+			data: {
+				id : idx
+				, blockedYn : newVal
+			},
+			dataType : "JSON",
+			success : function(data) {
+				if(data){
+					alert('변경이 완료되었습니다.');
+					location.reload();
+				}else{
+					alert('변경에 실패했습니다.');
+				}
+			},
+			error : function(xhr, status, error) {
+				alert('변경 중 오류가 발생했습니다.');
+			}
+		});
+	}
+}
+
 
 function getGroupList(){
 	jQuery.ajax({

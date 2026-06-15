@@ -36,7 +36,6 @@ public class DeviceController extends AbstractDeviceCRUDController<DeviceMapper,
 	private ConstructionMapper ConstructionMapper;
 
 	@Autowired
-	@Override
 	public void setCRUDMapper(DeviceMapper mapper) {
 		this.mapper = mapper;
 	}

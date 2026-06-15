@@ -3,120 +3,120 @@
 
 <mapper namespace="net.octacomm.sample.dao.mapper.ConstructionMapper">
 	
-	
 	<sql id="conditionByVim">
         <where>
-        	isDel = 0
+        	A.groupIdx = B.idx and A.isDel = 0
         	<if test="param.searchField != null and param.searchField != '' and param.searchWord != null and param.searchWord != ''">
      			and ${param.searchField} like '%${param.searchWord}%'
        		</if>
        		<if test="param.startDate != null and param.startDate != '' and param.endDate != null and param.endDate != ''">
-       			and date_format(createDate, '%Y-%m-%d') between  #{param.startDate}  and  #{param.endDate} 
+       			and date_format(A.createDate, '%Y-%m-%d') between  #{param.startDate}  and  #{param.endDate} 
        		</if>
-     		
        </where>
 	</sql>
 	
 	
 	<sql id="condition">
         <where>
-        	isDel = 0
+        	A.groupIdx = B.idx and A.isDel = 0
         	<if test="param.groupIdx != null and param.groupIdx != '' and param.groupIdx != null and param.groupIdx != ''">
         		<if test="param.groupIdx == 174">
-        			 AND id IN (613, 627, 588)
+        			 AND A.id IN (613, 627, 588)
         		</if>
         		<if test="param.groupIdx != 174">
-        			 AND groupIdx = #{param.groupIdx}
+        			 AND A.groupIdx = #{param.groupIdx}
         		</if>
        		</if>
        		<if test="param.fcIdx != null and param.fcIdx != '' and param.fcIdx != null and param.fcIdx != ''">
-       			and fcIdx = #{param.fcIdx}
+       			and A.fcIdx = #{param.fcIdx}
        		</if>
         	<if test="param.searchField != null and param.searchField != '' and param.searchWord != null and param.searchWord != ''">
      			<if test="param.searchField == 'manager'">
-        			and ( manager like  '%${param.searchWord}%' or conManager like  '%${param.searchWord}%')
+        			and ( A.manager like  '%${param.searchWord}%' or A.conManager like  '%${param.searchWord}%')
         		</if>
         		<if test="param.searchField != 'manager'">
        				and ${param.searchField} like '%${param.searchWord}%'
         		</if>
        		</if>
        		<if test="param.startDate != null and param.startDate != '' and param.endDate != null and param.endDate != ''">
-       			and date_format(createDate, '%Y-%m-%d') between  #{param.startDate}  and  #{param.endDate} 
+       			and date_format(A.createDate, '%Y-%m-%d') between  #{param.startDate}  and  #{param.endDate} 
        		</if>
      		<if test="param.role == 1"> 
-     			and id = #{param.constructionIdx} 
+     			and A.id = #{param.constructionIdx} 
      		</if>
        </where>
 	</sql>
 	
 	<select id="getCountByParam" resultType="_int">
-        SELECT COUNT(*) FROM TB_CONSTRUCTION
+        SELECT COUNT(*) FROM TB_CONSTRUCTION A, TB_GROUP B
     	<include refid="condition"/>
     </select>
     
     <select id="getCountByParamByVim" resultType="_int">
-        SELECT COUNT(*) FROM TB_CONSTRUCTION
+        SELECT COUNT(*) FROM TB_CONSTRUCTION A, TB_GROUP B
     	<include refid="conditionByVim"/>
     </select>
    
     <select id="getListByParam" resultType="Construction">
     	SELECT 
-    		id
-			,name
-			,password
-			,manager
-			,contact
-			,conManager
-			,conContact
-			, date_format(createDate, '%Y-%m-%d') as createDate
-			,location
-			,role
-			,userId
-			,address
-			,isDel
-			,groupIdx
-			,secretCode
-			,conduct
-			,fcIdx
-			,longCalYn
-			,ubcYn
-			,originDataYn 
-			,showPdfYn 
-		 
-    	FROM TB_CONSTRUCTION
+    		A.id
+			, A.name
+			, A.password
+			, A.manager
+			, A.contact
+			, A.conManager
+			, A.conContact
+			, date_format(A.createDate, '%Y-%m-%d') as createDate
+			, A.location
+			, A.role
+			, A.userId
+			, A.address
+			, A.isDel
+			, A.groupIdx
+			, A.secretCode
+			, A.conduct
+			, A.fcIdx
+			, A.longCalYn
+			, A.ubcYn
+			, A.originDataYn
+			, A.showPdfYn
+			, IFNULL((SELECT blockedYn FROM TB_CONSTRUCTION_BLOCK WHERE constructionIdx = A.id), 0) AS blockedYn
+			, IFNULL((SELECT COUNT(*) FROM TB_CONTRACT WHERE CONSTRUCTION_IDX = A.id AND isDel = 0), 0) AS contractCount
+			, IFNULL((SELECT COUNT(*) FROM TB_CONTRACT_CONFIG c WHERE A.createDate >= c.APPLY_FROM_DATE), 0) AS contractRequired
+			, B.groupName
+    	FROM TB_CONSTRUCTION A, TB_GROUP B
     	<include refid="condition"/>
-    	ORDER BY (case when id = 1 then 10000 else (case when id = 587 then 9999 else 0 end) end ) desc , conduct ASC, id DESC
+    	ORDER BY (case when A.id = 1482 then 10000 else (case when A.id = 587 then 9999 else 0 end) end ) desc , A.conduct ASC, A.id DESC
         LIMIT #{pageSize} OFFSET #{startRow}
     </select>   
     
     
     <select id="getListByParamByVim" resultType="Construction">
     	SELECT 
-    		id
-			,name
-			,manager
-			,password
-			,contact
-			,conManager
-			,conContact
-			, date_format(createDate, '%Y-%m-%d') as createDate
-			,location
-			,role
-			,userId
-			,address
-			,isDel
-			,groupIdx
-			,secretCode
-			,conduct
-			,fcIdx
-			,longCalYn
-			,ubcYn
-			,originDataYn 
-			,showPdfYn 
-			
-    	FROM TB_CONSTRUCTION
+    		A.id
+			, A.name
+			, A.manager
+			, A.password
+			, A.contact
+			, A.conManager
+			, A.conContact
+			, date_format(A.createDate, '%Y-%m-%d') as createDate
+			, A.location
+			, A.role
+			, A.userId
+			, A.address
+			, A.isDel
+			, A.groupIdx
+			, A.secretCode
+			, A.conduct
+			, A.fcIdx
+			, A.longCalYn
+			, A.ubcYn
+			, A.originDataYn 
+			, A.showPdfYn 
+    	FROM TB_CONSTRUCTION A, TB_GROUP B
     	<include refid="conditionByVim"/>
-    	ORDER BY (case when id = 1 then 10000 else (case when id = 587 then 9999 else 0 end) end ) desc , conduct ASC, id DESC
+    	ORDER BY (case when A.id = 1482 then 10000 else (case when A.id = 587 then 9999 else 0 end) end ) desc , A.conduct ASC, A.id DESC
         LIMIT #{pageSize} OFFSET #{startRow}
     </select>  
     
@@ -141,7 +141,6 @@
     		, ubcYn = #{ubcYn}
     		, originDataYn  = #{originDataYn}
     		, showPdfYn  = #{showPdfYn}
-    	
 	    WHERE id = #{id} 
     </update>
     

@@ -145,6 +145,10 @@ public class ReportOneLine implements Domain {
 	
 	private String piFive;
 	
+	private String piSix;
+	
+	private String piSeven;
+	
 	private String pidOne;
 	
 	private String pidTwo;
@@ -154,6 +158,10 @@ public class ReportOneLine implements Domain {
 	private String pidFour;
 	
 	private String pidFive;
+	
+	private String pidSix;
+	
+	private String pidSeven;
 	
 	private int duplicated;
 	
@@ -188,9 +196,22 @@ public class ReportOneLine implements Domain {
 	
 	/** old **/
 	public float getGongSac() {
+		//if (getDeviceIdx() == 3042 || "isoo".equals(getSprCol1())) {
+		if ("isoo".equals(getSprCol1())) {
+		//if (getConstructionIdx() == 1482) {
+			// 역산: 천공깊이 - 관입깊이
+			try {
+				float drilling = Float.parseFloat(getDrillingDepth() != null && !getDrillingDepth().isEmpty() ? getDrillingDepth() : "0");
+				float intrusion = Float.parseFloat(getIntrusionDepth() != null && !getIntrusionDepth().isEmpty() ? getIntrusionDepth() : "0");
+				//System.err.println("Float.parseFloat(String.format(\"%.1f\", drilling - intrusion)) : " + Float.parseFloat(String.format("%.1f", drilling - intrusion)));
+				return Float.parseFloat(String.format("%.2f", drilling - intrusion));
+			} catch (Exception e) {
+				return 0;
+			}
+		}
 		return Float.parseFloat(String.format("%.1f", gongSac));
 	}
-	
+
 	public void setGongSac(float gongSac) {
 		this.gongSac = gongSac;
 	}

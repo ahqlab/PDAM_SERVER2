@@ -30,7 +30,6 @@ import net.octacomm.sample.domain.DeviceTestReportParam;
 public class DeviceTestReportController extends AbstractCRUDController<DeviceTestReportMapper, DeviceTestReport, DeviceTestReportParam, Integer>{
 
 	@Autowired
-	@Override
 	public void setCRUDMapper(DeviceTestReportMapper mapper) {
 		this.mapper = mapper;
 	}

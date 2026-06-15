@@ -94,7 +94,9 @@ public interface FileInventoryMapper extends CRUDMapper<FileInventory, FileInven
 			" ORDER BY TRIM(pileType)")
 	List<FileInventory> getPileTypeList(FileInventory inventory);
 
-	//List<FileInventoryOfChart> getFileInventoryOfChart(FileUsingChartParam param);
+	List<FileInventoryOfChart> getFileInventoryOfMultiChart(@Param("constructionIdx") int constructionIdx, @Param("pileType") String pileType, @Param("pileStandard") String pileStandard);
+	
+	List<FileInventoryOfChart> getFileInventoryOfSteelMultiChart(@Param("constructionIdx") int constructionIdx, @Param("pileType") String pileType, @Param("pileStandard") String pileStandard, @Param("fileWeight") String fileWeight);
 
 	List<FileInventoryOfChart> getFileInventoryOfChart(@Param("constructionIdx") int constructionIdx, @Param("pileType") String pileType, @Param("pileStandard") String pileStandard);
 	

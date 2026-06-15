@@ -17,6 +17,17 @@ public class FileInventoryOfChart extends FileInventory implements Domain {
 	
 	private int total4;
 	
+	private int bTotal;
+	
+	private int bTotal1;
+	
+	private int bTotal2;
+	
+	private int bTotal3;
+	
+	private int bTotal4;
+	
+	
 	@Override
 	public String toString() {
 		return "FileInventoryOfChart [accum=" + accum + ", total=" + total + ", total1=" + total1 + ", total2=" + total2

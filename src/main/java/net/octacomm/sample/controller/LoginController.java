@@ -4,11 +4,15 @@ import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
+import net.octacomm.sample.dao.mapper.ContractConfigMapper;
+import net.octacomm.sample.dao.mapper.ContractMapper;
 import net.octacomm.sample.dao.mapper.ConstructionMapper;
 import net.octacomm.sample.dao.mapper.FranchiseMapper;
 import net.octacomm.sample.dao.mapper.GroupMapper;
 import net.octacomm.sample.dao.mapper.SurveyMapper;
+import net.octacomm.sample.domain.Contract;
 import net.octacomm.sample.domain.Construction;
+import net.octacomm.sample.domain.ContractConfig;
 import net.octacomm.sample.domain.Franchise;
 import net.octacomm.sample.domain.Group;
 import net.octacomm.sample.domain.Survey;
@@ -41,7 +45,13 @@ public class LoginController {
 
 	@Autowired
 	private LoginService loginService;
-	
+
+	@Autowired
+	private ContractMapper contractMapper;
+
+	@Autowired
+	private ContractConfigMapper contractConfigMapper;
+
 	@Autowired
 	private ConstructionMapper conMapper;
 	
@@ -143,6 +153,7 @@ public class LoginController {
 						redirectAttributes.addFlashAttribute("constructionIdx", result.getId());
 						//redirectAttributes.addFlashAttribute("userId", result.getUserId());
 						redirectAttributes.addFlashAttribute("userId", construction.getUserId());
+						redirectAttributes.addFlashAttribute("userName", construction.getName());
 						redirectAttributes.addFlashAttribute("conManager", yes.getConManager());
 						//redirectAttributes.addFlashAttribute("password", result.getPassword());
 						redirectAttributes.addFlashAttribute("password", construction.getPassword());
@@ -163,9 +174,29 @@ public class LoginController {
 					//Group group = groupMapper.selectByUserId(result.getUserId());
 					return "redirect:" + DEFAULT_GROUP_TARGET_URL;
 				}
-				return "redirect:" + DEFAULT_TARGET_URL + "?constructionIdx=" + result.getId();
+				// 계약 기능 비활성 또는 기존 공사(APPLY_FROM_DATE 이전 등록)면 바로 통과
+				ContractConfig contractConfig = contractConfigMapper.getConfig();
+				if (contractConfig == null || contractConfig.getUseContractYn() == 0
+						|| conMapper.isContractRequired(result.getId()) == 0) {
+					return "redirect:" + DEFAULT_TARGET_URL + "?constructionIdx=" + result.getId();
+				}
+
+				// 계약 로직 대상 공사
+				List<Contract> contracts = contractMapper.getListByConstructionIdx(result.getId());
+				if (!contracts.isEmpty()) {
+					Contract draft = contractMapper.getDraftByConstructionIdx(result.getId());
+					if (draft != null) {
+						session.setAttribute("contractStatus", "DRAFT");
+						return "redirect:/contract/sign-view";
+					}
+					session.setAttribute("contractStatus", "SIGNED");
+					return "redirect:" + DEFAULT_TARGET_URL + "?constructionIdx=" + result.getId();
+				}
+
+				// 계약서 없음 → 접근 차단 페이지
+				return "redirect:/contract/required";
 			}
-			
+
 			model.addAttribute("errorMessage", "아이디가 비밀번호를 확인하세요.");
 			model.addAttribute("domain", new Construction());
 			return LOGIN_URL;
@@ -223,21 +254,23 @@ public class LoginController {
 			Construction construction = new Construction();
 			construction.setUserId(survey.getUserId());
 			construction.setPassword(survey.getPassword());
-			
+
 			Construction result = loginService.login(construction, session);
 			if(result != null) {
 				if(result.getRole() == 0) {
 					return "redirect:" + DEFAULT_ADMIN_TARGET_URL;
 				}else if(result.getRole() == 2) {
 					Group group = groupMapper.selectByUserId(result.getUserId());
-					//return "redirect:" + DEFAULT_GROUP_TARGET_URL + "?groupIdx=" + group.getIdx();
 					return "redirect:" + DEFAULT_GROUP_TARGET_URL;
 				}else if(result.getRole() == 3) {
 					Franchise franchise = franchiseMapper.selectByUserId(result.getUserId());
 					return "redirect:" + DEFAULT_GROUP_TARGET_URL + "?fcIdx=" + franchise.getIdx();
 				}else if(result.getRole() == 4) {
-					//Group group = groupMapper.selectByUserId(result.getUserId());
 					return "redirect:" + DEFAULT_GROUP_TARGET_URL;
+				}
+				Contract draft = contractMapper.getDraftByConstructionIdx(result.getId());
+				if (draft != null) {
+					return "redirect:/contract/sign-view";
 				}
 				return "redirect:" + DEFAULT_TARGET_URL + "?constructionIdx=" + result.getId();
 			}
@@ -246,21 +279,23 @@ public class LoginController {
 			Construction construction = new Construction();
 			construction.setUserId(survey.getUserId());
 			construction.setPassword(survey.getPassword());
-			
+
 			Construction result = loginService.login(construction, session);
 			if(result != null) {
 				if(result.getRole() == 0) {
 					return "redirect:" + DEFAULT_ADMIN_TARGET_URL;
 				}else if(result.getRole() == 2) {
 					Group group = groupMapper.selectByUserId(result.getUserId());
-					//return "redirect:" + DEFAULT_GROUP_TARGET_URL + "?groupIdx=" + group.getIdx();
 					return "redirect:" + DEFAULT_GROUP_TARGET_URL;
 				}else if(result.getRole() == 3) {
 					Franchise franchise = franchiseMapper.selectByUserId(result.getUserId());
 					return "redirect:" + DEFAULT_GROUP_TARGET_URL + "?fcIdx=" + franchise.getIdx();
 				}else if(result.getRole() == 4) {
-					//Group group = groupMapper.selectByUserId(result.getUserId());
 					return "redirect:" + DEFAULT_GROUP_TARGET_URL;
+				}
+				Contract draft2 = contractMapper.getDraftByConstructionIdx(result.getId());
+				if (draft2 != null) {
+					return "redirect:/contract/sign-view";
 				}
 				return "redirect:" + DEFAULT_TARGET_URL + "?constructionIdx=" + result.getId();
 			}

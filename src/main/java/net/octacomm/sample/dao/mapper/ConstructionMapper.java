@@ -1,6 +1,7 @@
 package net.octacomm.sample.dao.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.CacheNamespace;
 import org.apache.ibatis.annotations.Delete;
@@ -62,11 +63,31 @@ public interface ConstructionMapper extends CRUDMapper<Construction, Constructio
 	int doDelete(int id);
 	
 	//@Select(" SELECT IF(id = 815, LOCATION , CONCAT(CONCAT(IFNULL((SELECT  groupName  FROM TB_GROUP  WHERE TB_GROUP.idx = TB_CONSTRUCTION.groupIdx), ''), CONCAT(' ', NAME)), CONCAT(' ', LOCATION))) AS NAME  FROM TB_CONSTRUCTION WHERE id = #{id}")
+//	@Select(" SELECT IF(${role} = 0,CONCAT(CONCAT(IFNULL((SELECT groupName from TB_GROUP WHERE TB_GROUP.idx = TB_CONSTRUCTION.groupIdx), ''),  CONCAT(' ',NAME)), CONCAT(' ',LOCATION)) , LOCATION) AS NAME  FROM TB_CONSTRUCTION WHERE id = #{id}")
+//	Construction getFullName(@Param("id") int id, @Param("role") int role);
+	@Select("SELECT \r\n" + 
+			"  (SELECT groupName \r\n" + 
+			"   FROM TB_GROUP \r\n" + 
+			"   WHERE TB_GROUP.idx = TB_CONSTRUCTION.groupIdx) AS groupName ,\r\n" + 
+			"  NAME AS constructionName ,\r\n" + 
+			"  LOCATION AS constructionLocation ,\r\n" + 
+			"  ADDRESS AS constructionAddress\r\n" + 
+			"FROM TB_CONSTRUCTION\r\n" + 
+			"WHERE id = #{id}")
+	Map<String, Object> getFullName(@Param("id") int id, @Param("role") int role);
+	
 	@Select(" SELECT IF(${role} = 0,CONCAT(CONCAT(IFNULL((SELECT groupName from TB_GROUP WHERE TB_GROUP.idx = TB_CONSTRUCTION.groupIdx), ''),  CONCAT(' ',NAME)), CONCAT(' ',LOCATION)) , LOCATION) AS NAME  FROM TB_CONSTRUCTION WHERE id = #{id}")
-	Construction getFullName(@Param("id") int id, @Param("role") int role);
+	Construction getFullNameByConstruction(@Param("id") int id, @Param("role") int role);
 
 	@Update("UPDATE " + TABLE_NAME + " SET conduct = #{conduct} where id = #{id}")
 	int updateConduct(@Param("id") int id, @Param("conduct") int conduct);
+
+	@Update("INSERT INTO TB_CONSTRUCTION_BLOCK (constructionIdx, blockedYn) VALUES (#{id}, #{blockedYn}) "
+			+ "ON DUPLICATE KEY UPDATE blockedYn = #{blockedYn}")
+	int updateBlockedYn(@Param("id") int id, @Param("blockedYn") int blockedYn);
+
+	@Select("SELECT IFNULL((SELECT blockedYn FROM TB_CONSTRUCTION_BLOCK WHERE constructionIdx = #{id}), 0)")
+	int getBlockedYn(@Param("id") int id);
 		
 	@Select("\r\n" + 
 			"SELECT \r\n" + 
@@ -84,5 +105,8 @@ public interface ConstructionMapper extends CRUDMapper<Construction, Constructio
 
 	@Select(" SELECT * FROM TB_CONSTRUCTION WHERE ID = #{id}  AND now() > DATE_ADD(createDate, INTERVAL 14 DAY) ")
 	Construction findByIdAndCreateDate(@Param("id") int id);
+
+	@Select("SELECT COUNT(*) FROM TB_CONSTRUCTION t, TB_CONTRACT_CONFIG c WHERE t.id = #{id} AND t.createDate >= c.APPLY_FROM_DATE")
+	int isContractRequired(@Param("id") int id);
 
 }

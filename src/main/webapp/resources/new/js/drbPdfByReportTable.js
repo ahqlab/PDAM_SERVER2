@@ -2,12 +2,14 @@ var index;
 var role;
 var hiddenManager;
 var isBig;
+var extensivePileUsage;
 
-function showPdf(rowIndex, userRole, hManager, big){
+function showPdf(rowIndex, userRole, hManager, big, epu){
 	index = rowIndex;
 	role = userRole;
 	hiddenManager = hManager;
 	isBig = big;
+	extensivePileUsage = epu;
 }
 
 //외부차트를 사용할 경우 (현재는 사용하지 않는다.)
@@ -82,6 +84,398 @@ function yAxisLevel(currentAvgPenetrationValue){
 	}
 }
 
+function drawPageNumber(doc, index){
+	
+	const pageNumber = " - " + String(index + 1) + " - ";   // ← 숫자 → 문자열 변환 + 1
+    const pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
+    const textWidth = doc.getTextWidth(pageNumber);
+    const x = (pageWidth - textWidth) / 2;
+    doc.text(pageNumber, x, 290);
+
+}
+
+function drawPageNumberToTopRight(doc, index){
+	
+    const pageNumber = String(index + 1); // 숫자 → 문자열 변환 + 1
+    const pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
+    
+    doc.setFontSize(18); // 폰트 크게
+    const textWidth = doc.getTextWidth(pageNumber);
+    const x = pageWidth - 20; // 오른쪽 여백 20
+    const y = 15; // 상단 여백 30
+
+    doc.text(pageNumber, x, y);
+    
+    doc.setFontSize(12); // 원래 폰트 크기로 되돌리기 (필요하면)
+	
+}
+
+function drawAutoFitText(doc, text, x, y, maxWidth, options = { align: 'left' }, minFontSize = 6) {
+    const originalFontSize = doc.getFontSize(); // 원래 폰트 크기 저장
+
+    // 앞뒤 공백 제거
+    const trimmedText = text.trim();
+    const length = trimmedText.length;
+
+    let fontSize = originalFontSize;
+
+    // 6글자 초과일 때만 폰트 줄이기
+    if (length > 6) {
+        const excess = length - 6;
+        fontSize -= excess;
+        if (fontSize < minFontSize) fontSize = minFontSize;
+    }
+
+    // 텍스트 폭 계산 후 영역 맞춤
+    let textWidth = doc.getTextWidth(trimmedText) * (fontSize / originalFontSize);
+
+    if (textWidth > maxWidth) {
+        fontSize = fontSize * (maxWidth / textWidth);
+        if (fontSize < minFontSize) fontSize = minFontSize;
+    }
+
+    // 폰트 크기 적용 후 출력
+    doc.setFontSize(fontSize);
+    doc.text(trimmedText, x, y, options);
+
+    // 원래 폰트 크기 복원
+    doc.setFontSize(originalFontSize);
+}
+
+
+
+function drawHitCountLegend(doc, startY) {
+    const startX = 15;
+    const cellW  = 22;
+    const cellH  = 10;
+    const titleH = 7;
+    const fontSz = 10;
+
+    const cols = 4;
+    const totalW = cellW * cols;
+    const totalH = titleH + cellH * 2;
+
+    /* ===== 기본 스타일 ===== */
+    doc.setFontSize(fontSz);
+    doc.setLineWidth(0.2);
+    doc.setDrawColor(null);
+    doc.setLineCap('butt');
+    doc.setLineJoin('miter');
+
+    /* =================================================
+       1. 외곽 테두리
+    ================================================= */
+    doc.rect(startX, startY, totalW, totalH);
+
+    /* =================================================
+       2. 내부 가로선
+       - 제목 하단
+       - 헤더 하단
+    ================================================= */
+    doc.line(
+        startX,
+        startY + titleH,
+        startX + totalW,
+        startY + titleH
+    );
+
+    doc.line(
+        startX,
+        startY + titleH + cellH,
+        startX + totalW,
+        startY + titleH + cellH
+    );
+
+    /* =================================================
+       3. 내부 세로선
+       ※ 제목 행(titleH)에서는 선을 끊어
+         → 셀 병합 효과
+    ================================================= */
+    for (let i = 1; i < cols; i++) {
+        const x = startX + cellW * i;
+
+        // 헤더 + 값 영역만 세로선
+        doc.line(
+            x,
+            startY + titleH,
+            x,
+            startY + totalH
+        );
+    }
+
+    /* =================================================
+       4. 제목 텍스트 (병합 셀 중앙)
+    ================================================= */
+    const titleTextY =
+        startY +
+        titleH / 2 +
+        fontSz * 0.35;
+
+    doc.text(
+        '타 격 횟 수',
+        startX + totalW / 2,
+        titleTextY - 2,
+        { align: 'center' }
+    );
+
+    /* =================================================
+       5. 헤더 텍스트
+    ================================================= */
+    const headerTextY =
+        startY +
+        titleH +
+        cellH / 2 +
+        fontSz * 0.35;
+
+    doc.text('중단', startX + cellW * 0.5, headerTextY - 2, { align: 'center' });
+    doc.text('중단', startX + cellW * 1.5, headerTextY - 2, { align: 'center' });
+    doc.text('상단', startX + cellW * 2.5, headerTextY - 2, { align: 'center' });
+    doc.text('합계', startX + cellW * 3.5, headerTextY - 2, { align: 'center' });
+
+    /* =================================================
+       6. 다음 Y 반환
+    ================================================= */
+    return startY + totalH;
+}
+
+
+function drawCompactChart(
+	    root,
+	    index,
+	    pageWidth,
+	    pageHeight,
+	    doc,
+	    currentAvgPenetrationValue,
+	    currentTotalPenetrationValue,
+	    constructionIdx
+	) {
+
+	    // =========================
+	    // 기본 설정 (최종 drawCompactChart와 동일)
+	    // =========================
+	    var lectLeftPadding   = 15;
+	    var lectBottomPadding = 40;
+
+	    var lectTopY     = 134;
+	    var graphBottomY = pageHeight - lectBottomPadding;
+	    var graphHeight  = graphBottomY - lectTopY;
+
+	    var lectRightX = pageWidth - lectLeftPadding;
+
+	    // =========================
+	    // 그래프 테두리
+	    // =========================
+	    doc.setDrawColor(null);
+	    doc.setLineWidth(null);
+
+	    doc.line(lectLeftPadding, lectTopY, lectRightX, lectTopY);
+	    doc.line(lectLeftPadding, graphBottomY, lectRightX, graphBottomY);
+	    doc.line(lectLeftPadding, lectTopY, lectLeftPadding, graphBottomY);
+	    doc.line(lectRightX, lectTopY, lectRightX, graphBottomY);
+
+	    // =========================
+	    // Y축 최대값
+	    // =========================
+	    var rawMaxValue = currentTotalPenetrationValue;
+	    if (rawMaxValue <= 0) rawMaxValue = 1;
+
+	    var maxValue = rawMaxValue * 1.15;
+
+	    var step;
+	    if (maxValue > 1000) step = 200;
+	    else if (maxValue > 500) step = 100;
+	    else if (maxValue > 200) step = 50;
+	    else if (maxValue > 100) step = 20;
+	    else if (maxValue > 50) step = 10;
+	    else step = 5;
+
+	    // =========================
+	    // Y축 눈금선
+	    // =========================
+	    doc.setFontSize(9);
+
+	    for (var v = 0; v <= maxValue; v += step) {
+	        var y = graphBottomY - (v / maxValue) * graphHeight;
+	        if (y < lectTopY) continue;
+
+	        doc.line(lectLeftPadding, y, lectRightX, y);
+	        doc.text(
+	            Math.round(v).toString(),
+	            lectLeftPadding - 2,
+	            y + 2,
+	            { align: 'right' }
+	        );
+	    }
+
+	    // =========================
+	    // penetration 값 (DOM 유지)
+	    // =========================
+	    var penetrationsDom = document.getElementsByName(
+	        "penetrations[" + index + "]"
+	    );
+
+	    var penetrations = [];
+	    for (var i = 0; i < penetrationsDom.length; i++) {
+	        penetrations.push(
+	            penetrationsDom[i].value !== ""
+	                ? Number(penetrationsDom[i].value)
+	                : 0
+	        );
+	    }
+
+	    // =========================
+	    // 포인트 계산 (누적)
+	    // =========================
+	    var sum = 0;
+	    var verticalGap = (pageWidth - 30) / (penetrations.length + 1);
+	    var pointArr = [];
+
+	    for (var i = 0; i < penetrations.length; i++) {
+
+	        sum += penetrations[i];
+
+	        var y = graphBottomY - (sum / maxValue) * graphHeight;
+	        if (y < lectTopY) y = lectTopY;
+
+	        var x = lectLeftPadding + verticalGap * (i + 1);
+
+	        // 점
+	        doc.setFillColor(0, 173, 239);
+	        doc.circle(x, y, 1.2, 'F');
+
+	        pointArr.push([x, y]);
+
+	        // 세로 기준선
+	        doc.line(x, lectTopY, x, graphBottomY);
+
+	        // 하단 텍스트
+	        doc.setFontSize(penetrations.length > 5 ? 8 : 9);
+	        doc.text(
+	            (i + 1) + '회 측정',
+	            x,
+	            graphBottomY + 6,
+	            { align: 'center' }
+	        );
+	    }
+	    
+	    
+	    if(constructionIdx != 738){
+			jQuery.ajax({
+				type : "POST",
+				url : root + "/signroom/get/order/list",
+				data: { 
+					constructionIdx : constructionIdx			
+				}, 
+				dataType : "JSON", // 옵션이므로 JSON으로 받을게 아니면 안써도 됨
+				async : false,
+				success : function(data) {
+					
+					var signRoomStartX = 75;
+					var signRoomTopY = 12;
+					var signRoomBottomY = 22;
+					
+					if(data.length > 0){
+						
+						var roomOneWidth = 60;
+						
+						var endXSum = 0;
+						$.each(data, function(index, item) {
+							
+							if(constructionIdx == 969){
+								roomOneWidth = 60;
+							}else{
+								roomOneWidth = 44;
+							}
+							
+							var end = (pageWidth - 15) - (roomOneWidth * (index + 1));
+							endXSum = end;
+						});
+						
+						//세로
+						doc.line(endXSum, 
+								pageHeight - signRoomTopY, 
+								endXSum, 
+								pageHeight - signRoomBottomY);
+						
+						$.each(data, function(index, item) {
+							
+							if(constructionIdx == 969){
+								roomOneWidth = 60;
+							}else{
+								roomOneWidth = 44;
+							}
+							
+							var x = (pageWidth - 15) - (roomOneWidth * index);
+							var end = (pageWidth - 15) - (roomOneWidth * (index + 1));
+							
+							//가로위
+							doc.line(x, 
+									pageHeight - signRoomTopY, 
+									end,
+									pageHeight - signRoomTopY);
+							//가로아래
+							doc.line(x, 
+									pageHeight - signRoomBottomY, 
+									end,
+									pageHeight - signRoomBottomY);
+							//세로
+							doc.line(x, 
+									pageHeight - signRoomTopY, 
+									x, 
+									pageHeight - signRoomBottomY);
+							
+							//세로 칸의 중간
+							doc.line(x - (roomOneWidth / 2), 
+									pageHeight - signRoomTopY, 
+									x -  (roomOneWidth / 2), 
+									pageHeight - signRoomBottomY);
+							
+							
+							//doc.text(item.approver, x - ( (roomOneWidth / 2) + (roomOneWidth/4)), pageHeight - 16, {align: 'center'});
+							drawAutoFitText(
+								    doc,
+								    item.approver,
+								    x - ( (roomOneWidth / 2) + (roomOneWidth / 4) ),
+								    pageHeight - 16,
+								    roomOneWidth,
+								    { align: 'center' }
+								);
+							
+						});
+						
+						
+					}
+				},
+				complete : function(data) {
+				},
+				error : function(xhr, status, error) {
+				}
+			});
+		
+		}
+
+	    // =========================
+	    // 계단식 선 연결
+	    // =========================
+	    doc.setLineWidth(1.2);
+	    doc.setDrawColor(0, 173, 239);
+
+	    for (var i = 0; i < pointArr.length - 1; i++) {
+
+	        var x1 = pointArr[i][0];
+	        var y1 = pointArr[i][1];
+	        var x2 = pointArr[i + 1][0];
+	        var y2 = pointArr[i + 1][1];
+
+	        doc.line(x1, y1, x2, y1); // 수평
+	        doc.line(x2, y1, x2, y2); // 수직
+	    }
+
+	    // =========================
+	    // 값 표시 (기존 시그니처 유지)
+	    // =========================
+	    writeValue(pointArr, doc, index);
+	}
 
 //그래프를 그린다.
 function drawChart(root, index, pageWidth, pageHeight, doc, currentAvgPenetrationValue , currentTotalPenetrationValue, constructionIdx){
@@ -289,35 +683,18 @@ function drawChart(root, index, pageWidth, pageHeight, doc, currentAvgPenetratio
 								pageHeight - signRoomBottomY);
 						
 						
-						doc.text(item.approver, x - ( (roomOneWidth / 2) + (roomOneWidth/4)), pageHeight - 16, {align: 'center'});
-						
+						//doc.text(item.approver, x - ( (roomOneWidth / 2) + (roomOneWidth/4)), pageHeight - 16, {align: 'center'});
+						drawAutoFitText(
+							    doc,
+							    item.approver,
+							    x - ( (roomOneWidth / 2) + (roomOneWidth / 4) ),
+							    pageHeight - 16,
+							    roomOneWidth,
+							    { align: 'center' }
+							);
 						
 					});
 					
-					
-				}else{
-					//결재방시작
-					/**
-					var signRoomStartX = 75;
-					var signRoomTopY = 12;
-					var signRoomBottomY = 22;
-					//가로
-					doc.line( signRoomStartX , pageHeight - signRoomTopY , pageWidth - 15, pageHeight - signRoomTopY);
-					doc.line( signRoomStartX , pageHeight - signRoomBottomY , pageWidth - 15, pageHeight - signRoomBottomY);
-					
-					//세로
-					doc.line( signRoomStartX, pageHeight - signRoomTopY , signRoomStartX, pageHeight - signRoomBottomY);
-					for(var i = 1; i <= 4; i++){
-						doc.line( signRoomStartX  + (i*30) , pageHeight - signRoomTopY , signRoomStartX   + (i*30), pageHeight - signRoomBottomY);
-					}
-					
-					//doc.line( signRoomStartX  + 60 , pageHeight - signRoomTopY , signRoomStartX   + 60, pageHeight - signRoomBottomY);
-					//doc.line( signRoomStartX  + 90 , pageHeight - signRoomTopY , signRoomStartX   + 90, pageHeight - signRoomBottomY);
-					//doc.line( signRoomStartX  + 120 , pageHeight - signRoomTopY , signRoomStartX   + 120, pageHeight - signRoomBottomY);
-					doc.setFontSize(10);
-					doc.text('시공사', signRoomStartX  + 15, pageHeight - 16, {align: 'center'});
-					doc.text('감리단', signRoomStartX  + 60 + 15, pageHeight - 16, {align: 'center'});
-					**/
 					
 				}
 			},
@@ -328,32 +705,7 @@ function drawChart(root, index, pageWidth, pageHeight, doc, currentAvgPenetratio
 		});
 	
 	}
-	
-	
-	/*if(constructionIdx != 738){
-		//결재방시작
-		var signRoomStartX = 75;
-		var signRoomTopY = 12;
-		var signRoomBottomY = 22;
-		//가로
-		doc.line( signRoomStartX , pageHeight - signRoomTopY , pageWidth - 15, pageHeight - signRoomTopY);
-		doc.line( signRoomStartX , pageHeight - signRoomBottomY , pageWidth - 15, pageHeight - signRoomBottomY);
-		
-		//세로
-		doc.line( signRoomStartX, pageHeight - signRoomTopY , signRoomStartX, pageHeight - signRoomBottomY);
-		for(var i = 1; i <= 4; i++){
-			doc.line( signRoomStartX  + (i*30) , pageHeight - signRoomTopY , signRoomStartX   + (i*30), pageHeight - signRoomBottomY);
-		}
-		
-		//doc.line( signRoomStartX  + 60 , pageHeight - signRoomTopY , signRoomStartX   + 60, pageHeight - signRoomBottomY);
-		//doc.line( signRoomStartX  + 90 , pageHeight - signRoomTopY , signRoomStartX   + 90, pageHeight - signRoomBottomY);
-		//doc.line( signRoomStartX  + 120 , pageHeight - signRoomTopY , signRoomStartX   + 120, pageHeight - signRoomBottomY);
-		doc.setFontSize(10);
-		doc.text('시공사', signRoomStartX  + 15, pageHeight - 16, {align: 'center'});
-		doc.text('감리단', signRoomStartX  + 60 + 15, pageHeight - 16, {align: 'center'});
-	//결재방끝
-	}*/
-	
+
 	//실제 그래프를 그린다.
 	doc.setLineWidth(1); 
 	for(var i=0; i<pointArr.length; i++){
@@ -367,6 +719,26 @@ function drawChart(root, index, pageWidth, pageHeight, doc, currentAvgPenetratio
 	
 	//값의 숫자를 쓴다.
 	writeValue(pointArr, doc, index);
+	
+	if(constructionIdx == 1554){
+		//create1554Signarea(doc);
+		doc.setFontSize(12);
+		var signareaTopY = 18;
+		doc.text(
+		        '협력사 : 김 상 석    (인)',
+		        lectLeftPadding, pageHeight - signareaTopY,
+		        { align: 'left' });
+		
+		doc.text(
+		        '시공사 : 김 경 민    (인)',
+		        (pageWidth / 2) - 6, pageHeight - signareaTopY,
+		        { align: 'center' });
+		
+		doc.text(
+		        '건설사업관리단 : 양 흥 주    (인)',
+		        pageWidth - lectLeftPadding, pageHeight - signareaTopY,
+		        { align: 'right' });
+	}
 }
 
 
@@ -378,9 +750,9 @@ function createFileName(){
 }
 
 
-$(function () {
+function downloadDrivingOneRecoredBook(option) {
 		
-		$('#pdfBtn').on('click', function(e) {
+		//$('#pdfBtn').on('click', function(e) {
 			
 		    var doc = new jspdf.jsPDF("p", "mm", "a4");  //이렇게 바꾸어 줍니다!!!! 
 		    
@@ -433,8 +805,13 @@ $(function () {
 				currentLocation = $('#reportTable tr').eq(index).find('#location').val();
 				currentPileNo = $('#reportTable tr').eq(index).find('#pileNo').val();
 				currentPileStandard = $('#reportTable tr').eq(index).find('#pileStandard').val().trim();
-				currentPileSum = $('#reportTable tr').eq(index).find('td:eq(13)').text().trim();
-			
+				if(extensivePileUsage > 0){
+					
+					currentPileSum = $('#reportTable tr').eq(index).find('td:eq(15)').text().trim();
+				}else{
+					
+					currentPileSum = $('#reportTable tr').eq(index).find('td:eq(13)').text().trim();
+				}
 				currentDrillingDepth = $('#reportTable tr').eq(index).find('#drillingDepth').val();
 				
 				if(constructionIdx == 1269){
@@ -476,17 +853,39 @@ $(function () {
 					}
 					
 				}else{
-					currentBalance = $('#reportTable tr').eq(index).find('td:eq(17)').text().trim();
-					currentGongSac = $('#reportTable tr').eq(index).find('td:eq(18)').text().trim();
+					
+					if(extensivePileUsage > 0){
+						currentBalance = $('#reportTable tr').eq(index).find('td:eq(19)').text().trim();
+						currentGongSac = $('#reportTable tr').eq(index).find('td:eq(20)').text().trim();
+						
+					}else{
+						currentBalance = $('#reportTable tr').eq(index).find('td:eq(17)').text().trim();
+						currentGongSac = $('#reportTable tr').eq(index).find('td:eq(18)').text().trim();
+						
+					}
 					currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
 					currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
 					currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
 					if(isBig){
-						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(32)').text().trim();
-						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(33)').text().trim();
+						if(extensivePileUsage > 0){
+							
+							currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(34)').text().trim();
+							currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(35)').text().trim();
+						}else{
+							currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(32)').text().trim();
+							currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(33)').text().trim();
+							
+						}
 					}else{
-						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(27)').text().trim();
-						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(28)').text().trim();
+						if(extensivePileUsage > 0){
+							currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(29)').text().trim();
+							currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(30)').text().trim();
+							
+						}else{
+							
+							currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(27)').text().trim();
+							currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(28)').text().trim();
+						}
 					}
 				}
 				
@@ -502,7 +901,11 @@ $(function () {
 				currentLocation = $('#reportTable tr').eq(index).find('#location').val();
 				currentPileNo = $('#reportTable tr').eq(index).find('#pileNo').val();
 				currentPileStandard = $('#reportTable tr').eq(index).find('#pileStandard').val().trim();
-				currentPileSum = $('#reportTable tr').eq(index).find('td:eq(12)').text().trim();
+				if(extensivePileUsage > 0){
+					currentPileSum = $('#reportTable tr').eq(index).find('td:eq(14)').text().trim();
+				}else{
+					currentPileSum = $('#reportTable tr').eq(index).find('td:eq(12)').text().trim();
+				}
 			
 				currentDrillingDepth = $('#reportTable tr').eq(index).find('#drillingDepth').val();
 				currentIntrusionDepth = $('#reportTable tr').eq(index).find('#intrusionDepth').val();
@@ -521,25 +924,42 @@ $(function () {
 					currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
 					
 					if(isBig){
-						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(33)').text().trim();
-						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(34)').text().trim();
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(35)').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(36)').text().trim();
 					}else{
 						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(28)').text().trim();
 						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(29)').text().trim();
 					}
 				}else{
-					currentBalance = $('#reportTable tr').eq(index).find('td:eq(16)').text().trim();
-					currentGongSac = $('#reportTable tr').eq(index).find('td:eq(17)').text().trim();
+					if(extensivePileUsage > 0){
+						
+						currentBalance = $('#reportTable tr').eq(index).find('td:eq(18)').text().trim();
+						currentGongSac = $('#reportTable tr').eq(index).find('td:eq(19)').text().trim();
+					}else{
+						
+						currentBalance = $('#reportTable tr').eq(index).find('td:eq(16)').text().trim();
+						currentGongSac = $('#reportTable tr').eq(index).find('td:eq(17)').text().trim();
+					}
 					currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
 					currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
 					currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
 					
 					if(isBig){
-						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(31)').text().trim();
-						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(32)').text().trim();
+						if(extensivePileUsage > 0){
+							currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(33)').text().trim();
+							currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(34)').text().trim();
+						}else{
+							currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(31)').text().trim();
+							currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(32)').text().trim();
+						}
 					}else{
-						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(26)').text().trim();
-						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(27)').text().trim();
+						if(extensivePileUsage > 0){
+							currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(28)').text().trim();
+							currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(29)').text().trim();
+						}else{
+							currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(26)').text().trim();
+							currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(27)').text().trim();
+						}
 					}
 				}
 				
@@ -596,7 +1016,17 @@ $(function () {
 		    doc.setFontSize(20);
 		    doc.text('파일 항타기록지', pageWidth / 2, 15, {align: 'center'});
 		    doc.setFontSize(10);
-		    doc.text('시공일 : ' + currentDate.substring(0,10), pageWidth - 15 , 30, 'right');
+		    //doc.text('시공일 : ' + currentDate.substring(0,10), pageWidth - 15 , 30, 'right');
+		    doc.text(
+		    		  '시공일 : ' + (
+		    		    constructionIdx == 1508
+		    		      ? currentDate.substring(0,10).replace(/-/g, '.') + "."
+		    		      : currentDate.substring(0,10)
+		    		  ),
+		    		  pageWidth - 15,
+		    		  30,
+		    		  { align: 'right' }
+		    		);
 		    doc.setFontSize(10);
 		    doc.text(constructionName, 15, 30, {align: 'left'});
 		    
@@ -628,9 +1058,22 @@ $(function () {
 				title: 'PDF타이틀',        
 			});
 			drawLegend(doc);
-			drawChart(root, index, pageWidth, pageHeight, doc, currentAvgPenetrationValue , currentTotalPenetrationValue, constructionIdx);
 			
+			if(option == 'Y'){
+				drawHitCountLegend(doc, 105);
+				//금도건설 조풍건설 구형 흑연사업 토건공사
+				drawCompactChart(root, index, pageWidth, pageHeight, doc, currentAvgPenetrationValue , currentTotalPenetrationValue, constructionIdx);
+			}else{
+				//그 외 모든 현장
+				drawChart(root, index, pageWidth, pageHeight, doc, currentAvgPenetrationValue , currentTotalPenetrationValue, constructionIdx);
+			}
+			
+			if(constructionIdx == 1508){
+				drawPageNumberToTopRight(doc, index)
+			}else{
+				drawPageNumber(doc, index);
+			}
 			doc.save(createFileName() + '.pdf');
 	        
-		});
-    });
+		//});
+};

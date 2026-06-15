@@ -2,26 +2,68 @@
 <%@ include file="/WEB-INF/views/common/tagLib.jsp" %>
 <script type="text/javascript">
 
-$(document).ready( function() {
-    $('#submitBtn').click( function() {
-    	searchForm();
-    });
-});
+	$(document).ready( function() {
+	    $('#submitBtn').click( function() {
+	    	searchForm();
+	    });
+	});
+	
+	function goUrl(url){
+		document.location.href=url;
+	}
+	
+	function searchForm(){
+		$('#currentPage').val(1);
+		$("#searchForm").attr("action", "");
+		$("#searchForm").submit();
+	}
 
-function goUrl(url){
-	document.location.href=url;
-}
 
-function searchForm(){
-	$('#currentPage').val(1);
-	$("#searchForm").attr("action", "");
-	$("#searchForm").submit();
-}
+	var drivingRecordParams = null;
+
+	function openDrivingRecordPopup(contextPath, constructionIdx, machineNumber, currentDateTime) {
+	    drivingRecordParams = {
+	        contextPath: contextPath,
+	        constructionIdx: constructionIdx,
+	        machineNumber: machineNumber,
+	        currentDateTime: currentDateTime
+	    };
+
+	    document.getElementById('drivingRecordOverlay').style.display = 'block';
+	    document.getElementById('drivingRecordPopup').style.display = 'block';
+	}
+
+	function closeDrivingRecordPopup() {
+	    document.getElementById('drivingRecordOverlay').style.display = 'none';
+	    document.getElementById('drivingRecordPopup').style.display = 'none';
+	}
+
+	function confirmDrivingRecordDownload() {
+	    var radios = document.getElementsByName('hitOption');
+	    var hitOption = 'N';   // 기본값
+
+	    for (var i = 0; i < radios.length; i++) {
+	        if (radios[i].checked) {
+	            hitOption = radios[i].value;
+	            break;
+	        }
+	    } 
+	    closeDrivingRecordPopup();
+
+	    downloadDrivingRecoredBook(
+	        drivingRecordParams.contextPath,
+	        drivingRecordParams.constructionIdx,
+	        drivingRecordParams.machineNumber,
+	        drivingRecordParams.currentDateTime,
+	        hitOption
+	    );
+	}
 
 </script>
 
 <!--컨텐츠-->
 <div class="section-right">
+	<%@ include file="/WEB-INF/views/common/welcomeMsg.jsp" %>
 	<div class="TopContArea">
 		<div class="titArea mb-40">
 			<p class="h1Tit">${domain.machineNumber} 시공현황</p>
@@ -93,7 +135,14 @@ function searchForm(){
 									<tr>
 										<td style="width: calc(100% / 3);">${domain.currentDateTime}
 											<a href="${pageContext.request.contextPath}/report/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${param.constructionIdx}" class="tableCheck">기록지확인</a>
-											<a href="javascript:downloadDrivingRecoredBook('${pageContext.request.contextPath}', '${param.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}');" class="tableCheckGreen">일일 기록지 PDF</a>
+											<c:choose>
+												<c:when test="${(sessionInfo.constructionIdx == 1550 or  param.constructionIdx == 1550) and (sessionInfo.hiddenManager == true or sessionInfo.role == 0)}">
+													<a href="javascript:openDrivingRecordPopup('${pageContext.request.contextPath}', '${param.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}');" class="tableCheckGreen">일일 기록지 PDF</a>
+												</c:when>
+												<c:otherwise>
+													<a href="javascript:downloadDrivingRecoredBook('${pageContext.request.contextPath}', '${param.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}');" class="tableCheckGreen">일일 기록지 PDF</a>
+												</c:otherwise>
+											</c:choose>
 										</td>
 										<td style="width: calc(100% / 3);">
 											${domain.todayConstruction}공
@@ -112,7 +161,14 @@ function searchForm(){
 														<c:when test="${sessionInfo.showPdfYn == true}">
 															${domain.currentDateTime}
 															<a href="${pageContext.request.contextPath}/report/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${sessionInfo.constructionIdx}" class="tableCheck">기록지확인</a>
-															<a href="javascript:downloadDrivingRecoredBook('${pageContext.request.contextPath}', '${sessionInfo.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}');" class="tableCheckGreen">일일 기록지 PDF</a>
+															<c:choose>
+																<c:when test="${(sessionInfo.constructionIdx == 1550 or  param.constructionIdx == 1550) and (sessionInfo.hiddenManager == true or sessionInfo.role == 0)}">
+																	<a href="javascript:openDrivingRecordPopup('${pageContext.request.contextPath}', '${sessionInfo.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}');" class="tableCheckGreen">일일 기록지 PDF</a>
+																</c:when>
+																<c:otherwise>
+																	<a href="javascript:downloadDrivingRecoredBook('${pageContext.request.contextPath}', '${sessionInfo.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}' , 'N');" class="tableCheckGreen">일일 기록지 PDF</a>
+																</c:otherwise>
+															</c:choose>
 														</c:when>
 														<c:otherwise>
 															${domain.currentDateTime}
@@ -131,7 +187,14 @@ function searchForm(){
 														<c:when test="${sessionInfo.showPdfYn == true}">
 															${domain.currentDateTime}
 															<a href="${pageContext.request.contextPath}/report/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${sessionInfo.constructionIdx}" class="tableCheck">기록지확인</a>
-															<a href="javascript:downloadDrivingRecoredBook('${pageContext.request.contextPath}', '${sessionInfo.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}');" class="tableCheckGreen">일일 기록지 PDF</a>
+															<c:choose>
+																<c:when test="${(sessionInfo.constructionIdx == 1550 or  param.constructionIdx == 1550) and (sessionInfo.hiddenManager == true or sessionInfo.role == 0)}">
+																	<a href="javascript:openDrivingRecordPopup('${pageContext.request.contextPath}', '${sessionInfo.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}');" class="tableCheckGreen">일일 기록지 PDF</a>
+																</c:when>
+																<c:otherwise>
+																	<a href="javascript:downloadDrivingRecoredBook('${pageContext.request.contextPath}', '${sessionInfo.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}' , 'N');" class="tableCheckGreen">일일 기록지 PDF</a>
+																</c:otherwise>
+															</c:choose>
 														</c:when>
 														<c:otherwise>
 															${domain.currentDateTime}
@@ -139,7 +202,14 @@ function searchForm(){
 															<!-- 안동 호반 태흥특수만 틀별히 열어줌 -->
 															<c:choose>
 																<c:when test="${sessionInfo.constructionIdx == 738}">
-																	<a href="javascript:downloadDrivingRecoredBook('${pageContext.request.contextPath}', '${sessionInfo.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}');" class="tableCheckGreen">일일 기록지 PDF</a>
+																	<c:choose>
+																		<c:when test="${(sessionInfo.constructionIdx == 1550 or  param.constructionIdx == 1550) and (sessionInfo.hiddenManager == true or sessionInfo.role == 0)}">
+																			<a href="javascript:openDrivingRecordPopup('${pageContext.request.contextPath}', '${sessionInfo.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}');" class="tableCheckGreen">일일 기록지 PDF</a>
+																		</c:when>
+																		<c:otherwise>
+																			<a href="javascript:downloadDrivingRecoredBook('${pageContext.request.contextPath}', '${sessionInfo.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}' , 'N');" class="tableCheckGreen">일일 기록지 PDF</a>
+																		</c:otherwise>
+																	</c:choose>
 																</c:when>
 															</c:choose>
 														</c:otherwise>
@@ -157,7 +227,14 @@ function searchForm(){
 											<a href="${pageContext.request.contextPath}/report/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${param.constructionIdx}" class="tableCheck">기록지확인</a>
 											<c:choose>
 												<c:when test="${sessionInfo.userId == 'ji2177'}">
-													<a href="javascript:downloadDrivingRecoredBook('${pageContext.request.contextPath}', '${param.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}');" class="tableCheckGreen">일일 기록지 PDF</a>
+													<c:choose>
+														<c:when test="${(sessionInfo.constructionIdx == 1550 or  param.constructionIdx == 1550) and (sessionInfo.hiddenManager == true or sessionInfo.role == 0)}">
+															<a href="javascript:openDrivingRecordPopup('${pageContext.request.contextPath}', '${param.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}');" class="tableCheckGreen">일일 기록지 PDF</a>
+														</c:when>
+														<c:otherwise>
+															<a href="javascript:downloadDrivingRecoredBook('${pageContext.request.contextPath}', '${param.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}' , 'N');" class="tableCheckGreen">일일 기록지 PDF</a>
+														</c:otherwise>
+													</c:choose>
 												</c:when>
 											</c:choose>
 										</td>
@@ -173,7 +250,14 @@ function searchForm(){
 														<c:when test="${showPdfYn > 0}">
 															${domain.currentDateTime}
 															<a href="${pageContext.request.contextPath}/report/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${param.constructionIdx}" class="tableCheck">기록지확인</a>
-															<a href="javascript:downloadDrivingRecoredBook('${pageContext.request.contextPath}', '${param.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}');" class="tableCheckGreen">일일 기록지 PDF</a>
+															<c:choose>
+																<c:when test="${(sessionInfo.constructionIdx == 1550 or  param.constructionIdx == 1550) and (sessionInfo.hiddenManager == true or sessionInfo.role == 0)}">
+																	<a href="javascript:openDrivingRecordPopup('${pageContext.request.contextPath}', '${param.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}');" class="tableCheckGreen">일일 기록지 PDF</a>
+																</c:when>
+																<c:otherwise>
+																	<a href="javascript:downloadDrivingRecoredBook('${pageContext.request.contextPath}', '${param.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}' , 'N');" class="tableCheckGreen">일일 기록지 PDF</a>
+																</c:otherwise>
+															</c:choose>
 														</c:when>
 														<c:otherwise>
 															${domain.currentDateTime}
@@ -196,7 +280,14 @@ function searchForm(){
 														<c:when test="${showPdfYn > 0}">
 															${domain.currentDateTime}
 															<a href="${pageContext.request.contextPath}/report/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${param.constructionIdx}" class="tableCheck">기록지확인</a>
-															<a href="javascript:downloadDrivingRecoredBook('${pageContext.request.contextPath}', '${param.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}');" class="tableCheckGreen">일일 기록지 PDF</a>
+															<c:choose>
+																<c:when test="${(sessionInfo.constructionIdx == 1550 or  param.constructionIdx == 1550) and (sessionInfo.hiddenManager == true or sessionInfo.role == 0)}">
+																	<a href="javascript:openDrivingRecordPopup('${pageContext.request.contextPath}', '${param.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}');" class="tableCheckGreen">일일 기록지 PDF</a>
+																</c:when>
+																<c:otherwise>
+																	<a href="javascript:downloadDrivingRecoredBook('${pageContext.request.contextPath}', '${param.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}' , 'N');" class="tableCheckGreen">일일 기록지 PDF</a>
+																</c:otherwise>
+															</c:choose>
 														</c:when>
 														<c:otherwise>
 															${domain.currentDateTime}
@@ -220,93 +311,6 @@ function searchForm(){
 								</c:when>
 							</c:choose>
 						
-						
-							<%-- <c:choose>
-								<c:when test="${originDataYn > 0}">
-									<tr>
-										<td style="width: calc(100% / 3);">${domain.currentDateTime} 
-											<c:choose>
-												<c:when test="${sessionInfo.role == 0}">
-													<a href="${pageContext.request.contextPath}/report/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${param.constructionIdx}" class="tableCheck">기록지확인</a>
-													<a href="javascript:downloadDrivingRecoredBook('${pageContext.request.contextPath}', '${param.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}');" class="tableCheckGreen">일일 기록지 PDF</a>
-												</c:when>
-												<c:when test="${sessionInfo.role == 1}">
-													<a href="${pageContext.request.contextPath}/report/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${sessionInfo.constructionIdx}" class="tableCheck">기록지확인</a>
-													<c:choose>
-														<c:when test="${sessionInfo.showPdfYn == true}">
-															<a href="javascript:downloadDrivingRecoredBook('${pageContext.request.contextPath}', '${sessionInfo.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}');" class="tableCheckGreen">일일 기록지 PDF</a>
-														</c:when>
-													</c:choose>
-												</c:when>
-												<c:when test="${sessionInfo.role == 2}">
-													<a href="${pageContext.request.contextPath}/report/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${param.constructionIdx}" class="tableCheck">기록지확인</a>
-												</c:when>
-												<c:when test="${sessionInfo.role == 3}">
-													<a href="${pageContext.request.contextPath}/report/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${param.constructionIdx}" class="tableCheck">기록지확인</a>
-														<c:choose>
-															<c:when test="${showPdfYn > 0}">
-																<a href="javascript:downloadDrivingRecoredBook('${pageContext.request.contextPath}', '${param.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}');" class="tableCheckGreen">일일 기록지 PDF</a>
-															</c:when>
-														</c:choose>
-												</c:when>
-											</c:choose>
-										</td>
-										<td style="width: calc(100% / 3);">${domain.todayConstruction}공</td>
-										<c:choose>
-											<c:when test="${originDataYn > 0}">
-													<td style="width: calc(100% / 3);">${domain.currentDateTime}
-														<c:choose>
-															<c:when test="${sessionInfo.role == 0}">
-																<a href="${pageContext.request.contextPath}/report/origin/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${param.constructionIdx}" class="tableCheck">원본기록지확인</a>
-															</c:when>
-															<c:when test="${sessionInfo.role == 1}">
-																<a href="${pageContext.request.contextPath}/report/origin/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${sessionInfo.constructionIdx}"  class="tableCheck">원본기록지확인</a>
-															</c:when>
-															<c:when test="${sessionInfo.role == 2}">
-																<a href="${pageContext.request.contextPath}/report/origin/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${param.constructionIdx}"  class="tableCheck">원본기록지확인</a>
-															</c:when>
-															<c:when test="${sessionInfo.role == 3}">
-																<a href="${pageContext.request.contextPath}/report/origin/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${param.constructionIdx}"  class="tableCheck">원본기록지확인</a>
-															</c:when>
-														</c:choose>
-													</td>
-											</c:when>
-										</c:choose>
-									</tr>
-								</c:when>
-								<c:otherwise>
-									<tr>
-										<td>${domain.currentDateTime} 
-											<c:choose>
-												<c:when test="${sessionInfo.role == 0}">
-													<a href="${pageContext.request.contextPath}/report/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${param.constructionIdx}" class="tableCheck">기록지확인</a>
-													<a href="javascript:downloadDrivingRecoredBook('${pageContext.request.contextPath}', '${param.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}');" class="tableCheckGreen">일일 기록지 PDF</a>
-												</c:when>
-												<c:when test="${sessionInfo.role == 1}">
-													<a href="${pageContext.request.contextPath}/report/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${sessionInfo.constructionIdx}" class="tableCheck">기록지확인</a>
-													<c:choose>
-														<c:when test="${sessionInfo.showPdfYn == true}">
-															<a href="javascript:downloadDrivingRecoredBook('${pageContext.request.contextPath}', '${sessionInfo.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}');" class="tableCheckGreen">일일 기록지 PDF</a>
-														</c:when>
-													</c:choose>
-												</c:when>
-												<c:when test="${sessionInfo.role == 2}">
-													<a href="${pageContext.request.contextPath}/report/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${param.constructionIdx}" class="tableCheck">기록지확인</a>
-												</c:when>
-												<c:when test="${sessionInfo.role == 3}">
-													<a href="${pageContext.request.contextPath}/report/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${param.constructionIdx}" class="tableCheck">기록지확인</a>
-														<c:choose>
-															<c:when test="${showPdfYn > 0}">
-																<a href="javascript:downloadDrivingRecoredBook('${pageContext.request.contextPath}', '${param.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}');" class="tableCheckGreen">일일 기록지 PDF</a>
-															</c:when>
-														</c:choose>
-												</c:when>
-											</c:choose>
-										</td>
-										<td>${domain.todayConstruction}공</td>
-									</tr>
-								</c:otherwise>
-							</c:choose> --%>
 						</c:forEach>
 						<c:choose>
 							<c:when test="${fn:length(domainList) == 0}">
@@ -328,10 +332,34 @@ function searchForm(){
 		</div>
 	</div>
 	
+	
+	<div id="drivingRecordOverlay" style="display:none;"></div>
+
+		<div id="drivingRecordPopup" style="display:none;">
+		    <div class="popup-title">일일 기록지 PDF</div>
+		
+		    <div class="popup-content">
+		        <label>
+		            <input type="radio" name="hitOption" value="N" checked>
+	            		타격횟수 미포함
+		        </label>
+		        <br>
+		        <label>
+		            <input type="radio" name="hitOption" value="Y">
+		           		 타격횟수 포함
+		        </label>
+		    </div>
+		
+		    <div class="popup-footer">
+		        <button type="button" onclick="closeDrivingRecordPopup()">닫기</button>
+		        <button type="button" onclick="confirmDrivingRecordDownload()">PDF 생성</button>
+		    </div>
+	</div>
+	
 	<!--페이징-->
 	<%@ include file="/WEB-INF/views/common/pagination.jsp" %>
 	<!--//페이징-->
-
+	
 </div>
 <!--//컨텐츠-->
 

@@ -7,21 +7,26 @@ public class FileInventory implements Domain{
 	
 	private int fiIdx;
 	
-	private String registDate;
+	private int brokenFiIdx;
 	
-	//별도의 파일 타입? EX) EXT, SMART (단본)
-	private String separateSinglePileType;
-	//별도의 파일 타입? EX) EXT, SMART (단본)
-	private String separateBottomPileType;
+	private int constructionIdx;
 	
 	//파일종류 2020-05-13 new
 	private String pileType;
 	//파일규격
 	private String pileStandard;
 	
-	private int constructionIdx;
-	
 	private String fileWeight;
+	
+	private String registDate;
+	
+	private String maker;
+	
+	private String bigo;
+	//별도의 파일 타입? EX) EXT, SMART (단본)
+	private String separateSinglePileType;
+	//별도의 파일 타입? EX) EXT, SMART (단본)
+	private String separateBottomPileType;
 	
 	private String meterof51;
 	
@@ -135,9 +140,127 @@ public class FileInventory implements Domain{
 	
 	private String meterof184;
 	
-	private String maker;
+	private String bRegistDate;
 	
-	private String bigo;
+	private String bMaker;
+	
+	private String bBigo;
+	//별도의 파일 타입? EX) EXT, SMART (단본)
+	private String bSeparateSinglePileType;
+	//별도의 파일 타입? EX) EXT, SMART (단본)
+	private String bSeparateBottomPileType;
+	
+	private String bMeterof51;
+	
+	private String bMeterof52;
+	
+	private String bMeterof53;
+	
+	private String bMeterof54;
+	
+	private String bMeterof61;
+	
+	private String bMeterof62;
+
+	private String bMeterof63;
+	
+	private String bMeterof64;
+	
+	private String bMeterof71;
+	
+	private String bMeterof72;
+
+	private String bMeterof73;
+	
+	private String bMeterof74;
+	
+	private String bMeterof81;
+	
+	private String bMeterof82;
+
+	private String bMeterof83;
+	
+	private String bMeterof84;
+
+	private String bMeterof91;
+	
+	private String bMeterof92;
+
+	private String bMeterof93;
+	
+	private String bMeterof94;
+	
+	private String bMeterof101;
+	
+	private String bMeterof102;
+
+	private String bMeterof103;
+	
+	private String bMeterof104;
+	
+	private String bMeterof111;
+	
+	private String bMeterof112;
+
+	private String bMeterof113;
+	
+	private String bMeterof114;
+
+	private String bMeterof121;
+	
+	private String bMeterof122;
+
+	private String bMeterof123;
+	
+	private String bMeterof124;
+
+	private String bMeterof131;
+	
+	private String bMeterof132;
+
+	private String bMeterof133;
+	
+	private String bMeterof134;
+
+	private String bMeterof141;
+	
+	private String bMeterof142;
+
+	private String bMeterof143;
+	
+	private String bMeterof144;
+
+	private String bMeterof151;
+	
+	private String bMeterof152;
+
+	private String bMeterof153;
+	
+	private String bMeterof154;
+
+	private String bMeterof161;
+	
+	private String bMeterof162;
+
+	private String bMeterof163;
+	
+	private String bMeterof164;
+
+	private String bMeterof171;
+	
+	private String bMeterof172;
+
+	private String bMeterof173;
+	
+	private String bMeterof174;
+
+	private String bMeterof181;
+	
+	private String bMeterof182;
+
+	private String bMeterof183;
+	
+	private String bMeterof184;
 	
 	//신규버전만 추가
 	private int fcIdx;

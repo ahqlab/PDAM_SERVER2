@@ -17,7 +17,6 @@ import net.octacomm.sample.domain.ErpAdminParam;
 public class ErpAdminController extends AbstractCRUDController<ErpAdminMapper, ErpAdmin, ErpAdminParam, Integer>{
 	
 	@Autowired
-	@Override
 	public void setCRUDMapper(ErpAdminMapper mapper) {
 		this.mapper = mapper;	
 	}

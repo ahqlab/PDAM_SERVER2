@@ -27,7 +27,6 @@ import net.octacomm.sample.domain.SessionInfo;
 public class GroupController extends AbstractGroupCRUDController<GroupMapper, Group, GroupParam, Integer>{
 	
 	@Autowired
-	@Override
 	public void setCRUDMapper(GroupMapper mapper) {
 		this.mapper = mapper;
 	}

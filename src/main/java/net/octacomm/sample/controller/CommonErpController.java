@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -20,7 +21,7 @@ import net.octacomm.sample.domain.CommonErpParam;
 public class CommonErpController extends AbstractCommonErpController<CommonErpMapper, CommonErp, CommonErpParam, Integer>{
 	
 	@Autowired
-	@Override
+	@Qualifier("commonErpMapper")
 	public void setCRUDMapper(CommonErpMapper mapper) {
 		this.mapper = mapper;
 	}

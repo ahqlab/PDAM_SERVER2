@@ -39,7 +39,6 @@ import net.octacomm.sample.domain.UpdateReport;
 public class GpsFileController extends AbstractGpsFileCRUDController<GpsFileMapper, GpsFile, GpsFileParam, Integer>
 {
 	@Autowired
-	@Override
 	public void setCRUDMapper(GpsFileMapper mapper) {
 		this.mapper = mapper;
 	}

@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.octacomm.sample.dao.mapper.ContractMapper">
+
+	<resultMap id="contractMap" type="net.octacomm.sample.domain.Contract">
+		<id     property="contractIdx"      column="CONTRACT_IDX"/>
+		<result property="constructionIdx"  column="CONSTRUCTION_IDX"/>
+		<result property="constructionName" column="constructionName"/>
+		<result property="contractType"     column="CONTRACT_TYPE"/>
+		<result property="contractNo"       column="CONTRACT_NO"/>
+		<result property="siteName"         column="SITE_NAME"/>
+		<result property="companyName"      column="COMPANY_NAME"/>
+		<result property="modelName"        column="MODEL_NAME"/>
+		<result property="supplyDeadline"   column="SUPPLY_DEADLINE"/>
+		<result property="dailyFee"         column="DAILY_FEE"/>
+		<result property="reqTradeName"     column="REQ_TRADE_NAME"/>
+		<result property="reqAddress"       column="REQ_ADDRESS"/>
+		<result property="reqBusinessNo"    column="REQ_BUSINESS_NO"/>
+		<result property="reqTel"           column="REQ_TEL"/>
+		<result property="reqRepresentative" column="REQ_REPRESENTATIVE"/>
+		<result property="siteManager"      column="SITE_MANAGER"/>
+		<result property="status"           column="STATUS"/>
+		<result property="createdAt"        column="createdAt"/>
+		<result property="signedAt"         column="signedAt"/>
+		<result property="isDel"            column="isDel"/>
+	</resultMap>
+
+	<resultMap id="contractBinaryMap" extends="contractMap" type="net.octacomm.sample.domain.Contract">
+		<result property="buyerSignature"  column="BUYER_SIGNATURE"  jdbcType="BLOB"/>
+		<result property="contractPdf"     column="CONTRACT_PDF"     jdbcType="BLOB"/>
+	</resultMap>
+
+	<sql id="selectFields">
+		A.CONTRACT_IDX,
+		A.CONSTRUCTION_IDX,
+		B.name as constructionName,
+		A.CONTRACT_TYPE,
+		A.CONTRACT_NO,
+		A.SITE_NAME,
+		A.COMPANY_NAME,
+		A.MODEL_NAME,
+		A.SUPPLY_DEADLINE,
+		A.DAILY_FEE,
+		A.REQ_TRADE_NAME,
+		A.REQ_ADDRESS,
+		A.REQ_BUSINESS_NO,
+		A.REQ_TEL,
+		A.REQ_REPRESENTATIVE,
+		A.SITE_MANAGER,
+		A.STATUS,
+		date_format(A.CREATED_AT, '%Y-%m-%d') as createdAt,
+		date_format(A.SIGNED_AT,  '%Y-%m-%d') as signedAt,
+		A.isDel
+	</sql>
+
+	<insert id="insert" parameterType="net.octacomm.sample.domain.Contract" useGeneratedKeys="true" keyProperty="contractIdx">
+		INSERT INTO TB_CONTRACT
+		(CONSTRUCTION_IDX, CONTRACT_TYPE, CONTRACT_NO, SITE_NAME, COMPANY_NAME, MODEL_NAME,
+		 SUPPLY_DEADLINE, DAILY_FEE, REQ_TRADE_NAME, REQ_ADDRESS, REQ_BUSINESS_NO,
+		 REQ_TEL, REQ_REPRESENTATIVE, SITE_MANAGER, STATUS, CREATED_AT, isDel)
+		VALUES
+		(#{constructionIdx}, #{contractType}, #{contractNo}, #{siteName}, #{companyName}, #{modelName},
+		 #{supplyDeadline}, #{dailyFee}, #{reqTradeName}, #{reqAddress}, #{reqBusinessNo},
+		 #{reqTel}, #{reqRepresentative}, #{siteManager}, 'DRAFT', NOW(), 0)
+	</insert>
+
+	<select id="get" resultMap="contractMap">
+		SELECT <include refid="selectFields"/>
+		FROM TB_CONTRACT A
+		LEFT JOIN TB_CONSTRUCTION B ON A.CONSTRUCTION_IDX = B.id
+		WHERE A.CONTRACT_IDX = #{contractIdx} AND A.isDel = 0
+	</select>
+
+	<select id="getWithBinary" resultMap="contractBinaryMap">
+		SELECT <include refid="selectFields"/>,
+		       A.BUYER_SIGNATURE,
+		       A.CONTRACT_PDF
+		FROM TB_CONTRACT A
+		LEFT JOIN TB_CONSTRUCTION B ON A.CONSTRUCTION_IDX = B.id
+		WHERE A.CONTRACT_IDX = #{contractIdx}
+	</select>
+
+	<update id="updateContractPdf">
+		UPDATE TB_CONTRACT SET CONTRACT_PDF = #{contractPdf, jdbcType=BLOB}
+		WHERE CONTRACT_IDX = #{contractIdx}
+	</update>
+
+	<update id="update" parameterType="net.octacomm.sample.domain.Contract">
+		UPDATE TB_CONTRACT
+		SET CONTRACT_TYPE     = #{contractType},
+		    CONTRACT_NO       = #{contractNo},
+		    SITE_NAME         = #{siteName},
+		    COMPANY_NAME      = #{companyName},
+		    MODEL_NAME        = #{modelName},
+		    SUPPLY_DEADLINE   = #{supplyDeadline},
+		    DAILY_FEE         = #{dailyFee},
+		    REQ_TRADE_NAME    = #{reqTradeName},
+		    REQ_ADDRESS       = #{reqAddress},
+		    REQ_BUSINESS_NO   = #{reqBusinessNo},
+		    REQ_TEL           = #{reqTel},
+		    REQ_REPRESENTATIVE = #{reqRepresentative},
+		    SITE_MANAGER      = #{siteManager}
+		WHERE CONTRACT_IDX = #{contractIdx}
+	</update>
+
+	<update id="delete">
+		UPDATE TB_CONTRACT SET isDel = 1 WHERE CONTRACT_IDX = #{contractIdx}
+	</update>
+
+	<select id="getListByParam" resultMap="contractMap">
+		SELECT <include refid="selectFields"/>
+		FROM TB_CONTRACT A
+		LEFT JOIN TB_CONSTRUCTION B ON A.CONSTRUCTION_IDX = B.id
+		<where>
+			A.isDel = 0
+			<if test="param.constructionIdx != 0">
+				AND A.CONSTRUCTION_IDX = #{param.constructionIdx}
+			</if>
+			<if test="param.status != null and param.status != ''">
+				AND A.STATUS = #{param.status}
+			</if>
+			<if test="param.searchWord != null and param.searchWord != ''">
+				AND B.name LIKE '%${param.searchWord}%'
+			</if>
+		</where>
+		ORDER BY A.CONTRACT_IDX DESC
+		LIMIT #{param.pageSize} OFFSET #{param.startRow}
+	</select>
+
+	<select id="getCountByParam" resultType="_int">
+		SELECT COUNT(*)
+		FROM TB_CONTRACT A
+		LEFT JOIN TB_CONSTRUCTION B ON A.CONSTRUCTION_IDX = B.id
+		<where>
+			A.isDel = 0
+			<if test="param.constructionIdx != 0">
+				AND A.CONSTRUCTION_IDX = #{param.constructionIdx}
+			</if>
+			<if test="param.status != null and param.status != ''">
+				AND A.STATUS = #{param.status}
+			</if>
+			<if test="param.searchWord != null and param.searchWord != ''">
+				AND B.name LIKE '%${param.searchWord}%'
+			</if>
+		</where>
+	</select>
+
+	<select id="getConstructionBasic" resultType="map">
+		SELECT name, location, conManager FROM TB_CONSTRUCTION WHERE id = #{constructionIdx}
+	</select>
+
+	<select id="getDraftByConstructionIdx" resultMap="contractMap">
+		SELECT <include refid="selectFields"/>
+		FROM TB_CONTRACT A
+		LEFT JOIN TB_CONSTRUCTION B ON A.CONSTRUCTION_IDX = B.id
+		WHERE A.isDel = 0 AND A.CONSTRUCTION_IDX = #{constructionIdx} AND A.STATUS = 'DRAFT'
+		ORDER BY A.CONTRACT_IDX DESC
+		LIMIT 1
+	</select>
+
+	<select id="getListByConstructionIdx" resultMap="contractMap">
+		SELECT <include refid="selectFields"/>
+		FROM TB_CONTRACT A
+		LEFT JOIN TB_CONSTRUCTION B ON A.CONSTRUCTION_IDX = B.id
+		WHERE A.isDel = 0 AND A.CONSTRUCTION_IDX = #{constructionIdx}
+		ORDER BY A.CONTRACT_IDX DESC
+	</select>
+
+	<insert id="insertClauseConfirm">
+		INSERT INTO TB_CONTRACT_CLAUSE_CONFIRM (CONTRACT_IDX, CLAUSE_IDX, CONFIRMED_AT)
+		VALUES (#{contractIdx}, #{clauseIdx}, NOW())
+	</insert>
+
+	<delete id="deleteClauseConfirm">
+		DELETE FROM TB_CONTRACT_CLAUSE_CONFIRM WHERE CONTRACT_IDX = #{contractIdx}
+	</delete>
+
+	<update id="resetToDraft" parameterType="int">
+		UPDATE TB_CONTRACT
+		SET STATUS          = 'DRAFT',
+		    SIGNED_AT       = NULL,
+		    BUYER_SIGNATURE = NULL,
+		    CONTRACT_PDF    = NULL
+		WHERE CONTRACT_IDX = #{contractIdx}
+		  AND isDel = 0
+	</update>
+
+	<update id="updateStatus">
+		UPDATE TB_CONTRACT SET STATUS = #{status}
+		<if test="status == 'SIGNED'">, SIGNED_AT = NOW()</if>
+		WHERE CONTRACT_IDX = #{contractIdx}
+	</update>
+
+	<update id="updateBuyerSignature">
+		UPDATE TB_CONTRACT
+		SET BUYER_SIGNATURE = #{buyerSignature},
+		    SITE_MANAGER    = #{siteManager},
+		    STATUS = 'SIGNED', SIGNED_AT = NOW()
+		WHERE CONTRACT_IDX = #{contractIdx}
+	</update>
+
+	<select id="countByDatePrefix" resultType="_int">
+		SELECT COUNT(*) FROM TB_CONTRACT WHERE CONTRACT_NO LIKE #{datePrefix} AND isDel = 0
+	</select>
+
+	<select id="getFilenameInfo" resultType="map">
+		SELECT
+			G.groupName,
+			C.name        AS constructionName,
+			C.location    AS locationName,
+			A.CONTRACT_NO AS contractNo
+		FROM TB_CONTRACT A
+		LEFT JOIN TB_CONSTRUCTION C ON A.CONSTRUCTION_IDX = C.id
+		LEFT JOIN TB_GROUP G ON C.groupIdx = G.idx
+		WHERE A.CONTRACT_IDX = #{contractIdx}
+	</select>
+
+</mapper>

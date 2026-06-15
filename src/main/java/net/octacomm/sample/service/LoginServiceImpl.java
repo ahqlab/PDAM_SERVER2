@@ -25,6 +25,7 @@ public class LoginServiceImpl implements LoginService{
 		Construction result2 = userMapper.findByHiddenManagerPassword(construction);
 		if(result1 != null) {
 			session.setAttribute("userId", result1.getUserId());
+			session.setAttribute("userName", result1.getName());
 			session.setAttribute("constructionIdx", result1.getId());
 			session.setAttribute("role", result1.getRole());
 			session.setAttribute("isHiddenManager", false);
@@ -44,6 +45,7 @@ public class LoginServiceImpl implements LoginService{
 			return result1;
 		}else if(result2 != null) {
 			session.setAttribute("userId", result2.getUserId());
+			session.setAttribute("userName", result2.getName());
 			session.setAttribute("constructionIdx", result2.getId());
 			session.setAttribute("role", result2.getRole());
 			session.setAttribute("isHiddenManager", true);

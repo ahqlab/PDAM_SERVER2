@@ -25,6 +25,7 @@ import org.springframework.web.bind.support.SessionStatus;
 import net.octacomm.sample.dao.mapper.ConstructionMapper;
 import net.octacomm.sample.dao.mapper.DeviceMapper;
 import net.octacomm.sample.dao.mapper.ExcelSignroomMapper;
+import net.octacomm.sample.dao.mapper.ExtensivePileUsageMapper;
 import net.octacomm.sample.dao.mapper.OriginPenetrationMapper;
 import net.octacomm.sample.dao.mapper.OriginPieceMapper;
 import net.octacomm.sample.dao.mapper.OriginReportMapper;
@@ -32,8 +33,10 @@ import net.octacomm.sample.dao.mapper.PenetrationMapper;
 import net.octacomm.sample.dao.mapper.PieceMapper;
 import net.octacomm.sample.dao.mapper.ReportMapper;
 import net.octacomm.sample.domain.Construction;
+import net.octacomm.sample.domain.ConstructionSetting;
 import net.octacomm.sample.domain.Device;
 import net.octacomm.sample.domain.ExcelSignroom;
+import net.octacomm.sample.domain.ExtensivePileUsage;
 import net.octacomm.sample.domain.Penetration;
 import net.octacomm.sample.domain.Piece;
 import net.octacomm.sample.domain.Report;
@@ -78,6 +81,9 @@ public class ReportController{
 	@Autowired
 	private ExcelSignroomMapper excelSignroomMapper;
 	
+	@Autowired
+	private ExtensivePileUsageMapper extensivePileUsageMapper;
+	
 	
 	@RequestMapping(value = "/list")
 	public String list(Model model, @ModelAttribute("domainParam") ReportParam param, BindingResult result, HttpSession session) throws UnsupportedEncodingException {
@@ -86,20 +92,24 @@ public class ReportController{
 
 		int isBig = 0; 
 		
-		System.err.println("Search Param : {}" +  param); 
+		int extensivePileUsage = 0;
 		
-		isBig = mapper.isBigAllReports(param);
-		
-		Construction targetCon = constructionMapper.get((int) param.getConstructionIdx());
-		System.err.println("targetCon : " + targetCon);
+		isBig = mapper.isBigAllReports(param, (int) param.getConstructionIdx());
 		
 		param.setRole((int) session.getAttribute("role"));
 		
 		param.setConstructionIdx((int) session.getAttribute("constructionIdx"));
 		
+		Construction targetCon = constructionMapper.get((int) param.getConstructionIdx());
+		
 		Construction con = constructionMapper.get((int) session.getAttribute("constructionIdx"));
 		
-		System.err.println("mycon : " + con);
+		ExtensivePileUsage usage = extensivePileUsageMapper.findByConstructionIdx((int) param.getConstructionIdx());
+		if(usage != null) {
+			extensivePileUsage = usage.getIsUsed();
+		}else {
+			extensivePileUsage = 0;
+		}
 		
 		int totalCount = mapper.getCountByParam(param);
 		
@@ -117,19 +127,12 @@ public class ReportController{
 		
 		totalConstruction = mapper.getCount(param);
 		
-		List<ReportOneLine> domainList = mapper.getReportOneLineListByParam(page.getStartRow(), page.getPageSize(), param);
+		List<ReportOneLine> domainList = extensivePileUsage == 0 ? mapper.getReportOneLineListByParam(page.getStartRow(), page.getPageSize(), param) : mapper.getReportOneLineExtensivePileUsageListByParam(page.getStartRow(), page.getPageSize(), param);
 		
 		int rownum = (totalCount + 1) - page.getStartRow();
 		
 		for (int i = 0; i < domainList.size(); i++) {
 			domainList.get(i).setRownum(rownum = rownum - 1);
-//			domainList.get(i).setPiece(pieceMapper.getListByReportIdx(domainList.get(i).getId()));
-//			List<Penetration> penetrationsList =  penetrationMapper.getListByReportIdx(domainList.get(i).getId());
-//			System.err.println("penetrationsList.size() : " + penetrationsList.size());
-//			if(penetrationsList.size() > 5) {
-//				isBig = true;
-//			}
-//			domainList.get(i).setPenetrations(penetrationsList);
 		}
 		
 		try {
@@ -150,12 +153,14 @@ public class ReportController{
 			model.addAttribute("ubcYn", 0);
 			model.addAttribute("showPdfYn", 0);
 		}
+		
 		model.addAttribute("totalConstruction", totalConstruction);
 		model.addAttribute("device", device);
 		model.addAttribute("param", param);
 		model.addAttribute("page", page);		
 		model.addAttribute("domainList", domainList);
 		model.addAttribute("isBig", isBig);
+		model.addAttribute("extensivePileUsage", extensivePileUsage);
 		
 		return "report/listMultiOneLine";
 	}
@@ -348,13 +353,21 @@ public class ReportController{
 		
 		int isBig = 0; 
 		int role = (int) session.getAttribute("role");
+		int extensivePileUsage = 0;
 		//int constructionIdx = (int) session.getAttribute("constructionIdx");
 		int constructionIdx = 0;
 		boolean isHiddenManager  = (boolean) session.getAttribute("isHiddenManager");
 		
 		List<ReportOneLine> domainList;
-		isBig = mapper.isBigAllReports(param);
+		isBig = mapper.isBigAllReports(param, param.getConstructionIdx());
 		Construction targetCon = constructionMapper.get(param.getConstructionIdx());
+		ExtensivePileUsage usage = extensivePileUsageMapper.findByConstructionIdx(param.getConstructionIdx());
+		if(usage != null) {
+			extensivePileUsage = usage.getIsUsed();
+		}else {
+			extensivePileUsage = 0;
+		}
+		
 		
 		List<ExcelSignroom> signRoomList = null;
 		String constructionName =  null;
@@ -362,7 +375,7 @@ public class ReportController{
 		if(role == 0) {
 			//슈퍼관리자
 			signRoomList = excelSignroomMapper.getFindByConstructionIdxAndOrderBy(param.getConstructionIdx());
-			constructionName = constructionMapper.getFullName(param.getConstructionIdx(),role).getName();
+			constructionName = constructionMapper.getFullNameByConstruction(param.getConstructionIdx(),role).getName();
 			constructionIdx = param.getConstructionIdx();
 			if(constructionIdx == 815) {
 				constructionName = constructionName.replaceAll("두산에너빌리티 선일산업", "").trim();
@@ -371,7 +384,7 @@ public class ReportController{
 			//일반협력사
 			constructionIdx = (int) session.getAttribute("constructionIdx");
 			signRoomList = excelSignroomMapper.getFindByConstructionIdxAndOrderBy(constructionIdx);
-			constructionName = constructionMapper.getFullName(constructionIdx, role).getName();
+			constructionName = constructionMapper.getFullNameByConstruction(constructionIdx, role).getName();
 			if(constructionIdx == 815) {
 				constructionName = constructionName.replaceAll("두산에너빌리티 선일산업", "").trim();
 			}
@@ -379,7 +392,7 @@ public class ReportController{
 			//시공사
 			constructionIdx = param.getConstructionIdx();
 			signRoomList = excelSignroomMapper.getFindByConstructionIdxAndOrderBy(param.getConstructionIdx());
-			constructionName = constructionMapper.getFullName(param.getConstructionIdx(),role).getName();
+			constructionName = constructionMapper.getFullNameByConstruction(param.getConstructionIdx(),role).getName();
 			if(constructionIdx == 815) {
 				constructionName = constructionName.replaceAll("두산에너빌리티 선일산업", "").trim();
 			}
@@ -387,7 +400,7 @@ public class ReportController{
 			//가맹점
 			constructionIdx = param.getConstructionIdx();
 			signRoomList = excelSignroomMapper.getFindByConstructionIdxAndOrderBy(param.getConstructionIdx());
-			constructionName = constructionMapper.getFullName(param.getConstructionIdx(),role).getName();
+			constructionName = constructionMapper.getFullNameByConstruction(param.getConstructionIdx(),role).getName();
 			if(constructionIdx == 815) {
 				constructionName = constructionName.replaceAll("두산에너빌리티 선일산업", "").trim();
 			}
@@ -398,7 +411,7 @@ public class ReportController{
 		if(isBig > 0) {
 			Construction con = constructionMapper.get(constructionIdx);
 			if(param.getConstructionIdx() > 0) {
-				domainList = mapper.getListByParamExcelTen(param);
+				domainList = extensivePileUsage > 0 ? mapper.getListByParamExtensivePileUsageExcelTen(param) : mapper.getListByParamExcelTen(param);
 			}else {
 				domainList = new ArrayList<ReportOneLine>();
 			}
@@ -428,6 +441,7 @@ public class ReportController{
 			model.addAttribute("param", param);
 			model.addAttribute("signRoomList", signRoomList);
 			model.addAttribute("constructionName", constructionName);
+			model.addAttribute("extensivePileUsage", extensivePileUsage);
 			
 			if(constructionIdx == 645) {
 				System.err.println("reportTenAllJh");
@@ -441,13 +455,19 @@ public class ReportController{
 				return "reportTenAllFor1269";
 			}
 			
+			if(extensivePileUsage > 0) {
+				System.err.println("reportTenAllFor1338");
+				System.err.println("reportTenAllFor1338");
+				return "reportTenAllFor1338";
+			}
+			
 			System.err.println("reportTenAll");
 			System.err.println("reportTenAll");
 			return "reportTenAll";
 		}
 		Construction con = constructionMapper.get(constructionIdx);
 		if(param.getConstructionIdx() > 0) {
-			domainList = mapper.getListByParamExcelFive(param);
+			domainList = extensivePileUsage > 0 ? mapper.getListByParamExtensivePileUsageExcelFive(param) : mapper.getListByParamExcelFive(param);
 		}else {
 			domainList = new ArrayList<ReportOneLine>();
 		}
@@ -477,6 +497,7 @@ public class ReportController{
 		model.addAttribute("param", param);
 		model.addAttribute("signRoomList", signRoomList);
 		model.addAttribute("constructionName", constructionName);
+		model.addAttribute("extensivePileUsage", extensivePileUsage);
 		
 		if(constructionIdx == 645) {
 			System.err.println("reportFiveAllJh");
@@ -496,6 +517,12 @@ public class ReportController{
 			return "reportFiveAllFor1269";
 		}
 		
+		if(extensivePileUsage > 0) {
+			System.err.println("reportFiveAllFor1338");
+			System.err.println("reportFiveAllFor1338");
+			return "reportFiveAllFor1338";
+		}
+		
 		System.err.println("reportFiveAll");
 		System.err.println("reportFiveAll");
 		return "reportFiveAll";
@@ -511,8 +538,17 @@ public class ReportController{
 		int isBig = 0; 
 		int role = (int) session.getAttribute("role");
 		//int constructionIdx = (int) session.getAttribute("constructionIdx");
+		int extensivePileUsage = 0;
 		int constructionIdx = 0;
 		boolean isHiddenManager  = (boolean) session.getAttribute("isHiddenManager");
+		
+		ExtensivePileUsage usage = extensivePileUsageMapper.findByConstructionIdx(param.getConstructionIdx());
+		if(usage != null) {
+			extensivePileUsage = usage.getIsUsed();
+		}else {
+			extensivePileUsage = 0;
+		}
+		
 		
 		List<ReportOneLine> domainList;
 		isBig = mapper.isOriginBigAllReports(param.getConstructionIdx());
@@ -525,7 +561,7 @@ public class ReportController{
 			//슈퍼관리자
 			constructionIdx = param.getConstructionIdx();
 			signRoomList = excelSignroomMapper.getFindByConstructionIdxAndOrderBy(param.getConstructionIdx());
-			constructionName = constructionMapper.getFullName(param.getConstructionIdx(),role).getName();
+			constructionName = constructionMapper.getFullNameByConstruction(param.getConstructionIdx(),role).getName();
 			if(param.getConstructionIdx() == 815) {
 				constructionName = constructionName.replaceAll("두산에너빌리티 선일산업", "").trim();
 			}
@@ -533,7 +569,7 @@ public class ReportController{
 			//일반협력사
 			constructionIdx = (int) session.getAttribute("constructionIdx");
 			signRoomList = excelSignroomMapper.getFindByConstructionIdxAndOrderBy(constructionIdx);
-			constructionName = constructionMapper.getFullName(constructionIdx ,role).getName();
+			constructionName = constructionMapper.getFullNameByConstruction(constructionIdx ,role).getName();
 			if(constructionIdx == 815) {
 				constructionName = constructionName.replaceAll("두산에너빌리티 선일산업", "").trim();
 			}
@@ -541,7 +577,7 @@ public class ReportController{
 			//시공사
 			constructionIdx = param.getConstructionIdx();
 			signRoomList = excelSignroomMapper.getFindByConstructionIdxAndOrderBy(param.getConstructionIdx());
-			constructionName = constructionMapper.getFullName(param.getConstructionIdx() ,role).getName();
+			constructionName = constructionMapper.getFullNameByConstruction(param.getConstructionIdx() ,role).getName();
 			if(param.getConstructionIdx() == 815) {
 				constructionName = constructionName.replaceAll("두산에너빌리티 선일산업", "").trim();
 			}
@@ -549,7 +585,7 @@ public class ReportController{
 			//가맹점
 			constructionIdx = param.getConstructionIdx();
 			signRoomList = excelSignroomMapper.getFindByConstructionIdxAndOrderBy(param.getConstructionIdx());
-			constructionName = constructionMapper.getFullName(param.getConstructionIdx() ,role).getName();
+			constructionName = constructionMapper.getFullNameByConstruction(param.getConstructionIdx() ,role).getName();
 			if(param.getConstructionIdx() == 815) {
 				constructionName = constructionName.replaceAll("두산에너빌리티 선일산업", "").trim();
 			}
@@ -560,7 +596,7 @@ public class ReportController{
 		if(isBig > 0) {
 			Construction con = constructionMapper.get(constructionIdx);
 			if(param.getConstructionIdx() > 0) {
-				domainList = mapper.getListByParamExcelAllBig(param);
+				domainList = extensivePileUsage > 0 ? mapper.getListByParamExtensivePileUsageExcelAllBig(param) : mapper.getListByParamExcelAllBig(param);
 			}else {
 				domainList = new ArrayList<ReportOneLine>();
 			}
@@ -590,6 +626,7 @@ public class ReportController{
 			model.addAttribute("param", param);
 			model.addAttribute("signRoomList", signRoomList);
 			model.addAttribute("constructionName", constructionName);
+			model.addAttribute("extensivePileUsage", extensivePileUsage);
 			
 			if(constructionIdx == 645) {
 				System.err.println("reportTenAllJh");
@@ -605,13 +642,20 @@ public class ReportController{
 			}
 			
 			
+			if(extensivePileUsage > 0) {
+				System.err.println("reportTenAllFor1338");
+				System.err.println("reportTenAllFor1338");
+				return "reportTenAllFor1338";
+			}
+			
 			System.err.println("reportTenAll");
 			System.err.println("reportTenAll");
 			return "reportTenAll";
 		}
 		Construction con = constructionMapper.get(constructionIdx);
 		if(param.getConstructionIdx() > 0) {
-			domainList = mapper.getListByParamExcelAll(param);
+			//domainList = mapper.getListByParamExcelAll(param);
+			domainList = extensivePileUsage > 0 ? mapper.getListByParamExtensivePileUsageExcelAll(param) : mapper.getListByParamExcelAll(param);
 		}else {
 			domainList = new ArrayList<ReportOneLine>();
 		}
@@ -641,6 +685,7 @@ public class ReportController{
 		model.addAttribute("param", param);
 		model.addAttribute("signRoomList", signRoomList);
 		model.addAttribute("constructionName", constructionName);
+		model.addAttribute("extensivePileUsage", extensivePileUsage);
 		
 		if(constructionIdx == 645) {
 			System.err.println("reportFiveAllJh");
@@ -658,6 +703,12 @@ public class ReportController{
 			System.err.println("reportTenAllFor1269");
 			System.err.println("reportTenAllFor1269");
 			return "reportTenAllFor1269";
+		}
+		
+		if(extensivePileUsage > 0) {
+			System.err.println("reportFiveAllFor1338");
+			System.err.println("reportFiveAllFor1338");
+			return "reportFiveAllFor1338";
 		}
 		
 		
@@ -806,6 +857,7 @@ public class ReportController{
 	public boolean doDeleteMulti(@RequestBody List<UpdateReport> report) {
 		try {
 			for (UpdateReport updateReport : report) {  
+			
 				doDelete(updateReport);
 			}
 		}catch (Exception e) {
@@ -822,12 +874,55 @@ public class ReportController{
 	@RequestMapping(value = "/update/report", method = RequestMethod.POST)
 	public boolean updateReport(@RequestBody UpdateReport report) {
 		
-		report.setUltimateBearingCapacity(String.valueOf(calDanish(report)));
+		
+		/**report.setUltimateBearingCapacity(String.valueOf(calDanish(report)));
 		int result = mapper.update(report);
 		if(result > 0) {
 			//전체를 다 삭제하고.
 			pieceMapper.deleteByReportIdx(report.getId());
 			for (Piece piese : report.getPiece()) {
+				//다시 다 넣는다.
+				if(pieceMapper.insert(piese) == 0) {
+					return false;
+				}
+			}
+			
+			if(report.getPenetrations() != null) {
+				for (Penetration penetration : report.getPenetrations()) {
+					if(penetrationMapper.get(penetration.getId()) != null) {
+						penetrationMapper.update(penetration);
+					}else {
+						penetrationMapper.insert(penetration);
+					}
+				}
+			}
+		}
+		return true;**/
+		
+		
+		int constructionIdx = mapper.getConstructionIdx(report.getId());
+		
+		System.err.println("constructionIdx : " + constructionIdx);
+		
+		//ConstructionSetting setting = holder.get();
+		int extensivePileUsage = 0;
+		ExtensivePileUsage usage = extensivePileUsageMapper.findByConstructionIdx(constructionIdx);
+		System.err.println("usage : " + usage);
+		if(usage != null) {
+			extensivePileUsage = usage.getIsUsed();
+		}else {
+			extensivePileUsage = 0;
+		}
+		
+		report.setUltimateBearingCapacity(String.valueOf(calDanish(report)));
+		int result = mapper.update(report);
+		if(result > 0) {
+			//전체를 다 삭제하고.
+			System.err.println("Piece 전체를 다 삭제하고.");
+			pieceMapper.deleteByReportIdx(report.getId());
+			List<Piece> clearPieces = Utill.filterPieces(report.getPiece(), extensivePileUsage);
+			System.err.println("clearPieces : " + clearPieces.size());
+			for (Piece piese : clearPieces) {
 				//다시 다 넣는다.
 				if(pieceMapper.insert(piese) == 0) {
 					return false;
@@ -862,16 +957,16 @@ public class ReportController{
 	}*/
 	
 	
+	@Transactional
 	@ResponseBody
 	@RequestMapping(value = "/update/reportMulti", method = RequestMethod.POST)
 	public boolean updateReportMulti(@RequestBody List<UpdateReport> reports) {
 	    try {
 	        for (UpdateReport report : reports) {
-	            updateReportOne(report); // 실패하면 예외 발생
+	           updateReportOne(report);
 	        }
 	        return true;
 	    } catch (Exception e) {
-	        // 에러 로그는 남기되 사용자에겐 false만
 	        e.printStackTrace();
 	        return false;
 	    }
@@ -880,6 +975,18 @@ public class ReportController{
 	
 	@Transactional
 	public boolean updateReportOne(UpdateReport report) {
+		
+		int extensivePileUsage = 0;
+		
+		int construnctioIdx = mapper.getConstructionIdx(report.getId());
+		
+		ExtensivePileUsage usage = extensivePileUsageMapper.findByConstructionIdx(construnctioIdx);
+		
+		if(usage != null) {
+			extensivePileUsage = usage.getIsUsed();
+		}else {
+			extensivePileUsage = 0;
+		}
 	    // 1. 계산값 설정
 	    report.setUltimateBearingCapacity(String.valueOf(calDanish(report)));
 
@@ -894,17 +1001,27 @@ public class ReportController{
 	    int deletedCount = pieceMapper.deleteByReportIdx(report.getId());
 	    if (deletedCount < 0) {
 	        System.out.println("Piece 삭제 실패: report ID = " + report.getId());
-	        throw new RuntimeException("Delete failed for report ID: " + report.getId());
+	        //throw new RuntimeException("Delete failed for report ID: " + report.getId());
+	        return false;
 	    }
 
 	    // 4. piece 재삽입
-	    if (report.getPiece() != null) {
-	        for (Piece piece : report.getPiece()) {
-	            if (pieceMapper.insert(piece) == 0) {
-	                throw new RuntimeException("Insert failed for piece in report ID: " + report.getId());
-	            }
-	        }
-	    }
+	    //if (report.getPiece() != null) {
+	    //    for (Piece piece : report.getPiece()) {
+	    //        if (pieceMapper.insert(piece) == 0) {
+	    //            throw new RuntimeException("Insert failed for piece in report ID: " + report.getId());
+	    //        }
+	    //    }
+	    //}
+	    
+	    List<Piece> clearPieces = Utill.filterPieces(report.getPiece(), extensivePileUsage);
+		System.err.println("clearPieces : " + clearPieces.size());
+		for (Piece piese : clearPieces) {
+			//다시 다 넣는다.
+			if(pieceMapper.insert(piese) == 0) {
+				return false;
+			}
+		}
 
 	    // 5. penetration 처리
 	    if(report.getPenetrations() != null) {
@@ -1044,16 +1161,23 @@ public class ReportController{
 	
 	@ResponseBody
 	@RequestMapping(value = "/today/list", method = RequestMethod.POST)
-	public List<ReportOneLine> getTodayList(@RequestParam("constructionIdx") int constructionIdx
-			, @RequestParam("machineNumber") String machineNumber
-			, @RequestParam("currentDateTime") String currentDateTime){
-		return mapper.getTodayListByPdf(constructionIdx, machineNumber, currentDateTime);
+	public List<ReportOneLine> getTodayList(@RequestParam("constructionIdx") int constructionIdx , @RequestParam("machineNumber") String machineNumber , @RequestParam("currentDateTime") String currentDateTime){
+		
+		System.err.println("constructionIdx : " + constructionIdx);
+		int extensivePileUsage = 0;
+		ExtensivePileUsage usage = extensivePileUsageMapper.findByConstructionIdx(constructionIdx);
+		if(usage != null) {
+			extensivePileUsage = usage.getIsUsed();
+		}else {
+			extensivePileUsage = 0;
+		}
+		System.err.println("extensivePileUsage : " + extensivePileUsage);
+		return extensivePileUsage > 0 ? mapper.getTodayListByPdfExtensivePileUsage(constructionIdx, machineNumber, currentDateTime) : mapper.getTodayListByPdf(constructionIdx, machineNumber, currentDateTime);
 	}
 	
 	@ResponseBody
 	@RequestMapping(value = "/machine/list", method = RequestMethod.POST)
-	public List<ReportOneLine> getTodayList(@RequestParam("constructionIdx") int constructionIdx
-			, @RequestParam("machineNumber") String machineNumber){
+	public List<ReportOneLine> getTodayList(@RequestParam("constructionIdx") int constructionIdx , @RequestParam("machineNumber") String machineNumber){
 		return mapper.getMachineListByPdf(constructionIdx, machineNumber);
 	}
 	
@@ -1061,6 +1185,7 @@ public class ReportController{
 	public void setSessionInfo(Model model, HttpSession session) {
 		SessionInfo sessionInfo = new SessionInfo();
 		sessionInfo.setUserId((String) session.getAttribute("userId"));
+		sessionInfo.setUserName((String) session.getAttribute("userName"));
 		sessionInfo.setRole((Integer) session.getAttribute("role"));
 		sessionInfo.setConstructionIdx((Integer) session.getAttribute("constructionIdx"));
 		sessionInfo.setHiddenManager((Boolean) session.getAttribute("isHiddenManager"));

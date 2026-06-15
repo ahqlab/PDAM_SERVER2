@@ -1,31 +1,98 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/views/common/tagLib.jsp" %>
-
+<style>
+	.tableScroll {
+	  width: 100%;
+	}
+	
+	.reportTable {
+	  width: auto;
+	  border-collapse: collapse;
+	  table-layout: fixed;
+	}
+	.viewTh tr td,
+	.reportTable tr td, 
+	.reportTable thead tr th {
+	  width: 70px;  /* 전체 너비의 5% */
+	  padding: 2px;
+	  overflow: hidden;
+	  white-space: normal;      /* 한 줄에 강제하지 않고 줄바꿈 허용 */
+	  word-wrap: break-word;    /* 단어 단위 줄바꿈 허용 (구버전 호환) */
+	  overflow-wrap: break-word; /* 긴 단어도 줄바꿈 */
+	  text-overflow: clip;      /* 말줄임표 제거 */
+	  overflow: visible;        /* 내용이 넘쳐도 숨기지 않음 */
+	}
+	
+	.reportTable tr td input {
+	  width: 100%;
+	  box-sizing: border-box;
+	  padding: 2px 4px;
+	  margin: 0;
+	}
+</style>
 
 <script>
 
-var initIndex = 0;
+	var initIndex = 0;
+	
+	$(document).ready( function() {
+		
+		
+	    $('#submitBtn').click( function() {
+	    	searchForm();
+	    	getConstructionName();
+	    });
+		
+	    $("#aa").scroll(function () {
+	        $("#bb").scrollTop($("#bb").scrollTop());  
+	        $("#bb").scrollLeft($("#bb").scrollLeft());
+	    });
+	    $("#bb").scroll(function () {
+	        $("#aa").scrollTop($("#aa").scrollTop());
+	        $("#aa").scrollLeft($("#aa").scrollLeft());
+	    });
+	    getConstructionName();
+	    onRowClick(0);
+	    getPdfSignInfo();
+	    getExcelSignInfo();
+	    calcIntrusionFromSprCol1();
+	});
 
-$(document).ready( function() {
-    $('#submitBtn').click( function() {
-    	searchForm();
-    	getConstructionName();
-    });
-	
-    $("#aa").scroll(function () {
-        $("#bb").scrollTop($("#bb").scrollTop());  
-        $("#bb").scrollLeft($("#bb").scrollLeft());
-    });
-    $("#bb").scroll(function () {
-        $("#aa").scrollTop($("#aa").scrollTop());
-        $("#aa").scrollLeft($("#aa").scrollLeft());
-    });
-    getConstructionName();
-    onRowClick(0);
-    getPdfSignInfo();
-    getExcelSignInfo();
-});
-	
+	function calcIntrusionFromSprCol1() {
+		if ('${param.constructionIdx}' != '1823' && '${sessionInfo.constructionIdx}' != '1823') return;
+
+		// 구간 끝 카운트 경계값 (표 기준 고정)
+		var SEG_ENDS = [100, 200, 300, 400, 500, 600, 737, 800, 900];
+
+		$('#reportTable tr').each(function() {
+			if ($(this).find('#deviceIdx').val() != 3142) return;
+			var sprVal = $(this).find('#sprCol1').val();
+			if (!sprVal || sprVal === 'null') return;
+			var parts = sprVal.split(',');
+			if (parts.length !== 3) return;
+			var p0 = parts[0].trim(), p1 = parts[1].trim(), p2 = parts[2].trim();
+			if (p0 === '' || p1 === '' || p2 === '') return;
+			if (isNaN(parseFloat(p0)) || isNaN(parseFloat(p1)) || isNaN(parseFloat(p2))) return;
+
+			var baseTaco = parseFloat(p1);
+			var totalCount = parseInt(p2);
+			var depth = 0;
+			var prevEnd = 0;
+
+			for (var s = 0; s < SEG_ENDS.length; s++) {
+				if (prevEnd >= totalCount) break;
+				var segEnd = SEG_ENDS[s];
+				var countInSeg = Math.min(segEnd, totalCount) - prevEnd;
+				var segTaco = parseFloat((baseTaco - s * 0.001).toFixed(3));
+				depth += segTaco * countInSeg / 100;
+				prevEnd = segEnd;
+			}
+
+			$(this).find('#drillingDepth').val(depth.toFixed(2));
+		});
+	}
+
+
 	function getConstructionName(){
 		var role = ${sessionInfo.role};
 		var idx = ${param.constructionIdx};
@@ -38,7 +105,7 @@ $(document).ready( function() {
 				role : role
 			}, 
 			success : function(data) {
-				$('#constructionName').val(data);
+				$('#constructionName').val(data.constructionName + ' ' + data.constructionLocation);
 			},
 			complete : function(data) {
 			},
@@ -196,6 +263,7 @@ $(document).ready( function() {
 		var constructionIdx = ${sessionInfo.constructionIdx};
 		var conIdx = ${param.constructionIdx};
 		var isBig = ${isBig};
+		var extensivePileUsage = ${extensivePileUsage}
 		
 		var currentNo;
 		var currentDate;
@@ -220,7 +288,7 @@ $(document).ready( function() {
 		var currentTotalPenetrationValue;
 		
 		
-		if(role == 0 || hiddenManager == true){
+		if(role == 0 || role == 3 ||hiddenManager == true){
 			
 			currentNo = $('#reportTable tr').eq(index).find('td:eq(1)').text().trim();
 			currentDate = $('#reportTable tr').eq(index).find('td:eq(2)').text().trim();
@@ -229,7 +297,9 @@ $(document).ready( function() {
 			currentLocation = $('#reportTable tr').eq(index).find('#location').val();
 			currentPileNo = $('#reportTable tr').eq(index).find('#pileNo').val();
 			currentPileStandard = $('#reportTable tr').eq(index).find('#pileStandard').val().trim();
-			currentPileSum = $('#reportTable tr').eq(index).find('td:eq(13)').text().trim();
+			
+			
+			currentPileSum = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(15)' : 'td:eq(13)').text().trim();
 		
 			currentDrillingDepth = $('#reportTable tr').eq(index).find('#drillingDepth').val();
 			currentIntrusionDepth = $('#reportTable tr').eq(index).find('#intrusionDepth').val();
@@ -239,47 +309,47 @@ $(document).ready( function() {
 				var currentSdDrillingDepth = $('#reportTable tr').eq(index).find('#sdDrillingDepth').val();
 				var currentStDrillingDepth = $('#reportTable tr').eq(index).find('#stDrillingDepth').val();
 				
-				currentBalance = $('#reportTable tr').eq(index).find('td:eq(19)').text().trim();
-				currentGongSac = $('#reportTable tr').eq(index).find('td:eq(20)').text().trim();
+				currentBalance = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(21)' : 'td:eq(19)').text().trim();
+				currentGongSac = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(22)' : 'td:eq(20)').text().trim();
 				currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
 				currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
 				currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
 				if(isBig > 0){
-					currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(34)').text().trim();
-					currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(35)').text().trim();
+					currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(36)' : 'td:eq(34)').text().trim();
+					currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(37)' : 'td:eq(35)').text().trim();
 				}else{
-					currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(29)').text().trim();
-					currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(30)').text().trim();
+					currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(31)' : 'td:eq(29)').text().trim();
+					currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(32)' : 'td:eq(30)').text().trim();
 				}
 				
 			}else{
 				
 				if(constructionIdx == 1269 || conIdx == 1269){
-					currentBalance = $('#reportTable tr').eq(index).find('td:eq(18)').text().trim();
-					currentGongSac = $('#reportTable tr').eq(index).find('td:eq(19)').text().trim();
+					currentBalance = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(20)' : 'td:eq(18)').text().trim();
+					currentGongSac = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(21)' : 'td:eq(19)').text().trim();
 					currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
 					currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
 					currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
 					if(isBig > 0){
-						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(33)').text().trim();
-						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(34)').text().trim();
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(35)' : 'td:eq(33)').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(36)' : 'td:eq(34)').text().trim();
 					}else{
-						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(28)').text().trim();
-						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(29)').text().trim();
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(30)' : 'td:eq(28)').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(31)' : 'td:eq(29)').text().trim();
 					}
 					
 				}else{
-					currentBalance = $('#reportTable tr').eq(index).find('td:eq(17)').text().trim();
-					currentGongSac = $('#reportTable tr').eq(index).find('td:eq(18)').text().trim();
+					currentBalance = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(19)' : 'td:eq(17)').text().trim();
+					currentGongSac = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(20)' : 'td:eq(18)').text().trim();
 					currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
 					currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
 					currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
 					if(isBig > 0){
-						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(32)').text().trim();
-						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(33)').text().trim();
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(34)' : 'td:eq(32)').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(35)' : 'td:eq(33)').text().trim();
 					}else{
-						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(27)').text().trim();
-						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(28)').text().trim();
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(29)' : 'td:eq(27)').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(30)' : 'td:eq(28)').text().trim();
 					}
 				}
 			}
@@ -293,7 +363,7 @@ $(document).ready( function() {
 			currentLocation = $('#reportTable tr').eq(index).find('#location').val();
 			currentPileNo = $('#reportTable tr').eq(index).find('#pileNo').val();
 			currentPileStandard = $('#reportTable tr').eq(index).find('#pileStandard').val().trim();
-			currentPileSum = $('#reportTable tr').eq(index).find('td:eq(12)').text().trim();
+			currentPileSum = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(14)' : 'td:eq(12)').text().trim();
 		
 			currentDrillingDepth = $('#reportTable tr').eq(index).find('#drillingDepth').val();
 			currentIntrusionDepth = $('#reportTable tr').eq(index).find('#intrusionDepth').val();
@@ -304,49 +374,49 @@ $(document).ready( function() {
 				var currentSdDrillingDepth = $('#reportTable tr').eq(index).find('#sdDrillingDepth').val();
 				var currentStDrillingDepth = $('#reportTable tr').eq(index).find('#stDrillingDepth').val();
 				
-				currentBalance = $('#reportTable tr').eq(index).find('td:eq(18)').text().trim();
-				currentGongSac = $('#reportTable tr').eq(index).find('td:eq(19)').text().trim();
+				currentBalance = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(20)' : 'td:eq(18)').text().trim();
+				currentGongSac = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(21)' : 'td:eq(19)').text().trim();
 				currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
 				currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
 				currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
 				
 				if(isBig > 0){
-					currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(33)').text().trim();
-					currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(34)').text().trim();
+					currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(35)' : 'td:eq(33)').text().trim();
+					currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(36)' : 'td:eq(34)').text().trim();
 				}else{
-					currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(28)').text().trim();
-					currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(29)').text().trim();
+					currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(30)' : 'td:eq(28)').text().trim();
+					currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(31)' : 'td:eq(29)').text().trim();
 				}
 				
 			}else{
 				
 				if(constructionIdx == 1269 || conIdx == 1269){
-					currentBalance = $('#reportTable tr').eq(index).find('td:eq(17)').text().trim();
-					currentGongSac = $('#reportTable tr').eq(index).find('td:eq(18)').text().trim();
+					currentBalance = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(19)' : 'td:eq(17)').text().trim();
+					currentGongSac = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(20)' : 'td:eq(18)').text().trim();
 					currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
 					currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
 					currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
 					
 					if(isBig > 0){
-						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(32)').text().trim();
-						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(33)').text().trim();
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(34)' : 'td:eq(32)').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(35)' : 'td:eq(33)').text().trim();
 					}else{
-						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(27)').text().trim();
-						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(28)').text().trim();
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(29)' : 'td:eq(27)').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(30)' : 'td:eq(28)').text().trim();
 					}
 				}else{
-					currentBalance = $('#reportTable tr').eq(index).find('td:eq(16)').text().trim();
-					currentGongSac = $('#reportTable tr').eq(index).find('td:eq(17)').text().trim();
+					currentBalance = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(18)' : 'td:eq(16)').text().trim();
+					currentGongSac = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(19)' : 'td:eq(17)').text().trim();
 					currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
 					currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
 					currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
 					
 					if(isBig > 0){
-						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(31)').text().trim();
-						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(32)').text().trim();
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(33)' : 'td:eq(31)').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(34)' : 'td:eq(32)').text().trim();
 					}else{
-						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(26)').text().trim();
-						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(27)').text().trim();
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(28)' : 'td:eq(26)').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(29)' : 'td:eq(27)').text().trim();
 					}
 				}
 			}
@@ -574,22 +644,42 @@ $(document).ready( function() {
 	      //console.log('minValue : ' + minValue);
 	      //console.log('maxValue : ' + maxValue);
 	      //console.log(myChart.getOption());
-		  showPdf(index, ${sessionInfo.role}, ${sessionInfo.hiddenManager}, ${isBig});
+		  showPdf(index, ${sessionInfo.role}, ${sessionInfo.hiddenManager}, ${isBig}, ${extensivePileUsage});
 		
 	}
 	
 	function getPieceNameByIndex(index){
-		if(index == 0){
-			return '단본';
-		}else if(index == 1){
-			return '하단';
-		}else if(index == 2){
-			return '중단';
-		}else if(index == 3){
-			return '중단';
-		}else if(index == 4){
-			return '상단';
+		var extensivePileUsage = ${extensivePileUsage};
+		if(extensivePileUsage > 0){
+			if(index == 0){
+				return '단본';
+			}else if(index == 1){
+				return '하단';
+			}else if(index == 2){
+				return '중단';
+			}else if(index == 3){
+				return '중단';
+			}else if(index == 4){
+				return '중단';
+			}else if(index == 5){
+				return '중단';
+			}else if(index == 6){
+				return '상단';
+			}
+		}else{
+			if(index == 0){
+				return '단본';
+			}else if(index == 1){
+				return '하단';
+			}else if(index == 2){
+				return '중단';
+			}else if(index == 3){
+				return '중단';
+			}else if(index == 4){
+				return '상단';
+			}
 		}
+		
 	}
 	
 	function onClickReportUpdate(){
@@ -609,15 +699,27 @@ $(document).ready( function() {
 			if (!$('#reportTable tr').eq(i).find('#selectOne').is(':checked')) {
 				continue;
 			}
-			var piece = document.getElementsByName("piece[" + i + "]");
-			var pieceId = document.getElementsByName("pieceId[" + i + "]");
-			var pieceName = document.getElementsByName("pieceName[" + i + "]");
+			
+			var piece     = $('#reportTable tr').eq(i).find('[name="piece[' + i + ']"]');
+			var pieceId   = $('#reportTable tr').eq(i).find('[name="pieceId[' + i + ']"]');
+			var pieceName = $('#reportTable tr').eq(i).find('[name="pieceName[' + i + ']"]');
+			
+			//var piece = document.getElementsByName("piece[" + i + "]");
+			//var pieceId = document.getElementsByName("pieceId[" + i + "]");
+			//var pieceName = document.getElementsByName("pieceName[" + i + "]");
 			
 			if(role == 0){
-				var penetrations = document.getElementsByName("penetrations[" + i + "]");
-				var penetrationsId = document.getElementsByName("penetrationsId[" + i + "]");
-				var penetrationsName = document.getElementsByName("penetrationsName[" + i + "]");
+				//var penetrations = document.getElementsByName("penetrations[" + i + "]");
+				//var penetrationsId = document.getElementsByName("penetrationsId[" + i + "]");
+				//var penetrationsName = document.getElementsByName("penetrationsName[" + i + "]");
+				
+				var penetrations     = $('#reportTable tr').eq(i).find('[name="penetrations[' + i + ']"]');
+				var penetrationsId   = $('#reportTable tr').eq(i).find('[name="penetrationsId[' + i + ']"]');
+				var penetrationsName = $('#reportTable tr').eq(i).find('[name="penetrationsName[' + i + ']"]');
 			}
+			
+			//alert('piece.length : ' + piece.length);
+			
 			var pieces = [];
 			for(var j=0; j<piece.length; j++){
 				var onePiece = {
@@ -628,8 +730,14 @@ $(document).ready( function() {
 				};
 				pieces.push(onePiece);	
 			}
+			
+			
+			//alert('pieces length : '  + JSON.stringify(pieces));
+			
 			if(role == 0){
+				
 				var penetrationss = [];
+				
 				for(var k=0; k<penetrations.length; k++){
 					if(penetrations[k].value != ""){
 						var onePenetrations = {
@@ -709,26 +817,31 @@ $(document).ready( function() {
 			return;
 		}
 		
+		//console.log(' JSON.stringify(reports) : ' +  JSON.stringify(reports));
+		
 		var result = confirm("수정하시겠습니까?");
 		if(result){
+			// 중복 제출 방지: 요청 중 모든 수정 버튼 비활성화
+			$('[onclick*="onClickReportUpdate"]').prop('disabled', true).css('pointer-events', 'none').css('opacity', '0.5');
 			jQuery.ajax({
 				type : "POST",
 				url : "${pageContext.request.contextPath}/report/update/reportMulti",
-				data: JSON.stringify(reports), 
-				dataType : "JSON", // 옵션이므로 JSON으로 받을게 아니면 안써도 됨
+				data: JSON.stringify(reports),
+				dataType : "JSON",
 				contentType : "application/json",
 				success : function(data) {
 					if(data == true){
-						//searchForm();
-						pageReload();
+						pageReload(); // 성공 시 페이지 리로드 → 버튼 자연 리셋
 					}
 				},
 				complete : function(data) {
+					// 실패/오류 시 버튼 복원 (성공 시엔 pageReload가 먼저 실행됨)
+					$('[onclick*="onClickReportUpdate"]').prop('disabled', false).css('pointer-events', '').css('opacity', '');
 				},
 				error : function(xhr, status, error) {
 				}
 			});
-			return; 
+			return;
 		}else{
 			return;
 		}
@@ -1341,9 +1454,39 @@ $(document).ready( function() {
 		
 	}
 	
+	
+	var drivingRecordParams = null;
+
+	function openDrivingRecordPopup() {
+
+	    document.getElementById('drivingRecordOverlay').style.display = 'block';
+	    document.getElementById('drivingRecordPopup').style.display = 'block';
+	}
+
+	function closeDrivingRecordPopup() {
+	    document.getElementById('drivingRecordOverlay').style.display = 'none';
+	    document.getElementById('drivingRecordPopup').style.display = 'none';
+	}
+
+	function confirmDrivingRecordDownload() {
+	    var radios = document.getElementsByName('hitOption');
+	    var hitOption = 'N';   // 기본값
+
+	    for (var i = 0; i < radios.length; i++) {
+	        if (radios[i].checked) {
+	            hitOption = radios[i].value;
+	            break;
+	        }
+	    } 
+	    closeDrivingRecordPopup();
+
+	    downloadDrivingOneRecoredBook(hitOption);
+	}
+	
 </script>
 <!--컨텐츠-->
 <div class="section-right" >
+	<%@ include file="/WEB-INF/views/common/welcomeMsg.jsp" %>
 	<div class="TopContArea">
 		<div class="titArea mb-40">
 			<p class="h1Tit">${device.machineNumber} 시공현황</p>
@@ -1496,8 +1639,9 @@ $(document).ready( function() {
 	<div class="min485">
 		<div class="tableArea">
 			
-			<div class="viewTable viewTable05">
-				<table class="viewTh">
+			<!-- <div class="viewTable viewTable05"> -->
+			<div class="viewTable" style="width: auto; table-layout: fixed; overflow-x: scroll; overflow-y: hidden;">
+				<table class="viewTh" style="table-layout: fixed;">
 					<tr>
 						<c:choose>
 							<c:when test="${sessionInfo.role == 0  || sessionInfo.hiddenManager == true  || sessionInfo.role == 3}">
@@ -1513,7 +1657,15 @@ $(document).ready( function() {
 						<td rowspan="2">시공위치</td>
 						<td rowspan="2">파일번호</td>
 						<td rowspan="2">파일규격</td>
-						<td colspan="6">파일구분</td>
+						
+						<c:choose>
+							<c:when test="${extensivePileUsage > 0}">
+								<td colspan="8" style="width: 560px;">파일구분</td>
+							</c:when>
+							<c:otherwise>
+								<td colspan="6" style="width: 420px;">파일구분</td>
+							</c:otherwise>
+						</c:choose>
 						<td rowspan="2">이음(개소)</td>
 						
 						<c:choose>
@@ -1619,8 +1771,26 @@ $(document).ready( function() {
 									<c:when test="${sessionInfo.hiddenManager == true and ubcYn == 1}">
 										<td rowspan="2">극한지지력<br>(kN)</td>
 										<td rowspan="2">해머효율(%)</td>
-										<td rowspan="2">탄성계수(t/cm2)</td>
-										<td rowspan="2">파일단면적(cm2)</td>
+										<td rowspan="2">
+											<c:choose>
+												<c:when test="${sessionInfo.constructionIdx == '1669'}">
+													개량T4
+												</c:when>
+												<c:otherwise>
+													탄성계수(t/cm2)
+												</c:otherwise>
+											</c:choose>
+										</td>
+										<td rowspan="2">
+											<c:choose>
+												<c:when test="${sessionInfo.constructionIdx == '1669'}">
+													정T4
+												</c:when>
+												<c:otherwise>
+													파일단면적(cm2)
+												</c:otherwise>
+											</c:choose>
+										</td>
 										<td rowspan="2">비고</td>
 									</c:when>
 									<c:otherwise>
@@ -1684,6 +1854,12 @@ $(document).ready( function() {
 						<td>하단(M)</td>
 						<td>중단(M)</td>
 						<td>중단(M)</td>
+						<c:choose>
+							<c:when test="${extensivePileUsage > 0}">
+								<td>중단(M)</td>
+								<td>중단(M)</td>
+							</c:when>
+						</c:choose>
 						<td>상단(M)</td>
 						<td>합계(M)</td>
 					</tr>
@@ -1696,7 +1872,7 @@ $(document).ready( function() {
 					</c:when>
 					<c:otherwise>
 						<div class="tableScroll">
-					<table id="reportTable" name="reportTable">
+					<table id="reportTable" name="reportTable" class="reportTable" >
 					</c:otherwise>
 				</c:choose>				
 					
@@ -1736,11 +1912,19 @@ $(document).ready( function() {
 														 					</c:choose>
 														 				</c:when>
 														 				<c:otherwise>
-														 					<tr class="lampOn-l" onclick="javascript:onRowClick(${status.index});" style="background-color: #F0DDA4;">		
+															 				<c:choose>
+															 					<c:when test="${param.constructionIdx == 1619 or sessionInfo.constructionIdx == 1619}">
+															 						<tr onclick="javascript:onRowClick(${status.index});">
+															 					</c:when>
+															 					<c:otherwise>
+															 						<tr class="lampOn-l" onclick="javascript:onRowClick(${status.index});" style="background-color: #F0DDA4;">	
+															 					</c:otherwise>
+															 				</c:choose>
 														 				</c:otherwise>
 														 			</c:choose>
 																</c:when>
 																<c:otherwise>
+																	<!-- 10회였을때 10회를 다 채우지 않은 경우에 노란색이 안보인다는 말인데... -->
 																	<tr onclick="javascript:onRowClick(${status.index});">
 																</c:otherwise>	
 														 	</c:choose>
@@ -1755,15 +1939,7 @@ $(document).ready( function() {
 							<c:choose>
 								<c:when test="${sessionInfo.role == 0  || sessionInfo.hiddenManager == true  || sessionInfo.role == 3}">
 									<td>
-										<c:choose>
-											<c:when test="${domain.isDel == 1}">
-												<!-- 삭제된것에 클릭 -->
-												<input type="checkbox" id="selectOne" name="selectOne" onclick="doOpenCheck(this, this.parentNode.parentNode.rowIndex);">
-											</c:when>
-											<c:otherwise>
-												<input type="checkbox" id="selectOne" name="selectOne" onclick="doOpenCheck(this, this.parentNode.parentNode.rowIndex);">
-											</c:otherwise>
-										</c:choose>
+										<input type="checkbox" id="selectOne" name="selectOne" onclick="doOpenCheck(this, this.parentNode.parentNode.rowIndex);">
 									</td>
 								</c:when>
 							</c:choose>
@@ -1907,8 +2083,24 @@ $(document).ready( function() {
 							<td>
 								<input type="text" id="piece[${status.index}]" name="piece[${status.index}]" disabled="disabled"  class="tdInput" value="${domain.piFive}">
 								<input type="hidden" id="pieceId[${status.index}]" name="pieceId[${status.index}]" value="${domain.pidFive}">
-								<input type="hidden" id="pieceName[${status.index}]" name="pieceName[${status.index}]" value="상단">
+								<input type="hidden" id="pieceName[${status.index}]" name="pieceName[${status.index}]" value="중단">
 							</td>
+							<c:choose>
+								<c:when test="${extensivePileUsage > 0}">
+										<td>
+											<input type="text" id="piece[${status.index}]" name="piece[${status.index}]" disabled="disabled"  class="tdInput" value="${domain.piSix}">
+											<input type="hidden" id="pieceId[${status.index}]" name="pieceId[${status.index}]" value="${domain.pidSix}">
+											<input type="hidden" id="pieceName[${status.index}]" name="pieceName[${status.index}]" value="중단">
+										</td>
+										<td>
+											<input type="text" id="piece[${status.index}]" name="piece[${status.index}]" disabled="disabled"  class="tdInput" value="${domain.piSeven}">
+											<input type="hidden" id="pieceId[${status.index}]" name="pieceId[${status.index}]" value="${domain.pidSeven}">
+											<input type="hidden" id="pieceName[${status.index}]" name="pieceName[${status.index}]" value="상단">
+										</td>
+								</c:when>
+							</c:choose>
+							
+							
 							<td>${domain.totalConnectWidth}</td>
 							<td>
 								${domain.connectLength}
@@ -2311,95 +2503,6 @@ $(document).ready( function() {
 								</c:otherwise>
 								
 							</c:choose>
-							
-							<!-- <c:forEach var="i" begin="0" end="${isBig > 0 ? 9 : 4}">
-								<c:choose>
-									<c:when test="${sessionInfo.role == 0}">
-										<td>
-											<input type="text" id="penetrations[${status.index}]" name="penetrations[${status.index}]" disabled="disabled"  class="tdInput" value="${domain.penetrations[i].value eq '0' ? '' : domain.penetrations[i].value}">
-											<input type="hidden" id="penetrationsId[${status.index}]" name="penetrationsId[${status.index}]" value="${domain.penetrations[i].id}">
-											<c:choose>
-												<c:when test="${domain.penetrations[i].name != null}">
-													<input type="hidden" id="penetrationsName[${status.index}]" name="penetrationsName[${status.index}]" value="${domain.penetrations[i].name}">	
-												</c:when>
-												<c:otherwise>
-													<c:choose>
-														<c:when test="${isBig > 0}">
-																<c:choose>
-																	<c:when test="${i == 0}">
-																		<input type="hidden" id="penetrationsName[${status.index}]" name="penetrationsName[${status.index}]" value="1회">	
-																	</c:when>
-																	<c:when test="${i == 1}">
-																		<input type="hidden" id="penetrationsName[${status.index}]" name="penetrationsName[${status.index}]" value="2회">	
-																	</c:when>
-																	<c:when test="${i == 2}">
-																		<input type="hidden" id="penetrationsName[${status.index}]" name="penetrationsName[${status.index}]" value="3회">	
-																	</c:when>
-																	<c:when test="${i == 3}">
-																		<input type="hidden" id="penetrationsName[${status.index}]" name="penetrationsName[${status.index}]" value="4회">	
-																	</c:when>
-																	<c:when test="${i == 4}">
-																		<input type="hidden" id="penetrationsName[${status.index}]" name="penetrationsName[${status.index}]" value="5회">				
-																	</c:when>
-																	<c:when test="${i == 5}">
-																		<input type="hidden" id="penetrationsName[${status.index}]" name="penetrationsName[${status.index}]" value="6회">	
-																	</c:when>
-																	<c:when test="${i == 6}">
-																		<input type="hidden" id="penetrationsName[${status.index}]" name="penetrationsName[${status.index}]" value="7회">	
-																	</c:when>
-																	<c:when test="${i == 7}">
-																		<input type="hidden" id="penetrationsName[${status.index}]" name="penetrationsName[${status.index}]" value="8회">	
-																	</c:when>
-																	<c:when test="${i == 8}">
-																		<input type="hidden" id="penetrationsName[${status.index}]" name="penetrationsName[${status.index}]" value="9회">	
-																	</c:when>
-																	<c:when test="${i == 9}">
-																		<input type="hidden" id="penetrationsName[${status.index}]" name="penetrationsName[${status.index}]" value="10회">	
-																	</c:when>
-																</c:choose>
-														
-														</c:when>
-														<c:otherwise>
-																<c:choose>
-																	<c:when test="${i == 0}">
-																		<input type="hidden" id="penetrationsName[${status.index}]" name="penetrationsName[${status.index}]" value="1회">	
-																	</c:when>
-																	<c:when test="${i == 1}">
-																		<input type="hidden" id="penetrationsName[${status.index}]" name="penetrationsName[${status.index}]" value="2회">	
-																	</c:when>
-																	<c:when test="${i == 2}">
-																		<input type="hidden" id="penetrationsName[${status.index}]" name="penetrationsName[${status.index}]" value="3회">	
-																	</c:when>
-																	<c:when test="${i == 3}">
-																		<input type="hidden" id="penetrationsName[${status.index}]" name="penetrationsName[${status.index}]" value="4회">	
-																	</c:when>
-																	<c:when test="${i == 4}">
-																		<input type="hidden" id="penetrationsName[${status.index}]" name="penetrationsName[${status.index}]" value="5회">				
-																	</c:when>
-																</c:choose>
-														</c:otherwise>
-													</c:choose>
-												</c:otherwise>
-											</c:choose>
-										</td>
-									</c:when>
-									<c:otherwise>
-										<c:choose>
-											<c:when test="${sessionInfo.constructionIdx == 645}">
-												<td  style="display:none;">
-													${domain.penetrations[i].value}
-												</td> 
-											</c:when>
-											<c:otherwise>
-												<td>
-													${domain.penetrations[i].value}
-												</td> 
-											</c:otherwise>
-										</c:choose>
-										<input type="hidden" id="penetrations[${status.index}]" name="penetrations[${status.index}]" disabled="disabled"  class="tdInput" value="${domain.penetrations[i].value eq '0' ? '' : domain.penetrations[i].value}">
-									</c:otherwise>
-								</c:choose>											
-							</c:forEach> -->
 							<c:choose>
 								<c:when test="${domain.managedStandard + 0 < domain.avgPenetrationValue + 0}">
 									<td style="background-color: red; color: white;">
@@ -2525,7 +2628,15 @@ $(document).ready( function() {
 				<c:when test="${sessionInfo.role == 0}"> <!-- 슈퍼관리자 -->
 					<div class="tableCArea">
 						<div class="btnType02" onclick="javascript:onClickReportUpdate();" style="visibility: hidden;"></div>
-						<div class="btnType02" id="pdfBtn" style="width: 200px;  background: #258348; border: 1px solid #258348;">현재 파일 항타기록지 PDF</div>
+						<c:choose>
+							<c:when test="${(sessionInfo.constructionIdx == 1550 or  param.constructionIdx == 1550) and (sessionInfo.hiddenManager == true or sessionInfo.role == 0)}">
+								<div class="btnType02" id="pdfBtn" onclick="javascript:openDrivingRecordPopup();" style="width: 200px;  background: #258348; border: 1px solid #258348;">현재 파일 항타기록지 PDF</div>
+							</c:when>
+							<c:otherwise>
+								<div class="btnType02" id="pdfBtn" onclick="javascript:downloadDrivingOneRecoredBook();" style="width: 200px;  background: #258348; border: 1px solid #258348;">현재 파일 항타기록지 PDF</div>
+							</c:otherwise>
+						</c:choose>
+						
 						<div class="btnType02" id="pdfSignRoomSetting" style="width: 200px; margin-top:10px; background: #FFD400; color:#000000; border: 1px solid #258348;">PDF 결재방 설정</div>
 						<!-- <div class="btnType02" id="pdfSignRoomSetting" style="width: 200px; margin-top:10px; background: #760A2D; border: 1px solid #258348;">PDF 결재방 설정</div> -->
 					</div>
@@ -2535,7 +2646,14 @@ $(document).ready( function() {
 						<c:when test="${ sessionInfo.showPdfYn == true}">
 							<div class="tableCArea">
 								<div class="btnType02" onclick="javascript:onClickReportUpdate();" style="visibility: hidden;"></div>
-								<div class="btnType02" id="pdfBtn" style="width: 200px;  background: #258348; border: 1px solid #258348;">현재 파일 항타기록지 PDF</div>
+								<c:choose>
+									<c:when test="${(sessionInfo.constructionIdx == 1550 or  param.constructionIdx == 1550) and (sessionInfo.hiddenManager == true or sessionInfo.role == 0)}">
+										<div class="btnType02" id="pdfBtn"  onclick="javascript:openDrivingRecordPopup();" style="width: 200px;  background: #258348; border: 1px solid #258348;">현재 파일 항타기록지 PDF</div>
+									</c:when>
+									<c:otherwise>
+										<div class="btnType02" id="pdfBtn" onclick="javascript:downloadDrivingOneRecoredBook();" style="width: 200px;  background: #258348; border: 1px solid #258348;">현재 파일 항타기록지 PDF</div>
+									</c:otherwise>
+								</c:choose>
 								<div class="btnType02" id="pdfSignRoomSetting" style="width: 200px; margin-top:10px; background: #FFD400; color:#000000; border: 1px solid #258348;">PDF 결재방 설정</div>
 								<!-- <div class="btnType02" id="pdfSignRoomSetting" style="width: 200px; margin-top:10px; background: #760A2D; border: 1px solid #258348;">PDF 결재방 설정</div> -->
 							</div>
@@ -2546,7 +2664,14 @@ $(document).ready( function() {
 								<c:when test="${sessionInfo.constructionIdx == 738}">
 									<div class="tableCArea">
 										<div class="btnType02" onclick="javascript:onClickReportUpdate();" style="visibility: hidden;"></div>
-										<div class="btnType02" id="pdfBtn" style="width: 200px;  background: #258348; border: 1px solid #258348;">현재 파일 항타기록지 PDF</div>
+										<c:choose>
+											<c:when test="${(sessionInfo.constructionIdx == 1550 or  param.constructionIdx == 1550) and (sessionInfo.hiddenManager == true or sessionInfo.role == 0)}">
+												<div class="btnType02" id="pdfBtn"  onclick="javascript:openDrivingRecordPopup();" style="width: 200px;  background: #258348; border: 1px solid #258348;">현재 파일 항타기록지 PDF</div>
+											</c:when>
+											<c:otherwise>
+												<div class="btnType02" id="pdfBtn" onclick="javascript:downloadDrivingOneRecoredBook();" style="width: 200px;  background: #258348; border: 1px solid #258348;">현재 파일 항타기록지 PDF</div>
+											</c:otherwise>
+										</c:choose>
 										<div class="btnType02" id="pdfSignRoomSetting" style="width: 200px; margin-top:10px; background: #FFD400; color:#000000; border: 1px solid #258348;">PDF 결재방 설정</div>
 										<!-- <div class="btnType02" id="pdfSignRoomSetting" style="width: 200px; margin-top:10px; background: #760A2D; border: 1px solid #258348;">PDF 결재방 설정</div> -->
 									</div>
@@ -2560,7 +2685,14 @@ $(document).ready( function() {
 						<c:when test="${sessionInfo.userId == 'ji2177'}"> <!-- 제일건설(주) 만 열어줌 -->
 							<div class="tableCArea">
 								<div class="btnType02" onclick="javascript:onClickReportUpdate();" style="visibility: hidden;"></div>
-								<div class="btnType02" id="pdfBtn" style="width: 200px;  background: #258348; border: 1px solid #258348;">현재 파일 항타기록지 PDF</div>
+								<c:choose>
+									<c:when test="${(sessionInfo.constructionIdx == 1550 or  param.constructionIdx == 1550) and (sessionInfo.hiddenManager == true or sessionInfo.role == 0)}">
+										<div class="btnType02" id="pdfBtn"  onclick="javascript:openDrivingRecordPopup();" style="width: 200px;  background: #258348; border: 1px solid #258348;">현재 파일 항타기록지 PDF</div>
+									</c:when>
+									<c:otherwise>
+										<div class="btnType02" id="pdfBtn" onclick="javascript:downloadDrivingOneRecoredBook();" style="width: 200px;  background: #258348; border: 1px solid #258348;">현재 파일 항타기록지 PDF</div>
+									</c:otherwise>
+								</c:choose>
 								<div class="btnType02" id="pdfSignRoomSetting" style="width: 200px; margin-top:10px; background: #FFD400; color:#000000; border: 1px solid #258348;">PDF 결재방 설정</div>
 								<!-- <div class="btnType02" id="pdfSignRoomSetting" style="width: 200px; margin-top:10px; background: #760A2D; border: 1px solid #258348;">PDF 결재방 설정</div> -->
 							</div>
@@ -2572,7 +2704,7 @@ $(document).ready( function() {
 						<c:when test="${showPdfYn > 0}">
 							<div class="tableCArea">
 								<div class="btnType02" onclick="javascript:onClickReportUpdate();" style="visibility: hidden;"></div>
-								<div class="btnType02" id="pdfBtn" style="width: 200px;  background: #258348; border: 1px solid #258348;">현재 파일 항타기록지 PDF</div>
+								<div class="btnType02" id="pdfBtn"  onclick="javascript:downloadDrivingOneRecoredBook();" style="width: 200px;  background: #258348; border: 1px solid #258348;">현재 파일 항타기록지 PDF</div>
 								<div class="btnType02" id="pdfSignRoomSetting" style="width: 200px; margin-top:10px; background: #FFD400; color:#000000; border: 1px solid #258348;">PDF 결재방 설정</div>
 								<!-- <div class="btnType02" id="pdfSignRoomSetting" style="width: 200px; margin-top:10px; background: #760A2D; border: 1px solid #258348;">PDF 결재방 설정</div> -->
 							</div>
@@ -2982,6 +3114,30 @@ $(document).ready( function() {
 			</div>
 		</div>
 	</div>
+	
+	<div id="drivingRecordOverlay" style="display:none;"></div>
+
+		<div id="drivingRecordPopup" style="display:none;">
+		    <div class="popup-title">현재 파일항타 기록지 PDF</div>
+		
+		    <div class="popup-content">
+		        <label>
+		            <input type="radio" name="hitOption" value="N" checked>
+	            		타격횟수 미포함
+		        </label>
+		        <br>
+		        <label>
+		            <input type="radio" name="hitOption" value="Y">
+		           		 타격횟수 포함
+		        </label>
+		    </div>
+		
+		    <div class="popup-footer">
+		        <button type="button" onclick="closeDrivingRecordPopup()">닫기</button>
+		        <button type="button" onclick="confirmDrivingRecordDownload()">PDF 생성</button>
+		    </div>
+	</div>
+	
 	<div class="popLayer"></div>								
 	<!--//컨텐츠-->
 
@@ -2996,7 +3152,6 @@ $(document).ready( function() {
 		$('.popLayer').show();
 		$('body').css('overflow', 'hidden');
 	});
-	
 	
 	$('#pdfSignRoomSetting').on('click', function(e){
 		$('.popUp02').show();
@@ -3024,10 +3179,6 @@ $(document).ready( function() {
 
 </script>
 <!-- //팝업 -->
-
-
-
-
 <script>
   $( function() {
     $(".datepicker").datepicker();
@@ -3046,9 +3197,6 @@ $(document).ready(function() {
 			"left": "-150%"
 		}, 500);
 	});
-	
-	
-	
 });
 
 $('.mlist a').on('click', function(e){

@@ -20,7 +20,6 @@ import net.octacomm.sample.domain.ReportParam;
 public class SimpleReportController extends AbstractSimpleReportCRUDController<SimpleReportMapper, Report, ReportParam, Integer>{
 
 	@Autowired
-	@Override
 	public void setCRUDMapper(SimpleReportMapper mapper) {
 		this.mapper = mapper;
 	}

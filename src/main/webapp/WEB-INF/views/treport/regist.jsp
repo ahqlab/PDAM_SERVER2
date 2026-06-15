@@ -45,6 +45,7 @@
 </script>
 <!--컨텐츠-->
 <div class="section-right">
+	<%@ include file="/WEB-INF/views/common/welcomeMsg.jsp" %>
 	<p class="sub-tit text-center">시험성적서 등록</p>
 
 	<!--공지내용-->

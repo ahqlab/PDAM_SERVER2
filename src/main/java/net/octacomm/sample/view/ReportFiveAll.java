@@ -12,6 +12,7 @@ import net.octacomm.sample.domain.ReportParam;
 import net.octacomm.sample.utils.DateUtil;
 import net.octacomm.sample.utils.ExcelColor;
 import net.octacomm.sample.utils.ExcelTitleUtil;
+import net.octacomm.sample.utils.ExcelTitleUtilFor1669;
 import net.octacomm.sample.utils.ExcelTitleUtilForBooyoung;
 import net.octacomm.sample.utils.ExcelTitleUtilForDirectDrilling;
 
@@ -449,7 +450,7 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
     	  
     	  
     	  strings = new String[]{ String.valueOf(i + 1), 
-    			    setDinamicDate(role, isHiddenManager, longCalYn, ((ReportOneLine)reportList.get(i)).getCurrentDateTime(), ((ReportOneLine)reportList.get(i)).getCreateDate()),
+    			    setDinamicDate(role, isHiddenManager, longCalYn, chanegeCurrentDate(((ReportOneLine)reportList.get(i)).getCurrentDateTime()), ((ReportOneLine)reportList.get(i)).getCreateDate()),
     			    ((ReportOneLine)reportList.get(i)).getMachineNumber(), 
     		        ((ReportOneLine)reportList.get(i)).getPileType(), 
     		        ((ReportOneLine)reportList.get(i)).getMethod(), 
@@ -500,7 +501,7 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
     	  gongSacSum +=  (double) Math.abs(gongSacFixExp(((ReportOneLine)reportList.get(i)).getBalance(), ((ReportOneLine)reportList.get(i)).getGongSac(), param.getConstructionIdx()));
     	  
     	  strings = new String[]{ String.valueOf(i + 1), 
-			setDinamicDate(role, isHiddenManager, longCalYn, ((ReportOneLine)reportList.get(i)).getCurrentDateTime(), ((ReportOneLine)reportList.get(i)).getCreateDate()),
+			setDinamicDate(role, isHiddenManager, longCalYn, chanegeCurrentDate(((ReportOneLine)reportList.get(i)).getCurrentDateTime()), ((ReportOneLine)reportList.get(i)).getCreateDate()),
     		((ReportOneLine)reportList.get(i)).getMachineNumber(), 
 	        ((ReportOneLine)reportList.get(i)).getPileType(), 
 	        ((ReportOneLine)reportList.get(i)).getMethod(), 
@@ -846,6 +847,8 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
     	}else if(constructionIdx == 1269 || param.getConstructionIdx() == 1269){
     		//중흥토건 나라기초 부산 에코델타시티 공동4블럭 중흥S-클래스 아파트
     		setColumnLabels(workbook, row1, ExcelTitleUtilForDirectDrilling.FIVE_TOP_UBC );
+    	}else if(constructionIdx == 1669 || param.getConstructionIdx() == 1669){
+    		setColumnLabels(workbook, row1, ExcelTitleUtilFor1669.FIVE_TOP_UBC );
     	}else {
     		setColumnLabels(workbook, row1, ExcelTitleUtil.FIVE_TOP_UBC );
     	}
@@ -857,7 +860,7 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
     		setColumnLabels(workbook, row1, ExcelTitleUtilForBooyoung.FIVE_TOP );
     	}else if(constructionIdx == 1269 || param.getConstructionIdx() == 1269){
     		//중흥토건 나라기초 부산 에코델타시티 공동4블럭 중흥S-클래스 아파트
-    		setColumnLabels(workbook, row1, ExcelTitleUtilForDirectDrilling.FIVE_TOP );
+    		setColumnLabels(workbook, row1, ExcelTitleUtilForDirectDrilling.FIVE_TOP );	
     	}else {
     		setColumnLabels(workbook, row1, ExcelTitleUtil.FIVE_TOP );
     	}
@@ -874,6 +877,8 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
     	}else if(constructionIdx == 1269 || param.getConstructionIdx() == 1269) {
     		//중흥토건 나라기초 부산 에코델타시티 공동4블럭 중흥S-클래스 아파트
     		setColumnLabels(workbook, row2,  ExcelTitleUtilForDirectDrilling.FIVE_BOTTOM_UBC );
+    	}else if(constructionIdx == 1669 || param.getConstructionIdx() == 1669){	
+    		setColumnLabels(workbook, row2,  ExcelTitleUtilFor1669.FIVE_BOTTOM_UBC );
     	}else {
     		setColumnLabels(workbook, row2,  ExcelTitleUtil.FIVE_BOTTOM_UBC );
     	}
@@ -1178,5 +1183,13 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
 		}
 	  
   }
+  
+	
+	private String chanegeCurrentDate(String currentDateTime) {
+		if(constructionIdx == 1508) {
+			return currentDateTime.replaceAll("-", ".") + ".";
+		}
+		return currentDateTime;
+	}
  
 }

@@ -5,7 +5,7 @@
   	
   	<sql id="condition">
         <where>
-        	TB_FILE_INVENTORY.constructionIdx = ${param.constructionIdx} 
+        	A.constructionIdx = ${param.constructionIdx} 
         	<if test="param.searchField != null and param.searchField != '' and param.searchWord != null and param.searchWord != ''">
        			AND ${param.searchField} like '%${param.searchWord}%'
        		</if>
@@ -339,7 +339,386 @@
 		ORDER BY registDate ASC
     </select>
     
-    
+     <select id="getFileInventoryOfMultiChart" resultType="net.octacomm.sample.domain.FileInventoryOfChart" parameterType="net.octacomm.sample.domain.FileUsingChartParam">
+    	SELECT 
+			A.registDate, 
+			A.maker,
+			A.bigo,
+			A.separateSinglePileType,
+			A.separateBottomPileType
+		    ,(IF(A.meterof51 != "" , cast(A.meterof51  as SIGNED) , 0 )
+				+ IF(A.meterof61 != "" , cast(A.meterof61  as SIGNED) , 0 ) 
+				+ IF(A.meterof71 != "" , cast(A.meterof71  as SIGNED) , 0 ) 
+				+ IF(A.meterof81 != "" , cast(A.meterof81  as SIGNED) , 0 ) 
+				+ IF(A.meterof91 != "" , cast(A.meterof91  as SIGNED) , 0 ) 
+				+ IF(A.meterof101 != "" , cast(A.meterof101  as SIGNED) , 0 ) 
+				+ IF(A.meterof111 != "" , cast(A.meterof111  as SIGNED) , 0 ) 
+				+ IF(A.meterof121 != "" , cast(A.meterof121  as SIGNED) , 0 ) 
+				+ IF(A.meterof131 != "" , cast(A.meterof131  as SIGNED) , 0 ) 
+				+ IF(A.meterof141 != "" , cast(A.meterof141  as SIGNED) , 0 ) 
+				+ IF(A.meterof151 != "" , cast(A.meterof151  as SIGNED) , 0 )
+				+ IF(A.meterof161 != "" , cast(A.meterof161  as SIGNED) , 0 )
+				+ IF(A.meterof171 != "" , cast(A.meterof171  as SIGNED) , 0 )
+				+ IF(A.meterof181 != "" , cast(A.meterof181  as SIGNED) , 0 )
+				+ IF(A.meterof52 != "" , cast(A.meterof52  as SIGNED) , 0 )
+				+ IF(A.meterof62 != "" , cast(A.meterof62  as SIGNED) , 0 ) 
+				+ IF(A.meterof72 != "" , cast(A.meterof72  as SIGNED) , 0 ) 
+				+ IF(A.meterof82 != "" , cast(A.meterof82  as SIGNED) , 0 ) 
+				+ IF(A.meterof92 != "" , cast(A.meterof92  as SIGNED) , 0 )
+				+ IF(A.meterof102 != "" , cast(A.meterof102  as SIGNED) , 0 ) 
+				+ IF(A.meterof112 != "" , cast(A.meterof112  as SIGNED) , 0 ) 
+				+ IF(A.meterof122 != "" , cast(A.meterof122  as SIGNED) , 0 ) 
+				+ IF(A.meterof132 != "" , cast(A.meterof132  as SIGNED) , 0 ) 
+				+ IF(A.meterof142 != "" , cast(A.meterof142  as SIGNED) , 0 ) 
+				+ IF(A.meterof152 != "" , cast(A.meterof152  as SIGNED) , 0 )
+				+ IF(A.meterof162 != "" , cast(A.meterof162  as SIGNED) , 0 )
+				+ IF(A.meterof172 != "" , cast(A.meterof172  as SIGNED) , 0 )
+				+ IF(A.meterof182 != "" , cast(A.meterof182  as SIGNED) , 0 )
+				+ IF(A.meterof53 != "" , cast(A.meterof53  as SIGNED) , 0 )
+				+ IF(A.meterof63 != "" , cast(A.meterof63  as SIGNED) , 0 ) 
+				+ IF(A.meterof73 != "" , cast(A.meterof73  as SIGNED) , 0 ) 
+				+ IF(A.meterof83 != "" , cast(A.meterof83  as SIGNED) , 0 ) 
+				+ IF(A.meterof93 != "" , cast(A.meterof93  as SIGNED) , 0 )
+				+ IF(A.meterof103 != "" , cast(A.meterof103  as SIGNED) , 0 ) 
+				+ IF(A.meterof113 != "" , cast(A.meterof113  as SIGNED) , 0 ) 
+				+ IF(A.meterof123 != "" , cast(A.meterof123  as SIGNED) , 0 ) 
+				+ IF(A.meterof133 != "" , cast(A.meterof133  as SIGNED) , 0 ) 
+				+ IF(A.meterof143 != "" , cast(A.meterof143  as SIGNED) , 0 ) 
+				+ IF(A.meterof153 != "" , cast(A.meterof153  as SIGNED) , 0 )
+				+ IF(A.meterof163 != "" , cast(A.meterof163  as SIGNED) , 0 )
+				+ IF(A.meterof173 != "" , cast(A.meterof173  as SIGNED) , 0 )
+				+ IF(A.meterof183 != "" , cast(A.meterof183  as SIGNED) , 0 )
+				+ IF(A.meterof54 != "" , cast(A.meterof54  as SIGNED) , 0 )
+				+ IF(A.meterof64 != "" , cast(A.meterof64  as SIGNED) , 0 ) 
+				+ IF(A.meterof74 != "" , cast(A.meterof74  as SIGNED) , 0 ) 
+				+ IF(A.meterof84 != "" , cast(A.meterof84  as SIGNED) , 0 ) 
+				+ IF(A.meterof94 != "" , cast(A.meterof94  as SIGNED) , 0 )
+				+ IF(A.meterof104 != "" , cast(A.meterof104  as SIGNED) , 0 ) 
+				+ IF(A.meterof114 != "" , cast(A.meterof114  as SIGNED) , 0 ) 
+				+ IF(A.meterof124 != "" , cast(A.meterof124  as SIGNED) , 0 ) 
+				+ IF(A.meterof134 != "" , cast(A.meterof134  as SIGNED) , 0 ) 
+				+ IF(A.meterof144 != "" , cast(A.meterof144  as SIGNED) , 0 ) 
+				+ IF(A.meterof154 != "" , cast(A.meterof154  as SIGNED) , 0 )
+				+ IF(A.meterof164 != "" , cast(A.meterof164  as SIGNED) , 0 )
+				+ IF(A.meterof174 != "" , cast(A.meterof174  as SIGNED) , 0 )
+				+ IF(A.meterof184 != "" , cast(A.meterof184  as SIGNED) , 0 )) total
+			, A.meterof51
+			, A.meterof61
+			, A.meterof71
+			, A.meterof81
+			, A.meterof91
+			, A.meterof101
+			, A.meterof111
+			, A.meterof121
+			, A.meterof131
+			, A.meterof141
+			, A.meterof151
+			, A.meterof161
+			, A.meterof171
+			, A.meterof181
+			, (IF(A.meterof51 != "" , cast(A.meterof51  as SIGNED) , 0 )
+				+ IF(A.meterof61 != "" , cast(A.meterof61  as SIGNED) , 0 ) 
+				+ IF(A.meterof71 != "" , cast(A.meterof71  as SIGNED) , 0 ) 
+				+ IF(A.meterof81 != "" , cast(A.meterof81  as SIGNED) , 0 ) 
+				+ IF(A.meterof91 != "" , cast(A.meterof91  as SIGNED) , 0 ) 
+				+ IF(A.meterof101 != "" , cast(A.meterof101  as SIGNED) , 0 ) 
+				+ IF(A.meterof111 != "" , cast(A.meterof111  as SIGNED) , 0 ) 
+				+ IF(A.meterof121 != "" , cast(A.meterof121  as SIGNED) , 0 ) 
+				+ IF(A.meterof131 != "" , cast(A.meterof131  as SIGNED) , 0 ) 
+				+ IF(A.meterof141 != "" , cast(A.meterof141  as SIGNED) , 0 ) 
+				+ IF(A.meterof151 != "" , cast(A.meterof151  as SIGNED) , 0 )
+				+ IF(A.meterof161 != "" , cast(A.meterof161  as SIGNED) , 0 )
+				+ IF(A.meterof171 != "" , cast(A.meterof171  as SIGNED) , 0 )
+				+ IF(A.meterof181 != "" , cast(A.meterof181  as SIGNED) , 0 )) total1
+			, A.meterof52
+			, A.meterof62
+			, A.meterof72
+			, A.meterof82
+			, A.meterof92
+			, A.meterof102
+			, A.meterof112
+			, A.meterof122
+			, A.meterof132
+			, A.meterof142
+			, A.meterof152
+			, A.meterof162
+			, A.meterof172
+			, A.meterof182
+				, (IF(A.meterof52 != "" , cast(A.meterof52  as SIGNED) , 0 )
+				+ IF(A.meterof62 != "" , cast(A.meterof62  as SIGNED) , 0 ) 
+				+ IF(A.meterof72 != "" , cast(A.meterof72  as SIGNED) , 0 ) 
+				+ IF(A.meterof82 != "" , cast(A.meterof82  as SIGNED) , 0 ) 
+				+ IF(A.meterof92 != "" , cast(A.meterof92  as SIGNED) , 0 ) 
+				+ IF(A.meterof102 != "" , cast(A.meterof102  as SIGNED) , 0 ) 
+				+ IF(A.meterof112 != "" , cast(A.meterof112  as SIGNED) , 0 ) 
+				+ IF(A.meterof122 != "" , cast(A.meterof122  as SIGNED) , 0 ) 
+				+ IF(A.meterof132 != "" , cast(A.meterof132  as SIGNED) , 0 ) 
+				+ IF(A.meterof142 != "" , cast(A.meterof142  as SIGNED) , 0 ) 
+				+ IF(A.meterof152 != "" , cast(A.meterof152  as SIGNED) , 0 )
+				+ IF(A.meterof162 != "" , cast(A.meterof162  as SIGNED) , 0 )
+				+ IF(A.meterof172 != "" , cast(A.meterof172  as SIGNED) , 0 )
+				+ IF(A.meterof182 != "" , cast(A.meterof182  as SIGNED) , 0 )) total2  
+		    , A.meterof53
+			, A.meterof63
+			, A.meterof73
+			, A.meterof83
+			, A.meterof93
+			, A.meterof103
+			, A.meterof113
+			, A.meterof123
+			, A.meterof133
+			, A.meterof143
+			, A.meterof153
+			, A.meterof163
+			, A.meterof173
+			, A.meterof183
+			, (IF(A.meterof53 != "" , cast(A.meterof53  as SIGNED) , 0 )
+				+ IF(A.meterof63 != "" , cast(A.meterof63  as SIGNED) , 0 ) 
+				+ IF(A.meterof73 != "" , cast(A.meterof73  as SIGNED) , 0 ) 
+				+ IF(A.meterof83 != "" , cast(A.meterof83  as SIGNED) , 0 ) 
+				+ IF(A.meterof93 != "" , cast(A.meterof93  as SIGNED) , 0 ) 
+				+ IF(A.meterof103 != "" , cast(A.meterof103  as SIGNED) , 0 ) 
+				+ IF(A.meterof113 != "" , cast(A.meterof113  as SIGNED) , 0 ) 
+				+ IF(A.meterof123 != "" , cast(A.meterof123  as SIGNED) , 0 ) 
+				+ IF(A.meterof133 != "" , cast(A.meterof133  as SIGNED) , 0 ) 
+				+ IF(A.meterof143 != "" , cast(A.meterof143  as SIGNED) , 0 ) 
+				+ IF(A.meterof153 != "" , cast(A.meterof153  as SIGNED) , 0 )
+				+ IF(A.meterof163 != "" , cast(A.meterof163  as SIGNED) , 0 )
+				+ IF(A.meterof173 != "" , cast(A.meterof173  as SIGNED) , 0 )
+				+ IF(A.meterof183 != "" , cast(A.meterof183  as SIGNED) , 0 )
+				) total3
+			, A.meterof54
+			, A.meterof64
+			, A.meterof74
+			, A.meterof84
+			, A.meterof94
+			, A.meterof104
+			, A.meterof114
+			, A.meterof124
+			, A.meterof134
+			, A.meterof144
+			, A.meterof154
+			, A.meterof164
+			, A.meterof174
+			, A.meterof184
+		    , (IF(A.meterof54 != "" , cast(A.meterof54  as SIGNED) , 0 )
+			+ IF(A.meterof64 != "" , cast(A.meterof64  as SIGNED) , 0 ) 
+			+ IF(A.meterof74 != "" , cast(A.meterof74  as SIGNED) , 0 ) 
+			+ IF(A.meterof84 != "" , cast(A.meterof84  as SIGNED) , 0 ) 
+			+ IF(A.meterof94 != "" , cast(A.meterof94  as SIGNED) , 0 ) 
+			+ IF(A.meterof104 != "" , cast(A.meterof104  as SIGNED) , 0 ) 
+			+ IF(A.meterof114 != "" , cast(A.meterof114  as SIGNED) , 0 ) 
+			+ IF(A.meterof124 != "" , cast(A.meterof124  as SIGNED) , 0 ) 
+			+ IF(A.meterof134 != "" , cast(A.meterof134  as SIGNED) , 0 ) 
+			+ IF(A.meterof144 != "" , cast(A.meterof144  as SIGNED) , 0 ) 
+			+ IF(A.meterof154 != "" , cast(A.meterof154  as SIGNED) , 0 )
+			+ IF(A.meterof164 != "" , cast(A.meterof164  as SIGNED) , 0 )
+			+ IF(A.meterof174 != "" , cast(A.meterof174  as SIGNED) , 0 )
+			+ IF(A.meterof184 != "" , cast(A.meterof184  as SIGNED) , 0 )) total4 ,
+		    B.registDate AS bRegistDate, 
+			B.maker AS bMaker,
+			B.bigo AS bBigo,
+			B.separateSinglePileType AS bSeparateSinglePileType,
+			B.separateBottomPileType AS bSeparateBottomPileType,
+			(
+				IF(B.meterof51 != "" , CAST(B.meterof51 AS SIGNED), 0)
+				+ IF(B.meterof61 != "" , CAST(B.meterof61 AS SIGNED), 0)
+				+ IF(B.meterof71 != "" , CAST(B.meterof71 AS SIGNED), 0)
+				+ IF(B.meterof81 != "" , CAST(B.meterof81 AS SIGNED), 0)
+				+ IF(B.meterof91 != "" , CAST(B.meterof91 AS SIGNED), 0)
+				+ IF(B.meterof101 != "" , CAST(B.meterof101 AS SIGNED), 0)
+				+ IF(B.meterof111 != "" , CAST(B.meterof111 AS SIGNED), 0)
+				+ IF(B.meterof121 != "" , CAST(B.meterof121 AS SIGNED), 0)
+				+ IF(B.meterof131 != "" , CAST(B.meterof131 AS SIGNED), 0)
+				+ IF(B.meterof141 != "" , CAST(B.meterof141 AS SIGNED), 0)
+				+ IF(B.meterof151 != "" , CAST(B.meterof151 AS SIGNED), 0)
+				+ IF(B.meterof161 != "" , CAST(B.meterof161 AS SIGNED), 0)
+				+ IF(B.meterof171 != "" , CAST(B.meterof171 AS SIGNED), 0)
+				+ IF(B.meterof181 != "" , CAST(B.meterof181 AS SIGNED), 0)
+				+ IF(B.meterof52 != "" , CAST(B.meterof52 AS SIGNED), 0)
+				+ IF(B.meterof62 != "" , CAST(B.meterof62 AS SIGNED), 0)
+				+ IF(B.meterof72 != "" , CAST(B.meterof72 AS SIGNED), 0)
+				+ IF(B.meterof82 != "" , CAST(B.meterof82 AS SIGNED), 0)
+				+ IF(B.meterof92 != "" , CAST(B.meterof92 AS SIGNED), 0)
+				+ IF(B.meterof102 != "" , CAST(B.meterof102 AS SIGNED), 0)
+				+ IF(B.meterof112 != "" , CAST(B.meterof112 AS SIGNED), 0)
+				+ IF(B.meterof122 != "" , CAST(B.meterof122 AS SIGNED), 0)
+				+ IF(B.meterof132 != "" , CAST(B.meterof132 AS SIGNED), 0)
+				+ IF(B.meterof142 != "" , CAST(B.meterof142 AS SIGNED), 0)
+				+ IF(B.meterof152 != "" , CAST(B.meterof152 AS SIGNED), 0)
+				+ IF(B.meterof162 != "" , CAST(B.meterof162 AS SIGNED), 0)
+				+ IF(B.meterof172 != "" , CAST(B.meterof172 AS SIGNED), 0)
+				+ IF(B.meterof182 != "" , CAST(B.meterof182 AS SIGNED), 0)
+				+ IF(B.meterof53 != "" , CAST(B.meterof53 AS SIGNED), 0)
+				+ IF(B.meterof63 != "" , CAST(B.meterof63 AS SIGNED), 0)
+				+ IF(B.meterof73 != "" , CAST(B.meterof73 AS SIGNED), 0)
+				+ IF(B.meterof83 != "" , CAST(B.meterof83 AS SIGNED), 0)
+				+ IF(B.meterof93 != "" , CAST(B.meterof93 AS SIGNED), 0)
+				+ IF(B.meterof103 != "" , CAST(B.meterof103 AS SIGNED), 0)
+				+ IF(B.meterof113 != "" , CAST(B.meterof113 AS SIGNED), 0)
+				+ IF(B.meterof123 != "" , CAST(B.meterof123 AS SIGNED), 0)
+				+ IF(B.meterof133 != "" , CAST(B.meterof133 AS SIGNED), 0)
+				+ IF(B.meterof143 != "" , CAST(B.meterof143 AS SIGNED), 0)
+				+ IF(B.meterof153 != "" , CAST(B.meterof153 AS SIGNED), 0)
+				+ IF(B.meterof163 != "" , CAST(B.meterof163 AS SIGNED), 0)
+				+ IF(B.meterof173 != "" , CAST(B.meterof173 AS SIGNED), 0)
+				+ IF(B.meterof183 != "" , CAST(B.meterof183 AS SIGNED), 0)
+				+ IF(B.meterof54 != "" , CAST(B.meterof54 AS SIGNED), 0)
+				+ IF(B.meterof64 != "" , CAST(B.meterof64 AS SIGNED), 0)
+				+ IF(B.meterof74 != "" , CAST(B.meterof74 AS SIGNED), 0)
+				+ IF(B.meterof84 != "" , CAST(B.meterof84 AS SIGNED), 0)
+				+ IF(B.meterof94 != "" , CAST(B.meterof94 AS SIGNED), 0)
+				+ IF(B.meterof104 != "" , CAST(B.meterof104 AS SIGNED), 0)
+				+ IF(B.meterof114 != "" , CAST(B.meterof114 AS SIGNED), 0)
+				+ IF(B.meterof124 != "" , CAST(B.meterof124 AS SIGNED), 0)
+				+ IF(B.meterof134 != "" , CAST(B.meterof134 AS SIGNED), 0)
+				+ IF(B.meterof144 != "" , CAST(B.meterof144 AS SIGNED), 0)
+				+ IF(B.meterof154 != "" , CAST(B.meterof154 AS SIGNED), 0)
+				+ IF(B.meterof164 != "" , CAST(B.meterof164 AS SIGNED), 0)
+				+ IF(B.meterof174 != "" , CAST(B.meterof174 AS SIGNED), 0)
+				+ IF(B.meterof184 != "" , CAST(B.meterof184 AS SIGNED), 0)
+			) AS bTotal,
+		
+			-- meterof51 ~ meterof181
+			B.meterof51 AS bMeterof51,
+			B.meterof61 AS bMeterof61,
+			B.meterof71 AS bMeterof71,
+			B.meterof81 AS bMeterof81,
+			B.meterof91 AS bMeterof91,
+			B.meterof101 AS bMeterof101,
+			B.meterof111 AS bMeterof111,
+			B.meterof121 AS bMeterof121,
+			B.meterof131 AS bMeterof131,
+			B.meterof141 AS bMeterof141,
+			B.meterof151 AS bMeterof151,
+			B.meterof161 AS bMeterof161,
+			B.meterof171 AS bMeterof171,
+			B.meterof181 AS bMeterof181,
+			(
+				IF(B.meterof51 != "" , CAST(B.meterof51 AS SIGNED), 0)
+				+ IF(B.meterof61 != "" , CAST(B.meterof61 AS SIGNED), 0)
+				+ IF(B.meterof71 != "" , CAST(B.meterof71 AS SIGNED), 0)
+				+ IF(B.meterof81 != "" , CAST(B.meterof81 AS SIGNED), 0)
+				+ IF(B.meterof91 != "" , CAST(B.meterof91 AS SIGNED), 0)
+				+ IF(B.meterof101 != "" , CAST(B.meterof101 AS SIGNED), 0)
+				+ IF(B.meterof111 != "" , CAST(B.meterof111 AS SIGNED), 0)
+				+ IF(B.meterof121 != "" , CAST(B.meterof121 AS SIGNED), 0)
+				+ IF(B.meterof131 != "" , CAST(B.meterof131 AS SIGNED), 0)
+				+ IF(B.meterof141 != "" , CAST(B.meterof141 AS SIGNED), 0)
+				+ IF(B.meterof151 != "" , CAST(B.meterof151 AS SIGNED), 0)
+				+ IF(B.meterof161 != "" , CAST(B.meterof161 AS SIGNED), 0)
+				+ IF(B.meterof171 != "" , CAST(B.meterof171 AS SIGNED), 0)
+				+ IF(B.meterof181 != "" , CAST(B.meterof181 AS SIGNED), 0)
+			) AS bTotal1,
+		
+			-- meterof52 ~ meterof182
+			B.meterof52 AS bMeterof52,
+			B.meterof62 AS bMeterof62,
+			B.meterof72 AS bMeterof72,
+			B.meterof82 AS bMeterof82,
+			B.meterof92 AS bMeterof92,
+			B.meterof102 AS bMeterof102,
+			B.meterof112 AS bMeterof112,
+			B.meterof122 AS bMeterof122,
+			B.meterof132 AS bMeterof132,
+			B.meterof142 AS bMeterof142,
+			B.meterof152 AS bMeterof152,
+			B.meterof162 AS bMeterof162,
+			B.meterof172 AS bMeterof172,
+			B.meterof182 AS bMeterof182,
+			(
+				IF(B.meterof52 != "" , CAST(B.meterof52 AS SIGNED), 0)
+				+ IF(B.meterof62 != "" , CAST(B.meterof62 AS SIGNED), 0)
+				+ IF(B.meterof72 != "" , CAST(B.meterof72 AS SIGNED), 0)
+				+ IF(B.meterof82 != "" , CAST(B.meterof82 AS SIGNED), 0)
+				+ IF(B.meterof92 != "" , CAST(B.meterof92 AS SIGNED), 0)
+				+ IF(B.meterof102 != "" , CAST(B.meterof102 AS SIGNED), 0)
+				+ IF(B.meterof112 != "" , CAST(B.meterof112 AS SIGNED), 0)
+				+ IF(B.meterof122 != "" , CAST(B.meterof122 AS SIGNED), 0)
+				+ IF(B.meterof132 != "" , CAST(B.meterof132 AS SIGNED), 0)
+				+ IF(B.meterof142 != "" , CAST(B.meterof142 AS SIGNED), 0)
+				+ IF(B.meterof152 != "" , CAST(B.meterof152 AS SIGNED), 0)
+				+ IF(B.meterof162 != "" , CAST(B.meterof162 AS SIGNED), 0)
+				+ IF(B.meterof172 != "" , CAST(B.meterof172 AS SIGNED), 0)
+				+ IF(B.meterof182 != "" , CAST(B.meterof182 AS SIGNED), 0)
+			) AS bTotal2,
+		
+			-- meterof53 ~ meterof183
+			B.meterof53 AS bMeterof53,
+			B.meterof63 AS bMeterof63,
+			B.meterof73 AS bMeterof73,
+			B.meterof83 AS bMeterof83,
+			B.meterof93 AS bMeterof93,
+			B.meterof103 AS bMeterof103,
+			B.meterof113 AS bMeterof113,
+			B.meterof123 AS bMeterof123,
+			B.meterof133 AS bMeterof133,
+			B.meterof143 AS bMeterof143,
+			B.meterof153 AS bMeterof153,
+			B.meterof163 AS bMeterof163,
+			B.meterof173 AS bMeterof173,
+			B.meterof183 AS bMeterof183,
+			(
+				IF(B.meterof53 != "" , CAST(B.meterof53 AS SIGNED), 0)
+				+ IF(B.meterof63 != "" , CAST(B.meterof63 AS SIGNED), 0)
+				+ IF(B.meterof73 != "" , CAST(B.meterof73 AS SIGNED), 0)
+				+ IF(B.meterof83 != "" , CAST(B.meterof83 AS SIGNED), 0)
+				+ IF(B.meterof93 != "" , CAST(B.meterof93 AS SIGNED), 0)
+				+ IF(B.meterof103 != "" , CAST(B.meterof103 AS SIGNED), 0)
+				+ IF(B.meterof113 != "" , CAST(B.meterof113 AS SIGNED), 0)
+				+ IF(B.meterof123 != "" , CAST(B.meterof123 AS SIGNED), 0)
+				+ IF(B.meterof133 != "" , CAST(B.meterof133 AS SIGNED), 0)
+				+ IF(B.meterof143 != "" , CAST(B.meterof143 AS SIGNED), 0)
+				+ IF(B.meterof153 != "" , CAST(B.meterof153 AS SIGNED), 0)
+				+ IF(B.meterof163 != "" , CAST(B.meterof163 AS SIGNED), 0)
+				+ IF(B.meterof173 != "" , CAST(B.meterof173 AS SIGNED), 0)
+				+ IF(B.meterof183 != "" , CAST(B.meterof183 AS SIGNED), 0)
+			) AS bTotal3,
+		
+			-- meterof54 ~ meterof184
+			B.meterof54 AS bMeterof54,
+			B.meterof64 AS bMeterof64,
+			B.meterof74 AS bMeterof74,
+			B.meterof84 AS bMeterof84,
+			B.meterof94 AS bMeterof94,
+			B.meterof104 AS bMeterof104,
+			B.meterof114 AS bMeterof114,
+			B.meterof124 AS bMeterof124,
+			B.meterof134 AS bMeterof134,
+			B.meterof144 AS bMeterof144,
+			B.meterof154 AS bMeterof154,
+			B.meterof164 AS bMeterof164,
+			B.meterof174 AS bMeterof174,
+			B.meterof184 AS bMeterof184,
+			(
+				IF(B.meterof54 != "" , CAST(B.meterof54 AS SIGNED), 0)
+				+ IF(B.meterof64 != "" , CAST(B.meterof64 AS SIGNED), 0)
+				+ IF(B.meterof74 != "" , CAST(B.meterof74 AS SIGNED), 0)
+				+ IF(B.meterof84 != "" , CAST(B.meterof84 AS SIGNED), 0)
+				+ IF(B.meterof94 != "" , CAST(B.meterof94 AS SIGNED), 0)
+				+ IF(B.meterof104 != "" , CAST(B.meterof104 AS SIGNED), 0)
+				+ IF(B.meterof114 != "" , CAST(B.meterof114 AS SIGNED), 0)
+				+ IF(B.meterof124 != "" , CAST(B.meterof124 AS SIGNED), 0)
+				+ IF(B.meterof134 != "" , CAST(B.meterof134 AS SIGNED), 0)
+				+ IF(B.meterof144 != "" , CAST(B.meterof144 AS SIGNED), 0)
+				+ IF(B.meterof154 != "" , CAST(B.meterof154 AS SIGNED), 0)
+				+ IF(B.meterof164 != "" , CAST(B.meterof164 AS SIGNED), 0)
+				+ IF(B.meterof174 != "" , CAST(B.meterof174 AS SIGNED), 0)
+				+ IF(B.meterof184 != "" , CAST(B.meterof184 AS SIGNED), 0)
+			) AS bTotal4
+		FROM TB_FILE_INVENTORY A
+			LEFT JOIN TB_FILE_BROKEN_INVENTORY B
+				ON A.constructionIdx = B.constructionIdx
+				AND A.registDate = B.registDate
+		        AND A.pileType = B.pileType
+		        AND A.pileStandard = B.pileStandard
+		        AND COALESCE(A.fileWeight, '') = COALESCE(B.fileWeight, '')
+			WHERE 1=1
+			AND A.constructionIdx = #{constructionIdx}
+			AND A.pileType = #{pileType}
+			AND A.pileStandard = #{pileStandard}
+			ORDER BY A.registDate ASC
+    </select>
     
     <select id="getFileInventoryOfSteelChart" resultType="net.octacomm.sample.domain.FileInventoryOfChart" parameterType="net.octacomm.sample.domain.FileUsingChartParam">
     	SELECT
@@ -527,84 +906,458 @@
 		ORDER BY registDate ASC
     </select>
     
+     <select id="getFileInventoryOfSteelMultiChart" resultType="net.octacomm.sample.domain.FileInventoryOfChart" parameterType="net.octacomm.sample.domain.FileUsingChartParam">
+    	SELECT
+		  A.registDate,
+		  A.maker,
+		  A.bigo,
+		  A.separateSinglePileType,
+    	  A.separateBottomPileType,
+		  (IF(A.meterof51 != "" , cast(A.meterof51  as SIGNED) , 0 )
+		  	+ IF(A.meterof61 != "" , cast(A.meterof61  as SIGNED) , 0 ) 
+			+ IF(A.meterof71 != "" , cast(A.meterof71  as SIGNED) , 0 ) 
+			+ IF(A.meterof81 != "" , cast(A.meterof81  as SIGNED) , 0 ) 
+			+ IF(A.meterof91 != "" , cast(A.meterof91  as SIGNED) , 0 ) 
+			+ IF(A.meterof101 != "" , cast(A.meterof101  as SIGNED) , 0 ) 
+			+ IF(A.meterof111 != "" , cast(A.meterof111  as SIGNED) , 0 ) 
+			+ IF(A.meterof121 != "" , cast(A.meterof121  as SIGNED) , 0 ) 
+			+ IF(A.meterof131 != "" , cast(A.meterof131  as SIGNED) , 0 ) 
+			+ IF(A.meterof141 != "" , cast(A.meterof141  as SIGNED) , 0 ) 
+			+ IF(A.meterof151 != "" , cast(A.meterof151  as SIGNED) , 0 )
+			+ IF(A.meterof161 != "" , cast(A.meterof161  as SIGNED) , 0 )
+			+ IF(A.meterof171 != "" , cast(A.meterof171  as SIGNED) , 0 )
+			+ IF(A.meterof181 != "" , cast(A.meterof181  as SIGNED) , 0 )
+		    + IF(A.meterof52 != "" , cast(A.meterof52  as SIGNED) , 0 )
+			+ IF(A.meterof62 != "" , cast(A.meterof62  as SIGNED) , 0 ) 
+			+ IF(A.meterof72 != "" , cast(A.meterof72  as SIGNED) , 0 ) 
+			+ IF(A.meterof82 != "" , cast(A.meterof82  as SIGNED) , 0 ) 
+			+ IF(A.meterof92 != "" , cast(A.meterof92  as SIGNED) , 0 ) 
+			+ IF(A.meterof102 != "" , cast(A.meterof102  as SIGNED) , 0 ) 
+			+ IF(A.meterof112 != "" , cast(A.meterof112  as SIGNED) , 0 ) 
+			+ IF(A.meterof122 != "" , cast(A.meterof122  as SIGNED) , 0 ) 
+			+ IF(A.meterof132 != "" , cast(A.meterof132  as SIGNED) , 0 ) 
+			+ IF(A.meterof142 != "" , cast(A.meterof142  as SIGNED) , 0 ) 
+			+ IF(A.meterof152 != "" , cast(A.meterof152  as SIGNED) , 0 )
+			+ IF(A.meterof162 != "" , cast(A.meterof162  as SIGNED) , 0 )
+			+ IF(A.meterof172 != "" , cast(A.meterof172  as SIGNED) , 0 )
+			+ IF(A.meterof182 != "" , cast(A.meterof182  as SIGNED) , 0 )
+		    + IF(A.meterof53 != "" , cast(A.meterof53  as SIGNED) , 0 )
+			+ IF(A.meterof63 != "" , cast(A.meterof63  as SIGNED) , 0 ) 
+			+ IF(A.meterof73 != "" , cast(A.meterof73  as SIGNED) , 0 ) 
+			+ IF(A.meterof83 != "" , cast(A.meterof83  as SIGNED) , 0 ) 
+			+ IF(A.meterof93 != "" , cast(A.meterof93  as SIGNED) , 0 ) 
+			+ IF(A.meterof103 != "" , cast(A.meterof103  as SIGNED) , 0 ) 
+			+ IF(A.meterof113 != "" , cast(A.meterof113  as SIGNED) , 0 ) 
+			+ IF(A.meterof123 != "" , cast(A.meterof123  as SIGNED) , 0 ) 
+			+ IF(A.meterof133 != "" , cast(A.meterof133  as SIGNED) , 0 ) 
+     	    + IF(A.meterof143 != "" , cast(A.meterof143  as SIGNED) , 0 ) 
+			+ IF(A.meterof153 != "" , cast(A.meterof153  as SIGNED) , 0 )
+			+ IF(A.meterof163 != "" , cast(A.meterof163  as SIGNED) , 0 )
+			+ IF(A.meterof173 != "" , cast(A.meterof173  as SIGNED) , 0 )
+			+ IF(A.meterof183 != "" , cast(A.meterof183  as SIGNED) , 0 )
+		    + IF(A.meterof54 != "" , cast(A.meterof54  as SIGNED) , 0 )
+			+ IF(A.meterof64 != "" , cast(A.meterof64  as SIGNED) , 0 ) 
+			+ IF(A.meterof74 != "" , cast(A.meterof74  as SIGNED) , 0 ) 
+			+ IF(A.meterof84 != "" , cast(A.meterof84  as SIGNED) , 0 ) 
+			+ IF(A.meterof94 != "" , cast(A.meterof94  as SIGNED) , 0 ) 
+			+ IF(A.meterof104 != "" , cast(A.meterof104  as SIGNED) , 0 ) 
+			+ IF(A.meterof114 != "" , cast(A.meterof114  as SIGNED) , 0 ) 
+			+ IF(A.meterof124 != "" , cast(A.meterof124  as SIGNED) , 0 ) 
+			+ IF(A.meterof134 != "" , cast(A.meterof134  as SIGNED) , 0 ) 
+			+ IF(A.meterof144 != "" , cast(A.meterof144  as SIGNED) , 0 ) 
+			+ IF(A.meterof154 != "" , cast(A.meterof154  as SIGNED) , 0 )
+			+ IF(A.meterof164 != "" , cast(A.meterof164  as SIGNED) , 0 )
+			+ IF(A.meterof174 != "" , cast(A.meterof174  as SIGNED) , 0 )
+			+ IF(A.meterof184 != "" , cast(A.meterof184  as SIGNED) , 0 )) total
+		  ,A.meterof51
+		  ,A.meterof61
+		  ,A.meterof71
+		  ,A.meterof81
+		  ,A.meterof91
+		  ,A.meterof101
+		  ,A.meterof111
+		  ,A.meterof121
+		  ,A.meterof131
+		  ,A.meterof141
+		  ,A.meterof151
+		  ,A.meterof161
+		  ,A.meterof171
+		  ,A.meterof181 
+		  , 
+		  (IF(A.meterof51 != "" , cast(A.meterof51  as SIGNED) , 0 )
+			+ IF(A.meterof61 != "" , cast(A.meterof61  as SIGNED) , 0 ) 
+			+ IF(A.meterof71 != "" , cast(A.meterof71  as SIGNED) , 0 ) 
+			+ IF(A.meterof81 != "" , cast(A.meterof81  as SIGNED) , 0 ) 
+			+ IF(A.meterof91 != "" , cast(A.meterof91  as SIGNED) , 0 ) 
+			+ IF(A.meterof101 != "" , cast(A.meterof101  as SIGNED) , 0 ) 
+			+ IF(A.meterof111 != "" , cast(A.meterof111  as SIGNED) , 0 ) 
+			+ IF(A.meterof121 != "" , cast(A.meterof121  as SIGNED) , 0 ) 
+			+ IF(A.meterof131 != "" , cast(A.meterof131  as SIGNED) , 0 ) 
+			+ IF(A.meterof141 != "" , cast(A.meterof141  as SIGNED) , 0 ) 
+			+ IF(A.meterof151 != "" , cast(A.meterof151  as SIGNED) , 0 )
+			+ IF(A.meterof161 != "" , cast(A.meterof161  as SIGNED) , 0 )
+			+ IF(A.meterof171 != "" , cast(A.meterof171  as SIGNED) , 0 )
+			+ IF(A.meterof181 != "" , cast(A.meterof181  as SIGNED) , 0 )) total1
+		  , A.meterof52
+		  , A.meterof62
+		  , A.meterof72
+		  , A.meterof82
+		  , A.meterof92
+		  , A.meterof102
+		  , A.meterof112
+		  , A.meterof122
+		  , A.meterof132
+		  , A.meterof142
+		  , A.meterof152
+		  , A.meterof162
+		  , A.meterof172
+		  , A.meterof182 
+		  , (IF(A.meterof52 != "" , cast(A.meterof52  as SIGNED) , 0 )
+			+ IF(A.meterof62 != "" , cast(A.meterof62  as SIGNED) , 0 ) 
+			+ IF(A.meterof72 != "" , cast(A.meterof72  as SIGNED) , 0 ) 
+			+ IF(A.meterof82 != "" , cast(A.meterof82  as SIGNED) , 0 ) 
+			+ IF(A.meterof92 != "" , cast(A.meterof92  as SIGNED) , 0 ) 
+			+ IF(A.meterof102 != "" , cast(A.meterof102  as SIGNED) , 0 ) 
+			+ IF(A.meterof112 != "" , cast(A.meterof112  as SIGNED) , 0 ) 
+			+ IF(A.meterof122 != "" , cast(A.meterof122  as SIGNED) , 0 ) 
+			+ IF(A.meterof132 != "" , cast(A.meterof132  as SIGNED) , 0 ) 
+			+ IF(A.meterof142 != "" , cast(A.meterof142  as SIGNED) , 0 ) 
+			+ IF(A.meterof152 != "" , cast(A.meterof152  as SIGNED) , 0 )
+			+ IF(A.meterof162 != "" , cast(A.meterof162  as SIGNED) , 0 )
+			+ IF(A.meterof172 != "" , cast(A.meterof172  as SIGNED) , 0 )
+			+ IF(A.meterof182 != "" , cast(A.meterof182  as SIGNED) , 0 )) total2    
+		  , A.meterof53
+		  , A.meterof63
+		  , A.meterof73
+		  , A.meterof83
+		  , A.meterof93
+		  , A.meterof103
+		  , A.meterof113
+		  , A.meterof123
+		  , A.meterof133
+		  , A.meterof143
+		  , A.meterof153
+		  , A.meterof163
+		  , A.meterof173
+		  , A.meterof183
+		  , (IF(A.meterof53 != "" , cast(A.meterof53  as SIGNED) , 0 )
+		 	+ IF(A.meterof63 != "" , cast(A.meterof63  as SIGNED) , 0 ) 
+		    + IF(A.meterof73 != "" , cast(A.meterof73  as SIGNED) , 0 ) 
+		    + IF(A.meterof83 != "" , cast(A.meterof83  as SIGNED) , 0 ) 
+		    + IF(A.meterof93 != "" , cast(A.meterof93  as SIGNED) , 0 ) 
+		    + IF(A.meterof103 != "" , cast(A.meterof103  as SIGNED) , 0 ) 
+		    + IF(A.meterof113 != "" , cast(A.meterof113  as SIGNED) , 0 ) 
+		    + IF(A.meterof123 != "" , cast(A.meterof123  as SIGNED) , 0 ) 
+		    + IF(A.meterof133 != "" , cast(A.meterof133  as SIGNED) , 0 ) 
+		    + IF(A.meterof143 != "" , cast(A.meterof143  as SIGNED) , 0 ) 
+		    + IF(A.meterof153 != "" , cast(A.meterof153  as SIGNED) , 0 )
+		    + IF(A.meterof163 != "" , cast(A.meterof163  as SIGNED) , 0 )
+			+ IF(A.meterof173 != "" , cast(A.meterof173  as SIGNED) , 0 )
+			+ IF(A.meterof183 != "" , cast(A.meterof183  as SIGNED) , 0 )
+		    ) total3
+		  , A.meterof54
+		  , A.meterof64
+		  , A.meterof74
+		  , A.meterof84
+		  , A.meterof94
+		  , A.meterof104
+		  , A.meterof114
+		  , A.meterof124
+		  , A.meterof134
+		  , A.meterof144
+		  , A.meterof154
+		  , A.meterof164
+		  , A.meterof174
+		  , A.meterof184
+		  , (IF(A.meterof54 != "" , cast(A.meterof54  as SIGNED) , 0 )
+		  	+ IF(A.meterof64 != "" , cast(A.meterof64  as SIGNED) , 0 ) 
+			+ IF(A.meterof74 != "" , cast(A.meterof74  as SIGNED) , 0 ) 
+			+ IF(A.meterof84 != "" , cast(A.meterof84  as SIGNED) , 0 ) 
+			+ IF(A.meterof94 != "" , cast(A.meterof94  as SIGNED) , 0 ) 
+			+ IF(A.meterof104 != "" , cast(A.meterof104  as SIGNED) , 0 ) 
+			+ IF(A.meterof114 != "" , cast(A.meterof114  as SIGNED) , 0 ) 
+			+ IF(A.meterof124 != "" , cast(A.meterof124  as SIGNED) , 0 ) 
+			+ IF(A.meterof134 != "" , cast(A.meterof134  as SIGNED) , 0 ) 
+			+ IF(A.meterof144 != "" , cast(A.meterof144  as SIGNED) , 0 ) 
+			+ IF(A.meterof154 != "" , cast(A.meterof154  as SIGNED) , 0 )
+			+ IF(A.meterof164 != "" , cast(A.meterof164  as SIGNED) , 0 )
+			+ IF(A.meterof174 != "" , cast(A.meterof174  as SIGNED) , 0 )
+			+ IF(A.meterof184 != "" , cast(A.meterof184  as SIGNED) , 0 )) total4 ,  
+		  B.registDate as bRegistDate, 
+		  B.maker as bMaker,
+		  B.bigo as bBigo,
+		  B.separateSinglePileType as bSeparateSinglePileType,
+    	  B.separateBottomPileType as bSeparateBottomPileType,
+		  (IF(B.meterof51 != "" , cast(B.meterof51  as SIGNED) , 0 )
+		  	+ IF(B.meterof61 != "" , cast(B.meterof61  as SIGNED) , 0 ) 
+			+ IF(B.meterof71 != "" , cast(B.meterof71  as SIGNED) , 0 ) 
+			+ IF(B.meterof81 != "" , cast(B.meterof81  as SIGNED) , 0 ) 
+			+ IF(B.meterof91 != "" , cast(B.meterof91  as SIGNED) , 0 ) 
+			+ IF(B.meterof101 != "" , cast(B.meterof101  as SIGNED) , 0 ) 
+			+ IF(B.meterof111 != "" , cast(B.meterof111  as SIGNED) , 0 ) 
+			+ IF(B.meterof121 != "" , cast(B.meterof121  as SIGNED) , 0 ) 
+			+ IF(B.meterof131 != "" , cast(B.meterof131  as SIGNED) , 0 ) 
+			+ IF(B.meterof141 != "" , cast(B.meterof141  as SIGNED) , 0 ) 
+			+ IF(B.meterof151 != "" , cast(B.meterof151  as SIGNED) , 0 )
+			+ IF(B.meterof161 != "" , cast(B.meterof161  as SIGNED) , 0 )
+			+ IF(B.meterof171 != "" , cast(B.meterof171  as SIGNED) , 0 )
+			+ IF(B.meterof181 != "" , cast(B.meterof181  as SIGNED) , 0 )
+		    + IF(B.meterof52 != "" , cast(B.meterof52  as SIGNED) , 0 )
+			+ IF(B.meterof62 != "" , cast(B.meterof62  as SIGNED) , 0 ) 
+			+ IF(B.meterof72 != "" , cast(B.meterof72  as SIGNED) , 0 ) 
+			+ IF(B.meterof82 != "" , cast(B.meterof82  as SIGNED) , 0 ) 
+			+ IF(B.meterof92 != "" , cast(B.meterof92  as SIGNED) , 0 ) 
+			+ IF(B.meterof102 != "" , cast(B.meterof102  as SIGNED) , 0 ) 
+			+ IF(B.meterof112 != "" , cast(B.meterof112  as SIGNED) , 0 ) 
+			+ IF(B.meterof122 != "" , cast(B.meterof122  as SIGNED) , 0 ) 
+			+ IF(B.meterof132 != "" , cast(B.meterof132  as SIGNED) , 0 ) 
+			+ IF(B.meterof142 != "" , cast(B.meterof142  as SIGNED) , 0 ) 
+			+ IF(B.meterof152 != "" , cast(B.meterof152  as SIGNED) , 0 )
+			+ IF(B.meterof162 != "" , cast(B.meterof162  as SIGNED) , 0 )
+			+ IF(B.meterof172 != "" , cast(B.meterof172  as SIGNED) , 0 )
+			+ IF(B.meterof182 != "" , cast(B.meterof182  as SIGNED) , 0 )
+		    + IF(B.meterof53 != "" , cast(B.meterof53  as SIGNED) , 0 )
+			+ IF(B.meterof63 != "" , cast(B.meterof63  as SIGNED) , 0 ) 
+			+ IF(B.meterof73 != "" , cast(B.meterof73  as SIGNED) , 0 ) 
+			+ IF(B.meterof83 != "" , cast(B.meterof83  as SIGNED) , 0 ) 
+			+ IF(B.meterof93 != "" , cast(B.meterof93  as SIGNED) , 0 ) 
+			+ IF(B.meterof103 != "" , cast(B.meterof103  as SIGNED) , 0 ) 
+			+ IF(B.meterof113 != "" , cast(B.meterof113  as SIGNED) , 0 ) 
+			+ IF(B.meterof123 != "" , cast(B.meterof123  as SIGNED) , 0 ) 
+			+ IF(B.meterof133 != "" , cast(B.meterof133  as SIGNED) , 0 ) 
+     	    + IF(B.meterof143 != "" , cast(B.meterof143  as SIGNED) , 0 ) 
+			+ IF(B.meterof153 != "" , cast(B.meterof153  as SIGNED) , 0 )
+			+ IF(B.meterof163 != "" , cast(B.meterof163  as SIGNED) , 0 )
+			+ IF(B.meterof173 != "" , cast(B.meterof173  as SIGNED) , 0 )
+			+ IF(B.meterof183 != "" , cast(B.meterof183  as SIGNED) , 0 )
+		    + IF(B.meterof54 != "" , cast(B.meterof54  as SIGNED) , 0 )
+			+ IF(B.meterof64 != "" , cast(B.meterof64  as SIGNED) , 0 ) 
+			+ IF(B.meterof74 != "" , cast(B.meterof74  as SIGNED) , 0 ) 
+			+ IF(B.meterof84 != "" , cast(B.meterof84  as SIGNED) , 0 ) 
+			+ IF(B.meterof94 != "" , cast(B.meterof94  as SIGNED) , 0 ) 
+			+ IF(B.meterof104 != "" , cast(B.meterof104  as SIGNED) , 0 ) 
+			+ IF(B.meterof114 != "" , cast(B.meterof114  as SIGNED) , 0 ) 
+			+ IF(B.meterof124 != "" , cast(B.meterof124  as SIGNED) , 0 ) 
+			+ IF(B.meterof134 != "" , cast(B.meterof134  as SIGNED) , 0 ) 
+			+ IF(B.meterof144 != "" , cast(B.meterof144  as SIGNED) , 0 ) 
+			+ IF(B.meterof154 != "" , cast(B.meterof154  as SIGNED) , 0 )
+			+ IF(B.meterof164 != "" , cast(B.meterof164  as SIGNED) , 0 )
+			+ IF(B.meterof174 != "" , cast(B.meterof174  as SIGNED) , 0 )
+			+ IF(B.meterof184 != "" , cast(B.meterof184  as SIGNED) , 0 )) as bTotal
+		  ,B.meterof51 as bMeterof51
+		  ,B.meterof61 as bMeterof61
+		  ,B.meterof71 as bMeterof71
+		  ,B.meterof81 as bMeterof81
+		  ,B.meterof91 as bMeterof91
+		  ,B.meterof101 as bMeterof101
+		  ,B.meterof111 as bMeterof111
+		  ,B.meterof121 as bMeterof121
+		  ,B.meterof131 as bMeterof131
+		  ,B.meterof141 as bMeterof141
+		  ,B.meterof151 as bMeterof151
+		  ,B.meterof161 as bMeterof161
+		  ,B.meterof171 as bMeterof171
+		  ,B.meterof181  as bMeterof181
+		  , 
+		  (IF(B.meterof51 != "" , cast(B.meterof51  as SIGNED) , 0 )
+			+ IF(B.meterof61 != "" , cast(B.meterof61  as SIGNED) , 0 ) 
+			+ IF(B.meterof71 != "" , cast(B.meterof71  as SIGNED) , 0 ) 
+			+ IF(B.meterof81 != "" , cast(B.meterof81  as SIGNED) , 0 ) 
+			+ IF(B.meterof91 != "" , cast(B.meterof91  as SIGNED) , 0 ) 
+			+ IF(B.meterof101 != "" , cast(B.meterof101  as SIGNED) , 0 ) 
+			+ IF(B.meterof111 != "" , cast(B.meterof111  as SIGNED) , 0 ) 
+			+ IF(B.meterof121 != "" , cast(B.meterof121  as SIGNED) , 0 ) 
+			+ IF(B.meterof131 != "" , cast(B.meterof131  as SIGNED) , 0 ) 
+			+ IF(B.meterof141 != "" , cast(B.meterof141  as SIGNED) , 0 ) 
+			+ IF(B.meterof151 != "" , cast(B.meterof151  as SIGNED) , 0 )
+			+ IF(B.meterof161 != "" , cast(B.meterof161  as SIGNED) , 0 )
+			+ IF(B.meterof171 != "" , cast(B.meterof171  as SIGNED) , 0 )
+			+ IF(B.meterof181 != "" , cast(B.meterof181  as SIGNED) , 0 )) as bTotal1
+		  , B.meterof52 as bMeterof52
+		  , B.meterof62 as bMeterof62
+		  , B.meterof72 as bMeterof72
+		  , B.meterof82 as bMeterof82
+		  , B.meterof92 as bMeterof92
+		  , B.meterof102 as bMeterof102
+		  , B.meterof112 as bMeterof112
+		  , B.meterof122 as bMeterof122
+		  , B.meterof132 as bMeterof132
+		  , B.meterof142 as bMeterof142
+		  , B.meterof152 as bMeterof152
+		  , B.meterof162 as bMeterof162
+		  , B.meterof172 as bMeterof172
+		  , B.meterof182 as bMeterof182
+		  , (IF(B.meterof52 != "" , cast(B.meterof52  as SIGNED) , 0 )
+			+ IF(B.meterof62 != "" , cast(B.meterof62  as SIGNED) , 0 ) 
+			+ IF(B.meterof72 != "" , cast(B.meterof72  as SIGNED) , 0 ) 
+			+ IF(B.meterof82 != "" , cast(B.meterof82  as SIGNED) , 0 ) 
+			+ IF(B.meterof92 != "" , cast(B.meterof92  as SIGNED) , 0 ) 
+			+ IF(B.meterof102 != "" , cast(B.meterof102  as SIGNED) , 0 ) 
+			+ IF(B.meterof112 != "" , cast(B.meterof112  as SIGNED) , 0 ) 
+			+ IF(B.meterof122 != "" , cast(B.meterof122  as SIGNED) , 0 ) 
+			+ IF(B.meterof132 != "" , cast(B.meterof132  as SIGNED) , 0 ) 
+			+ IF(B.meterof142 != "" , cast(B.meterof142  as SIGNED) , 0 ) 
+			+ IF(B.meterof152 != "" , cast(B.meterof152  as SIGNED) , 0 )
+			+ IF(B.meterof162 != "" , cast(B.meterof162  as SIGNED) , 0 )
+			+ IF(B.meterof172 != "" , cast(B.meterof172  as SIGNED) , 0 )
+			+ IF(B.meterof182 != "" , cast(B.meterof182  as SIGNED) , 0 )) as bTotal2    
+		  , B.meterof53 as bMeterof53
+		  , B.meterof63 as bMeterof63
+		  , B.meterof73 as bMeterof73
+		  , B.meterof83 as bMeterof83
+		  , B.meterof93 as bMeterof93
+		  , B.meterof103 as bMeterof103
+		  , B.meterof113 as bMeterof113
+		  , B.meterof123 as bMeterof123
+		  , B.meterof133 as bMeterof133
+		  , B.meterof143 as bMeterof143
+		  , B.meterof153 as bMeterof153
+		  , B.meterof163 as bMeterof163
+		  , B.meterof173 as bMeterof173
+		  , B.meterof183 as bMeterof183
+		  , (IF(B.meterof53 != "" , cast(B.meterof53  as SIGNED) , 0 )
+		 	+ IF(B.meterof63 != "" , cast(B.meterof63  as SIGNED) , 0 ) 
+		    + IF(B.meterof73 != "" , cast(B.meterof73  as SIGNED) , 0 ) 
+		    + IF(B.meterof83 != "" , cast(B.meterof83  as SIGNED) , 0 ) 
+		    + IF(B.meterof93 != "" , cast(B.meterof93  as SIGNED) , 0 ) 
+		    + IF(B.meterof103 != "" , cast(B.meterof103  as SIGNED) , 0 ) 
+		    + IF(B.meterof113 != "" , cast(B.meterof113  as SIGNED) , 0 ) 
+		    + IF(B.meterof123 != "" , cast(B.meterof123  as SIGNED) , 0 ) 
+		    + IF(B.meterof133 != "" , cast(B.meterof133  as SIGNED) , 0 ) 
+		    + IF(B.meterof143 != "" , cast(B.meterof143  as SIGNED) , 0 ) 
+		    + IF(B.meterof153 != "" , cast(B.meterof153  as SIGNED) , 0 )
+		    + IF(B.meterof163 != "" , cast(B.meterof163  as SIGNED) , 0 )
+			+ IF(B.meterof173 != "" , cast(B.meterof173  as SIGNED) , 0 )
+			+ IF(B.meterof183 != "" , cast(B.meterof183  as SIGNED) , 0 )) bTotal3
+		  , B.meterof54 as bMeterof54
+		  , B.meterof64 as bMeterof64
+		  , B.meterof74 as bMeterof74
+		  , B.meterof84 as bMeterof84
+		  , B.meterof94 as bMeterof94
+		  , B.meterof104 as bMeterof104
+		  , B.meterof114 as bMeterof114
+		  , B.meterof124 as bMeterof124
+		  , B.meterof134 as bMeterof134
+		  , B.meterof144 as bMeterof144
+		  , B.meterof154 as bMeterof154
+		  , B.meterof164 as bMeterof164
+		  , B.meterof174 as bMeterof174
+		  , B.meterof184 as bMeterof184
+		  , (IF(B.meterof54 != "" , cast(B.meterof54  as SIGNED) , 0 )
+		  	+ IF(B.meterof64 != "" , cast(B.meterof64  as SIGNED) , 0 ) 
+			+ IF(B.meterof74 != "" , cast(B.meterof74  as SIGNED) , 0 ) 
+			+ IF(B.meterof84 != "" , cast(B.meterof84  as SIGNED) , 0 ) 
+			+ IF(B.meterof94 != "" , cast(B.meterof94  as SIGNED) , 0 ) 
+			+ IF(B.meterof104 != "" , cast(B.meterof104  as SIGNED) , 0 ) 
+			+ IF(B.meterof114 != "" , cast(B.meterof114  as SIGNED) , 0 ) 
+			+ IF(B.meterof124 != "" , cast(B.meterof124  as SIGNED) , 0 ) 
+			+ IF(B.meterof134 != "" , cast(B.meterof134  as SIGNED) , 0 ) 
+			+ IF(B.meterof144 != "" , cast(B.meterof144  as SIGNED) , 0 ) 
+			+ IF(B.meterof154 != "" , cast(B.meterof154  as SIGNED) , 0 )
+			+ IF(B.meterof164 != "" , cast(B.meterof164  as SIGNED) , 0 )
+			+ IF(B.meterof174 != "" , cast(B.meterof174  as SIGNED) , 0 )
+			+ IF(B.meterof184 != "" , cast(B.meterof184  as SIGNED) , 0 )) AS bTotal4
+		FROM TB_FILE_INVENTORY A
+			LEFT JOIN TB_FILE_BROKEN_INVENTORY B
+				ON A.constructionIdx = B.constructionIdx
+				AND A.registDate = B.registDate
+		        AND A.pileType = B.pileType
+		        AND A.pileStandard = B.pileStandard
+		        AND COALESCE(A.fileWeight, '') = COALESCE(B.fileWeight, '')
+			WHERE 1=1
+			AND A.constructionIdx = #{constructionIdx}
+			AND A.pileType = #{pileType}
+			AND A.pileStandard = #{pileStandard}
+			AND A.fileWeight = #{fileWeight}
+			ORDER BY A.registDate ASC
+		
+		
+    </select>
+    
     <select id="getCountByParam" resultType="_int">
 		SELECT 
 			COUNT(*)
-		FROM TB_FILE_INVENTORY
+		FROM TB_FILE_INVENTORY A
 		<include refid="condition"/>
-		ORDER BY registDate DESC , fiIdx DESC 
+		ORDER BY A.registDate DESC , A.fiIdx DESC 
     </select>
    
     <select id="getListByParam" resultType="FileInventory">
     	SELECT 
-    		fiIdx, 
-    		registDate, 
-    		separateSinglePileType,
-    		separateBottomPileType,
-    		pileType,
-    		pileStandard, 
-    		fileWeight,
-    		maker,
-    		bigo,
-			(IF(meterof51 != "" , cast(meterof51  as SIGNED) , 0 )
-		  	+ IF(meterof61 != "" , cast(meterof61  as SIGNED) , 0 ) 
-			+ IF(meterof71 != "" , cast(meterof71  as SIGNED) , 0 ) 
-			+ IF(meterof81 != "" , cast(meterof81  as SIGNED) , 0 ) 
-			+ IF(meterof91 != "" , cast(meterof91  as SIGNED) , 0 ) 
-			+ IF(meterof101 != "" , cast(meterof101  as SIGNED) , 0 ) 
-			+ IF(meterof111 != "" , cast(meterof111  as SIGNED) , 0 ) 
-			+ IF(meterof121 != "" , cast(meterof121  as SIGNED) , 0 ) 
-			+ IF(meterof131 != "" , cast(meterof131  as SIGNED) , 0 ) 
-			+ IF(meterof141 != "" , cast(meterof141  as SIGNED) , 0 ) 
-			+ IF(meterof151 != "" , cast(meterof151  as SIGNED) , 0 )
-			+ IF(meterof161 != "" , cast(meterof161  as SIGNED) , 0 )
-			+ IF(meterof171 != "" , cast(meterof171  as SIGNED) , 0 )
-			+ IF(meterof181 != "" , cast(meterof181  as SIGNED) , 0 )
-		    + IF(meterof52 != "" , cast(meterof52  as SIGNED) , 0 )
-			+ IF(meterof62 != "" , cast(meterof62  as SIGNED) , 0 ) 
-			+ IF(meterof72 != "" , cast(meterof72  as SIGNED) , 0 ) 
-			+ IF(meterof82 != "" , cast(meterof82  as SIGNED) , 0 ) 
-			+ IF(meterof92 != "" , cast(meterof92  as SIGNED) , 0 ) 
-			+ IF(meterof102 != "" , cast(meterof102  as SIGNED) , 0 ) 
-			+ IF(meterof112 != "" , cast(meterof112  as SIGNED) , 0 ) 
-			+ IF(meterof122 != "" , cast(meterof122  as SIGNED) , 0 ) 
-			+ IF(meterof132 != "" , cast(meterof132  as SIGNED) , 0 ) 
-			+ IF(meterof142 != "" , cast(meterof142  as SIGNED) , 0 ) 
-			+ IF(meterof152 != "" , cast(meterof152  as SIGNED) , 0 )
-			+ IF(meterof162 != "" , cast(meterof162  as SIGNED) , 0 )
-			+ IF(meterof172 != "" , cast(meterof172  as SIGNED) , 0 )
-			+ IF(meterof182 != "" , cast(meterof182  as SIGNED) , 0 )
-		    + IF(meterof53 != "" , cast(meterof53  as SIGNED) , 0 )
-			+ IF(meterof63 != "" , cast(meterof63  as SIGNED) , 0 ) 
-			+ IF(meterof73 != "" , cast(meterof73  as SIGNED) , 0 ) 
-			+ IF(meterof83 != "" , cast(meterof83  as SIGNED) , 0 ) 
-			+ IF(meterof93 != "" , cast(meterof93  as SIGNED) , 0 ) 
-			+ IF(meterof103 != "" , cast(meterof103  as SIGNED) , 0 ) 
-			+ IF(meterof113 != "" , cast(meterof113  as SIGNED) , 0 ) 
-			+ IF(meterof123 != "" , cast(meterof123  as SIGNED) , 0 ) 
-			+ IF(meterof133 != "" , cast(meterof133  as SIGNED) , 0 ) 
-     	    + IF(meterof143 != "" , cast(meterof143  as SIGNED) , 0 ) 
-			+ IF(meterof153 != "" , cast(meterof153  as SIGNED) , 0 )
-			+ IF(meterof163 != "" , cast(meterof163  as SIGNED) , 0 )
-			+ IF(meterof173 != "" , cast(meterof173  as SIGNED) , 0 )
-			+ IF(meterof183 != "" , cast(meterof183  as SIGNED) , 0 )
-		    + IF(meterof54 != "" , cast(meterof54  as SIGNED) , 0 )
-			+ IF(meterof64 != "" , cast(meterof64  as SIGNED) , 0 ) 
-			+ IF(meterof74 != "" , cast(meterof74  as SIGNED) , 0 ) 
-			+ IF(meterof84 != "" , cast(meterof84  as SIGNED) , 0 ) 
-			+ IF(meterof94 != "" , cast(meterof94  as SIGNED) , 0 ) 
-			+ IF(meterof104 != "" , cast(meterof104  as SIGNED) , 0 ) 
-			+ IF(meterof114 != "" , cast(meterof114  as SIGNED) , 0 ) 
-			+ IF(meterof124 != "" , cast(meterof124  as SIGNED) , 0 ) 
-			+ IF(meterof134 != "" , cast(meterof134  as SIGNED) , 0 ) 
-			+ IF(meterof144 != "" , cast(meterof144  as SIGNED) , 0 ) 
-			+ IF(meterof154 != "" , cast(meterof154  as SIGNED) , 0 )
-			+ IF(meterof164 != "" , cast(meterof164  as SIGNED) , 0 )
-			+ IF(meterof174 != "" , cast(meterof174  as SIGNED) , 0 )
-			+ IF(meterof184 != "" , cast(meterof184  as SIGNED) , 0 )) meterof51
-		FROM TB_FILE_INVENTORY
+		    A.fiIdx, 
+	     	IFNULL(B.fiIdx, 0) AS brokenFiIdx,
+		    A.registDate, 
+		    A.separateSinglePileType,
+		    A.separateBottomPileType,
+		    A.pileType,
+		    A.pileStandard, 
+		    A.fileWeight,
+		    A.maker,
+		    A.bigo,
+		    (
+		        (IF(A.meterof51 != '' , CAST(A.meterof51 AS SIGNED), 0))
+		      + (IF(A.meterof61 != '' , CAST(A.meterof61 AS SIGNED), 0))
+		      + (IF(A.meterof71 != '' , CAST(A.meterof71 AS SIGNED), 0))
+		      + (IF(A.meterof81 != '' , CAST(A.meterof81 AS SIGNED), 0))
+		      + (IF(A.meterof91 != '' , CAST(A.meterof91 AS SIGNED), 0))
+		      + (IF(A.meterof101 != '' , CAST(A.meterof101 AS SIGNED), 0))
+		      + (IF(A.meterof111 != '' , CAST(A.meterof111 AS SIGNED), 0))
+		      + (IF(A.meterof121 != '' , CAST(A.meterof121 AS SIGNED), 0))
+		      + (IF(A.meterof131 != '' , CAST(A.meterof131 AS SIGNED), 0))
+		      + (IF(A.meterof141 != '' , CAST(A.meterof141 AS SIGNED), 0))
+		      + (IF(A.meterof151 != '' , CAST(A.meterof151 AS SIGNED), 0))
+		      + (IF(A.meterof161 != '' , CAST(A.meterof161 AS SIGNED), 0))
+		      + (IF(A.meterof171 != '' , CAST(A.meterof171 AS SIGNED), 0))
+		      + (IF(A.meterof181 != '' , CAST(A.meterof181 AS SIGNED), 0))
+		      + (IF(A.meterof52 != '' , CAST(A.meterof52 AS SIGNED), 0))
+		      + (IF(A.meterof62 != '' , CAST(A.meterof62 AS SIGNED), 0))
+		      + (IF(A.meterof72 != '' , CAST(A.meterof72 AS SIGNED), 0))
+		      + (IF(A.meterof82 != '' , CAST(A.meterof82 AS SIGNED), 0))
+		      + (IF(A.meterof92 != '' , CAST(A.meterof92 AS SIGNED), 0))
+		      + (IF(A.meterof102 != '' , CAST(A.meterof102 AS SIGNED), 0))
+		      + (IF(A.meterof112 != '' , CAST(A.meterof112 AS SIGNED), 0))
+		      + (IF(A.meterof122 != '' , CAST(A.meterof122 AS SIGNED), 0))
+		      + (IF(A.meterof132 != '' , CAST(A.meterof132 AS SIGNED), 0))
+		      + (IF(A.meterof142 != '' , CAST(A.meterof142 AS SIGNED), 0))
+		      + (IF(A.meterof152 != '' , CAST(A.meterof152 AS SIGNED), 0))
+		      + (IF(A.meterof162 != '' , CAST(A.meterof162 AS SIGNED), 0))
+		      + (IF(A.meterof172 != '' , CAST(A.meterof172 AS SIGNED), 0))
+		      + (IF(A.meterof182 != '' , CAST(A.meterof182 AS SIGNED), 0))
+		      + (IF(A.meterof53 != '' , CAST(A.meterof53 AS SIGNED), 0))
+		      + (IF(A.meterof63 != '' , CAST(A.meterof63 AS SIGNED), 0))
+		      + (IF(A.meterof73 != '' , CAST(A.meterof73 AS SIGNED), 0))
+		      + (IF(A.meterof83 != '' , CAST(A.meterof83 AS SIGNED), 0))
+		      + (IF(A.meterof93 != '' , CAST(A.meterof93 AS SIGNED), 0))
+		      + (IF(A.meterof103 != '' , CAST(A.meterof103 AS SIGNED), 0))
+		      + (IF(A.meterof113 != '' , CAST(A.meterof113 AS SIGNED), 0))
+		      + (IF(A.meterof123 != '' , CAST(A.meterof123 AS SIGNED), 0))
+		      + (IF(A.meterof133 != '' , CAST(A.meterof133 AS SIGNED), 0))
+		      + (IF(A.meterof143 != '' , CAST(A.meterof143 AS SIGNED), 0))
+		      + (IF(A.meterof153 != '' , CAST(A.meterof153 AS SIGNED), 0))
+		      + (IF(A.meterof163 != '' , CAST(A.meterof163 AS SIGNED), 0))
+		      + (IF(A.meterof173 != '' , CAST(A.meterof173 AS SIGNED), 0))
+		      + (IF(A.meterof183 != '' , CAST(A.meterof183 AS SIGNED), 0))
+		      + (IF(A.meterof54 != '' , CAST(A.meterof54 AS SIGNED), 0))
+		      + (IF(A.meterof64 != '' , CAST(A.meterof64 AS SIGNED), 0))
+		      + (IF(A.meterof74 != '' , CAST(A.meterof74 AS SIGNED), 0))
+		      + (IF(A.meterof84 != '' , CAST(A.meterof84 AS SIGNED), 0))
+		      + (IF(A.meterof94 != '' , CAST(A.meterof94 AS SIGNED), 0))
+		      + (IF(A.meterof104 != '' , CAST(A.meterof104 AS SIGNED), 0))
+		      + (IF(A.meterof114 != '' , CAST(A.meterof114 AS SIGNED), 0))
+		      + (IF(A.meterof124 != '' , CAST(A.meterof124 AS SIGNED), 0))
+		      + (IF(A.meterof134 != '' , CAST(A.meterof134 AS SIGNED), 0))
+		      + (IF(A.meterof144 != '' , CAST(A.meterof144 AS SIGNED), 0))
+		      + (IF(A.meterof154 != '' , CAST(A.meterof154 AS SIGNED), 0))
+		      + (IF(A.meterof164 != '' , CAST(A.meterof164 AS SIGNED), 0))
+		      + (IF(A.meterof174 != '' , CAST(A.meterof174 AS SIGNED), 0))
+		      + (IF(A.meterof184 != '' , CAST(A.meterof184 AS SIGNED), 0))
+		    ) AS meterof51
+		FROM TB_FILE_INVENTORY A
+		LEFT JOIN TB_FILE_BROKEN_INVENTORY B
+		    ON A.constructionIdx = B.constructionIdx
+		    AND A.registDate = B.registDate
 		<include refid="condition"/>
-		ORDER BY registDate DESC , fiIdx DESC 
+		ORDER BY A.registDate DESC, A.fiIdx DESC
 		LIMIT #{pageSize} OFFSET #{startRow}
     </select> 
     

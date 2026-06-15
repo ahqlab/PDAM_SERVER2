@@ -1191,6 +1191,7 @@ $(document).ready( function() {
 </script>
 <!--컨텐츠-->
 <div class="section-right" >
+	<%@ include file="/WEB-INF/views/common/welcomeMsg.jsp" %>
 	<div class="TopContArea">
 		<div class="titArea mb-40">
 			<p class="h1Tit">${device.machineNumber} 시공현황</p>

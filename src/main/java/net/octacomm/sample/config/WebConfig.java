@@ -1,20 +1,26 @@
 package net.octacomm.sample.config;
 
 import net.octacomm.logger.LoggerBeanPostProcessor;
+import net.octacomm.sample.interceptor.ContractInterceptor;
 import net.octacomm.sample.interceptor.LogInterceptor;
 import net.octacomm.sample.interceptor.LoginInterceptor;
 import net.octacomm.sample.view.ReportTenAll;
 import net.octacomm.sample.view.ReportTenAllFor1269;
+import net.octacomm.sample.view.ReportTenAllFor1338;
 import net.octacomm.sample.view.ReportTenAllJh;
 import net.octacomm.sample.view.ReportFiveAll;
 import net.octacomm.sample.view.ReportFiveAllBy;
 import net.octacomm.sample.view.ReportFiveAllFor1269;
+import net.octacomm.sample.view.ReportFiveAllFor1338;
 import net.octacomm.sample.view.ReportFiveAllJh;
 import net.octacomm.sample.view.ReportTen;
 import net.octacomm.sample.view.ReportTenJh;
 import net.octacomm.sample.view.ReportFive;
 import net.octacomm.sample.view.ReportFiveJh;
+import net.octacomm.sample.view.MultiFileUsingChartExcelView;
+import net.octacomm.sample.view.MultiFileUsingChartExcelView2;
 import net.octacomm.sample.view.NewFileUsingChartExcelView;
+import net.octacomm.sample.view.NewFileUsingChartExcelView2;
 
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Bean;
@@ -37,8 +43,12 @@ import org.springframework.web.servlet.view.tiles2.TilesViewResolver;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackages = "net.octacomm.sample.controller")
+@ComponentScan(basePackages = {"net.octacomm.sample.controller", "net.octacomm.sample.interceptor"})
 public class WebConfig extends WebMvcConfigurerAdapter {
+
+	@org.springframework.beans.factory.annotation.Autowired
+	private ContractInterceptor contractInterceptor;
+
 
 	@Bean
 	public BeanPostProcessor loggerBeanPostProcessor() {
@@ -107,15 +117,39 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 	}
 	
 	@Bean
+	public AbstractExcelView reportFiveAllFor1338() {
+		return new ReportFiveAllFor1338();
+	}
+	
+	@Bean
 	public AbstractExcelView reportTenAllFor1269() {
 		return new ReportTenAllFor1269();
 	}
 	
 	
+	@Bean
+	public AbstractExcelView reportTenAllFor1338() {
+		return new ReportTenAllFor1338();
+	}
 	
 	@Bean
 	public AbstractExcelView fileUsingChartExcelView() {
 		return new NewFileUsingChartExcelView();
+	}
+	
+	@Bean
+	public AbstractExcelView fileUsingChartExcelView2() {
+		return new NewFileUsingChartExcelView2();
+	}
+	
+	@Bean
+	public AbstractExcelView multiFileUsingChartExcelView() {
+		return new MultiFileUsingChartExcelView();
+	}
+	
+	@Bean
+	public AbstractExcelView multiFileUsingChartExcelView2() {
+		return new MultiFileUsingChartExcelView2();
 	}
 	
 	@Bean
@@ -141,6 +175,14 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 		}; 
 		registry.addInterceptor(logInterceptor())
 						.addPathPatterns("/**");
+		registry.addInterceptor(contractInterceptor)
+						.addPathPatterns("/**")
+						.excludePathPatterns("/login")
+						.excludePathPatterns("/contract/sign-view")
+						.excludePathPatterns("/contract/sign")
+						.excludePathPatterns("/contract/pdf")
+						.excludePathPatterns("/contract/required")
+						.excludePathPatterns("/contract/blocked");
 		registry.addInterceptor(new LoginInterceptor())
 						.addPathPatterns(patterns)
 						.excludePathPatterns("/login")
@@ -151,13 +193,19 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 						.excludePathPatterns("/api/get/auth/check")
 						.excludePathPatterns("/mobile/regist/report")
 						.excludePathPatterns("/mobile/pilestandard/all/list")
+						.excludePathPatterns("/mobile/pileselectvalue/piletype/list")
+						.excludePathPatterns("/mobile/pileselectvalue/list")
 						.excludePathPatterns("/mobile/regist/report2")
 						.excludePathPatterns("/mobile/regist/report4")
+						.excludePathPatterns("/qr/**")
 						.excludePathPatterns("/mobile/regist/report5");
 	}
 
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		
+		registry.addResourceHandler("/uploads/**").addResourceLocations("file:///D:/PDGM/uploads/");
+		
 		registry.addResourceHandler("/**").addResourceLocations("/resources/");
 	}
 

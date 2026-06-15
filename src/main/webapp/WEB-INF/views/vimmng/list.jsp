@@ -81,6 +81,7 @@ function setGroupName(){
 
 		<!--컨텐츠-->
 		<div class="section-right">
+			<%@ include file="/WEB-INF/views/common/welcomeMsg.jsp" %>
 			<div class="TopContArea">
 				<div class="titArea">
 					<p id="listTitle" class="h1Tit">빔파트너스(관리) 협력사 리스트</p>

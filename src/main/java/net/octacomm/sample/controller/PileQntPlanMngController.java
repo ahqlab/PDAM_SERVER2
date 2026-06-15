@@ -37,7 +37,6 @@ import net.octacomm.sample.domain.PileQntPlanMngParam;
 public class PileQntPlanMngController extends AbstractPileQntPlanMngCRUDController<PileQntPlanMngMapper, PileQntPlanMng, PileQntPlanMngParam, Integer>
 {
 	@Autowired
-	@Override
 	public void setCRUDMapper(PileQntPlanMngMapper mapper) {
 		this.mapper = mapper;
 	}

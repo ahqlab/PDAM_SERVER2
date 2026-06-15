@@ -9,6 +9,8 @@ public class SessionInfo implements Domain{
 	
 	private String userId;
 	
+	private String userName;
+	
 	private int constructionIdx;
 	
 	private int role;

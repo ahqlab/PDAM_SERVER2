@@ -212,12 +212,12 @@ function onClickFileDelete(idx){
 </script>
 <!--컨텐츠-->
 		<div class="section-right">
+			<%@ include file="/WEB-INF/views/common/welcomeMsg.jsp" %>
 			<div class="TopContArea">
 				<div class="titArea mb-40">
 					<p class="h1Tit">파일수량 관리계획</p>
 						<div id="printBtn" class="printBtn">CSV다운로드</div>
 				</div>
-				
 				<!--검색-->
 				<form:form id="searchForm" commandName="domainParam" method="POST">
 					<form:hidden path="currentPage"/>

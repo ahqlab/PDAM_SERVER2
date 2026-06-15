@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.octacomm.sample.dao.mapper.CompanyMapper">
+
+	<resultMap id="companyResultMap" type="net.octacomm.sample.domain.Company">
+		<id     property="id"             column="id" />
+		<result property="name"           column="name" />
+		<result property="address"        column="address" />
+		<result property="businessNo"     column="businessNo" />
+		<result property="tel"            column="tel" />
+		<result property="representative" column="representative" />
+	</resultMap>
+
+	<select id="getList" resultMap="companyResultMap">
+		SELECT id, name, address, businessNo, tel, representative
+		FROM TB_COMPANY
+		ORDER BY name ASC
+	</select>
+
+	<select id="getById" resultMap="companyResultMap">
+		SELECT id, name, address, businessNo, tel, representative
+		FROM TB_COMPANY
+		WHERE id = #{id}
+	</select>
+
+	<select id="getByName" resultMap="companyResultMap">
+		SELECT id, name, address, businessNo, tel, representative
+		FROM TB_COMPANY
+		WHERE name = #{name}
+		LIMIT 1
+	</select>
+
+	<insert id="insert" parameterType="net.octacomm.sample.domain.Company"
+	        useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO TB_COMPANY (name, address, businessNo, tel, representative)
+		VALUES (#{name}, #{address}, #{businessNo}, #{tel}, #{representative})
+	</insert>
+
+	<update id="update" parameterType="net.octacomm.sample.domain.Company">
+		UPDATE TB_COMPANY
+		SET name           = #{name},
+		    address        = #{address},
+		    businessNo     = #{businessNo},
+		    tel            = #{tel},
+		    representative = #{representative}
+		WHERE id = #{id}
+	</update>
+
+	<delete id="delete">
+		DELETE FROM TB_COMPANY WHERE id = #{id}
+	</delete>
+
+</mapper>

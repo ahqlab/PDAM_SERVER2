@@ -123,9 +123,29 @@
 		<put-attribute name="nav" value="/WEB-INF/views/customer/nav.jsp" />
 	</definition>
 	
-		<definition name="pqpm/**" extends="commomLayout">
+	<definition name="pqpm/**" extends="commomLayout">
 		<put-attribute name="content" value="/WEB-INF/views/pqpm/{1}.jsp" />
 		<put-attribute name="nav" value="/WEB-INF/views/pqpm/nav.jsp" />
 	</definition>
 	
+	<definition name="qr/**" extends="commomLayout">
+		<put-attribute name="content" value="/WEB-INF/views/qr/{1}.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/qr/nav.jsp" />
+	</definition>
+
+	<definition name="contractClause/**" extends="commomLayout">
+		<put-attribute name="content" value="/WEB-INF/views/contractClause/{1}.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/contractClause/nav.jsp" />
+	</definition>
+
+	<definition name="contract/**" extends="commomLayout">
+		<put-attribute name="content" value="/WEB-INF/views/contract/{1}.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/contract/nav.jsp" />
+	</definition>
+
+	<definition name="company/**" extends="commomLayout">
+		<put-attribute name="content" value="/WEB-INF/views/company/{1}.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/company/nav.jsp" />
+	</definition>
+
 </tiles-definitions>

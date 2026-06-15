@@ -1,5 +1,90 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/views/common/tagLib.jsp" %>
+<style>
+	.popup-bg {
+	  position: fixed;
+	  top: 0; left: 0;
+	  width: 100%; height: 100%;
+	  background: rgba(0, 0, 0, 0.5);
+	  display: flex;
+	  justify-content: center;
+	  align-items: center;
+	  z-index: 9999;
+	}
+	
+	.popup-box {
+	  background: #fff;
+	  padding: 20px 30px;
+	  border-radius: 10px;
+	  width: 400px;
+	  max-height: 80vh;
+	  overflow-y: auto;
+	  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+	  color: #000; /* ✅ 전체 폰트 색상 검은색 */
+	  font-family: "맑은 고딕", "Apple SD Gothic Neo", sans-serif;
+	}
+	
+	.pile-list label {
+	  display: block;
+	  margin: 6px 0;
+	  font-size: 15px;
+	  color: #000; /* ✅ 라벨 폰트도 검은색 명시 */
+	}
+	
+	.popup-actions {
+	  text-align: right;
+	  margin-top: 15px;
+	}
+	
+	.popup-actions button {
+	  background: #f0f0f0;
+	  color: #000; /* ✅ 버튼 글자도 검은색 */
+	  border: 1px solid #ccc;
+	  border-radius: 5px;
+	  padding: 5px 10px;
+	  cursor: pointer;
+	}
+	
+	.popup-actions button:hover {
+	  background: #ddd;
+	}
+
+	/* 반응형 */
+	@media (max-width: 768px) {
+		/* titBtnArea: 버튼/셀렉트 세로 줄바꿈 */
+		.titBtnArea {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 6px;
+			margin-left: 0;
+			margin-top: 10px;
+			width: 100%;
+		}
+		.titBtnArea select,
+		.titBtnArea .printBtn,
+		.titBtnArea .printBtn02,
+		.titBtnArea .printPdfBtn {
+			margin-left: 0 !important;
+			margin-right: 0 !important;
+			width: calc(50% - 3px) !important;
+			box-sizing: border-box;
+		}
+		/* titArea: 모바일에서 세로 배치 */
+		.titArea {
+			flex-direction: column;
+			align-items: flex-start;
+		}
+		/* 팝업 박스: 모바일 폭에 맞춤 */
+		.popup-box {
+			width: 90vw;
+			padding: 16px;
+		}
+		/* 상단 공사명 텍스트 */
+		#constructionName { font-size: 1.3rem !important; }
+		#groupName        { font-size: 1rem !important; }
+		#constructionAddress { font-size: 0.85rem !important; }
+	}
+</style>
 <script type="text/javascript">
 $( document ).ready( function() 
 {	
@@ -235,17 +320,32 @@ function getConstructionName(){
 	jQuery.ajax({
 		type : "POST",
 		contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+		dataType: "json",  // ← 이걸 추가!
 		url : "${pageContext.request.contextPath}/construction/get/name",
 		data: {
 			id : idx,
 			role : role
 		}, 
 		success : function(data) {
-			$('.h1Tit').text(data);
+			if(role == 0){
+				$('.h1Tit').text(data.groupName + ' ' + data.constructionName + ' ' + data.constructionLocation);
+				//$('#constructionAddress').text(data.constructionAddress);
+			}else{
+				$('#groupName').text(data.groupName);
+				$('#constructionName').text('[ ' + data.constructionName + ' ] ' + data.constructionLocation);
+				$('#constructionAddress').text(data.constructionAddress);
+			}
+			//$('.h1Tit').text(data);
+			//$('#groupName').text(data.groupName);
+			//$('.h1Tit').text('[ ' + data.constructionName + ' ] ' + data.constructionLocation);
+			//$('#constructionAddress').text(data.constructionAddress);
 		},
 		complete : function(data) {
 		},
 		error : function(xhr, status, error) {
+			console.error("AJAX 오류 상태:", status);             // ex: "parsererror", "error", "timeout"
+			console.error("AJAX 오류 메시지:", error);             // ex: "SyntaxError: Unexpected token ..."
+			console.error("서버 응답:", xhr.responseText);         // ← 이게 진짜 중요
 		}
 	}); 
 }
@@ -657,25 +757,129 @@ function changeSpareDevice(targetId, changeId, constructionIdx){
 
 		<!--컨텐츠-->
 <div class="section-right">
-
+	<%@ include file="/WEB-INF/views/common/welcomeMsg.jsp" %>
 	<div class="TopContArea">
-		<div class="titArea mb-40">
-			<p class="h1Tit"></p>
+		<div class="titArea mb-0">
+			<c:choose>
+				<c:when test="${sessionInfo.role == 0}">
+					<p class="h1Tit" style="margin-bottom: 20px;"></p>
+				</c:when>
+				<c:otherwise>
+					<div style="margin-bottom : 10px;">
+					<p style="font-size: 1.2rem; color: #ffffff; opacity: 0.7; margin: 0 0 4px 0; font-weight: 500; letter-spacing: -0.02em;" id="groupName"></p> <!-- 시공사명 -->
+					<p style="font-size: 1.6rem; font-weight: 700; color: #ffffff; margin: 0 0 6px 0; letter-spacing: -0.03em;" id="constructionName"></p>
+					<p style="font-size: 1rem; color: #c5e1f1; opacity: 0.8; margin: 0; font-weight: 400;" id="constructionAddress"></p>     <!-- 현장주소 -->
+				</div>
+				</c:otherwise>
+			</c:choose>
+			
 			<div class="titBtnArea" style="">
-				
 				<c:choose>
 					<c:when test="${sessionInfo.role < 4}">
 							<select id="select2" name="select2" onchange="javascript:fileChangeSelect2(this.value);" style="background-color: #0a4b76;">
 								<option value="">시험성적표 출력 ▼</option>
 							</select>	
 							
-							<select id="select1" name="select1" onchange="javascript:fileChange(this.value);">
-								<option selected disabled value="">파일현황 출력 ▼</option>
-							</select> 
+							<c:choose>
+							  <c:when test="${sessionInfo.constructionIdx == 1308}">
+							    <!-- 단일 선택 + 팝업 -->
+							    <select id="select1" name="select1" onchange="openPilePopup()">
+							      <option selected disabled value="">파일현황 출력 ▼</option>
+							      <option value="open">선택하기</option>
+							    </select>
+							
+							    <!-- 팝업 구조 (초기에는 hidden) -->
+							    <div id="pilePopup" class="popup-bg" style="display:none;">
+								  <div class="popup-box">
+								    <h3>파일 종류 선택</h3>
+								    <div id="pileList" class="pile-list"></div>
+								
+								    <div class="popup-actions">
+								      <button type="button" onclick="submitPileSelection()">다운로드</button>
+								      <button type="button" onclick="closePilePopup()">닫기</button>
+								    </div>
+								  </div>
+								</div>
+							
+							    <script>
+							    function openPilePopup() {
+							    	  // 팝업 오픈
+							    	  $("#pilePopup").show();
+
+							    	  // 목록 로딩
+							    	  getPileTypeList2();
+							    	}
+
+							    	function closePilePopup() {
+							    	  $("#pilePopup").hide();
+							    	}
+
+							    	// 기존 함수 재활용
+							    	function getPileTypeList() {
+							    	  var idx = ${param.constructionIdx};
+
+							    	  $("#pileList").html("<div>로딩 중...</div>");
+
+							    	  jQuery.ajax({
+							    	    type : "POST",
+							    	    contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+							    	    url : "${pageContext.request.contextPath}/fileinventory/get/pile/type/list",
+							    	    data: { constructionIdx : idx },
+							    	    success : function(data) {				
+							    	      var html = "";
+							    	      $.each(data, function (i, item) {
+							    	        var option;
+							    	        if(item.pileType == "PHC" || item.pileType == "UHC" || item.pileType == "UPHC"){
+							    	          option = item.pileType + " " + item.pileStandard;
+							    	        } else {
+							    	          option = item.pileType + " " + item.fileWeight + " " + item.pileStandard;
+							    	        }
+							    	        html += "<label><input type='checkbox' name='pile' value='"+option+"'> "+option+"</label>";
+							    	      });
+							    	      $("#pileList").html(html);
+							    	    },
+							    	    error : function() {
+							    	      $("#pileList").html("<div class='text-danger'>목록을 불러오지 못했습니다.</div>");
+							    	    }
+							    	  });
+							    	}
+
+							    	function submitPileSelection() {
+							    	  var constructionIdx = ${param.constructionIdx};
+							    	  var selectedValues = [];
+
+							    	  $('input[name="pile"]:checked').each(function() {
+							    	    selectedValues.push($(this).val());
+							    	  });
+
+							    	  if (selectedValues.length === 0) {
+							    	    alert("파일 종류를 하나 이상 선택하세요.");
+							    	    return;
+							    	  }
+
+							    	  var pileParam = selectedValues.join(',');
+
+							    	  // 전송
+							    	  location.href = '${pageContext.request.contextPath}/file/using/chart/download/multi/excel'
+							    	    + '?constructionIdx=' + constructionIdx
+							    	    + '&pile=' + encodeURIComponent(pileParam);
+
+							    	  // 팝업 닫기 + select 초기화
+							    	  closePilePopup();
+							    	  $('#select1 option:eq(0)').prop('selected', true);
+							    	}
+							    </script>
+							
+							  </c:when>
+							  <c:otherwise>
+							    <!-- 다중 선택 일반 select -->
+							    <select id="select1" name="select1" onchange="javascript:fileChange(this.value);">
+									<option selected disabled value="">파일현황 출력 ▼</option>
+								</select> 
+							  </c:otherwise>
+						  </c:choose>
 					</c:when>
 				</c:choose>
-			 
-				
 				<c:choose>
 					<c:when test="${sessionInfo.role == 0}">
 						<div class="printBtn" onclick="javascript:downloadAllReport(${param.constructionIdx});">기록지 전체 출력</div>
@@ -685,8 +889,63 @@ function changeSpareDevice(targetId, changeId, constructionIdx){
 					</c:when>
 					<c:otherwise>
 						<div class="printBtn" onclick="javascript:downloadAllReport(${sessionInfo.constructionIdx});">기록지 전체 출력</div>
+						<c:if test="${sessionInfo.role == 1}">
+							<div id="contractDownloadBtn" class="printBtn" onclick="openContractDownload()" style="background-color:#28a745;margin-left:10px;display:none;">계약서 다운로드</div>
+						</c:if>
 					</c:otherwise>
 				</c:choose>
+
+				<!-- 계약서 선택 팝업 (다중 계약서 대비) -->
+				<div id="contractDownloadPopup" class="popup-bg" style="display:none;">
+					<div class="popup-box">
+						<h3 style="margin-bottom:14px;font-size:15px;">계약서 선택</h3>
+						<div id="contractDownloadList"></div>
+						<div class="popup-actions">
+							<button type="button" onclick="document.getElementById('contractDownloadPopup').style.display='none';">닫기</button>
+						</div>
+					</div>
+				</div>
+
+				<script>
+				$(function() {
+					var _ctx  = '${pageContext.request.contextPath}';
+					var _cIdx = ${sessionInfo.constructionIdx};
+					if (_cIdx) {
+						$.getJSON(_ctx + '/contract/ajax/list', {constructionIdx: _cIdx}, function(list) {
+							var hasSigned = list && list.some(function(c) { return c.status === 'SIGNED'; });
+							if (hasSigned) $('#contractDownloadBtn').show();
+						});
+					}
+				});
+
+				function openContractDownload() {
+					var constructionIdx = ${sessionInfo.constructionIdx};
+					var ctx = '${pageContext.request.contextPath}';
+					$.getJSON(ctx + '/contract/ajax/list', {constructionIdx: constructionIdx}, function(list) {
+						var signed = list ? list.filter(function(c) { return c.status === 'SIGNED'; }) : [];
+						if (signed.length === 0) {
+							alert('다운로드 가능한 계약서가 없습니다.');
+							return;
+						}
+						if (signed.length === 1) {
+							location.href = ctx + '/contract/pdf?contractIdx=' + signed[0].contractIdx;
+							return;
+						}
+						var html = '';
+						$.each(signed, function(i, c) {
+							html += '<div style="margin-bottom:10px;">'
+								+ '<a href="' + ctx + '/contract/pdf?contractIdx=' + c.contractIdx + '" '
+								+ 'style="display:block;padding:8px 12px;background:#f5f5f5;border:1px solid #ddd;border-radius:4px;color:#333;text-decoration:none;font-size:13px;">'
+								+ escHtmlDvc(c.contractNo || ('계약서 #' + c.contractIdx))
+								+ '<span style="float:right;color:#28a745;font-size:12px;">' + (c.signedAt || '') + '</span>'
+								+ '</a></div>';
+						});
+						$('#contractDownloadList').html(html);
+						$('#contractDownloadPopup').show();
+					});
+				}
+				function escHtmlDvc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+				</script>
 				
 				<form:form id="searchForm" commandName="domainParam" method="POST">
 					<form:hidden path="currentPage"/>
@@ -708,9 +967,9 @@ function changeSpareDevice(targetId, changeId, constructionIdx){
 								<p><span>시공수량</span>&nbsp;&nbsp;${totalWorkQuantity.executedQuantity + 71}&nbsp;&nbsp;공</p>
 							</c:when>
 							<c:otherwise>
-								<p><span>공정률</span>&nbsp;&nbsp;${totalWorkQuantity.processRate}&nbsp;&nbsp;%</p>
-								<p><span>남은수량</span>&nbsp;&nbsp;${totalWorkQuantity.quantityLeft}&nbsp;&nbsp;공</p>
-								<p><span>시공수량</span>&nbsp;&nbsp;${totalWorkQuantity.executedQuantity}&nbsp;&nbsp;공</p>
+								<p id="processRate"><span>공정률</span>&nbsp;&nbsp;${totalWorkQuantity.processRate}&nbsp;&nbsp;%</p>
+								<p id="quantityLeft"><span>남은수량</span>&nbsp;&nbsp;${totalWorkQuantity.quantityLeft}&nbsp;&nbsp;공</p>
+								<p id="executedQuantity"><span>시공수량</span>&nbsp;&nbsp;${totalWorkQuantity.executedQuantity}&nbsp;&nbsp;공</p>
 							</c:otherwise>
 						</c:choose>
 						<c:choose>
@@ -1899,6 +2158,15 @@ $( function() {
 });
 
 $(document).ready(function() {
+	
+	//alert('1111');
+	//var totalWorkQuantity = $("#quantity").val();
+	//alert('totalWorkQuantity : ' + totalWorkQuantity);
+	//<p id="processRate"><span>공정률</span>&nbsp;&nbsp;${totalWorkQuantity.processRate}&nbsp;&nbsp;%</p>
+	//<p id="quantityLeft"><span>남은수량</span>&nbsp;&nbsp;${totalWorkQuantity.quantityLeft}&nbsp;&nbsp;공</p>
+	//<p id="executedQuantity"><span>시공수량</span>&nbsp;&nbsp;${totalWorkQuantity.executedQuantity}&nbsp;&nbsp;공</p>
+	
+	
 	$(".navBtn").click(function() {
 		$(".left-menu").animate({
 			"left": "0%"

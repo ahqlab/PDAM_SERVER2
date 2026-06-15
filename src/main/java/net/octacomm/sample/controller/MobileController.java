@@ -1,5 +1,6 @@
 package net.octacomm.sample.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import net.octacomm.sample.dao.mapper.DeviceMapper;
@@ -18,6 +20,8 @@ import net.octacomm.sample.dao.mapper.OriginPieceMapper;
 import net.octacomm.sample.dao.mapper.PenetrationMapper;
 import net.octacomm.sample.dao.mapper.PieceMapper;
 import net.octacomm.sample.dao.mapper.PileCrosSectionMapper;
+import net.octacomm.sample.dao.mapper.PileSelectMethodValueMapper;
+import net.octacomm.sample.dao.mapper.PileSelectValueMapper;
 import net.octacomm.sample.dao.mapper.PileStandardMapper;
 import net.octacomm.sample.dao.mapper.PileTicknessMapper;
 import net.octacomm.sample.dao.mapper.ReportMapper;
@@ -29,6 +33,9 @@ import net.octacomm.sample.domain.FallMeter;
 import net.octacomm.sample.domain.GReport;
 import net.octacomm.sample.domain.Penetration;
 import net.octacomm.sample.domain.Piece;
+import net.octacomm.sample.domain.PileSelectMethodValue;
+import net.octacomm.sample.domain.PileSelectValue;
+import net.octacomm.sample.domain.PileSelectValueParent;
 import net.octacomm.sample.domain.PileStandardInfo;
 import net.octacomm.sample.domain.Report;
 import net.octacomm.sample.domain.ReportWithFallMeter;
@@ -79,6 +86,12 @@ public class MobileController {
 	
 	@Autowired
 	private ReportWithFallMeterMapper reportWithFallMeterMapper;
+	
+	@Autowired
+	private PileSelectValueMapper pileSelectValueMapper;
+	
+	@Autowired
+	private PileSelectMethodValueMapper pileSelectMethodValueMapper;
 	
 	
 	
@@ -419,11 +432,6 @@ public class MobileController {
 	}
 	
 
-	
-	
-	
-	
-	
 	@ResponseBody
 	@RequestMapping(value = "/device/login", method = RequestMethod.POST)
 	public CommonResponse<Device> mobileLogin(@RequestBody Device device) {
@@ -461,6 +469,42 @@ public class MobileController {
 		info.setPileSrossSectionList(pileCrosSectionMapper.getList());
 		info.setPileTicknessList(pileTicknessMapper.getList());
 		return info;
+	}
+	
+//	@ResponseBody
+//	@RequestMapping(value = "/pileselectvalue/piletype/list", method = RequestMethod.GET)
+//	public List<PileSelectValue> getPileSelectValues(){
+//		List<PileSelectValue> list = pileSelectValueMapper.getPileTypeList();
+//		return (list != null && !list.isEmpty()) ? list : new ArrayList<PileSelectValue>();
+//	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/pileselectvalue/list", method = RequestMethod.POST)
+	public CommonResponse<PileSelectValueParent> getPileSelectValues(@RequestBody Device device){
+		
+		CommonResponse<PileSelectValueParent> response = new CommonResponse<PileSelectValueParent>();
+		
+		PileSelectValueParent parent = new PileSelectValueParent();
+		List<PileSelectValue> currentSelectValueList = pileSelectValueMapper.getListByDeviceIdx(device.getId());
+		List<PileSelectMethodValue> currentMethodValueList = pileSelectMethodValueMapper.getListByDeviceIdx(device.getId());
+		
+		if(currentSelectValueList.size() > 0) {
+			parent.setPileSelectValues(currentSelectValueList);
+			response.setDomain(parent);
+		}else {
+			currentSelectValueList = pileSelectValueMapper.getListByDeviceIdx(0);
+			parent.setPileSelectValues(currentSelectValueList);
+		}
+		
+		if(currentMethodValueList.size() > 0) {
+			parent.setPileSelectMethodValue(currentMethodValueList);
+		}else {
+			currentMethodValueList = pileSelectMethodValueMapper.getListByDeviceIdx(0);
+			parent.setPileSelectMethodValue(currentMethodValueList);
+		}
+		response.setDomain(parent);
+		response.setResultMessage("성공");
+		return response;
 	}
 	
 	

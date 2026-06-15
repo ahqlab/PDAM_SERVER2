@@ -5,6 +5,7 @@
 </script>
 <!--컨텐츠-->
 <div class="section-right">
+	<%@ include file="/WEB-INF/views/common/welcomeMsg.jsp" %>
 	<div class="TopContArea">
 		<div class="titArea">
 			<p class="h1Tit">만족도조사 결과 ( 2024-07-04 ~ 진행중 )</p>

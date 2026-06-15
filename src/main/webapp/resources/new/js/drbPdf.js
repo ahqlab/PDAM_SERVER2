@@ -1,4 +1,35 @@
 
+function drawAutoFitText(doc, text, x, y, maxWidth, options = { align: 'left' }, minFontSize = 6) {
+    const originalFontSize = doc.getFontSize(); // 원래 폰트 크기 저장
+
+    // 앞뒤 공백 제거
+    const trimmedText = text.trim();
+    const length = trimmedText.length;
+
+    let fontSize = originalFontSize;
+
+    // 6글자 초과일 때만 폰트 줄이기
+    if (length > 6) {
+        const excess = length - 6;
+        fontSize -= excess;
+        if (fontSize < minFontSize) fontSize = minFontSize;
+    }
+
+    // 텍스트 폭 계산 후 영역 맞춤
+    let textWidth = doc.getTextWidth(trimmedText) * (fontSize / originalFontSize);
+
+    if (textWidth > maxWidth) {
+        fontSize = fontSize * (maxWidth / textWidth);
+        if (fontSize < minFontSize) fontSize = minFontSize;
+    }
+
+    // 폰트 크기 적용 후 출력
+    doc.setFontSize(fontSize);
+    doc.text(trimmedText, x, y, options);
+
+    // 원래 폰트 크기 복원
+    doc.setFontSize(originalFontSize);
+}
 
 function drawLegend(doc){
 	var pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
@@ -57,6 +88,322 @@ function yAxisLevel(currentAvgPenetrationValue){
 		return 1;
 	}
 }
+//페이지 하단
+function drawPageNumber(doc, index){
+	
+	const pageNumber = " - " + String(index + 1) + " - ";   // ← 숫자 → 문자열 변환 + 1
+    const pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
+    const textWidth = doc.getTextWidth(pageNumber);
+    const x = (pageWidth - textWidth) / 2;
+    doc.text(pageNumber, x, 290);
+
+}
+
+function drawPageNumberToTopRight(doc, index){
+	
+    const pageNumber = String(index + 1); // 숫자 → 문자열 변환 + 1
+    const pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
+    
+    doc.setFontSize(18); // 폰트 크게
+    const textWidth = doc.getTextWidth(pageNumber);
+    const x = pageWidth - 20; // 오른쪽 여백 20
+    const y = 15; // 상단 여백 30
+
+    doc.text(pageNumber, x, y);
+    
+    doc.setFontSize(12); // 원래 폰트 크기로 되돌리기 (필요하면)
+	
+}
+function drawCompactChart(
+	    root,
+	    index,
+	    item,
+	    pageWidth,
+	    pageHeight,
+	    doc,
+	    currentAvgPenetrationValue,
+	    currentTotalPenetrationValue,
+	    constructionIdx
+	) {
+
+	    // =========================
+	    // 기본 설정
+	    // =========================
+	    var lectLeftPadding   = 15;
+	    var lectBottomPadding = 40;
+
+	    var lectTopY     = 134;
+	    var graphBottomY = pageHeight - lectBottomPadding;
+	    var graphHeight  = graphBottomY - lectTopY;
+
+	    var lectRightX = pageWidth - lectLeftPadding;
+
+	    // =========================
+	    // 그래프 테두리
+	    // =========================
+	    doc.setDrawColor(null);
+	    doc.setLineWidth(null);
+
+	    doc.line(lectLeftPadding, lectTopY, lectRightX, lectTopY);
+	    doc.line(lectLeftPadding, graphBottomY, lectRightX, graphBottomY);
+	    doc.line(lectLeftPadding, lectTopY, lectLeftPadding, graphBottomY);
+	    doc.line(lectRightX, lectTopY, lectRightX, graphBottomY);
+
+	    // =========================
+	    // Y축 최대값 (상단 여유 포함)
+	    // =========================
+	    var rawMaxValue = currentTotalPenetrationValue;
+	    if (rawMaxValue <= 0) rawMaxValue = 1;
+
+	    // 15% headroom
+	    var maxValue = rawMaxValue * 1.15;
+
+	    // 눈금 간격
+	    var step;
+	    if (maxValue > 1000) step = 200;
+	    else if (maxValue > 500) step = 100;
+	    else if (maxValue > 200) step = 50;
+	    else if (maxValue > 100) step = 20;
+	    else if (maxValue > 50) step = 10;
+	    else step = 5;
+
+	    // =========================
+	    // Y축 눈금선
+	    // =========================
+	    doc.setFontSize(9);
+	    //doc.setDrawColor(180, 180, 180);
+
+	    for (var v = 0; v <= maxValue; v += step) {
+	        var y = graphBottomY - (v / maxValue) * graphHeight;
+	        if (y < lectTopY) continue;
+
+	        doc.line(lectLeftPadding, y, lectRightX, y);
+	        doc.text(Math.round(v).toString(), lectLeftPadding - 2, y + 2, { align: 'right' });
+	    }
+
+	    // =========================
+	    // 데이터 배열
+	    // =========================
+	    var penetrations = [
+	        item.peOne,
+	        item.peTwo,
+	        item.peThree,
+	        item.peFour,
+	        item.peFive
+	    ];
+
+	    if (
+	        item.peSix   != null &&
+	        item.peSeven != null &&
+	        item.peEight != null &&
+	        item.peNine  != null &&
+	        item.peTen   != null
+	    ) {
+	        penetrations.push(
+	            item.peSix,
+	            item.peSeven,
+	            item.peEight,
+	            item.peNine,
+	            item.peTen
+	        );
+	    }
+
+	    // =========================
+	    // 포인트 계산 (누적)
+	    // =========================
+	    var sum = 0;
+	    var verticalGap = (pageWidth - 30) / (penetrations.length + 1);
+	    var pointArr = [];
+
+	    for (var i = 0; i < penetrations.length; i++) {
+
+	        var value = penetrations[i] !== "" ? Number(penetrations[i]) : 0;
+	        sum += value;
+
+	        var y = graphBottomY - (sum / maxValue) * graphHeight;
+	        if (y < lectTopY) y = lectTopY;
+
+	        var x = lectLeftPadding + verticalGap * (i + 1);
+
+	        // 점
+	        doc.setFillColor(0, 173, 239);
+	        doc.circle(x, y, 1.2, 'F');
+
+	        pointArr.push([x, y]);
+
+	        // 세로 기준선
+	        //doc.setDrawColor(220, 220, 220);
+	        doc.line(x, lectTopY, x, graphBottomY);
+
+	        // 하단 텍스트
+	        doc.setFontSize(penetrations.length > 5 ? 8 : 9);
+	        doc.text((i + 1) + '회 측정', x, graphBottomY + 6, { align: 'center' });
+	    }
+	    
+	    if(constructionIdx != 738){
+			jQuery.ajax({
+				type : "POST",
+				url : root + "/signroom/get/order/list",
+				data: { 
+					constructionIdx : constructionIdx			
+				}, 
+				dataType : "JSON", // 옵션이므로 JSON으로 받을게 아니면 안써도 됨
+				async : false,
+				success : function(data) {
+					
+					var signRoomStartX = 75;
+					var signRoomTopY = 12;
+					var signRoomBottomY = 22;
+					
+					if(data.length > 0){
+						
+						var roomOneWidth = 44;
+						
+						var endXSum = 0;
+						$.each(data, function(index, item) {
+							
+							if(constructionIdx == 969){
+								roomOneWidth = 60;
+							}else{
+								roomOneWidth = 44;
+							}
+							
+							
+							var end = (pageWidth - 15) - (roomOneWidth * (index + 1));
+							endXSum = end;
+						});
+						
+						//세로
+						doc.line(endXSum, 
+								pageHeight - signRoomTopY, 
+								endXSum, 
+								pageHeight - signRoomBottomY);
+						
+						$.each(data, function(index, item) {
+							
+							if(constructionIdx == 969){
+								roomOneWidth = 60;
+							}else{
+								roomOneWidth = 44;
+							}
+							
+							var x = (pageWidth - 15) - (roomOneWidth * index);
+							var end = (pageWidth - 15) - (roomOneWidth * (index + 1));
+							
+							//가로위
+							doc.line(x, 
+									pageHeight - signRoomTopY, 
+									end,
+									pageHeight - signRoomTopY);
+							//가로아래
+							doc.line(x, 
+									pageHeight - signRoomBottomY, 
+									end,
+									pageHeight - signRoomBottomY);
+							//세로
+							doc.line(x, 
+									pageHeight - signRoomTopY, 
+									x, 
+									pageHeight - signRoomBottomY);
+							
+							//세로 칸의 중간
+							doc.line(x - (roomOneWidth / 2), 
+									pageHeight - signRoomTopY, 
+									x -  (roomOneWidth / 2), 
+									pageHeight - signRoomBottomY);
+							
+							
+							//doc.text(item.approver , x - ( (roomOneWidth / 2) + (roomOneWidth/4)), pageHeight - 16, {align: 'center'});
+							drawAutoFitText(
+								    doc,
+								    item.approver,
+								    x - ( (roomOneWidth / 2) + (roomOneWidth / 4) ),
+								    pageHeight - 16,
+								    roomOneWidth,
+								    { align: 'center' }
+								);
+							
+						});
+						
+						
+					}else{
+						//결재방시작
+						/**
+						var signRoomStartX = 75;
+						var signRoomTopY = 12;
+						var signRoomBottomY = 22;
+						//가로
+						doc.line( signRoomStartX , pageHeight - signRoomTopY , pageWidth - 15, pageHeight - signRoomTopY);
+						doc.line( signRoomStartX , pageHeight - signRoomBottomY , pageWidth - 15, pageHeight - signRoomBottomY);
+						
+						//세로
+						doc.line( signRoomStartX, pageHeight - signRoomTopY , signRoomStartX, pageHeight - signRoomBottomY);
+						for(var i = 1; i <= 4; i++){
+							doc.line( signRoomStartX  + (i*30) , pageHeight - signRoomTopY , signRoomStartX   + (i*30), pageHeight - signRoomBottomY);
+						}
+						
+						//doc.line( signRoomStartX  + 60 , pageHeight - signRoomTopY , signRoomStartX   + 60, pageHeight - signRoomBottomY);
+						//doc.line( signRoomStartX  + 90 , pageHeight - signRoomTopY , signRoomStartX   + 90, pageHeight - signRoomBottomY);
+						//doc.line( signRoomStartX  + 120 , pageHeight - signRoomTopY , signRoomStartX   + 120, pageHeight - signRoomBottomY);
+						doc.setFontSize(10);
+						doc.text('시공사', signRoomStartX  + 15, pageHeight - 16, {align: 'center'});
+						doc.text('감리단', signRoomStartX  + 60 + 15, pageHeight - 16, {align: 'center'});
+						**/
+		
+					}
+				},
+				complete : function(data) {
+				},
+				error : function(xhr, status, error) {
+				}
+			});
+		}
+
+	    // =========================
+	    // 계단식 선 연결 (핵심)
+	    // =========================
+	    doc.setLineWidth(1.2);
+	    doc.setDrawColor(0, 173, 239);
+
+	    for (var i = 0; i < pointArr.length - 1; i++) {
+
+	        var x1 = pointArr[i][0];
+	        var y1 = pointArr[i][1];
+	        var x2 = pointArr[i + 1][0];
+	        var y2 = pointArr[i + 1][1];
+
+	        // 수평
+	        doc.line(x1, y1, x2, y1);
+	        // 수직
+	        doc.line(x2, y1, x2, y2);
+	    }
+
+	    // =========================
+	    // 값 표시
+	    // =========================
+	    writeValue(penetrations, pointArr, doc, index);
+	    
+	    /** 여긴 이게 필요 없어 **/
+	    /**if(constructionIdx == 1554){
+			//create1554Signarea(doc);
+			doc.setFontSize(12);
+			var signareaTopY = 18;
+			doc.text(
+			        '협력사 : 김 상 석    (인)',
+			        lectLeftPadding, pageHeight - signareaTopY,
+			        { align: 'left' });
+			
+			doc.text(
+			        '시공사 : 김 경 민    (인)',
+			        (pageWidth / 2) - 6, pageHeight - signareaTopY,
+			        { align: 'center' });
+			
+			doc.text(
+			        '건설사업관리단 : 양 흥 주    (인)',
+			        pageWidth - lectLeftPadding, pageHeight - signareaTopY,
+			        { align: 'right' });
+		}**/
+	}
 
 
 //그래프를 그린다.
@@ -152,7 +499,7 @@ function drawChart(root, index, item, pageWidth, pageHeight, doc, currentAvgPene
     penetrations.push(item.peFour); 
     penetrations.push(item.peFive);
     
-    console.log('item.peSix : ' + item.peSix + 'item.peSeven : ' + item.peSeven + 'item.peEight : ' + item.peEight + 'item.peNine : ' + item.peNine + 'item.peTen : ' + item.peTen);
+    //console.log('item.peSix : ' + item.peSix + 'item.peSeven : ' + item.peSeven + 'item.peEight : ' + item.peEight + 'item.peNine : ' + item.peNine + 'item.peTen : ' + item.peTen);
     
     if(item.peSix != null && item.peSeven != null && item.peEight != null && item.peNine != null && item.peTen != null){
     	penetrations.push(item.peSix);
@@ -207,6 +554,8 @@ function drawChart(root, index, item, pageWidth, pageHeight, doc, currentAvgPene
 		
 		doc.text(Number(i + 1) + '회 측정', lectLeftPadding + (verticalGap * (i + 1)), lectStartY + 5 , {align: 'center'});
 	}
+	
+	
 	
 	
 	if(constructionIdx != 738){
@@ -282,8 +631,15 @@ function drawChart(root, index, item, pageWidth, pageHeight, doc, currentAvgPene
 								pageHeight - signRoomBottomY);
 						
 						
-						doc.text(item.approver , x - ( (roomOneWidth / 2) + (roomOneWidth/4)), pageHeight - 16, {align: 'center'});
-						
+						//doc.text(item.approver , x - ( (roomOneWidth / 2) + (roomOneWidth/4)), pageHeight - 16, {align: 'center'});
+						drawAutoFitText(
+							    doc,
+							    item.approver,
+							    x - ( (roomOneWidth / 2) + (roomOneWidth / 4) ),
+							    pageHeight - 16,
+							    roomOneWidth,
+							    { align: 'center' }
+							);
 						
 					});
 					
@@ -338,13 +694,126 @@ function drawChart(root, index, item, pageWidth, pageHeight, doc, currentAvgPene
 	//값의 숫자를 쓴다.
 	writeValue(penetrations, pointArr, doc, index);
 	
+	if(constructionIdx == 1554){
+		//create1554Signarea(doc);
+		doc.setFontSize(12);
+		var signareaTopY = 18;
+		doc.text(
+		        '협력사 : 김 상 석    (인)',
+		        lectLeftPadding, pageHeight - signareaTopY,
+		        { align: 'left' });
+		
+		doc.text(
+		        '시공사 : 김 경 민    (인)',
+		        (pageWidth / 2) - 6, pageHeight - signareaTopY,
+		        { align: 'center' });
+		
+		doc.text(
+		        '건설사업관리단 : 양 흥 주    (인)',
+		        pageWidth - lectLeftPadding, pageHeight - signareaTopY,
+		        { align: 'right' });
+	}
+	
 }
 
+function drawHitCountLegend(doc, startY) {
+    const startX = 15;
+    const cellW  = 22;
+    const cellH  = 10;
+    const titleH = 7;
+    const fontSz = 10;
+
+    const cols = 4;
+    const totalW = cellW * cols;
+    const totalH = titleH + cellH * 2;
+
+    /* ===== 기본 스타일 ===== */
+    doc.setFontSize(fontSz);
+    doc.setLineWidth(0.2);
+    doc.setDrawColor(null);
+    doc.setLineCap('butt');
+    doc.setLineJoin('miter');
+
+    /* =================================================
+       1. 외곽 테두리
+    ================================================= */
+    doc.rect(startX, startY, totalW, totalH);
+
+    /* =================================================
+       2. 내부 가로선
+       - 제목 하단
+       - 헤더 하단
+    ================================================= */
+    doc.line(
+        startX,
+        startY + titleH,
+        startX + totalW,
+        startY + titleH
+    );
+
+    doc.line(
+        startX,
+        startY + titleH + cellH,
+        startX + totalW,
+        startY + titleH + cellH
+    );
+
+    /* =================================================
+       3. 내부 세로선
+       ※ 제목 행(titleH)에서는 선을 끊어
+         → 셀 병합 효과
+    ================================================= */
+    for (let i = 1; i < cols; i++) {
+        const x = startX + cellW * i;
+
+        // 헤더 + 값 영역만 세로선
+        doc.line(
+            x,
+            startY + titleH,
+            x,
+            startY + totalH
+        );
+    }
+
+    /* =================================================
+       4. 제목 텍스트 (병합 셀 중앙)
+    ================================================= */
+    const titleTextY =
+        startY +
+        titleH / 2 +
+        fontSz * 0.35;
+
+    doc.text(
+        '타 격 횟 수',
+        startX + totalW / 2,
+        titleTextY - 2,
+        { align: 'center' }
+    );
+
+    /* =================================================
+       5. 헤더 텍스트
+    ================================================= */
+    const headerTextY =
+        startY +
+        titleH +
+        cellH / 2 +
+        fontSz * 0.35;
+
+    doc.text('중단', startX + cellW * 0.5, headerTextY - 2, { align: 'center' });
+    doc.text('중단', startX + cellW * 1.5, headerTextY - 2, { align: 'center' });
+    doc.text('상단', startX + cellW * 2.5, headerTextY - 2, { align: 'center' });
+    doc.text('합계', startX + cellW * 3.5, headerTextY - 2, { align: 'center' });
+
+    /* =================================================
+       6. 다음 Y 반환
+    ================================================= */
+    return startY + totalH;
+}
+
+
 function createFileName(){
-	
 	var date = new Date; // Date 객체
 	return '파일 항타기록지_' + date.getFullYear() + '' + (date.getMonth() + 1) + '' + date.getDate() + '' + date.getHours() + '' + date.getMinutes() + '' + date.getSeconds();
-	
 }
 
 
@@ -356,8 +825,6 @@ function getBalance1082(item){
 	var intrusionDepth = Number(item.intrusionDepth);
 	var total =  totalConnectWidth - drillingDepth - sdDrillingDepth - intrusionDepth;
 	return total.toFixed(1);
-	
-	
 }
 
 function balanceFixExp1082(balance) {
@@ -392,7 +859,7 @@ function gongSacFixExp(balance, gongSac, constructionIdx){
 	}
 }
 
-function downloadDrivingRecoredBook(root, constructionIdx, machineNumber, currentDateTime){
+function downloadDrivingRecoredBook(root, constructionIdx, machineNumber, currentDateTime, option){
 	
 	if(confirm("일일 기록지를 출력하시겠습니까?")){
 		jQuery.ajax({
@@ -441,8 +908,6 @@ function downloadDrivingRecoredBook(root, constructionIdx, machineNumber, curren
 						var currentAvgPenetrationValue = item.avgPenetrationValue;
 						var currentTotalPenetrationValue = item.totalPenetrationValue;
 						
-						
-						
 						var allPiece = '';
 						var allPieceValue = 0;
 					    var piece = new Array();    //배열 선언
@@ -451,6 +916,15 @@ function downloadDrivingRecoredBook(root, constructionIdx, machineNumber, curren
 					    piece.push(item.piThree); 
 					    piece.push(item.piFour); 
 					    piece.push(item.piFive);
+					    
+					    if(item.piSix != null){
+					    	 piece.push(item.piSix);
+					    }
+					    if(item.piSeven != null){
+					    	 piece.push(item.piSeven);
+					    }
+					   
+					   // piece.push(item.piSeven);
 					    console.log(piece.length);
 					    for (var y = 0; y < piece.length; y++) {
 					    	if(piece[y].value != ''){
@@ -509,7 +983,17 @@ function downloadDrivingRecoredBook(root, constructionIdx, machineNumber, curren
 					    doc.setFontSize(20);
 					    doc.text('파일 항타기록지', pageWidth / 2, 15, {align: 'center'});
 					    doc.setFontSize(10);
-					    doc.text('시공일 : ' + currentDate.substring(0,10), pageWidth - 15 , 30, 'right');
+					    //doc.text('시공일 : ' + currentDate.substring(0,10), pageWidth - 15 , 30, 'right');
+					    doc.text(
+					    		  '시공일 : ' + (
+					    		    constructionIdx == 1508
+					    		      ? currentDate.substring(0,10).replace(/-/g, '.') + "."
+					    		      : currentDate.substring(0,10)
+					    		  ),
+					    		  pageWidth - 15,
+					    		  30,
+					    		  { align: 'right' }
+					    		);
 					    doc.setFontSize(10);
 					    doc.text(constructionName, 15, 30, {align: 'left'});
 					  //  doc.setFontType('bold');        
@@ -538,7 +1022,27 @@ function downloadDrivingRecoredBook(root, constructionIdx, machineNumber, curren
 							title: 'PDF타이틀',        
 						});
 						drawLegend(doc);
-						drawChart(root, index, item, pageWidth, pageHeight, doc, currentAvgPenetrationValue , currentTotalPenetrationValue, constructionIdx);
+						
+						if(constructionIdx == 1550){
+							//여기에 넣어줘  <--	
+						}else{
+							//그 외 모든 현장
+						}
+						
+						if(option == 'Y'){
+							drawHitCountLegend(doc, 105);
+							//금도건설 조풍건설 구형 흑연사업 토건공사
+							drawCompactChart(root, index, item, pageWidth, pageHeight, doc, currentAvgPenetrationValue , currentTotalPenetrationValue, constructionIdx);
+						}else{
+							drawChart(root, index, item, pageWidth, pageHeight, doc, currentAvgPenetrationValue , currentTotalPenetrationValue, constructionIdx);
+						}
+						
+						if(constructionIdx == 1508){
+							drawPageNumberToTopRight(doc, index)
+						}else{
+							drawPageNumber(doc, index);
+						}
+						
 						if(index < data.length - 1){
 							doc.addPage();
 						}
@@ -618,6 +1122,10 @@ function downloadDrivingAllRecoredBook(root, constructionIdx, machineNumber){
 					    piece.push(item.piThree); 
 					    piece.push(item.piFour); 
 					    piece.push(item.piFive);
+					    piece.push(item.piSix);
+					    piece.push(item.piSeven);
+					    
+					    
 					    console.log(piece.length);
 					    for (var y = 0; y < piece.length; y++) {
 					    	if(piece[y].value != ''){
@@ -653,7 +1161,17 @@ function downloadDrivingAllRecoredBook(root, constructionIdx, machineNumber){
 					    doc.setFontSize(20);
 					    doc.text('파일 항타기록지', pageWidth / 2, 15, {align: 'center'});
 					    doc.setFontSize(10);
-					    doc.text('시공일 : ' + currentDate.substring(0,10), pageWidth - 15 , 30, 'right');
+					    //doc.text('시공일 : ' + currentDate.substring(0,10), pageWidth - 15 , 30, 'right');
+					    doc.text(
+					    		  '시공일 : ' + (
+					    		    constructionIdx == 1508
+					    		      ? currentDate.substring(0,10).replace(/-/g, '.') + "."
+					    		      : currentDate.substring(0,10)
+					    		  ),
+					    		  pageWidth - 15,
+					    		  30,
+					    		  { align: 'right' }
+					    		);
 					    doc.setFontSize(10);
 					    doc.text(constructionName, 15, 30, {align: 'left'});
 					  //  doc.setFontType('bold');        
@@ -683,6 +1201,7 @@ function downloadDrivingAllRecoredBook(root, constructionIdx, machineNumber){
 						});
 						drawLegend(doc);
 						drawChart(root, index, item, pageWidth, pageHeight, doc, currentAvgPenetrationValue , currentTotalPenetrationValue, constructionIdx);
+						drawPageNumber(doc, index);
 						if(index < data.length - 1){
 							doc.addPage();
 						}

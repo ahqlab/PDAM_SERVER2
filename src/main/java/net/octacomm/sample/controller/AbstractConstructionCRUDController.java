@@ -51,12 +51,6 @@ public abstract class AbstractConstructionCRUDController<M extends CRUDMapper<D,
 	protected static final String URL_DELETE = "/delete";
 
 	protected M mapper;
-	
-	/**
-	 * 반드시 CRUDMapper 를 지정해야 한다.
-	 * @param mapper
-	 */
-	public abstract void setCRUDMapper(M mapper);
 
 	@RequestMapping(value = URL_LIST)
 	public void list(Model model, @ModelAttribute("domainParam") P param, BindingResult result, HttpSession session) {
@@ -149,6 +143,7 @@ public abstract class AbstractConstructionCRUDController<M extends CRUDMapper<D,
 	public void setSessionInfo(Model model, HttpSession session) {
 		SessionInfo sessionInfo = new SessionInfo();
 		sessionInfo.setUserId((String) session.getAttribute("userId"));
+		sessionInfo.setUserName((String) session.getAttribute("userName"));
 		sessionInfo.setRole((Integer) session.getAttribute("role"));
 		sessionInfo.setConstructionIdx((Integer) session.getAttribute("constructionIdx"));
 		sessionInfo.setHiddenManager((Boolean) session.getAttribute("isHiddenManager"));

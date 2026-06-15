@@ -1,2 +1,7 @@
-
-target/m2e-wtp/web-resources/META-INF/maven/net.octacomm.sample/web-template-mybatis/pom.properties
+target/
+.classpath
+.factorypath
+.project
+.settings/
+.vscode/
+logs/

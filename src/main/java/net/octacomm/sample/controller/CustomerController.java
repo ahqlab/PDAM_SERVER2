@@ -61,6 +61,7 @@ public class CustomerController {
 	public void setSessionInfo(Model model, HttpSession session) {
 		SessionInfo sessionInfo = new SessionInfo();
 		sessionInfo.setUserId((String) session.getAttribute("userId"));
+		sessionInfo.setUserName((String) session.getAttribute("userName"));
 		sessionInfo.setRole((Integer) session.getAttribute("role"));
 		sessionInfo.setConstructionIdx((Integer) session.getAttribute("constructionIdx"));
 		sessionInfo.setHiddenManager((Boolean) session.getAttribute("isHiddenManager"));

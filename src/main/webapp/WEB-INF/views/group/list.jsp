@@ -84,6 +84,7 @@ function checkDuplicateGroupName(){
 
 <!--컨텐츠-->
 		<div class="section-right">
+			<%@ include file="/WEB-INF/views/common/welcomeMsg.jsp" %>
 			<div class="TopContArea">
 				<div class="titArea">
 					<p class="h1Tit">시공사 리스트</p>

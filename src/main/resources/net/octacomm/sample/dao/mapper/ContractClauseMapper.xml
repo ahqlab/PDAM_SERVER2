@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.octacomm.sample.dao.mapper.ContractClauseMapper">
+
+	<insert id="insert" parameterType="net.octacomm.sample.domain.ContractClause" useGeneratedKeys="true" keyProperty="clauseIdx">
+		INSERT INTO TB_CONTRACT_CLAUSE
+		(CONTRACT_TYPE, CLAUSE_NO, CLAUSE_TITLE, CLAUSE_CONTENT, IS_ACTIVE, SORT_ORDER, CREATED_AT)
+		VALUES
+		(#{contractType}, #{clauseNo}, #{clauseTitle}, #{clauseContent}, 1, #{sortOrder}, NOW())
+	</insert>
+
+	<select id="get" resultType="net.octacomm.sample.domain.ContractClause">
+		SELECT
+			CLAUSE_IDX, CONTRACT_TYPE, CLAUSE_NO, CLAUSE_TITLE, CLAUSE_CONTENT,
+			IS_ACTIVE, SORT_ORDER,
+			date_format(CREATED_AT, '%Y-%m-%d') as CREATED_AT,
+			date_format(UPDATED_AT, '%Y-%m-%d') as UPDATED_AT
+		FROM TB_CONTRACT_CLAUSE
+		WHERE CLAUSE_IDX = #{clauseIdx}
+	</select>
+
+	<update id="update" parameterType="net.octacomm.sample.domain.ContractClause">
+		UPDATE TB_CONTRACT_CLAUSE
+		SET CONTRACT_TYPE  = #{contractType},
+		    CLAUSE_NO      = #{clauseNo},
+		    CLAUSE_TITLE   = #{clauseTitle},
+		    CLAUSE_CONTENT = #{clauseContent},
+		    SORT_ORDER     = #{sortOrder},
+		    IS_ACTIVE      = #{isActive},
+		    UPDATED_AT     = NOW()
+		WHERE CLAUSE_IDX = #{clauseIdx}
+	</update>
+
+	<update id="delete">
+		UPDATE TB_CONTRACT_CLAUSE SET IS_ACTIVE = 0, UPDATED_AT = NOW() WHERE CLAUSE_IDX = #{clauseIdx}
+	</update>
+
+	<select id="getList" resultType="net.octacomm.sample.domain.ContractClause">
+		SELECT
+			CLAUSE_IDX, CONTRACT_TYPE, CLAUSE_NO, CLAUSE_TITLE, CLAUSE_CONTENT,
+			IS_ACTIVE, SORT_ORDER,
+			date_format(CREATED_AT, '%Y-%m-%d') as CREATED_AT
+		FROM TB_CONTRACT_CLAUSE
+		WHERE IS_ACTIVE = 1
+		ORDER BY CONTRACT_TYPE, SORT_ORDER ASC, CLAUSE_NO ASC
+	</select>
+
+	<select id="getListByContractType" resultType="net.octacomm.sample.domain.ContractClause">
+		SELECT
+			CLAUSE_IDX, CONTRACT_TYPE, CLAUSE_NO, CLAUSE_TITLE, CLAUSE_CONTENT,
+			IS_ACTIVE, SORT_ORDER,
+			date_format(CREATED_AT, '%Y-%m-%d') as CREATED_AT
+		FROM TB_CONTRACT_CLAUSE
+		WHERE IS_ACTIVE = 1 AND CONTRACT_TYPE = #{contractType}
+		ORDER BY SORT_ORDER ASC, CLAUSE_NO ASC
+	</select>
+
+	<select id="getListByContractIdx" resultType="net.octacomm.sample.domain.ContractClause">
+		SELECT
+			C.CLAUSE_IDX, C.CONTRACT_TYPE, C.CLAUSE_NO, C.CLAUSE_TITLE, C.CLAUSE_CONTENT,
+			C.IS_ACTIVE, C.SORT_ORDER
+		FROM TB_CONTRACT_CLAUSE C
+		INNER JOIN TB_CONTRACT_CLAUSE_CONFIRM CC ON C.CLAUSE_IDX = CC.CLAUSE_IDX
+		WHERE CC.CONTRACT_IDX = #{contractIdx}
+		ORDER BY C.SORT_ORDER ASC, C.CLAUSE_NO ASC
+	</select>
+
+	<select id="getCount" resultType="_int">
+		SELECT COUNT(*) FROM TB_CONTRACT_CLAUSE WHERE IS_ACTIVE = 1
+	</select>
+
+</mapper>

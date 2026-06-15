@@ -362,7 +362,7 @@ public class ReportAllController{
 		if(role == 0) {
 			//슈퍼관리자
 			signRoomList = excelSignroomMapper.getFindByConstructionIdxAndOrderBy(param.getConstructionIdx());
-			constructionName = constructionMapper.getFullName(param.getConstructionIdx(),role).getName();
+			constructionName = constructionMapper.getFullNameByConstruction(param.getConstructionIdx(),role).getName();
 			constructionIdx = param.getConstructionIdx();
 			if(constructionIdx == 815) {
 				constructionName = constructionName.replaceAll("두산에너빌리티 선일산업", "").trim();
@@ -371,7 +371,7 @@ public class ReportAllController{
 			//일반협력사
 			constructionIdx = (int) session.getAttribute("constructionIdx");
 			signRoomList = excelSignroomMapper.getFindByConstructionIdxAndOrderBy(constructionIdx);
-			constructionName = constructionMapper.getFullName(constructionIdx, role).getName();
+			constructionName = constructionMapper.getFullNameByConstruction(constructionIdx, role).getName();
 			if(constructionIdx == 815) {
 				constructionName = constructionName.replaceAll("두산에너빌리티 선일산업", "").trim();
 			}
@@ -379,7 +379,7 @@ public class ReportAllController{
 			//시공사
 			constructionIdx = param.getConstructionIdx();
 			signRoomList = excelSignroomMapper.getFindByConstructionIdxAndOrderBy(param.getConstructionIdx());
-			constructionName = constructionMapper.getFullName(param.getConstructionIdx(),role).getName();
+			constructionName = constructionMapper.getFullNameByConstruction(param.getConstructionIdx(),role).getName();
 			if(constructionIdx == 815) {
 				constructionName = constructionName.replaceAll("두산에너빌리티 선일산업", "").trim();
 			}
@@ -387,7 +387,7 @@ public class ReportAllController{
 			//가맹점
 			constructionIdx = param.getConstructionIdx();
 			signRoomList = excelSignroomMapper.getFindByConstructionIdxAndOrderBy(param.getConstructionIdx());
-			constructionName = constructionMapper.getFullName(param.getConstructionIdx(),role).getName();
+			constructionName = constructionMapper.getFullNameByConstruction(param.getConstructionIdx(),role).getName();
 			if(constructionIdx == 815) {
 				constructionName = constructionName.replaceAll("두산에너빌리티 선일산업", "").trim();
 			}
@@ -509,7 +509,7 @@ public class ReportAllController{
 			//슈퍼관리자
 			constructionIdx = param.getConstructionIdx();
 			signRoomList = excelSignroomMapper.getFindByConstructionIdxAndOrderBy(param.getConstructionIdx());
-			constructionName = constructionMapper.getFullName(param.getConstructionIdx(),role).getName();
+			constructionName = constructionMapper.getFullNameByConstruction(param.getConstructionIdx(),role).getName();
 			if(param.getConstructionIdx() == 815) {
 				constructionName = constructionName.replaceAll("두산에너빌리티 선일산업", "").trim();
 			}
@@ -517,7 +517,7 @@ public class ReportAllController{
 			//일반협력사
 			constructionIdx = (int) session.getAttribute("constructionIdx");
 			signRoomList = excelSignroomMapper.getFindByConstructionIdxAndOrderBy(constructionIdx);
-			constructionName = constructionMapper.getFullName(constructionIdx ,role).getName();
+			constructionName = constructionMapper.getFullNameByConstruction(constructionIdx ,role).getName();
 			if(constructionIdx == 815) {
 				constructionName = constructionName.replaceAll("두산에너빌리티 선일산업", "").trim();
 			}
@@ -525,7 +525,7 @@ public class ReportAllController{
 			//시공사
 			constructionIdx = param.getConstructionIdx();
 			signRoomList = excelSignroomMapper.getFindByConstructionIdxAndOrderBy(param.getConstructionIdx());
-			constructionName = constructionMapper.getFullName(param.getConstructionIdx() ,role).getName();
+			constructionName = constructionMapper.getFullNameByConstruction(param.getConstructionIdx() ,role).getName();
 			if(param.getConstructionIdx() == 815) {
 				constructionName = constructionName.replaceAll("두산에너빌리티 선일산업", "").trim();
 			}
@@ -533,7 +533,7 @@ public class ReportAllController{
 			//가맹점
 			constructionIdx = param.getConstructionIdx();
 			signRoomList = excelSignroomMapper.getFindByConstructionIdxAndOrderBy(param.getConstructionIdx());
-			constructionName = constructionMapper.getFullName(param.getConstructionIdx() ,role).getName();
+			constructionName = constructionMapper.getFullNameByConstruction(param.getConstructionIdx() ,role).getName();
 			if(param.getConstructionIdx() == 815) {
 				constructionName = constructionName.replaceAll("두산에너빌리티 선일산업", "").trim();
 			}
@@ -867,6 +867,7 @@ public class ReportAllController{
 	public void setSessionInfo(Model model, HttpSession session) {
 		SessionInfo sessionInfo = new SessionInfo();
 		sessionInfo.setUserId((String) session.getAttribute("userId"));
+		sessionInfo.setUserName((String) session.getAttribute("userName"));
 		sessionInfo.setRole((Integer) session.getAttribute("role"));
 		sessionInfo.setConstructionIdx((Integer) session.getAttribute("constructionIdx"));
 		sessionInfo.setHiddenManager((Boolean) session.getAttribute("isHiddenManager"));

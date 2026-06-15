@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.octacomm.sample.dao.mapper.ContractSignBackupMapper">
+
+	<insert id="insertBackup">
+		INSERT INTO TB_CONTRACT_SIGN_BACKUP
+		    (CONTRACT_IDX, BUYER_SIGNATURE, CONTRACT_PDF, SIGNED_AT, BACKUP_AT, BACKUP_BY)
+		VALUES
+		    (#{contractIdx}, #{buyerSignature}, #{contractPdf}, #{signedAt}, NOW(), #{backupBy})
+	</insert>
+
+</mapper>

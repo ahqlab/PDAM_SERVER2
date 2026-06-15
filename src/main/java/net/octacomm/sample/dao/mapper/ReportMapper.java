@@ -88,13 +88,22 @@ public interface ReportMapper extends CRUDMapper<Report, ReportParam, Integer> {
 			@Param("pageSize") int pageSize,
 			@Param("param") ReportParam param);
 	
+	List<ReportOneLine> getReportOneLineExtensivePileUsageListByParam(
+			@Param("startRow") int startRow,
+			@Param("pageSize") int pageSize,
+			@Param("param") ReportParam param);
+	
 	
 	
 	List<Report> getListByParamExcel(@Param("param") ReportParam param);
 	
 	List<ReportOneLine> getListByParamExcelAll(@Param("param") ReportParam param);
 	
+	List<ReportOneLine> getListByParamExtensivePileUsageExcelAll(@Param("param") ReportParam param); //처리완
+	
 	List<ReportOneLine> getListByParamExcelAllBig(@Param("param") ReportParam param);
+	
+	List<ReportOneLine> getListByParamExtensivePileUsageExcelAllBig(@Param("param") ReportParam param); //처리완
 	
 	@Override
 	int getCountByParam(@Param("param") ReportParam param);
@@ -193,7 +202,7 @@ public interface ReportMapper extends CRUDMapper<Report, ReportParam, Integer> {
 	int isOriginBigAllReports(@Param("constructionIdx") int constructionIdx);
 	
 	
-	int isBigAllReports(@Param("param") ReportParam param);
+	int isBigAllReports(@Param("param") ReportParam param, @Param("constructionIdx") int constructionIdx);
 	
 	@Select("SELECT COUNT(*) FROM TB_REPORT WHERE deviceIdx = #{deviceIdx} AND location =  #{location} AND pileNo = #{pileNo} AND isDel = 0 ")
 	int isDuplication(Report report2);
@@ -224,12 +233,19 @@ public interface ReportMapper extends CRUDMapper<Report, ReportParam, Integer> {
 	List<Report> getDuplicationRepotsAllReport(UpdateReport rp);
 
 	List<ReportOneLine> getTodayListByPdf(@Param("constructionIdx") int constructionIdx, @Param("machineNumber") String machineNumber, @Param("currentDateTime") String currentDateTime);
+	List<ReportOneLine> getTodayListByPdfExtensivePileUsage(@Param("constructionIdx") int constructionIdx, @Param("machineNumber") String machineNumber, @Param("currentDateTime") String currentDateTime);
 
 	List<ReportOneLine> getMachineListByPdf(@Param("constructionIdx") int constructionIdx, @Param("machineNumber") String machineNumber);
+	
+	List<ReportOneLine> getMachineListByPdfExtensivePileUsage(@Param("constructionIdx") int constructionIdx, @Param("machineNumber") String machineNumber);
 
 	List<ReportOneLine> getListByParamExcelTen(@Param("param") ReportParam param);
 	
+	List<ReportOneLine> getListByParamExtensivePileUsageExcelTen(@Param("param") ReportParam param); //처리완
+	
 	List<ReportOneLine> getListByParamExcelFive(@Param("param") ReportParam param);
+	
+	List<ReportOneLine> getListByParamExtensivePileUsageExcelFive(@Param("param") ReportParam param); //처리완
 	
 	@Select("SELECT count(*) as ng_quantity  FROM TB_REPORT WHERE deviceIdx IN (SELECT id FROM TB_DEVICE WHERE constructionIdx = #{constructionIdx} ) AND bigo like '%ng%' AND isDel = 0  ")
 	int getNgQuantity(@Param("constructionIdx") int constructionIdx);
@@ -246,5 +262,8 @@ public interface ReportMapper extends CRUDMapper<Report, ReportParam, Integer> {
 			@Param("startRow") int startRow,
 			@Param("pageSize") int pageSize,
 			@Param("param") ReportParam param);
+
+	@Select("SELECT constructionIdx FROM TB_DEVICE WHERE ID =  (SELECT deviceIdx FROM TB_REPORT WHERE ID = #{reportIdx})")
+	int getConstructionIdx(@Param("reportIdx") int reportIdx);
 
 }

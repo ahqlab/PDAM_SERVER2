@@ -114,8 +114,8 @@
 		      AND TB_DEVICE.constructionIdx  = TB_CONSTRUCTION.id
 		      AND TB_DEVICE.ID = TB_REPORT.deviceIdx
 		      AND TB_REPORT.id = TB_PIECE.reportIdx
-		      AND TB_REPORT.pileType like '%${pileType}%'
-		      AND TB_REPORT.pileStandard like '%${pileStandard}%'
+			  AND TB_REPORT.pileType     REGEXP '[[:&lt;:]]${pileType}[[:&gt;:]]'
+			  AND TB_REPORT.pileStandard REGEXP '[[:&lt;:]]${pileStandard}[[:&gt;:]]'
 		      AND TB_PIECE.name = #{name}
 		      AND TB_REPORT.isDel = 0 
  			  AND TB_DEVICE.isDel = 0 

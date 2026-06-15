@@ -49,6 +49,12 @@ public class Construction implements Domain{
 	private int originDataYn;
 	//파일 항타기록지 PDF 노출 여부
 	private int showPdfYn;
+	//이용요금 미납으로 인한 접속 차단 여부
+	private int blockedYn;
+	//등록된 계약서 건수
+	private int contractCount;
+	//계약 관리 대상 여부 (TB_CONTRACT_CONFIG.APPLY_FROM_DATE 이후 등록)
+	private int contractRequired;
 	//MOU 체결한 빔파트너스 의 관리여부
 	//private int vimManaged;
 

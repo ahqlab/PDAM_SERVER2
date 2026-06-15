@@ -16,7 +16,6 @@ import net.octacomm.sample.domain.InputPersonStatusParam;
 public class InputPersonStartusController extends AbstractIpsCRUDController<InputPersonStatusMapper, InputPersonStatus, InputPersonStatusParam, Integer>{
 
 	@Autowired
-	@Override
 	public void setCRUDMapper(InputPersonStatusMapper mapper) {
 		this.mapper = mapper;
 	}

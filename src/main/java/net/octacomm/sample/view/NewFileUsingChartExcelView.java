@@ -136,6 +136,12 @@ public class NewFileUsingChartExcelView extends AbstractExcelView {
 			//System.err.println("삭제대상 : " + deleteTarget.get(i).toString());
 			sheet.setColumnHidden(Integer.parseInt(deleteTarget.get(i).toString()), true);
 		}
+		
+		
+		//첫줄 타이틀
+		setExcelTitleLayoutSetting(sheet, workbook, construction, pileName);
+		
+		
 	}
 
 	private void setExcelValueSetting(HSSFSheet sheet, HSSFWorkbook workbook, List<FileInventoryOfChart> fileInventoryChartList, CellStyle cellStyle) {
@@ -788,8 +794,8 @@ public class NewFileUsingChartExcelView extends AbstractExcelView {
 
 	}
 
-	private void setExcelTitleLayoutSetting(HSSFSheet sheet, HSSFWorkbook workbook, Construction construction,
-			String pileName) {
+	private void setExcelTitleLayoutSetting(HSSFSheet sheet, HSSFWorkbook workbook, Construction construction, String pileName) {
+		
 		createExcelTitle(sheet, workbook, construction, pileName);
 		
 		if(isPhc) {
@@ -798,15 +804,6 @@ public class NewFileUsingChartExcelView extends AbstractExcelView {
 			sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, (52 + 12)));
 		}
 
-		//if (isPhc) {
-		//	sheet.addMergedRegion(new CellRangeAddress(0, 0, 4, 15));
-		//	sheet.addMergedRegion(new CellRangeAddress(0, 0, 16, 27));
-		//	sheet.addMergedRegion(new CellRangeAddress(0, 0, 28, 52));
-		//} else {
-		//	sheet.addMergedRegion(new CellRangeAddress(0, 0, 4, 15 + 3));
-		//	sheet.addMergedRegion(new CellRangeAddress(0, 0, 16 + 3, 27 + 3));
-		//	sheet.addMergedRegion(new CellRangeAddress(0, 0, 28 + 3, (52 + 12)));
-		//}
 
 	}
 

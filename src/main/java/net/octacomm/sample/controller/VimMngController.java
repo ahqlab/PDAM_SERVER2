@@ -19,7 +19,6 @@ import net.octacomm.sample.domain.ConstructionParam;
 public class VimMngController extends AbstractVImMngCRUDController<ConstructionMapper, Construction, ConstructionParam, Integer>{
 
 	@Autowired
-	@Override
 	public void setCRUDMapper(ConstructionMapper mapper) {
 		this.mapper = mapper;
 	}

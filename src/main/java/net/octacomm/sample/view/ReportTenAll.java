@@ -49,6 +49,7 @@ public class ReportTenAll extends AbstractExcelView
   private ReportParam param; 
   private List<ExcelSignroom> signRoomList;
   private String constructionName;
+  private int extensivePileUsage;
   
   
   protected void buildExcelDocument(Map<String, Object> model, HSSFWorkbook workbook, HttpServletRequest req, HttpServletResponse res)
@@ -71,6 +72,7 @@ public class ReportTenAll extends AbstractExcelView
     param = (ReportParam) model.get("param");
     signRoomList = (List<ExcelSignroom>) model.get("signRoomList");
     constructionName = (String) model.get("constructionName");
+    extensivePileUsage = (int) model.get("extensivePileUsage");
     
     
     
@@ -454,7 +456,7 @@ public class ReportTenAll extends AbstractExcelView
     	  
     	  strings = new String[]{ String.valueOf(i + 1), 
     		        //(role == 0 ? ((ReportOneLine)reportList.get(i)).getCreateDate() : ((ReportOneLine)reportList.get(i)).getCurrentDateTime()), 
-    			    setDinamicDate(role, isHiddenManager, longCalYn, ((ReportOneLine)reportList.get(i)).getCurrentDateTime(), ((ReportOneLine)reportList.get(i)).getCreateDate()),  
+    			    setDinamicDate(role, isHiddenManager, longCalYn, chanegeCurrentDate(((ReportOneLine)reportList.get(i)).getCurrentDateTime()), ((ReportOneLine)reportList.get(i)).getCreateDate()),  
     			    ((ReportOneLine)reportList.get(i)).getMachineNumber(), 
     		        ((ReportOneLine)reportList.get(i)).getPileType(), 
     		        ((ReportOneLine)reportList.get(i)).getMethod(), 
@@ -511,7 +513,7 @@ public class ReportTenAll extends AbstractExcelView
     	  
     	  strings = new String[]{ String.valueOf(i + 1), 
     		        //(role == 0 ? ((ReportOneLine)reportList.get(i)).getCreateDate() : ((ReportOneLine)reportList.get(i)).getCurrentDateTime()), 
-    		        setDinamicDate(role, isHiddenManager, longCalYn, ((ReportOneLine)reportList.get(i)).getCurrentDateTime(), ((ReportOneLine)reportList.get(i)).getCreateDate()),
+    		        setDinamicDate(role, isHiddenManager, longCalYn, chanegeCurrentDate(((ReportOneLine)reportList.get(i)).getCurrentDateTime()), ((ReportOneLine)reportList.get(i)).getCreateDate()),
     		        ((ReportOneLine)reportList.get(i)).getMachineNumber(), 
     		        ((ReportOneLine)reportList.get(i)).getPileType(), 
     		        ((ReportOneLine)reportList.get(i)).getMethod(), 
@@ -1136,5 +1138,12 @@ public class ReportTenAll extends AbstractExcelView
 		  return currentDateTime;
 	  }
   }
+  
+	private String chanegeCurrentDate(String currentDateTime) {
+		if(constructionIdx == 1508) {
+			return currentDateTime.replaceAll("-", ".") + ".";
+		}
+		return currentDateTime;
+	}
  
 }

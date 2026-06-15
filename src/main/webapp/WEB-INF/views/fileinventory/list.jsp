@@ -342,7 +342,7 @@ function checkValidation(){
 </script>
 <!--컨텐츠-->
 		<div class="section-right">
-
+			<%@ include file="/WEB-INF/views/common/welcomeMsg.jsp" %>
 			<div class="TopContArea">
 				<div class="titArea mb-40">
 					<p class="h1Tit">파일반입 및 수정</p>
@@ -526,7 +526,7 @@ function checkValidation(){
 		<!--//컨텐츠-->
 
 		<!--정보 변경 팝업-->
-		<form:form commandName="domain"  action="${pageContext.request.contextPath}/fileinventory/regist" method="POST" id="regForm">
+		<form:form commandName="domain"  action="${pageContext.request.contextPath}/fileinventory/regist2" method="POST" id="regForm">
 		
 			<div class="popUp w70">
 				<div class="popTit">
@@ -602,6 +602,7 @@ function checkValidation(){
 												<form:option value="PHC">PHC</form:option>
 												<form:option value="STEEL">STEEL</form:option>
 												<form:option value="UHC">UHC</form:option>
+												<form:option value="UPHC">UPHC</form:option>
 											</form:select>
 											</th>
 											<th>5m</th>

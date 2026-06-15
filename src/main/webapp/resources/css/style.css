@@ -4,7 +4,7 @@
 @font-face{
 	font-family:'nanum';
 	src:url('../include/NanumGothic.eot');
-	src:local(��), 
+	src:local(占쏙옙), 
 		url('../include/NanumGothic.woff') format('woff')
 }
 
@@ -769,3 +769,5 @@ button:focus {
     
     font-family: 'Noto Sans KR', sans-serif;
 }
+
+

@@ -67,7 +67,7 @@ public class ApiController {
 	@ResponseBody
 	@RequestMapping(value = "/get/report/list", method = RequestMethod.POST)
 	public List<ApiReport> getReportList(AuthCode authCode) {
-		AuthCode ad = authCodeMapper.getAuthCode(authCode);
+		AuthCode ad = authCodeMapper.getAuthCodeByCode(authCode);
 		if(ad != null) {
 			List<ApiReport> report = reportMapper.getApiReport();
 			return report;

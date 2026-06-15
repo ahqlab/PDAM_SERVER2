@@ -48,14 +48,9 @@ public abstract class AbstractFileInventoryCRUDController<M extends CRUDMapper<D
 	protected static final String URL_DELETE = "/delete";
 
 	protected M mapper;
-	/**
-	 * 반드시 CRUDMapper 를 지정해야 한다.
-	 * @param mapper
-	 */
-	public abstract void setCRUDMapper(M mapper);
 
 	@RequestMapping(value = URL_LIST)
-	public void list(Model model, @ModelAttribute("domainParam") P param, BindingResult result, HttpSession session) {
+	public String list(Model model, @ModelAttribute("domainParam") P param, BindingResult result, HttpSession session) {
 	
 		logger.debug("Search Param : {}", param);
 		
@@ -82,6 +77,11 @@ public abstract class AbstractFileInventoryCRUDController<M extends CRUDMapper<D
 		
 		model.addAttribute("page", page);		
 		model.addAttribute("domainList", domainList);
+		
+		if((int) session.getAttribute("constructionIdx") == 1308) {
+			return "fileinventory/listJeil";
+		}
+		return "fileinventory/list";
 	}
 
 	@RequestMapping(value = URL_REGIST, method = RequestMethod.GET)
@@ -136,6 +136,7 @@ public abstract class AbstractFileInventoryCRUDController<M extends CRUDMapper<D
 	public void setSessionInfo(Model model, HttpSession session) {
 		SessionInfo sessionInfo = new SessionInfo();
 		sessionInfo.setUserId((String) session.getAttribute("userId"));
+		sessionInfo.setUserName((String) session.getAttribute("userName"));
 		sessionInfo.setRole((Integer) session.getAttribute("role"));
 		sessionInfo.setConstructionIdx((Integer) session.getAttribute("constructionIdx"));
 		sessionInfo.setHiddenManager((Boolean) session.getAttribute("isHiddenManager"));

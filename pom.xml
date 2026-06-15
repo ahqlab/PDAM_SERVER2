@@ -39,9 +39,12 @@
 		<!-- Java Network Framework -->
 		<jboss.netty.version>3.2.9.Final</jboss.netty.version>
 		
-		<lombok.version>1.12.4</lombok.version>
+		<lombok.version>1.18.30</lombok.version>
 		<poi.version>4.0.0</poi.version>
 		<javax.mail.version>1.4.7</javax.mail.version>
+
+		<!-- 로컬 배포 경로 (개인 PC의 ~/.m2/settings.xml 프로필에서 덮어쓰기 가능) -->
+		<war.output.dir>${project.build.directory}</war.output.dir>
 	</properties>
 	
 	<dependencies>
@@ -318,15 +321,42 @@
 		    <artifactId>commons-io</artifactId>
 		    <version>2.5</version>
 		</dependency>
-			
+		
+		<dependency>
+		    <groupId>com.google.zxing</groupId>
+		    <artifactId>core</artifactId>
+		    <version>3.5.3</version>
+		</dependency>
+		<dependency>
+		    <groupId>com.google.zxing</groupId>
+		    <artifactId>javase</artifactId>
+		    <version>3.5.3</version>
+		</dependency>
+
+		<!-- PDF Generation -->
+		<dependency>
+		    <groupId>com.openhtmltopdf</groupId>
+		    <artifactId>openhtmltopdf-pdfbox</artifactId>
+		    <version>1.0.10</version>
+		</dependency>
+
 	</dependencies>
 	
 	<build>
+		<finalName>pdam</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<outputDirectory>${war.output.dir}</outputDirectory>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.5.1</version>
+				<version>3.11.0</version>
 				<configuration>
 					<source>${java-version}</source>
 					<target>${java-version}</target>

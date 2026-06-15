@@ -35,7 +35,152 @@
     	<include refid="condition"/>
     </select>
    	
-     <select id="getCountByParamForSamsung" resultType="_int">
+   <select id="getCountByParamForSamsung" resultType="_int">
+    SELECT 
+        COUNT(*)
+    FROM (
+    SELECT  
+            AA.zone
+            , AA.machineNumber
+            , BB.dis_count as totalCountByZone
+            , IFNULL(CC.dis_count, 0) as countByZone
+            , IFNULL(DD.dis_count, 0) as todayCnt
+            , IFNULL(EE.dis_count, 0) as yesterdayCnt
+            , AA.id
+            , AA.lavelNo 
+            , AA.name
+            , AA.constructionIdx
+            , AA.bluetoothNo
+            , AA.tabletNo
+            , AA.password 
+            , AA.weContact
+            , AA.tabletManager
+            , AA.conduct
+            , AA.startDate
+            , AA.endDate
+    FROM (
+        SELECT
+                getZoneNameForSamsung3(TRIM(A.pileNo), B.id) as zone,
+                B.machineNumber, 
+                B.id, 
+                B.lavelNo, 
+                C.name,
+                B.constructionIdx, 
+                B.bluetoothNo, 
+                B.tabletNo, 
+                B.password , 
+                B.weContact ,
+                B.tabletManager ,
+                B.conduct ,
+                date_format(B.startDate, '%Y-%m-%d') as startDate , 
+                date_format(B.endDate, '%Y-%m-%d') as endDate
+            from TB_REPORT A, TB_DEVICE B, TB_CONSTRUCTION C
+            where 1=1
+            AND A.deviceIdx = B.id
+            and B.constructionIdx  = C.id
+            AND B.isDel = 0
+            AND A.isDel = 0
+            AND A.deviceIdx in (SELECT id FROM TB_DEVICE WHERE constructionIdx = ${param.constructionIdx}  AND isDel = 0)
+            GROUP BY zone, machineNumber, id, lavelNo, C.name,B.constructionIdx, 
+                B.bluetoothNo, 
+                B.tabletNo, 
+                B.password , 
+                B.weContact ,
+                B.tabletManager ,
+                B.conduct, 
+                date_format(B.startDate, '%Y-%m-%d'),
+                date_format(B.endDate, '%Y-%m-%d')) AA 
+            LEFT OUTER JOIN 
+                (select 
+                 getZoneNameForSamsung3(TRIM(p.pileNo), p.deviceIdx) as zone 
+                 , count(distinct p.deviceIdx, p.location, p.pileNo) as dis_count 
+               from TB_REPORT p
+              where p.deviceIdx in (SELECT dvs.id FROM TB_DEVICE dvs WHERE dvs.constructionIdx = ${param.constructionIdx})
+                and p.isDel = 0
+                group by zone) BB 
+            ON AA.ZONE = BB.ZONE
+            LEFT OUTER JOIN 
+                (  select 
+                 getZoneNameForSamsung3(TRIM(p.pileNo), p.deviceIdx) as zone 
+                 , p.deviceIdx
+                 , count(distinct p.deviceIdx, p.location, p.pileNo) as dis_count 
+               from TB_REPORT p
+              where p.deviceIdx in (SELECT dvs.id FROM TB_DEVICE dvs WHERE dvs.constructionIdx = ${param.constructionIdx})
+                and p.isDel = 0
+                group by zone, deviceIdx) CC
+           ON AA.ZONE = CC.ZONE and  AA.id = CC.deviceIdx 
+            LEFT OUTER JOIN 
+                (  select 
+                 getZoneNameForSamsung3(TRIM(p.pileNo), p.deviceIdx) as zone 
+                 , p.deviceIdx
+                 , count(distinct p.deviceIdx, p.location, p.pileNo) as dis_count 
+               from TB_REPORT p
+              where p.deviceIdx in (SELECT dvs.id FROM TB_DEVICE dvs WHERE dvs.constructionIdx = ${param.constructionIdx})
+                and p.isDel = 0
+                and p.currentDateTime = DATE_FORMAT(NOW() , '%Y-%m-%d')
+                group by zone, deviceIdx) DD
+           ON AA.ZONE = DD.ZONE and  AA.id = DD.deviceIdx 
+           LEFT OUTER JOIN 
+                (  select 
+                 getZoneNameForSamsung3(TRIM(p.pileNo), p.deviceIdx) as zone 
+                 , p.deviceIdx
+                 , count(distinct p.deviceIdx, p.location, p.pileNo) as dis_count 
+               from TB_REPORT p
+              where p.deviceIdx in (SELECT dvs.id FROM TB_DEVICE dvs WHERE dvs.constructionIdx = ${param.constructionIdx})
+                and p.isDel = 0
+                and p.currentDateTime = DATE_FORMAT(date_add(NOW(), interval -1 day) , '%Y-%m-%d')
+                group by zone, deviceIdx) EE
+           ON AA.ZONE = EE.ZONE and  AA.id = EE.deviceIdx 
+        WHERE 1=1
+        union ALL
+        SELECT
+               CASE WHEN A.id IN (3046, 3047) THEN 'CDC외' ELSE '' END AS zone  -- 여기 수정
+                , A.machineNumber
+                , IFNULL((
+			        SELECT count(distinct p.deviceIdx, p.location, p.pileNo)
+			        FROM TB_REPORT p
+			        WHERE p.deviceIdx IN (SELECT dvs.id FROM TB_DEVICE dvs WHERE dvs.constructionIdx = ${param.constructionIdx})
+			          AND p.isDel = 0
+			          AND getZoneNameForSamsung3(TRIM(p.pileNo), p.deviceIdx) = 
+			              CASE WHEN A.id IN (3046, 3047) THEN 'CDC외' ELSE '' END
+			    ), 0) AS totalCountByZone
+                , 0 AS countByZone
+                , 0 AS todayCnt
+                , 0 AS yesterdayCnt
+                , A.id
+                , A.lavelNo
+                , B.name
+                , A.constructionIdx
+                , A.bluetoothNo
+                , A.tabletNo
+                , A.password 
+                , A.weContact
+                , A.tabletManager
+                , A.conduct
+                , date_format(A.startDate, '%Y-%m-%d') as startDate 
+                , date_format(A.endDate, '%Y-%m-%d') as endDate
+                from TB_DEVICE A, TB_CONSTRUCTION B 
+                where A.machineNumber not in (
+                    select machineNumber from 
+                    (
+                    SELECT
+                        getZoneNameForSamsung3(TRIM(A.pileNo), B.id) as zone,
+                        B.machineNumber
+                    from TB_REPORT A, TB_DEVICE B, TB_CONSTRUCTION C
+                    where 1=1
+                    AND A.deviceIdx = B.id
+                    and B.constructionIdx  = C.id
+                    AND B.isDel = 0
+                    AND A.deviceIdx in (SELECT id FROM TB_DEVICE WHERE constructionIdx = ${param.constructionIdx}  AND isDel = 0)
+                    GROUP BY zone, machineNumber) ASD)
+                AND A.isDel = 0
+                AND A.constructionIdx  = B.id
+                AND A.constructionIdx = ${param.constructionIdx}) AAA
+           <include refid="conditionForSamsung"/> 
+		</select>
+
+   	
+     <!-- <select id="getCountByParamForSamsung" resultType="_int">
         SELECT 
 			COUNT(*)
 		FROM (
@@ -170,7 +315,7 @@
 						AND A.constructionIdx  = B.id
 						AND A.constructionIdx = ${param.constructionIdx}) AAA
 		       <include refid="conditionForSamsung"/> 
-    </select>
+    </select> -->
    	
    	
     <select id="getListByParam" resultType="Device">
@@ -199,7 +344,147 @@
         LIMIT #{pageSize} OFFSET #{startRow}
     </select>   
     
-   <select id="getListByParamForSamsung" resultType="Device">
+    <select id="getListByParamForSamsung" resultType="Device">
+    	SELECT 
+		    AAA.zone, AAA.machineNumber, AAA.totalCountByZone,
+		    AAA.countByZone, AAA.todayCnt, AAA.yesterdayCnt,
+		    AAA.id, AAA.lavelNo, AAA.name, AAA.constructionIdx,
+		    AAA.bluetoothNo, AAA.tabletNo, AAA.password,
+		    AAA.weContact, AAA.tabletManager, AAA.conduct,
+		    AAA.startDate, AAA.endDate
+		FROM (
+		    SELECT  
+		        AA.zone, AA.machineNumber,
+		        BB.dis_count as totalCountByZone,
+		        IFNULL(CC.dis_count, 0) as countByZone,
+		        IFNULL(DD.dis_count, 0) as todayCnt,
+		        IFNULL(EE.dis_count, 0) as yesterdayCnt,
+		        AA.id, AA.lavelNo, AA.name, AA.constructionIdx,
+		        AA.bluetoothNo, AA.tabletNo, AA.password,
+		        AA.weContact, AA.tabletManager, AA.conduct,
+		        AA.startDate, AA.endDate
+		    FROM (
+		        SELECT
+		            getZoneNameForSamsung3(TRIM(A.pileNo), B.id) as zone,
+		            B.machineNumber, B.id, B.lavelNo, C.name,
+		            B.constructionIdx, B.bluetoothNo, B.tabletNo,
+		            B.password, B.weContact, B.tabletManager, B.conduct,
+		            date_format(B.startDate, '%Y-%m-%d') as startDate,
+		            date_format(B.endDate, '%Y-%m-%d') as endDate
+		        FROM TB_REPORT A, TB_DEVICE B, TB_CONSTRUCTION C
+		        WHERE A.deviceIdx = B.id
+		          AND B.constructionIdx = C.id
+		          AND B.isDel = 0
+		          AND A.isDel = 0
+		          AND A.deviceIdx IN (SELECT id FROM TB_DEVICE WHERE constructionIdx = ${param.constructionIdx} AND isDel = 0)
+		        GROUP BY zone, machineNumber, id, lavelNo, C.name, B.constructionIdx,
+		            B.bluetoothNo, B.tabletNo, B.password, B.weContact,
+		            B.tabletManager, B.conduct,
+		            date_format(B.startDate, '%Y-%m-%d'),
+		            date_format(B.endDate, '%Y-%m-%d')
+		    ) AA
+		    LEFT OUTER JOIN (
+		        SELECT
+		            getZoneNameForSamsung3(TRIM(p.pileNo), p.deviceIdx) as zone,
+		            count(distinct p.deviceIdx, p.location, p.pileNo) as dis_count
+		        FROM TB_REPORT p
+		        WHERE p.deviceIdx IN (SELECT dvs.id FROM TB_DEVICE dvs WHERE dvs.constructionIdx = ${param.constructionIdx})
+		          AND p.isDel = 0
+		        GROUP BY zone
+		    ) BB ON AA.ZONE = BB.ZONE
+		    LEFT OUTER JOIN (
+		        SELECT
+		            getZoneNameForSamsung3(TRIM(p.pileNo), p.deviceIdx) as zone,
+		            p.deviceIdx,
+		            count(distinct p.deviceIdx, p.location, p.pileNo) as dis_count
+		        FROM TB_REPORT p
+		        WHERE p.deviceIdx IN (SELECT dvs.id FROM TB_DEVICE dvs WHERE dvs.constructionIdx = ${param.constructionIdx})
+		          AND p.isDel = 0
+		        GROUP BY zone, deviceIdx
+		    ) CC ON AA.ZONE = CC.ZONE AND AA.id = CC.deviceIdx
+		    LEFT OUTER JOIN (
+		        SELECT
+		            getZoneNameForSamsung3(TRIM(p.pileNo), p.deviceIdx) as zone,
+		            p.deviceIdx,
+		            count(distinct p.deviceIdx, p.location, p.pileNo) as dis_count
+		        FROM TB_REPORT p
+		        WHERE p.deviceIdx IN (SELECT dvs.id FROM TB_DEVICE dvs WHERE dvs.constructionIdx = ${param.constructionIdx})
+		          AND p.isDel = 0
+		          AND p.currentDateTime = DATE_FORMAT(NOW(), '%Y-%m-%d')
+		        GROUP BY zone, deviceIdx
+		    ) DD ON AA.ZONE = DD.ZONE AND AA.id = DD.deviceIdx
+		    LEFT OUTER JOIN (
+		        SELECT
+		            getZoneNameForSamsung3(TRIM(p.pileNo), p.deviceIdx) as zone,
+		            p.deviceIdx,
+		            count(distinct p.deviceIdx, p.location, p.pileNo) as dis_count
+		        FROM TB_REPORT p
+		        WHERE p.deviceIdx IN (SELECT dvs.id FROM TB_DEVICE dvs WHERE dvs.constructionIdx = ${param.constructionIdx})
+		          AND p.isDel = 0
+		          AND p.currentDateTime = DATE_FORMAT(date_add(NOW(), interval -1 day), '%Y-%m-%d')
+		        GROUP BY zone, deviceIdx
+		    ) EE ON AA.ZONE = EE.ZONE AND AA.id = EE.deviceIdx
+		    WHERE 1=1
+		
+		    UNION ALL
+		
+		    SELECT
+		        CASE WHEN A.id IN (3046, 3047) THEN 'CDC외' ELSE '' END AS zone  -- 여기 수정
+		        , A.machineNumber
+		        , IFNULL((
+			        SELECT count(distinct p.deviceIdx, p.location, p.pileNo)
+			        FROM TB_REPORT p
+			        WHERE p.deviceIdx IN (SELECT dvs.id FROM TB_DEVICE dvs WHERE dvs.constructionIdx = ${param.constructionIdx})
+			          AND p.isDel = 0
+			          AND getZoneNameForSamsung3(TRIM(p.pileNo), p.deviceIdx) = 
+			              CASE WHEN A.id IN (3046, 3047) THEN 'CDC외' ELSE '' END
+			    ), 0) AS totalCountByZone
+		        , 0 AS countByZone
+		        , 0 AS todayCnt
+		        , 0 AS yesterdayCnt
+		        , A.id
+		        , A.lavelNo
+		        , B.name
+		        , A.constructionIdx
+		        , A.bluetoothNo
+		        , A.tabletNo
+		        , A.password
+		        , A.weContact
+		        , A.tabletManager
+		        , A.conduct,
+		        date_format(A.startDate, '%Y-%m-%d') as startDate,
+		        date_format(A.endDate, '%Y-%m-%d') as endDate
+		    FROM TB_DEVICE A, TB_CONSTRUCTION B
+		    WHERE A.machineNumber NOT IN (
+		        SELECT machineNumber FROM (
+		            SELECT
+		                getZoneNameForSamsung3(TRIM(A.pileNo), B.id) as zone,
+		                B.machineNumber
+		            FROM TB_REPORT A, TB_DEVICE B, TB_CONSTRUCTION C
+		            WHERE A.deviceIdx = B.id
+		              AND B.constructionIdx = C.id
+		              AND B.isDel = 0
+		              AND A.deviceIdx IN (SELECT id FROM TB_DEVICE WHERE constructionIdx = ${param.constructionIdx} AND isDel = 0)
+		            GROUP BY zone, machineNumber
+		        ) ASD
+		    )
+		    AND A.isDel = 0
+		    AND A.constructionIdx = B.id
+		    AND A.constructionIdx = ${param.constructionIdx}
+		) AAA
+		<include refid="conditionForSamsung"/>
+		ORDER BY (
+		    CASE
+		        WHEN AAA.zone = 'CDC외' THEN 0
+		        WHEN AAA.zone = '' OR AAA.zone IS NULL THEN 900
+		        ELSE ABS(SUBSTRING_INDEX((CASE WHEN AAA.zone = 'ept' THEN '800 Zone' ELSE AAA.zone END), ' ', 1))
+		    END
+		) ASC, ABS(machineNumber) ASC
+		LIMIT #{pageSize} OFFSET #{startRow}
+		    	
+    </select>
+    
+  <!--  <select id="getListByParamForSamsung" resultType="Device">
 		SELECT 
 			AAA.zone
 			, AAA.machineNumber
@@ -353,7 +638,7 @@
 		       <include refid="conditionForSamsung"/>         
 				ORDER BY (case when AAA.zone = '' or AAA.zone is null then 900 else ABS(SUBSTRING_INDEX((case when AAA.zone = 'ept' then '800 Zone' else AAA.zone end), ' ', 1)) end) asc, ABS(machineNumber) asc
 			LIMIT #{pageSize} OFFSET #{startRow}
-    </select>   
+    </select>   --> 
     
       <update id="update" parameterType="Device">
 	    UPDATE 
