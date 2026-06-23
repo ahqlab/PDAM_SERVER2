@@ -7,11 +7,11 @@
 	    	searchForm();
 	    });
 	});
-	
+
 	function goUrl(url){
 		document.location.href=url;
 	}
-	
+
 	function searchForm(){
 		$('#currentPage').val(1);
 		$("#searchForm").attr("action", "");
@@ -47,7 +47,7 @@
 	            hitOption = radios[i].value;
 	            break;
 	        }
-	    } 
+	    }
 	    closeDrivingRecordPopup();
 
 	    downloadDrivingRecoredBook(
@@ -72,17 +72,15 @@
 					<c:when test="${sessionInfo.role == 1}">
 						<div class="printBtn02" onclick="goUrl('${pageContext.request.contextPath}/report/list?id=${param.id}&type=all&constructionIdx=${sessionInfo.constructionIdx}');">총 작업내역</div>
 						<div class="printBtn" onclick="goUrl('${pageContext.request.contextPath}/report/list?id=${param.id}&date=today&constructionIdx=${sessionInfo.constructionIdx}');">금일작업내역</div>
-						<%-- <div class="printPdfBtn" onclick="javascript:downloadDrivingAllRecoredBook('${pageContext.request.contextPath}', '${sessionInfo.constructionIdx}', '${domain.machineNumber}');" >전체 기록지 PDF</div> --%>
 					</c:when>
 					<c:otherwise>
 						<div class="printBtn02" onclick="goUrl('${pageContext.request.contextPath}/report/list?id=${param.id}&type=all&constructionIdx=${param.constructionIdx}');">총 작업내역</div>
 						<div class="printBtn" onclick="goUrl('${pageContext.request.contextPath}/report/list?id=${param.id}&date=today&constructionIdx=${param.constructionIdx}');">금일작업내역</div>
-						<%-- <div class="printPdfBtn" onclick="javascript:downloadDrivingAllRecoredBook('${pageContext.request.contextPath}', '${param.constructionIdx}', '${domain.machineNumber}');" >전체 기록지 PDF</div> --%>
 					</c:otherwise>
 				</c:choose>
 			</div>
 		</div>
-		
+
 		<!--검색-->
 		<form:form id="searchForm" commandName="domainParam" method="POST">
 			<form:hidden path="currentPage"/>
@@ -96,248 +94,79 @@
 					</div>
 				</div>
 			</div>
-		
+
 		</form:form>
 	</div>
-				
+
 	<p class="listCount mb-15">총 시공량 <span>${totalConstruction}</span>공</p>
-	
+
 	<div class="min485">
 		<div class="tableArea">
-			
+
+			<%-- 컬럼 표시 여부: 원본데이터/휴지통은 권한(settingRequired 현장) 기반, PDF는 기존 로직 유지 --%>
+			<c:set var="showOriginData" value="${originDataYn > 0}" />
+			<c:set var="showTrash" value="${not sessionScope.settingRequired or (sessionScope.isHiddenManager ? sessionScope.constructionSetting.useAdminTrash : sessionScope.constructionSetting.useGuestTrash)}" />
+			<c:set var="showPdf" value="${sessionInfo.role == 0 or sessionInfo.showPdfYn or showPdfYn > 0 or sessionInfo.userId == 'ji2177' or sessionInfo.constructionIdx == 738}" />
+			<c:set var="conIdx" value="${sessionInfo.role == 1 ? sessionInfo.constructionIdx : param.constructionIdx}" />
+			<c:set var="colCount" value="2" />
+			<c:if test="${showOriginData}"><c:set var="colCount" value="${colCount + 1}" /></c:if>
+			<c:if test="${showTrash}"><c:set var="colCount" value="${colCount + 1}" /></c:if>
+			<c:set var="colWidth" value="${100 / colCount}%" />
+
 			<div class="viewTable viewTable04">
 				<ul class="viewTh">
-				
-				<c:choose>
-					<c:when test="${originDataYn > 0}">
-						<li  style="width: calc(100% / 3);">시공일</li>
-						<li  style="width: calc(100% / 3);">금일시공량</li>
-						<c:choose>
-							<c:when test="${originDataYn > 0}">
-								<li  style="width: calc(100% / 3);">원본데이터</li>
-							</c:when>
-						</c:choose>
-					</c:when>
-					<c:otherwise>
-						<li  style="width: calc(100% / 2);">시공일</li>
-						<li  style="width: calc(100% / 2);">금일시공량</li>
-					</c:otherwise>
-				</c:choose>
+					<li style="width: ${colWidth};">시공일</li>
+					<li style="width: ${colWidth};">금일시공량</li>
+					<c:if test="${showOriginData}"><li style="width: ${colWidth};">원본데이터</li></c:if>
+					<c:if test="${showTrash}"><li style="width: ${colWidth};">휴지통</li></c:if>
 				</ul>
-				
+
 				<div class="tableScroll">
 					<table>
-						<c:forEach var="domain" items="${domainList}"  varStatus="status">
-						
-						
-							<c:choose>
-								<c:when test="${sessionInfo.role == 0}">
-									<tr>
-										<td style="width: calc(100% / 3);">${domain.currentDateTime}
-											<a href="${pageContext.request.contextPath}/report/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${param.constructionIdx}" class="tableCheck">기록지확인</a>
-											<c:choose>
-												<c:when test="${(sessionInfo.constructionIdx == 1550 or  param.constructionIdx == 1550) and (sessionInfo.hiddenManager == true or sessionInfo.role == 0)}">
-													<a href="javascript:openDrivingRecordPopup('${pageContext.request.contextPath}', '${param.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}');" class="tableCheckGreen">일일 기록지 PDF</a>
-												</c:when>
-												<c:otherwise>
-													<a href="javascript:downloadDrivingRecoredBook('${pageContext.request.contextPath}', '${param.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}');" class="tableCheckGreen">일일 기록지 PDF</a>
-												</c:otherwise>
-											</c:choose>
-										</td>
-										<td style="width: calc(100% / 3);">
-											${domain.todayConstruction}공
-										</td>
-										<td style="width: calc(100% / 3);">
-											<a href="${pageContext.request.contextPath}/report/origin/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${param.constructionIdx}" class="tableCheck">원본기록지확인</a>
-										</td>
-									</tr>
-								</c:when>
-								<c:when test="${sessionInfo.role == 1}">
-									<tr>
+						<c:forEach var="domain" items="${domainList}" varStatus="status">
+							<tr>
+								<td style="width: ${colWidth};">
+									${domain.currentDateTime}
+									<a href="${pageContext.request.contextPath}/report/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${conIdx}" class="tableCheck">기록지확인</a>
+									<c:if test="${showPdf}">
 										<c:choose>
-											<c:when test="${sessionInfo.hiddenManager == true && originDataYn > 0}">
-												<td style="width: calc(100% / 3);">
-													<c:choose>
-														<c:when test="${sessionInfo.showPdfYn == true}">
-															${domain.currentDateTime}
-															<a href="${pageContext.request.contextPath}/report/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${sessionInfo.constructionIdx}" class="tableCheck">기록지확인</a>
-															<c:choose>
-																<c:when test="${(sessionInfo.constructionIdx == 1550 or  param.constructionIdx == 1550) and (sessionInfo.hiddenManager == true or sessionInfo.role == 0)}">
-																	<a href="javascript:openDrivingRecordPopup('${pageContext.request.contextPath}', '${sessionInfo.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}');" class="tableCheckGreen">일일 기록지 PDF</a>
-																</c:when>
-																<c:otherwise>
-																	<a href="javascript:downloadDrivingRecoredBook('${pageContext.request.contextPath}', '${sessionInfo.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}' , 'N');" class="tableCheckGreen">일일 기록지 PDF</a>
-																</c:otherwise>
-															</c:choose>
-														</c:when>
-														<c:otherwise>
-															${domain.currentDateTime}
-															<a href="${pageContext.request.contextPath}/report/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${sessionInfo.constructionIdx}" class="tableCheck">기록지확인</a>
-														</c:otherwise>
-													</c:choose>
-												</td>
-												<td style="width: calc(100% / 3);">${domain.todayConstruction}공</td>
-												<td style="width: calc(100% / 3);">
-													<a href="${pageContext.request.contextPath}/report/origin/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${sessionInfo.constructionIdx}"  class="tableCheck">원본기록지확인</a>
-												</td>
+											<c:when test="${(sessionInfo.constructionIdx == 1550 or param.constructionIdx == 1550) and (sessionInfo.hiddenManager == true or sessionInfo.role == 0)}">
+												<a href="javascript:openDrivingRecordPopup('${pageContext.request.contextPath}', '${conIdx}', '${domain.machineNumber}', '${domain.currentDateTime}');" class="tableCheckGreen">일일 기록지 PDF</a>
 											</c:when>
 											<c:otherwise>
-												<td>
-													<c:choose>
-														<c:when test="${sessionInfo.showPdfYn == true}">
-															${domain.currentDateTime}
-															<a href="${pageContext.request.contextPath}/report/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${sessionInfo.constructionIdx}" class="tableCheck">기록지확인</a>
-															<c:choose>
-																<c:when test="${(sessionInfo.constructionIdx == 1550 or  param.constructionIdx == 1550) and (sessionInfo.hiddenManager == true or sessionInfo.role == 0)}">
-																	<a href="javascript:openDrivingRecordPopup('${pageContext.request.contextPath}', '${sessionInfo.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}');" class="tableCheckGreen">일일 기록지 PDF</a>
-																</c:when>
-																<c:otherwise>
-																	<a href="javascript:downloadDrivingRecoredBook('${pageContext.request.contextPath}', '${sessionInfo.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}' , 'N');" class="tableCheckGreen">일일 기록지 PDF</a>
-																</c:otherwise>
-															</c:choose>
-														</c:when>
-														<c:otherwise>
-															${domain.currentDateTime}
-															<a href="${pageContext.request.contextPath}/report/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${sessionInfo.constructionIdx}" class="tableCheck">기록지확인</a>			
-															<!-- 안동 호반 태흥특수만 틀별히 열어줌 -->
-															<c:choose>
-																<c:when test="${sessionInfo.constructionIdx == 738}">
-																	<c:choose>
-																		<c:when test="${(sessionInfo.constructionIdx == 1550 or  param.constructionIdx == 1550) and (sessionInfo.hiddenManager == true or sessionInfo.role == 0)}">
-																			<a href="javascript:openDrivingRecordPopup('${pageContext.request.contextPath}', '${sessionInfo.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}');" class="tableCheckGreen">일일 기록지 PDF</a>
-																		</c:when>
-																		<c:otherwise>
-																			<a href="javascript:downloadDrivingRecoredBook('${pageContext.request.contextPath}', '${sessionInfo.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}' , 'N');" class="tableCheckGreen">일일 기록지 PDF</a>
-																		</c:otherwise>
-																	</c:choose>
-																</c:when>
-															</c:choose>
-														</c:otherwise>
-													</c:choose>
-												</td>
-												<td>${domain.todayConstruction}공</td>
+												<a href="javascript:downloadDrivingRecoredBook('${pageContext.request.contextPath}', '${conIdx}', '${domain.machineNumber}', '${domain.currentDateTime}' , 'N');" class="tableCheckGreen">일일 기록지 PDF</a>
 											</c:otherwise>
 										</c:choose>
-									</tr>
-								</c:when>
-								<c:when test="${sessionInfo.role == 2}">
-									<tr>
-										<td>
-											${domain.currentDateTime}
-											<a href="${pageContext.request.contextPath}/report/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${param.constructionIdx}" class="tableCheck">기록지확인</a>
-											<c:choose>
-												<c:when test="${sessionInfo.userId == 'ji2177'}">
-													<c:choose>
-														<c:when test="${(sessionInfo.constructionIdx == 1550 or  param.constructionIdx == 1550) and (sessionInfo.hiddenManager == true or sessionInfo.role == 0)}">
-															<a href="javascript:openDrivingRecordPopup('${pageContext.request.contextPath}', '${param.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}');" class="tableCheckGreen">일일 기록지 PDF</a>
-														</c:when>
-														<c:otherwise>
-															<a href="javascript:downloadDrivingRecoredBook('${pageContext.request.contextPath}', '${param.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}' , 'N');" class="tableCheckGreen">일일 기록지 PDF</a>
-														</c:otherwise>
-													</c:choose>
-												</c:when>
-											</c:choose>
-										</td>
-										<td>${domain.todayConstruction}공</td>
-									</tr>	
-								</c:when>
-								<c:when test="${sessionInfo.role == 3}">
-									<c:choose>
-										<c:when test="${originDataYn > 0}">
-											<tr>
-												<td style="width: calc(100% / 3);">
-													<c:choose>
-														<c:when test="${showPdfYn > 0}">
-															${domain.currentDateTime}
-															<a href="${pageContext.request.contextPath}/report/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${param.constructionIdx}" class="tableCheck">기록지확인</a>
-															<c:choose>
-																<c:when test="${(sessionInfo.constructionIdx == 1550 or  param.constructionIdx == 1550) and (sessionInfo.hiddenManager == true or sessionInfo.role == 0)}">
-																	<a href="javascript:openDrivingRecordPopup('${pageContext.request.contextPath}', '${param.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}');" class="tableCheckGreen">일일 기록지 PDF</a>
-																</c:when>
-																<c:otherwise>
-																	<a href="javascript:downloadDrivingRecoredBook('${pageContext.request.contextPath}', '${param.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}' , 'N');" class="tableCheckGreen">일일 기록지 PDF</a>
-																</c:otherwise>
-															</c:choose>
-														</c:when>
-														<c:otherwise>
-															${domain.currentDateTime}
-															<a href="${pageContext.request.contextPath}/report/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${param.constructionIdx}" class="tableCheck">기록지확인</a>
-														</c:otherwise>
-													</c:choose>
-												</td>
-												<td style="width: calc(100% / 3);">
-													${domain.todayConstruction}공
-												</td>
-												<td style="width: calc(100% / 3);">
-													<a href="${pageContext.request.contextPath}/report/origin/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${param.constructionIdx}"  class="tableCheck">원본기록지확인</a>
-												</td>
-											</tr>
-										</c:when>
-										<c:otherwise>
-											<tr>
-												<td>
-													<c:choose>
-														<c:when test="${showPdfYn > 0}">
-															${domain.currentDateTime}
-															<a href="${pageContext.request.contextPath}/report/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${param.constructionIdx}" class="tableCheck">기록지확인</a>
-															<c:choose>
-																<c:when test="${(sessionInfo.constructionIdx == 1550 or  param.constructionIdx == 1550) and (sessionInfo.hiddenManager == true or sessionInfo.role == 0)}">
-																	<a href="javascript:openDrivingRecordPopup('${pageContext.request.contextPath}', '${param.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}');" class="tableCheckGreen">일일 기록지 PDF</a>
-																</c:when>
-																<c:otherwise>
-																	<a href="javascript:downloadDrivingRecoredBook('${pageContext.request.contextPath}', '${param.constructionIdx}', '${domain.machineNumber}', '${domain.currentDateTime}' , 'N');" class="tableCheckGreen">일일 기록지 PDF</a>
-																</c:otherwise>
-															</c:choose>
-														</c:when>
-														<c:otherwise>
-															${domain.currentDateTime}
-															<a href="${pageContext.request.contextPath}/report/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${param.constructionIdx}" class="tableCheck">기록지확인</a>
-														</c:otherwise>
-													</c:choose>
-												</td>
-												<td>${domain.todayConstruction}공</td>
-											</tr>
-										</c:otherwise>
-									</c:choose>
-								</c:when>
-								<c:when test="${sessionInfo.role == 4}">
-									<tr>
-										<td>
-											${domain.currentDateTime}
-											<a href="${pageContext.request.contextPath}/report/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${param.constructionIdx}" class="tableCheck">기록지확인</a>
-										</td>
-										<td>${domain.todayConstruction}공</td>
-									</tr>	
-								</c:when>
-							</c:choose>
-						
+									</c:if>
+								</td>
+								<td style="width: ${colWidth};">${domain.todayConstruction}공</td>
+								<c:if test="${showOriginData}">
+									<td style="width: ${colWidth};">
+										<a href="${pageContext.request.contextPath}/report/origin/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${conIdx}" class="tableCheck">원본기록지확인</a>
+									</td>
+								</c:if>
+								<c:if test="${showTrash}">
+									<td style="width: ${colWidth};">
+										<a href="${pageContext.request.contextPath}/trashbin/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${conIdx}" class="tableCheck">휴지통</a>
+									</td>
+								</c:if>
+							</tr>
 						</c:forEach>
-						<c:choose>
-							<c:when test="${fn:length(domainList) == 0}">
-								<tr>	
-									<c:choose>
-										<c:when test="${originDataYn > 0}">
-											<td colspan="3">등록된 데이터가 없습니다.</td>
-										</c:when>
-										<c:otherwise>
-											<td colspan="2">등록된 데이터가 없습니다.</td>
-										</c:otherwise>
-									</c:choose>
-								</tr>
-							</c:when>
-						</c:choose>
+						<c:if test="${fn:length(domainList) == 0}">
+							<tr><td colspan="${colCount}">등록된 데이터가 없습니다.</td></tr>
+						</c:if>
 					</table>
 				</div>
 			</div>
 		</div>
 	</div>
-	
-	
+
+
 	<div id="drivingRecordOverlay" style="display:none;"></div>
 
 		<div id="drivingRecordPopup" style="display:none;">
 		    <div class="popup-title">일일 기록지 PDF</div>
-		
+
 		    <div class="popup-content">
 		        <label>
 		            <input type="radio" name="hitOption" value="N" checked>
@@ -349,17 +178,17 @@
 		           		 타격횟수 포함
 		        </label>
 		    </div>
-		
+
 		    <div class="popup-footer">
 		        <button type="button" onclick="closeDrivingRecordPopup()">닫기</button>
 		        <button type="button" onclick="confirmDrivingRecordDownload()">PDF 생성</button>
 		    </div>
 	</div>
-	
+
 	<!--페이징-->
 	<%@ include file="/WEB-INF/views/common/pagination.jsp" %>
 	<!--//페이징-->
-	
+
 </div>
 <!--//컨텐츠-->
 

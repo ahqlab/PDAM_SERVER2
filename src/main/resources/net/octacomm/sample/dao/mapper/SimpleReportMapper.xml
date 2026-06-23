@@ -45,8 +45,8 @@
    
     <select id="getListByParam" resultType="SimpleReport">
     	SELECT 
-    		  B.machineNumber,  
-    		  A.currentDateTime, 
+    		  MAX(B.machineNumber) AS machineNumber,
+    		  A.currentDateTime,
     		  COUNT(*) as todayConstruction
 		FROM TB_REPORT A, TB_DEVICE B, TB_CONSTRUCTION C
 		<include refid="condition"/>

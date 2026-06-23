@@ -1,5 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/views/common/tagLib.jsp" %>
+<%-- 파일현황 출력/기록지 전체 출력(엑셀) 노출 권한: nav 메뉴와 동일하게 세션 constructionSetting을 따른다.
+     settingRequired 현장만 권한 적용(관리자=보안코드 useAdmin*, 게스트=일반 useGuest*), 그 외 현장은 기존대로 노출. --%>
+<c:set var="useFileMenu" value="${not sessionScope.settingRequired or (sessionScope.isHiddenManager ? sessionScope.constructionSetting.useAdminFileMenu : sessionScope.constructionSetting.useGuestFileMenu)}" />
+<c:set var="useExcel" value="${not sessionScope.settingRequired or (sessionScope.isHiddenManager ? sessionScope.constructionSetting.useAdminExcel : sessionScope.constructionSetting.useGuestExcel)}" />
 <style>
 	.popup-bg {
 	  position: fixed;
@@ -783,10 +787,12 @@ function changeSpareDevice(targetId, changeId, constructionIdx){
 							<c:choose>
 							  <c:when test="${sessionInfo.constructionIdx == 1308}">
 							    <!-- 단일 선택 + 팝업 -->
+							    <c:if test="${useFileMenu}">
 							    <select id="select1" name="select1" onchange="openPilePopup()">
 							      <option selected disabled value="">파일현황 출력 ▼</option>
 							      <option value="open">선택하기</option>
 							    </select>
+							    </c:if>
 							
 							    <!-- 팝업 구조 (초기에는 hidden) -->
 							    <div id="pilePopup" class="popup-bg" style="display:none;">
@@ -873,22 +879,24 @@ function changeSpareDevice(targetId, changeId, constructionIdx){
 							  </c:when>
 							  <c:otherwise>
 							    <!-- 다중 선택 일반 select -->
+							    <c:if test="${useFileMenu}">
 							    <select id="select1" name="select1" onchange="javascript:fileChange(this.value);">
 									<option selected disabled value="">파일현황 출력 ▼</option>
-								</select> 
+								</select>
+								</c:if>
 							  </c:otherwise>
 						  </c:choose>
 					</c:when>
 				</c:choose>
 				<c:choose>
 					<c:when test="${sessionInfo.role == 0}">
-						<div class="printBtn" onclick="javascript:downloadAllReport(${param.constructionIdx});">기록지 전체 출력</div>
+						<c:if test="${useExcel}"><div class="printBtn" onclick="javascript:downloadAllReport(${param.constructionIdx});">기록지 전체 출력</div></c:if>
 					</c:when>
 					<c:when test="${sessionInfo.role == 2 or sessionInfo.role == 3 or sessionInfo.role == 4}">
-						<div class="printBtn" onclick="javascript:downloadAllReport(${param.constructionIdx});">기록지 전체 출력</div>
+						<c:if test="${useExcel}"><div class="printBtn" onclick="javascript:downloadAllReport(${param.constructionIdx});">기록지 전체 출력</div></c:if>
 					</c:when>
 					<c:otherwise>
-						<div class="printBtn" onclick="javascript:downloadAllReport(${sessionInfo.constructionIdx});">기록지 전체 출력</div>
+						<c:if test="${useExcel}"><div class="printBtn" onclick="javascript:downloadAllReport(${sessionInfo.constructionIdx});">기록지 전체 출력</div></c:if>
 						<c:if test="${sessionInfo.role == 1}">
 							<div id="contractDownloadBtn" class="printBtn" onclick="openContractDownload()" style="background-color:#28a745;margin-left:10px;display:none;">계약서 다운로드</div>
 						</c:if>

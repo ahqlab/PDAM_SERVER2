@@ -97,7 +97,7 @@
 		<div style="margin-top:16px;font-size:12px;color:#333;line-height:1.8;border-top:1px solid #ddd;padding-top:12px;">
 			<c:choose>
 				<c:when test="${contract.contractType != 'DAILY'}">
-					<p>※ 동일사업장 PDAM시스템 SET 추가시 계약서 및 계약조건은 위 내용과 동일하다.</p>
+					<p>※ 동일사업장에 PDAM시스템 SET 추가 시 별도 계약 체결 여부와 관계없이 본 계약서의 모든 조건이 동일하게 적용됩니다.</p>
 				</c:when>
 				<c:otherwise>
 					<p>※ PDAM 시스템 SET 추가 시, 계약서 및 계약 조건은 위 내용과 동일합니다.</p>
@@ -115,9 +115,9 @@
 			<p style="font-size:14px;font-weight:bold;text-align:center;margin-bottom:16px;">${not empty contract.signedAt ? contract.signedAt : contract.createdAt}</p>
 
 			<div class="party-section">
-				<!-- 수요자 (을) -->
+				<!-- 수요자 -->
 				<div class="party-card">
-					<div class="party-card-hdr">수 요 자 (을)</div>
+					<div class="party-card-hdr">수 요 자</div>
 					<table class="party-card-tbl">
 						<tr><th>상&nbsp;&nbsp;호</th><td>${contract.reqTradeName}</td></tr>
 						<tr><th>사업자번호</th><td>${contract.reqBusinessNo}</td></tr>
@@ -150,9 +150,9 @@
 						</td></tr>
 					</table>
 				</div>
-				<!-- 공급자 (갑) -->
+				<!-- 공급자 -->
 				<div class="party-card">
-					<div class="party-card-hdr">공 급 자 (갑)</div>
+					<div class="party-card-hdr">공 급 자</div>
 					<table class="party-card-tbl">
 						<tr><th>상&nbsp;&nbsp;호</th><td>우리기술 주식회사</td></tr>
 						<tr><th>사업자번호</th><td>787-88-01517</td></tr>

@@ -79,12 +79,12 @@
 <!-- 서명란 -->
 			<div class="signature-section">
 				<div class="signature-box">
-					<p><strong>갑 (공급자)</strong></p>
+					<p><strong>공급자</strong></p>
 					<p>우리기술(주)</p>
 					<div class="sig-area"><span class="sig-placeholder">직인</span></div>
 				</div>
 				<div class="signature-box">
-					<p><strong>을 (협력사)</strong></p>
+					<p><strong>협력사</strong></p>
 					<p>${domain.reqTradeName}</p>
 					<div class="sig-area">
 						<c:choose>

@@ -74,7 +74,7 @@ public class ContractPdfService {
 		sb.append("h2{font-size:18px;text-align:center;margin:0 0 1px;}");
 		sb.append(".sub{text-align:center;color:#555;margin:0 0 5px;font-size:11px;}");
 		sb.append("table{width:100%;border-collapse:collapse;margin-bottom:4px;table-layout:fixed;}");
-		sb.append("th{border:1px solid #ccc;padding:5px 7px;background:#f5f5f5;width:15%;font-size:11.5px;line-height:1.3;}");
+		sb.append("th{border:1px solid #ccc;padding:5px 7px;background:#f5f5f5;width:15%;font-size:11.5px;line-height:1.3;text-align:center;}");
 		sb.append("td{border:1px solid #ccc;padding:5px 7px;font-size:11.5px;width:35%;line-height:1.3;}");
 		sb.append(".hdr{background:#f0f0f0;font-weight:bold;width:50%;}");
 		sb.append(".clause{font-size:11px;margin-bottom:3px;line-height:1.4;}.chk{font-size:9px;color:#28a745;font-weight:bold;white-space:nowrap;}");
@@ -107,7 +107,7 @@ public class ContractPdfService {
 
 		sb.append("<div class='note'>");
 		if (isMonthly) {
-			sb.append("<p>※ 동일사업장 PDAM시스템 SET 추가시 계약서 및 계약조건은 위 내용과 동일하다.</p>");
+			sb.append("<p>※ 동일사업장에 PDAM시스템 SET 추가 시 별도 계약 체결 여부와 관계없이 본 계약서의 모든 조건이 동일하게 적용됩니다.</p>");
 		} else {
 			sb.append("<p>※ PDAM 시스템 SET 추가 시, 계약서 및 계약 조건은 위 내용과 동일합니다.</p>");
 		}
@@ -124,7 +124,7 @@ public class ContractPdfService {
 		sb.append("<p class='foot-date'>").append(esc(footDate)).append("</p>");
 
 		sb.append("<table><colgroup><col style='width:13%'/><col style='width:12%'/><col style='width:13%'/><col style='width:12%'/><col style='width:15%'/><col style='width:35%'/></colgroup>");
-		sb.append("<tr><td colspan='4' class='hdr'>수 요 자 (을)</td><td colspan='2' class='hdr'>공 급 자 (갑)</td></tr>");
+		sb.append("<tr><td colspan='4' class='hdr'>수 요 자</td><td colspan='2' class='hdr'>공 급 자</td></tr>");
 		sb.append("<tr><th>상&#160;호</th><td colspan='3'>").append(esc(contract.getReqTradeName())).append("</td><th>상&#160;호</th><td>우리기술 주식회사</td></tr>");
 		sb.append("<tr><th>사업자번호</th><td colspan='3'>").append(esc(contract.getReqBusinessNo())).append("</td><th>사업자번호</th><td>787-88-01517</td></tr>");
 		sb.append("<tr><th>주&#160;소</th><td colspan='3'>").append(esc(contract.getReqAddress())).append("</td><th>주&#160;소</th><td>대전광역시 대덕구 신탄동로 105 304호(신일동,벤처타운)</td></tr>");
@@ -160,6 +160,8 @@ public class ContractPdfService {
 
 	private String esc(String s) {
 		if (s == null) return "";
+		// MalgunGothic 폰트에 없는 가운뎃점 유사 문자(U+2024 등)를 표준 중간점으로 치환 (PDF에서 # 로 깨지는 문제 방지)
+		s = s.replaceAll("[․‧・ㆍ•]", "·");
 		return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;");
 	}
 

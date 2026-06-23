@@ -1,9 +1,6 @@
 package net.octacomm.sample.controller;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +8,6 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -32,6 +28,7 @@ import net.octacomm.sample.dao.mapper.OriginReportMapper;
 import net.octacomm.sample.dao.mapper.PenetrationMapper;
 import net.octacomm.sample.dao.mapper.PieceMapper;
 import net.octacomm.sample.dao.mapper.ReportMapper;
+import net.octacomm.sample.dao.mapper.TrashbinMapper;
 import net.octacomm.sample.domain.Construction;
 import net.octacomm.sample.domain.ConstructionSetting;
 import net.octacomm.sample.domain.Device;
@@ -50,10 +47,10 @@ import net.octacomm.sample.utils.Pagination;
 import net.octacomm.sample.utils.ReportPagination;
 import net.octacomm.sample.utils.Utill;
 
-@RequestMapping("/report")
+@RequestMapping("/trashbin")
 @Controller
-public class ReportController{
-		
+public class TrashbinController {
+	
 	@Autowired
 	private DeviceMapper deviceMapper;
 	
@@ -70,7 +67,7 @@ public class ReportController{
 	protected OriginPieceMapper originPieceMapper;
 	
 	@Autowired
-	protected ReportMapper mapper;
+	protected TrashbinMapper mapper;
 	
 	@Autowired
 	protected OriginReportMapper originReportMapper;
@@ -83,8 +80,7 @@ public class ReportController{
 	
 	@Autowired
 	private ExtensivePileUsageMapper extensivePileUsageMapper;
-	
-	
+
 	@RequestMapping(value = "/list")
 	public String list(Model model, @ModelAttribute("domainParam") ReportParam param, BindingResult result, HttpSession session) throws UnsupportedEncodingException {
 		
@@ -94,13 +90,17 @@ public class ReportController{
 		
 		int extensivePileUsage = 0;
 		
-		isBig = mapper.isBigAllReports(param, (int) param.getConstructionIdx());
+		
+		System.err.println("Search Param : {}" +  param); 
+		
+		isBig = mapper.isBigAllReports(param);
+		
+		Construction targetCon = constructionMapper.get((int) param.getConstructionIdx());
+		System.err.println("targetCon : " + targetCon);
 		
 		param.setRole((int) session.getAttribute("role"));
 		
 		param.setConstructionIdx((int) session.getAttribute("constructionIdx"));
-		
-		Construction targetCon = constructionMapper.get((int) param.getConstructionIdx());
 		
 		Construction con = constructionMapper.get((int) session.getAttribute("constructionIdx"));
 		
@@ -110,6 +110,8 @@ public class ReportController{
 		}else {
 			extensivePileUsage = 0;
 		}
+		
+		System.err.println("mycon : " + con);
 		
 		int totalCount = mapper.getCountByParam(param);
 		
@@ -127,38 +129,37 @@ public class ReportController{
 		
 		totalConstruction = mapper.getCount(param);
 		
-		List<ReportOneLine> domainList = extensivePileUsage == 0 ? mapper.getReportOneLineListByParam(page.getStartRow(), page.getPageSize(), param) : mapper.getReportOneLineExtensivePileUsageListByParam(page.getStartRow(), page.getPageSize(), param);
+		List<ReportOneLine> domainList = mapper.getReportOneLineListByParam(page.getStartRow(), page.getPageSize(), param);
 		
 		int rownum = (totalCount + 1) - page.getStartRow();
 		
 		for (int i = 0; i < domainList.size(); i++) {
 			domainList.get(i).setRownum(rownum = rownum - 1);
 		}
-		
+
+		// report/listMultiOneLine.jsp 와 동일한 헤더/본문을 쓰므로 같은 모델값을 채운다.
 		try {
 			if((int) session.getAttribute("role") == 3) {
 				model.addAttribute("longCalYn", targetCon.getLongCalYn());
 				model.addAttribute("originDataYn", targetCon.getOriginDataYn());
 				model.addAttribute("ubcYn", targetCon.getUbcYn());
 				model.addAttribute("showPdfYn", targetCon.getShowPdfYn());
-			}else {
+			} else {
 				model.addAttribute("longCalYn", con.getLongCalYn());
 				model.addAttribute("originDataYn", con.getOriginDataYn());
 				model.addAttribute("ubcYn", con.getUbcYn());
 				model.addAttribute("showPdfYn", con.getShowPdfYn());
 			}
-		}catch (Exception e) {
+		} catch (Exception e) {
 			model.addAttribute("longCalYn", 0);
 			model.addAttribute("originDataYn", 0);
 			model.addAttribute("ubcYn", 0);
 			model.addAttribute("showPdfYn", 0);
 		}
 
-		// 엑셀 출력은 기본적으로 노출(기존 동작 유지). settingRequired 현장만 권한으로 제어한다.
-		model.addAttribute("useExcel", true);
-
-		// settingRequired 현장(TB_CONSTRUCTION_SETTING_CONFIG.APPLY_FROM_DATE 이후 등록)은
-		// 옛 TB_CONSTRUCTION 플래그(longCalYn/ubcYn/originDataYn/showPdfYn)를 무시하고 권한 설정을 따른다.
+		// 휴지통은 복구 전용 화면 → 엑셀/PDF 등 부가기능 버튼은 노출하지 않는다.
+		model.addAttribute("useExcel", false);
+		model.addAttribute("showPdfYn", 0);
 		Boolean settingRequired = (Boolean) session.getAttribute("settingRequired");
 		ConstructionSetting cs = (ConstructionSetting) session.getAttribute("constructionSetting");
 		if (Boolean.TRUE.equals(settingRequired) && cs != null) {
@@ -166,38 +167,21 @@ public class ReportController{
 			model.addAttribute("longCalYn",    (admin ? cs.isUseAdminReportTime() : cs.isUseGuestReportTime()) ? 1 : 0);
 			model.addAttribute("ubcYn",         (admin ? cs.isUseAdminUbc()        : cs.isUseGuestUbc())        ? 1 : 0);
 			model.addAttribute("originDataYn",  (admin ? cs.isUseAdminOriginData() : cs.isUseGuestOriginData()) ? 1 : 0);
-			model.addAttribute("showPdfYn",     (admin ? cs.isUseAdminPdf()        : cs.isUseGuestPdf())        ? 1 : 0);
-			model.addAttribute("useExcel",      (admin ? cs.isUseAdminExcel()      : cs.isUseGuestExcel()));
 		}
 
 		model.addAttribute("totalConstruction", totalConstruction);
 		model.addAttribute("device", device);
 		model.addAttribute("param", param);
-		model.addAttribute("page", page);		
+		model.addAttribute("page", page);
 		model.addAttribute("domainList", domainList);
 		model.addAttribute("isBig", isBig);
 		model.addAttribute("extensivePileUsage", extensivePileUsage);
-		
-		return "report/listMultiOneLine";
-	}
 
-	/**
-	 * settingRequired 현장은 옛 TB_CONSTRUCTION 플래그(longCalYn/ubcYn/originDataYn/showPdfYn) 대신
-	 * 권한 설정(관리자=보안코드 useAdmin*, 게스트=일반 useGuest*)을 따르도록 모델값을 덮어쓴다.
-	 * 엑셀 출력 등 longCalYn(기록지 시간)/ubcYn(극한지지력)을 쓰는 모든 화면에서 호출.
-	 */
-	private void overrideReportFlagsBySetting(Model model, HttpSession session) {
-		Boolean settingRequired = (Boolean) session.getAttribute("settingRequired");
-		ConstructionSetting cs = (ConstructionSetting) session.getAttribute("constructionSetting");
-		if (Boolean.TRUE.equals(settingRequired) && cs != null) {
-			boolean admin = Boolean.TRUE.equals(session.getAttribute("isHiddenManager"));
-			model.addAttribute("longCalYn",    (admin ? cs.isUseAdminReportTime() : cs.isUseGuestReportTime()) ? 1 : 0);
-			model.addAttribute("ubcYn",         (admin ? cs.isUseAdminUbc()        : cs.isUseGuestUbc())        ? 1 : 0);
-			model.addAttribute("originDataYn",  (admin ? cs.isUseAdminOriginData() : cs.isUseGuestOriginData()) ? 1 : 0);
-			model.addAttribute("showPdfYn",     (admin ? cs.isUseAdminPdf()        : cs.isUseGuestPdf())        ? 1 : 0);
-		}
+		return "trashbin/listMultiOneLine";
 	}
-
+	
+	
+	
 	@RequestMapping(value = "/origin/list")
 	public String originList(Model model, @ModelAttribute("domainParam") ReportParam param, BindingResult result, HttpSession session) throws UnsupportedEncodingException {
 		
@@ -262,14 +246,7 @@ public class ReportController{
 			model.addAttribute("ubcYn", 0);
 			model.addAttribute("showPdfYn", 0);
 		}
-		model.addAttribute("totalConstruction", totalConstruction);
-		model.addAttribute("device", device);
-		model.addAttribute("param", param);
-		model.addAttribute("page", page);		
-		model.addAttribute("domainList", domainList);
-		model.addAttribute("isBig", isBig);
-
-		// 엑셀 출력은 기본 노출(기존 동작 유지). settingRequired 현장만 권한 설정(엑셀 사용)으로 제어한다.
+		// 엑셀 출력 권한(report/origin/listMulti.jsp와 동일)
 		model.addAttribute("useExcel", true);
 		Boolean settingRequired = (Boolean) session.getAttribute("settingRequired");
 		ConstructionSetting cs = (ConstructionSetting) session.getAttribute("constructionSetting");
@@ -278,7 +255,14 @@ public class ReportController{
 			model.addAttribute("useExcel", admin ? cs.isUseAdminExcel() : cs.isUseGuestExcel());
 		}
 
-		return "report/origin/listMulti";
+		model.addAttribute("totalConstruction", totalConstruction);
+		model.addAttribute("device", device);
+		model.addAttribute("param", param);
+		model.addAttribute("page", page);
+		model.addAttribute("domainList", domainList);
+		model.addAttribute("isBig", isBig);
+
+		return "trashbin/origin/listMulti";
 		
 	}
 	
@@ -292,7 +276,7 @@ public class ReportController{
 		}
 	}
 	
-	//원본기록지 다운로드 XXXXXhttp://localhost:8080/web-template-mybatis/report/origin/download/excel?constructionIdx=812
+	//원본기록지 다운로드 XXXXXhttp://localhost:8080/web-template-mybatis/trashbin/origin/download/excel?constructionIdx=812
 	//All 총작업은 없음.  XXXXX
 	@RequestMapping(value = "/origin/download/excel")
 	public String originDownLoadExcel(Model model, @ModelAttribute("domainParam") ReportParam param, BindingResult result, HttpSession session) {
@@ -316,10 +300,6 @@ public class ReportController{
 		}
 		
 		boolean isHiddenManager  = (boolean) session.getAttribute("isHiddenManager");
-		// settingRequired 현장은 엑셀 뷰의 isHiddenManager 게이트를 통과시켜 권한(ubcYn/longCalYn)대로 표시. 구 현장은 미적용.
-		if (Boolean.TRUE.equals(session.getAttribute("settingRequired"))) {
-			isHiddenManager = true;
-		}
 		Construction targetCon = constructionMapper.get(param.getConstructionIdx());
 		
 		List<ExcelSignroom> signRoomList = excelSignroomMapper.getFindByConstructionIdxAndOrderBy(constructionIdx);
@@ -364,7 +344,6 @@ public class ReportController{
 			model.addAttribute("showPdfYn", 0);
 		}
 		model.addAttribute("domainList", domainList);
-		overrideReportFlagsBySetting(model, session);
 		model.addAttribute("role", role);
 		model.addAttribute("isHiddenManager", isHiddenManager);
 		model.addAttribute("signRoomList", signRoomList);
@@ -398,25 +377,13 @@ public class ReportController{
 		
 		int isBig = 0; 
 		int role = (int) session.getAttribute("role");
-		int extensivePileUsage = 0;
 		//int constructionIdx = (int) session.getAttribute("constructionIdx");
 		int constructionIdx = 0;
 		boolean isHiddenManager  = (boolean) session.getAttribute("isHiddenManager");
-		// settingRequired 현장은 엑셀 뷰의 isHiddenManager 게이트를 통과시켜 권한(ubcYn/longCalYn)대로 표시. 구 현장은 미적용.
-		if (Boolean.TRUE.equals(session.getAttribute("settingRequired"))) {
-			isHiddenManager = true;
-		}
 		
 		List<ReportOneLine> domainList;
-		isBig = mapper.isBigAllReports(param, param.getConstructionIdx());
+		isBig = mapper.isBigAllReports(param);
 		Construction targetCon = constructionMapper.get(param.getConstructionIdx());
-		ExtensivePileUsage usage = extensivePileUsageMapper.findByConstructionIdx(param.getConstructionIdx());
-		if(usage != null) {
-			extensivePileUsage = usage.getIsUsed();
-		}else {
-			extensivePileUsage = 0;
-		}
-		
 		
 		List<ExcelSignroom> signRoomList = null;
 		String constructionName =  null;
@@ -460,7 +427,7 @@ public class ReportController{
 		if(isBig > 0) {
 			Construction con = constructionMapper.get(constructionIdx);
 			if(param.getConstructionIdx() > 0) {
-				domainList = extensivePileUsage > 0 ? mapper.getListByParamExtensivePileUsageExcelTen(param) : mapper.getListByParamExcelTen(param);
+				domainList = mapper.getListByParamExcelTen(param);
 			}else {
 				domainList = new ArrayList<ReportOneLine>();
 			}
@@ -483,7 +450,6 @@ public class ReportController{
 				model.addAttribute("showPdfYn", 0);
 			}
 			
-			overrideReportFlagsBySetting(model, session);
 			model.addAttribute("role", role);
 			model.addAttribute("isHiddenManager", isHiddenManager);
 			model.addAttribute("domainList", domainList);
@@ -491,33 +457,19 @@ public class ReportController{
 			model.addAttribute("param", param);
 			model.addAttribute("signRoomList", signRoomList);
 			model.addAttribute("constructionName", constructionName);
-			model.addAttribute("extensivePileUsage", extensivePileUsage);
 			
 			if(constructionIdx == 645) {
 				System.err.println("reportTenAllJh");
 				System.err.println("reportTenAllJh");
 				return "reportTenAllJh";
 			}
-			
-			if(constructionIdx == 1269 || param.getConstructionIdx() == 1269) {
-				System.err.println("reportTenAllFor1269");
-				System.err.println("reportTenAllFor1269");
-				return "reportTenAllFor1269";
-			}
-			
-			if(extensivePileUsage > 0) {
-				System.err.println("reportTenAllFor1338");
-				System.err.println("reportTenAllFor1338");
-				return "reportTenAllFor1338";
-			}
-			
 			System.err.println("reportTenAll");
 			System.err.println("reportTenAll");
 			return "reportTenAll";
 		}
 		Construction con = constructionMapper.get(constructionIdx);
 		if(param.getConstructionIdx() > 0) {
-			domainList = extensivePileUsage > 0 ? mapper.getListByParamExtensivePileUsageExcelFive(param) : mapper.getListByParamExcelFive(param);
+			domainList = mapper.getListByParamExcelFive(param);
 		}else {
 			domainList = new ArrayList<ReportOneLine>();
 		}
@@ -540,7 +492,6 @@ public class ReportController{
 			model.addAttribute("showPdfYn", 0);
 		}
 		
-		overrideReportFlagsBySetting(model, session);
 		model.addAttribute("role", role);
 		model.addAttribute("domainList", domainList);
 		model.addAttribute("isHiddenManager", isHiddenManager);
@@ -548,30 +499,11 @@ public class ReportController{
 		model.addAttribute("param", param);
 		model.addAttribute("signRoomList", signRoomList);
 		model.addAttribute("constructionName", constructionName);
-		model.addAttribute("extensivePileUsage", extensivePileUsage);
 		
 		if(constructionIdx == 645) {
 			System.err.println("reportFiveAllJh");
 			System.err.println("reportFiveAllJh");
 			return "reportFiveAllJh";
-		}
-		
-		if(constructionIdx == 1082 || param.getConstructionIdx() == 1082) {
-			System.err.println("reportFiveAllBy");
-			System.err.println("reportFiveAllBy");
-			return "reportFiveAllBy";
-		}
-		
-		if(constructionIdx == 1269 || param.getConstructionIdx() == 1269) {
-			System.err.println("reportFiveAllFor1269");
-			System.err.println("reportFiveAllFor1269");
-			return "reportFiveAllFor1269";
-		}
-		
-		if(extensivePileUsage > 0) {
-			System.err.println("reportFiveAllFor1338");
-			System.err.println("reportFiveAllFor1338");
-			return "reportFiveAllFor1338";
 		}
 		
 		System.err.println("reportFiveAll");
@@ -589,21 +521,8 @@ public class ReportController{
 		int isBig = 0; 
 		int role = (int) session.getAttribute("role");
 		//int constructionIdx = (int) session.getAttribute("constructionIdx");
-		int extensivePileUsage = 0;
 		int constructionIdx = 0;
 		boolean isHiddenManager  = (boolean) session.getAttribute("isHiddenManager");
-		// settingRequired 현장은 엑셀 뷰의 isHiddenManager 게이트를 통과시켜 권한(ubcYn/longCalYn)대로 표시. 구 현장은 미적용.
-		if (Boolean.TRUE.equals(session.getAttribute("settingRequired"))) {
-			isHiddenManager = true;
-		}
-		
-		ExtensivePileUsage usage = extensivePileUsageMapper.findByConstructionIdx(param.getConstructionIdx());
-		if(usage != null) {
-			extensivePileUsage = usage.getIsUsed();
-		}else {
-			extensivePileUsage = 0;
-		}
-		
 		
 		List<ReportOneLine> domainList;
 		isBig = mapper.isOriginBigAllReports(param.getConstructionIdx());
@@ -651,7 +570,7 @@ public class ReportController{
 		if(isBig > 0) {
 			Construction con = constructionMapper.get(constructionIdx);
 			if(param.getConstructionIdx() > 0) {
-				domainList = extensivePileUsage > 0 ? mapper.getListByParamExtensivePileUsageExcelAllBig(param) : mapper.getListByParamExcelAllBig(param);
+				domainList = mapper.getListByParamExcelAllBig(param);
 			}else {
 				domainList = new ArrayList<ReportOneLine>();
 			}
@@ -674,7 +593,6 @@ public class ReportController{
 				model.addAttribute("showPdfYn", 0);
 			}
 			
-			overrideReportFlagsBySetting(model, session);
 			model.addAttribute("role", role);
 			model.addAttribute("isHiddenManager", isHiddenManager);
 			model.addAttribute("domainList", domainList);
@@ -682,26 +600,11 @@ public class ReportController{
 			model.addAttribute("param", param);
 			model.addAttribute("signRoomList", signRoomList);
 			model.addAttribute("constructionName", constructionName);
-			model.addAttribute("extensivePileUsage", extensivePileUsage);
 			
 			if(constructionIdx == 645) {
 				System.err.println("reportTenAllJh");
 				System.err.println("reportTenAllJh");
 				return "reportTenAllJh";
-			}
-			
-
-			if(constructionIdx == 1269 || param.getConstructionIdx() == 1269) {
-				System.err.println("reportTenAllFor1269");
-				System.err.println("reportTenAllFor1269");
-				return "reportTenAllFor1269";
-			}
-			
-			
-			if(extensivePileUsage > 0) {
-				System.err.println("reportTenAllFor1338");
-				System.err.println("reportTenAllFor1338");
-				return "reportTenAllFor1338";
 			}
 			
 			System.err.println("reportTenAll");
@@ -710,8 +613,7 @@ public class ReportController{
 		}
 		Construction con = constructionMapper.get(constructionIdx);
 		if(param.getConstructionIdx() > 0) {
-			//domainList = mapper.getListByParamExcelAll(param);
-			domainList = extensivePileUsage > 0 ? mapper.getListByParamExtensivePileUsageExcelAll(param) : mapper.getListByParamExcelAll(param);
+			domainList = mapper.getListByParamExcelAll(param);
 		}else {
 			domainList = new ArrayList<ReportOneLine>();
 		}
@@ -734,7 +636,6 @@ public class ReportController{
 			model.addAttribute("showPdfYn", 0);
 		}
 		
-		overrideReportFlagsBySetting(model, session);
 		model.addAttribute("role", role);
 		model.addAttribute("domainList", domainList);
 		model.addAttribute("isHiddenManager", isHiddenManager);
@@ -742,7 +643,6 @@ public class ReportController{
 		model.addAttribute("param", param);
 		model.addAttribute("signRoomList", signRoomList);
 		model.addAttribute("constructionName", constructionName);
-		model.addAttribute("extensivePileUsage", extensivePileUsage);
 		
 		if(constructionIdx == 645) {
 			System.err.println("reportFiveAllJh");
@@ -750,152 +650,12 @@ public class ReportController{
 			return "reportFiveAllJh";
 		}
 		
-		if(constructionIdx == 1082 || param.getConstructionIdx() == 1082) {
-			System.err.println("reportFiveAllBy");
-			System.err.println("reportFiveAllBy");
-			return "reportFiveAllBy";
-		}
-		
-		if(constructionIdx == 1269 || param.getConstructionIdx() == 1269) {
-			System.err.println("reportTenAllFor1269");
-			System.err.println("reportTenAllFor1269");
-			return "reportTenAllFor1269";
-		}
-		
-		if(extensivePileUsage > 0) {
-			System.err.println("reportFiveAllFor1338");
-			System.err.println("reportFiveAllFor1338");
-			return "reportFiveAllFor1338";
-		}
-		
-		
 		System.err.println("reportFiveAll");
 		System.err.println("reportFiveAll");
 		return "reportFiveAll";
 	}
+	
 	
-	//http://localhost:8080/web-template-mybatis/report/origin/download/all/excel?constructionIdx=812
-	//사용하지 않는것 같음...
-	//일단 중요하지 않는 걸로
-	/**@RequestMapping(value = "/origin/download/all/excel")
-	public String originDownLoadAllExcel(Model model, @ModelAttribute("domainParam") ReportParam param, BindingResult result, HttpSession session) {
-		
-		System.err.println("/origin/download/all/excel");
-		
-		int isBig = 0; 
-		int role = (int) session.getAttribute("role");
-		int constructionIdx = (int) session.getAttribute("constructionIdx");
-		boolean isHiddenManager  = (boolean) session.getAttribute("isHiddenManager");
-		// settingRequired 현장은 엑셀 뷰의 isHiddenManager 게이트를 통과시켜 권한(ubcYn/longCalYn)대로 표시. 구 현장은 미적용.
-		if (Boolean.TRUE.equals(session.getAttribute("settingRequired"))) {
-			isHiddenManager = true;
-		}
-		
-		List<ReportOneLine> domainList;
-		isBig = originReportMapper.isBigAllReports(param.getConstructionIdx());
-		Construction targetCon = constructionMapper.get(param.getConstructionIdx());
-		List<ExcelSignroom> signRoomList = null;
-		if(role == 0) {
-			//슈퍼관리자
-			signRoomList = excelSignroomMapper.getFindByConstructionIdxAndOrderBy(param.getConstructionIdx());
-		}else if(role == 1) {
-			//일반협력사
-			signRoomList = excelSignroomMapper.getFindByConstructionIdxAndOrderBy(constructionIdx);
-		}else if(role == 2) {
-			//시공사
-			signRoomList = excelSignroomMapper.getFindByConstructionIdxAndOrderBy(param.getConstructionIdx());
-		}else if(role == 3) {
-			//가맹점
-			signRoomList = excelSignroomMapper.getFindByConstructionIdxAndOrderBy(param.getConstructionIdx());
-		}
-		
-		if(isBig > 0) {
-			Construction con = constructionMapper.get(constructionIdx);
-			if(param.getConstructionIdx() > 0) {
-				domainList = originReportMapper.getListByParamExcelAllBig(param);
-			}else {
-				domainList = new ArrayList<ReportOneLine>();
-			}
-			try {
-				if((int) session.getAttribute("role") == 3) {
-					model.addAttribute("longCalYn", targetCon.getLongCalYn());
-					model.addAttribute("originDataYn", targetCon.getOriginDataYn());
-					model.addAttribute("ubcYn", targetCon.getUbcYn());
-					model.addAttribute("showPdfYn", targetCon.getShowPdfYn());
-				}else {
-					model.addAttribute("longCalYn", con.getLongCalYn());
-					model.addAttribute("originDataYn", con.getOriginDataYn());
-					model.addAttribute("ubcYn", con.getUbcYn());
-					model.addAttribute("showPdfYn", con.getShowPdfYn());
-				}
-			}catch (Exception e) {
-				model.addAttribute("longCalYn", 0);
-				model.addAttribute("originDataYn", 0);
-				model.addAttribute("ubcYn", 0);
-				model.addAttribute("showPdfYn", 0);
-			}
-			
-			overrideReportFlagsBySetting(model, session);
-			model.addAttribute("role", role);
-			model.addAttribute("isHiddenManager", isHiddenManager);
-			model.addAttribute("domainList", domainList);
-			model.addAttribute("constructionIdx", constructionIdx);
-			model.addAttribute("param", param);
-			model.addAttribute("signRoomList", signRoomList);
-			
-			if(constructionIdx == 645) {
-				System.err.println("reportTenAllJh");
-				System.err.println("reportTenAllJh");
-				return "reportTenAllJh";
-			}
-			System.err.println("reportTenAll");
-			System.err.println("reportTenAll");
-			return "reportTenAll";
-		}
-		//작은것들..
-		Construction con = constructionMapper.get(constructionIdx);
-		if(param.getConstructionIdx() > 0) {
-			domainList = originReportMapper.getListByParamExcelAll(param);
-		}else {
-			domainList = new ArrayList<ReportOneLine>();
-		}
-		try {
-			if((int) session.getAttribute("role") == 3) {
-				model.addAttribute("longCalYn", targetCon.getLongCalYn());
-				model.addAttribute("originDataYn", targetCon.getOriginDataYn());
-				model.addAttribute("ubcYn", targetCon.getUbcYn());
-				model.addAttribute("showPdfYn", targetCon.getShowPdfYn());
-			}else {
-				model.addAttribute("longCalYn", con.getLongCalYn());
-				model.addAttribute("originDataYn", con.getOriginDataYn());
-				model.addAttribute("ubcYn", con.getUbcYn());
-				model.addAttribute("showPdfYn", con.getShowPdfYn());
-			}
-		}catch (Exception e) {
-			model.addAttribute("longCalYn", 0);
-			model.addAttribute("originDataYn", 0);
-			model.addAttribute("ubcYn", 0);
-			model.addAttribute("showPdfYn", 0);
-		}
-		overrideReportFlagsBySetting(model, session);
-		model.addAttribute("role", role);
-		model.addAttribute("isHiddenManager", isHiddenManager);
-		model.addAttribute("domainList", domainList);
-		model.addAttribute("constructionIdx", constructionIdx);
-		model.addAttribute("param", param);
-		model.addAttribute("signRoomList", signRoomList);
-
-		if(constructionIdx == 645) {
-			System.err.println("reportFiveAllJh");
-			System.err.println("reportFiveAllJh");
-			return "reportFiveAllJh";
-		}
-		
-		System.err.println("reportFiveAll");
-		System.err.println("reportFiveAll");
-		return "reportFiveAll";
-	}
-	**/
 	
 	@ResponseBody
 	@RequestMapping(value = "/doRestoreMulti", method = RequestMethod.POST)
@@ -920,7 +680,6 @@ public class ReportController{
 	public boolean doDeleteMulti(@RequestBody List<UpdateReport> report) {
 		try {
 			for (UpdateReport updateReport : report) {  
-			
 				doDelete(updateReport);
 			}
 		}catch (Exception e) {
@@ -934,79 +693,6 @@ public class ReportController{
 	}
 	
 	@ResponseBody
-	@RequestMapping(value = "/update/report", method = RequestMethod.POST)
-	public boolean updateReport(@RequestBody UpdateReport report) {
-		
-		
-		/**report.setUltimateBearingCapacity(String.valueOf(calDanish(report)));
-		int result = mapper.update(report);
-		if(result > 0) {
-			//전체를 다 삭제하고.
-			pieceMapper.deleteByReportIdx(report.getId());
-			for (Piece piese : report.getPiece()) {
-				//다시 다 넣는다.
-				if(pieceMapper.insert(piese) == 0) {
-					return false;
-				}
-			}
-			
-			if(report.getPenetrations() != null) {
-				for (Penetration penetration : report.getPenetrations()) {
-					if(penetrationMapper.get(penetration.getId()) != null) {
-						penetrationMapper.update(penetration);
-					}else {
-						penetrationMapper.insert(penetration);
-					}
-				}
-			}
-		}
-		return true;**/
-		
-		
-		int constructionIdx = mapper.getConstructionIdx(report.getId());
-		
-		System.err.println("constructionIdx : " + constructionIdx);
-		
-		//ConstructionSetting setting = holder.get();
-		int extensivePileUsage = 0;
-		ExtensivePileUsage usage = extensivePileUsageMapper.findByConstructionIdx(constructionIdx);
-		System.err.println("usage : " + usage);
-		if(usage != null) {
-			extensivePileUsage = usage.getIsUsed();
-		}else {
-			extensivePileUsage = 0;
-		}
-		
-		report.setUltimateBearingCapacity(String.valueOf(calDanish(report)));
-		int result = mapper.update(report);
-		if(result > 0) {
-			//전체를 다 삭제하고.
-			System.err.println("Piece 전체를 다 삭제하고.");
-			pieceMapper.deleteByReportIdx(report.getId());
-			List<Piece> clearPieces = Utill.filterPieces(report.getPiece(), extensivePileUsage);
-			System.err.println("clearPieces : " + clearPieces.size());
-			for (Piece piese : clearPieces) {
-				//다시 다 넣는다.
-				if(pieceMapper.insert(piese) == 0) {
-					return false;
-				}
-			}
-			
-			
-			if(report.getPenetrations() != null) {
-				for (Penetration penetration : report.getPenetrations()) {
-					if(penetrationMapper.get(penetration.getId()) != null) {
-						penetrationMapper.update(penetration);
-					}else {
-						penetrationMapper.insert(penetration);
-					}
-				}
-			}
-		}
-		return true;
-	}
-	
-	/**@ResponseBody
 	@RequestMapping(value = "/update/reportMulti", method = RequestMethod.POST)
 	public boolean updateReportMulti(@RequestBody List<UpdateReport> report) {
 		try {
@@ -1017,94 +703,58 @@ public class ReportController{
 			return false;
 		}
 		return true;
-	}*/
-	
-	
-	@Transactional
-	@ResponseBody
-	@RequestMapping(value = "/update/reportMulti", method = RequestMethod.POST)
-	public boolean updateReportMulti(@RequestBody List<UpdateReport> reports) {
-	    try {
-	        for (UpdateReport report : reports) {
-	           updateReportOne(report);
-	        }
-	        return true;
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        return false;
-	    }
 	}
 	
 	
-	@Transactional
-	public boolean updateReportOne(UpdateReport report) {
+	
+	@ResponseBody
+	@RequestMapping(value = "/update/report", method = RequestMethod.POST)
+	public boolean updateReport(@RequestBody UpdateReport report) {
 		
-		int extensivePileUsage = 0;
-		
-		int construnctioIdx = mapper.getConstructionIdx(report.getId());
-		
-		ExtensivePileUsage usage = extensivePileUsageMapper.findByConstructionIdx(construnctioIdx);
-		
-		if(usage != null) {
-			extensivePileUsage = usage.getIsUsed();
-		}else {
-			extensivePileUsage = 0;
-		}
-	    // 1. 계산값 설정
-	    report.setUltimateBearingCapacity(String.valueOf(calDanish(report)));
-
-	    // 2. 메인 report update
-	    int result = mapper.update(report);
-	    if (result <= 0) {
-	        System.out.println("Report update 실패: ID = " + report.getId());
-	        return false;
-	    }
-
-	    // 3. 기존 piece 삭제
-	    int deletedCount = pieceMapper.deleteByReportIdx(report.getId());
-	    if (deletedCount < 0) {
-	        System.out.println("Piece 삭제 실패: report ID = " + report.getId());
-	        //throw new RuntimeException("Delete failed for report ID: " + report.getId());
-	        return false;
-	    }
-
-	    // 4. piece 재삽입
-	    //if (report.getPiece() != null) {
-	    //    for (Piece piece : report.getPiece()) {
-	    //        if (pieceMapper.insert(piece) == 0) {
-	    //            throw new RuntimeException("Insert failed for piece in report ID: " + report.getId());
-	    //        }
-	    //    }
-	    //}
-	    
-	    List<Piece> clearPieces = Utill.filterPieces(report.getPiece(), extensivePileUsage);
-		System.err.println("clearPieces : " + clearPieces.size());
-		for (Piece piese : clearPieces) {
-			//다시 다 넣는다.
-			if(pieceMapper.insert(piese) == 0) {
-				return false;
+		report.setUltimateBearingCapacity(String.valueOf(calDanish(report)));
+		int result = mapper.update(report);
+		if(result > 0) {
+			//전체를 다 삭제하고.
+			pieceMapper.deleteByReportIdx(report.getId());
+			for (Piece piese : report.getPiece()) {
+				//다시 다 넣는다.
+				if(pieceMapper.insert(piese) == 0) {
+					return false;
+				}
 			}
-		}
-
-	    // 5. penetration 처리
-	    if(report.getPenetrations() != null) {
-			for (Penetration penetration : report.getPenetrations()) {
-				if(penetrationMapper.get(penetration.getId()) != null) {
-					penetrationMapper.update(penetration);
-				}else {
-					penetrationMapper.insert(penetration);
+			
+			
+			if(report.getPenetrations() != null) {
+				for (Penetration penetration : report.getPenetrations()) {
+					if(penetrationMapper.get(penetration.getId()) != null) {
+						penetrationMapper.update(penetration);
+					}else {
+						penetrationMapper.insert(penetration);
+					}
 				}
 			}
 		}
-
-	    return true;
+		return true;
 	}
 	
-	/**@Transactional
-	public boolean updateReportOne(UpdateReport report) {
 	
+	public boolean updateReportOne(UpdateReport report) {
+		//원상태값
+		//Report rp = mapper.get(report.getId());
 		report.setUltimateBearingCapacity(String.valueOf(calDanish(report)));
-		int result = mapper.update(report);	
+		//report.setUltimateBearingCapacity(report.getUltimateBearingCapacity());
+		int result = mapper.update(report);
+//		List<Report> rp2 = mapper.getDuplicationRepotsAllReport(report);
+//		if(rp2.size() > 1) {
+//			for (int i = 0; i < rp2.size(); i++) {
+//				if(i == 0) {
+//					mapper.updateDupl2(rp2.get(i));
+//				} else {
+//					mapper.updateDupl(rp2.get(i));
+//				}
+//			}
+//		}
+		
 		if(result > 0) {
 			//전체를 다 삭제하고.
 			pieceMapper.deleteByReportIdx(report.getId());
@@ -1126,7 +776,7 @@ public class ReportController{
 			}
 		}
 		return true;
-	}**/
+	}
 	
 	
 	@ResponseBody
@@ -1217,30 +867,23 @@ public class ReportController{
 	public String regist(@ModelAttribute("domain") Report domain, SessionStatus sessionStatus) {
 		System.err.println("domain : {} " +  domain);
 		if (mapper.insert(domain) == 1) {
-			return "/report/regist";
+			return "/trashbin/regist";
 		}
-		return "/report/regist";
+		return "/trashbin/regist";
 	}
 	
 	@ResponseBody
 	@RequestMapping(value = "/today/list", method = RequestMethod.POST)
-	public List<ReportOneLine> getTodayList(@RequestParam("constructionIdx") int constructionIdx , @RequestParam("machineNumber") String machineNumber , @RequestParam("currentDateTime") String currentDateTime){
-		
-		System.err.println("constructionIdx : " + constructionIdx);
-		int extensivePileUsage = 0;
-		ExtensivePileUsage usage = extensivePileUsageMapper.findByConstructionIdx(constructionIdx);
-		if(usage != null) {
-			extensivePileUsage = usage.getIsUsed();
-		}else {
-			extensivePileUsage = 0;
-		}
-		System.err.println("extensivePileUsage : " + extensivePileUsage);
-		return extensivePileUsage > 0 ? mapper.getTodayListByPdfExtensivePileUsage(constructionIdx, machineNumber, currentDateTime) : mapper.getTodayListByPdf(constructionIdx, machineNumber, currentDateTime);
+	public List<ReportOneLine> getTodayList(@RequestParam("constructionIdx") int constructionIdx
+			, @RequestParam("machineNumber") String machineNumber
+			, @RequestParam("currentDateTime") String currentDateTime){
+		return mapper.getTodayListByPdf(constructionIdx, machineNumber, currentDateTime);
 	}
 	
 	@ResponseBody
 	@RequestMapping(value = "/machine/list", method = RequestMethod.POST)
-	public List<ReportOneLine> getTodayList(@RequestParam("constructionIdx") int constructionIdx , @RequestParam("machineNumber") String machineNumber){
+	public List<ReportOneLine> getTodayList(@RequestParam("constructionIdx") int constructionIdx
+			, @RequestParam("machineNumber") String machineNumber){
 		return mapper.getMachineListByPdf(constructionIdx, machineNumber);
 	}
 	
@@ -1258,3 +901,4 @@ public class ReportController{
 	    model.addAttribute("sessionInfo", sessionInfo);
 	}
 }
+

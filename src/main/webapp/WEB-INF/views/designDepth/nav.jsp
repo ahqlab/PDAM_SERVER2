@@ -84,9 +84,16 @@
 					<a href="${pageContext.request.contextPath}/device/list?constructionIdx=${sessionInfo.constructionIdx}">
 						<img src="${pageContext.request.contextPath}/images/menu_icon02.png" class="menu_icon">기기관리
 					</a>
+					<c:if test="${not sessionScope.settingRequired or (sessionScope.isHiddenManager ? sessionScope.constructionSetting.useAdminFileMenu : sessionScope.constructionSetting.useGuestFileMenu)}">
 					<a href="${pageContext.request.contextPath}/fileinventory/list?constructionIdx=${sessionInfo.constructionIdx}">
 						<img src="${pageContext.request.contextPath}/images/menu_icon01.png" class="menu_icon">파일반입 및 수정
 					</a>
+					</c:if>
+					<c:if test="${sessionScope.isHiddenManager and sessionScope.settingRequired}">
+					<a href="${pageContext.request.contextPath}/construction/settings?constructionIdx=${sessionInfo.constructionIdx}">
+						<img src="${pageContext.request.contextPath}/images/menu_icon01.png" class="menu_icon">설정
+					</a>
+					</c:if>
 					<%-- <a href="${pageContext.request.contextPath}/erpAdmin/list?constructionIdx=${sessionInfo.constructionIdx}">
 						<img src="${pageContext.request.contextPath}/images/menu_icon01.png" class="menu_icon">관리자현황
 					</a> --%>

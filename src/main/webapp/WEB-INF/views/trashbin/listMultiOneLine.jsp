@@ -1493,19 +1493,6 @@
 			<input type="hidden" id="machineNumber" name="machineNumber" value="${device.machineNumber}">
 			<input type="hidden" id="constructionName" name="constructionName" value="">
 			<input type="hidden" id="root" name="root" value="${pageContext.request.contextPath}">
-			<div class="titBtnArea">
-				<c:choose>
-					<c:when test="${sessionInfo.role == 1}">
-						<div class="printBtn02" onclick="goUrl('${pageContext.request.contextPath}/report/list?id=${param.id}&type=all&constructionIdx=${sessionInfo.constructionIdx}');">총 작업내역</div>
-						<div class="printBtn" onclick="goUrl('${pageContext.request.contextPath}/report/list?id=${param.id}&date=today&constructionIdx=${sessionInfo.constructionIdx}');">금일작업내역</div>
-						
-					</c:when>
-					<c:otherwise>
-						<div class="printBtn02" onclick="goUrl('${pageContext.request.contextPath}/report/list?id=${param.id}&type=all&constructionIdx=${param.constructionIdx}');">총 작업내역</div>
-						<div class="printBtn" style="background-color: #FBCA79; border : solid #FBCA79 1px;" onclick="goUrl('${pageContext.request.contextPath}/report/list?id=${param.id}&date=today&constructionIdx=${param.constructionIdx}');">금일작업내역</div>
-					</c:otherwise>
-				</c:choose>
-			</div>
 		</div>
 
 		<!--검색-->
@@ -1568,11 +1555,9 @@
 							<c:choose>												 
 								<c:when test="${sessionInfo.role == 0 || sessionInfo.hiddenManager == true || sessionInfo.role == 3}">
 									<c:if test="${useExcel}"><div class="btnType02 bg02" onclick="javascript:downloadExcel();">엑셀 출력</div></c:if>
-									<div class="btnType01" onclick="javascript:onClickReportUpdate();">기록지 수정</div>
 								</c:when>
 								<c:otherwise>
 									<c:if test="${useExcel}"><div class="btnType02 bg02" onclick="javascript:downloadExcel();">엑셀 출력</div></c:if>
-									<div class="btnType01" onclick="javascript:onClickReportUpdate();" style="display: none;">기록지 수정</div>
 								</c:otherwise>
 							</c:choose>
 						</div>
@@ -1624,7 +1609,6 @@
 							<c:choose>												 
 								<c:when test="${sessionInfo.role == 0 || sessionInfo.hiddenManager == true || sessionInfo.role == 3}">
 									<c:if test="${useExcel}"><div class="btnType02 bg02" onclick="javascript:downloadExcel();">엑셀 출력</div></c:if>
-									<div class="btnType01" onclick="javascript:onClickReportUpdate();">기록지 수정</div>
 								</c:when>
 								<c:otherwise>
 									<c:if test="${useExcel}"><div class="btnType02 bg02" onclick="javascript:downloadExcel();" style="float: right;">엑셀 출력</div></c:if>
@@ -2610,20 +2594,19 @@
 		<c:when test="${param.mode != 'simple'}">
 			 <c:choose>
 				<c:when test="${sessionInfo.role == 0}"> 
-						<div class="bottomBtn" style="margin-bottom: 10px;">
+						<div class="bottomBtn" style="margin-bottom: 10px; width: 100px;">
 							<div class="type01" onclick="javascript:doRestoreMulti();">복구</div>
-							<div class="type02" onclick="javascript:doDeleteMulti();" style="background: #EF340C; border: solid red 1px;">삭제</div>
 						</div>
 				 </c:when>
 				 <c:when test="${sessionInfo.hiddenManager == true  || sessionInfo.role == 3}">
-						<div class="bottomBtn" style="margin-bottom: 10px;">
-							<div class="type01" onclick="javascript:doRestoreMulti();" style="visibility: hidden;">복구</div>
-							<div class="type02" onclick="javascript:doDeleteMulti();"  style="background: #EF340C; border: solid red 1px;">삭제</div>
+						<div class="bottomBtn" style="margin-bottom: 10px; width: 100px;">
+							<div class="type01" onclick="javascript:doRestoreMulti();">복구</div>
 						</div>
 				 </c:when>
 			</c:choose>
 		</c:when>
 	</c:choose>
+			<c:if test="${false}"><%-- 휴지통은 복구 전용: PDF 버튼 미사용 --%>
 			<c:choose>
 				<c:when test="${sessionInfo.role == 0}"> <!-- 슈퍼관리자 -->
 					<div class="tableCArea">
@@ -2713,6 +2696,7 @@
 				</c:when>
 			</c:choose>
 			
+			</c:if>
 			<table id="sumGrpTb" class="sumGrpTb" style="table-layout: fixed">
 				<tr>
 					<td><img  src="${pageContext.request.contextPath}/new/img/report_up.png" onclick="javascript:onClickReportPrev();"></td>

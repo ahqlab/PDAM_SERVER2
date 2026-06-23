@@ -147,7 +147,7 @@
 	</select>
 
 	<select id="getConstructionBasic" resultType="map">
-		SELECT name, location, conManager FROM TB_CONSTRUCTION WHERE id = #{constructionIdx}
+		SELECT name, location, conManager, date_format(createDate, '%Y.%m.%d') as createDate FROM TB_CONSTRUCTION WHERE id = #{constructionIdx}
 	</select>
 
 	<select id="getDraftByConstructionIdx" resultMap="contractMap">

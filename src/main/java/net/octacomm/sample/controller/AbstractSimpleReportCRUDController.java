@@ -11,6 +11,7 @@ import net.octacomm.sample.dao.CRUDMapper;
 import net.octacomm.sample.dao.mapper.ConstructionMapper;
 import net.octacomm.sample.dao.mapper.ReportMapper;
 import net.octacomm.sample.domain.Construction;
+import net.octacomm.sample.domain.ConstructionSetting;
 import net.octacomm.sample.domain.Domain;
 import net.octacomm.sample.domain.DomainParam;
 import net.octacomm.sample.domain.SessionInfo;
@@ -115,7 +116,19 @@ public abstract class AbstractSimpleReportCRUDController<M extends CRUDMapper<D,
 			model.addAttribute("ubcYn", 0);
 			model.addAttribute("showPdfYn", 0);
 		}
-		model.addAttribute("page", page);		
+
+		// settingRequired 현장(TB_CONSTRUCTION_SETTING_CONFIG.APPLY_FROM_DATE 이후 등록)은
+		// 옛 TB_CONSTRUCTION 플래그를 무시하고 권한 설정(관리자=보안코드 useAdmin*, 게스트=일반 useGuest*)을 따른다.
+		Boolean settingRequired = (Boolean) session.getAttribute("settingRequired");
+		ConstructionSetting cs = (ConstructionSetting) session.getAttribute("constructionSetting");
+		if (Boolean.TRUE.equals(settingRequired) && cs != null) {
+			boolean admin = Boolean.TRUE.equals(session.getAttribute("isHiddenManager"));
+			model.addAttribute("longCalYn",    (admin ? cs.isUseAdminReportTime() : cs.isUseGuestReportTime()) ? 1 : 0);
+			model.addAttribute("ubcYn",         (admin ? cs.isUseAdminUbc()        : cs.isUseGuestUbc())        ? 1 : 0);
+			model.addAttribute("originDataYn",  (admin ? cs.isUseAdminOriginData() : cs.isUseGuestOriginData()) ? 1 : 0);
+			model.addAttribute("showPdfYn",     (admin ? cs.isUseAdminPdf()        : cs.isUseGuestPdf())        ? 1 : 0);
+		}
+		model.addAttribute("page", page);
 		model.addAttribute("domainList", domainList);
 		
 	}

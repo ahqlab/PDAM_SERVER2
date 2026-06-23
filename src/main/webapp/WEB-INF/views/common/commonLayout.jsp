@@ -20,7 +20,7 @@ $(function(){
 		$("#warp").attr('class','company');
     }else if( first_url.match('franchise')){
     	$("#warp").attr('class','franchise');
-    }else if( first_url.match('report') || first_url.match('fileinventory')  ||  first_url.match('simple')){
+    }else if( first_url.match('report') || first_url.match('fileinventory')  ||  first_url.match('simple') || first_url.match('trashbin')){
     	$("#warp").attr('class','view');
     }
 });

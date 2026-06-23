@@ -78,6 +78,37 @@ public interface ConstructionSettingMapper extends CRUDMapper<ConstructionSettin
     @Override
     java.util.List<ConstructionSetting> getList();
     
+    @Insert("INSERT INTO " + TABLE_NAME + " " + INSERT_FIELDS + " VALUES " + INSERT_VALUES
+            + " ON DUPLICATE KEY UPDATE " + UPDATE_VALUES)
+    int upsert(ConstructionSetting domain);
+
+    @Select("SELECT * FROM TB_CONSTRUCTION_SETTING_DEFAULT LIMIT 1")
+    @Results({
+        @Result(column="useAdminReportTime",    property="useAdminReportTime",    javaType=Boolean.class),
+        @Result(column="useGuestReportTime",    property="useGuestReportTime",    javaType=Boolean.class),
+        @Result(column="useAdminOriginData",    property="useAdminOriginData",    javaType=Boolean.class),
+        @Result(column="useGuestOriginData",    property="useGuestOriginData",    javaType=Boolean.class),
+        @Result(column="useAdminFileMenu",      property="useAdminFileMenu",      javaType=Boolean.class),
+        @Result(column="useGuestFileMenu",      property="useGuestFileMenu",      javaType=Boolean.class),
+        @Result(column="useAdminPdf",           property="useAdminPdf",           javaType=Boolean.class),
+        @Result(column="useGuestPdf",           property="useGuestPdf",           javaType=Boolean.class),
+        @Result(column="useAdminExcel",         property="useAdminExcel",         javaType=Boolean.class),
+        @Result(column="useGuestExcel",         property="useGuestExcel",         javaType=Boolean.class),
+        @Result(column="useAdminTrash",         property="useAdminTrash",         javaType=Boolean.class),
+        @Result(column="useGuestTrash",         property="useGuestTrash",         javaType=Boolean.class),
+        @Result(column="useAdminEditReport",    property="useAdminEditReport",    javaType=Boolean.class),
+        @Result(column="useGuestEditReport",    property="useGuestEditReport",    javaType=Boolean.class),
+        @Result(column="useAdminDeleteReport",  property="useAdminDeleteReport",  javaType=Boolean.class),
+        @Result(column="useGuestDeleteReport",  property="useGuestDeleteReport",  javaType=Boolean.class),
+        @Result(column="useAdminRestoreReport", property="useAdminRestoreReport", javaType=Boolean.class),
+        @Result(column="useGuestRestoreReport", property="useGuestRestoreReport", javaType=Boolean.class),
+        @Result(column="useAdminEditDai",       property="useAdminEditDai",       javaType=Boolean.class),
+        @Result(column="useGuestEditDai",       property="useGuestEditDai",       javaType=Boolean.class),
+        @Result(column="useAdminUbc",           property="useAdminUbc",           javaType=Boolean.class),
+        @Result(column="useGuestUbc",           property="useGuestUbc",           javaType=Boolean.class)
+    })
+    ConstructionSetting getDefault();
+
     @Select("SELECT * FROM " + TABLE_NAME + " WHERE constructionIdx = #{constructionIdx} ")
     @Results({
         @Result(column="constructionIdx", property="constructionIdx"),

@@ -70,6 +70,7 @@ var currentClauses = [];
 var constructionName = '${construction.name}';
 var constructionLocation = '${construction.location}';
 var constructionManager = '${construction.conManager}';
+var constructionCreateDate = '${construction.createDate}';
 
 /* ───── 좌측 목록 ───── */
 function refreshLeft() {
@@ -170,7 +171,7 @@ function renderDetail(c, clauses) {
 		+ '<h3 style="margin:0 0 8px;font-size:16px;">계약 조항</h3>'
 		+ (clauseHtml || '<p style="color:#999;">선택된 조항이 없습니다.</p>')
 		+ '<div style="margin-top:16px;font-size:12px;color:#333;line-height:1.8;border-top:1px solid #ddd;padding-top:12px;">'
-		+ (c.contractType !== 'DAILY' ? '<p>※ 동일사업장 PDAM시스템 SET 추가시 계약서 및 계약조건은 위 내용과 동일하다.</p>' : '<p>※ PDAM 시스템 SET 추가 시, 계약서 및 계약 조건은 위 내용과 동일합니다.</p>')
+		+ (c.contractType !== 'DAILY' ? '<p>※ 동일사업장에 PDAM시스템 SET 추가 시 별도 계약 체결 여부와 관계없이 본 계약서의 모든 조건이 동일하게 적용됩니다.</p>' : '<p>※ PDAM 시스템 SET 추가 시, 계약서 및 계약 조건은 위 내용과 동일합니다.</p>')
 		+ '<p style="margin-top:6px;">※ 협조 및 유의 사항</p>'
 		+ '<p style="padding-left:12px;">약정된 결제 기간(30일) 이내에 대금이 납부되지 않을 경우, 현장 기기 사용은 가능하나 서버 접속 및 데이터 연동이 제한될 수 있습니다.</p>'
 		+ '<p style="padding-left:12px;">원활한 서비스 이용을 위해 기한 내 납부를 부탁드립니다.</p>'
@@ -182,7 +183,7 @@ function renderDetail(c, clauses) {
 		+ '<div class="party-section">'
 
 		+ '<div class="party-card">'
-		+ '<div class="party-card-hdr">수 요 자 (을)</div>'
+		+ '<div class="party-card-hdr">수 요 자</div>'
 		+ '<table class="party-card-tbl">'
 		+ '<tr><th>상&nbsp;&nbsp;호</th><td>' + escHtml(c.reqTradeName||'') + '</td></tr>'
 		+ '<tr><th>사업자번호</th><td>' + escHtml(c.reqBusinessNo||'') + '</td></tr>'
@@ -199,7 +200,7 @@ function renderDetail(c, clauses) {
 		+ '</div>'
 
 		+ '<div class="party-card">'
-		+ '<div class="party-card-hdr">공 급 자 (갑)</div>'
+		+ '<div class="party-card-hdr">공 급 자</div>'
 		+ '<table class="party-card-tbl">'
 		+ '<tr><th>상&nbsp;&nbsp;호</th><td>우리기술 주식회사</td></tr>'
 		+ '<tr><th>사업자번호</th><td>787-88-01517</td></tr>'
@@ -258,6 +259,10 @@ function renderForm(contract, allClauses, selectedIdxs, nextContractNo) {
 	var typeDaily   = !isNew && contract.contractType === 'DAILY'   ? 'selected' : '';
 	var typeMonthly = !isNew && contract.contractType === 'MONTHLY' ? 'selected' : (isNew ? 'selected' : '');
 
+	var supplyStartVal = isNew
+		? escAttr(constructionCreateDate)
+		: escAttr((contract.supplyDeadline || '').split('~')[0].trim());
+
 	var clauseHtml = buildClauseCheckboxes(allClauses, selectedIdxs);
 
 	var html = '<div style="max-width:700px;">'
@@ -278,7 +283,8 @@ function renderForm(contract, allClauses, selectedIdxs, nextContractNo) {
 		+ row('회사명',    '<input id="f_companyName"      class="Input02" value="' + v('companyName') + '" />')
 		+ row('모델명',    '<input id="f_modelName" type="hidden" value="파일항타 관입량 자동측정 시스템(PDAM)" />'
 			+ '<span>파일항타 관입량 자동측정 시스템(PDAM)</span>')
-		+ row('공급기간',  '<input id="f_supplyDeadline"   class="Input02" value="' + v('supplyDeadline') + '" placeholder="예) 2025.01.01 ~ 2025.12.31" />')
+		+ row('공급기간',  '<input id="f_supplyStartDate" class="Input02 inputDate" style="width:160px;display:inline-block;" value="' + supplyStartVal + '" placeholder="예) 2025.01.01" readonly />'
+			+ '<span style="margin-left:8px;color:#555;">~ 공사종료시까지</span>')
 		+ row('사용료',    '<select id="f_dailyFeeSelect" class="Input02" style="width:100%;" onchange="onFeeChange()">'
 			+ '<option value="일금 일십육만원정 (₩160,000) VAT별도 / 출장비 별도 1회 ₩250,000">일금 일십육만원정 (₩160,000) VAT별도 / 출장비 별도 1회 ₩250,000</option>'
 			+ '<option value="일금 삼백만원정 (₩ 3,000,000) VAT별도">일금 삼백만원정 (₩ 3,000,000) VAT별도</option>'
@@ -309,6 +315,19 @@ function renderForm(contract, allClauses, selectedIdxs, nextContractNo) {
 	$('#rightPanel').html(html);
 	$('#rightPanel').find('input:not(#f_companySearch)').attr('autocomplete', 'off');
 	loadCompanyList();
+
+	$('#f_supplyStartDate').datepicker({
+		dateFormat: 'yy.mm.dd',
+		showOtherMonths: true,
+		showMonthAfterYear: true,
+		changeMonth: true,
+		changeYear: true,
+		yearSuffix: "년",
+		monthNamesShort: ['1','2','3','4','5','6','7','8','9','10','11','12'],
+		monthNames: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'],
+		dayNamesMin: ['일','월','화','수','목','금','토'],
+		dayNames: ['일요일','월요일','화요일','수요일','목요일','금요일','토요일']
+	});
 
 	var feeVal = $('#f_dailyFee').val();
 	if (!feeVal) {
@@ -428,7 +447,7 @@ function saveForm(isNew, contractIdx) {
 		siteName:         $('#f_siteName').val(),
 		companyName:      $('#f_companyName').val(),
 		modelName:        $('#f_modelName').val(),
-		supplyDeadline:   $('#f_supplyDeadline').val(),
+		supplyDeadline:   $('#f_supplyStartDate').val() + ' ~ 공사종료시까지',
 		dailyFee:         $('#f_dailyFee').val(),
 		reqTradeName:     $('#f_reqTradeName').val(),
 		reqAddress:       $('#f_reqAddress').val(),

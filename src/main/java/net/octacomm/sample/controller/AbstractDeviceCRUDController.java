@@ -196,10 +196,13 @@ public abstract class AbstractDeviceCRUDController<M extends CRUDMapper<D, P, PK
 		sessionInfo.setRole((Integer) session.getAttribute("role"));
 		sessionInfo.setConstructionIdx((Integer) session.getAttribute("constructionIdx"));
 		sessionInfo.setHiddenManager((Boolean) session.getAttribute("isHiddenManager"));
-		sessionInfo.setGroupIdx((Integer) session.getAttribute("groupIdx"));	
-		sessionInfo.setFcIdx((Integer) session.getAttribute("fcIdx"));	
-		sessionInfo.setShowPdfYn((Boolean) session.getAttribute("showPdfYn"));	
+		sessionInfo.setGroupIdx((Integer) session.getAttribute("groupIdx"));
+		sessionInfo.setFcIdx((Integer) session.getAttribute("fcIdx"));
+		sessionInfo.setShowPdfYn((Boolean) session.getAttribute("showPdfYn"));
+		Boolean sr = (Boolean) session.getAttribute("settingRequired");
+		sessionInfo.setSettingRequired(sr != null && sr);
 	    model.addAttribute("sessionInfo", sessionInfo);
+	    model.addAttribute("constructionSetting", session.getAttribute("constructionSetting"));
 	}
 
 }
