@@ -1,23 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="net.octacomm.sample.dao.mapper.ReportMapper">
+<mapper namespace="net.octacomm.sample.dao.mapper.TrashbinMapper">
 	<sql id="condition">
         <where>
         	A.deviceIdx = B.id AND B.constructionIdx = C.id
      		and A.deviceIdx = ${param.id}
+     		and A.isdel = 1
    			<if test="param.date != null and param.date != '' and param.date != null and param.date != ''">
        			and currentDateTime = #{param.date}
        		</if>
-       		<if test="param.role eq 1 or param.role eq 2 or param.role eq 3 or param.role eq 4"> 
-     			and A.isdel = 0 
-     		</if>
         	<if test="param.searchField != null and param.searchField != '' and param.searchWord != null and param.searchWord != ''">
        			and ${param.searchField} like '%${param.searchWord}%'
        		</if>
       		<if test="param.startDate != null and param.startDate != '' and param.endDate != null and param.endDate != ''">
        			and date(A.currentDateTime) <![CDATA[>=]]> #{param.startDate} and date(A.currentDateTime) <![CDATA[<=]]> #{param.endDate} 
-       		</if>       		
+       		</if>
        		<if test="param.pileNo != null and param.pileNo != ''">
        			and A.pileNo = #{param.pileNo} 
        		</if>
@@ -111,7 +109,6 @@
 				A.currentDateTime ,
 				A.location , A.pileNo ,
 				A.pileStandard ,
-				A.directDrillingDepth ,
 				A.drillingDepth ,
 				A.intrusionDepth ,
 				A.balance ,
@@ -186,9 +183,6 @@
 			AA.pileNo ,
 			AA.pileStandard ,
 			AA.drillingDepth ,
-			AA.directDrillingDepth ,
-			AA.stDrillingDepth ,
-			AA.sdDrillingDepth ,
 			AA.intrusionDepth ,
 			AA.balance ,
 			AA.connectLength ,
@@ -240,9 +234,6 @@
 			pileNo , 
 			pileStandard , 
 			drillingDepth , 
-			directDrillingDepth ,
-			stDrillingDepth , 
-            sdDrillingDepth , 
 			intrusionDepth , 
 			balance , 
 			connectLength , 
@@ -295,9 +286,6 @@
 		            A.pileNo , 
 		            A.pileStandard , 
 		            A.drillingDepth , 
-		            A.directDrillingDepth , 
-		            A.stDrillingDepth , 
-		            A.sdDrillingDepth , 
 		            A.intrusionDepth , 
 		            A.balance , 
 		            A.connectLength , 
@@ -356,9 +344,7 @@
 						 pileNo,
                          location 
                     FROM TB_REPORT
-				   WHERE deviceIdx IN (SELECT TD.ID FROM TB_DEVICE TD WHERE TD.constructionIdx = (
-							SELECT constructionIdx FROM TB_DEVICE WHERE ID IN (SELECT deviceIdx FROM TB_REPORT WHERE deviceIdx = ${param.id}) GROUP BY constructionIdx)
-                        )
+				   WHERE deviceIdx = ${param.id}
 					 AND isDel = 0
 				GROUP BY pileNo, location) CC 
 		              ON AA.pileNo  = CC.pileNo
@@ -367,6 +353,7 @@
 		    ORDER BY AA.createDate DESC
            LIMIT #{pageSize} OFFSET #{startRow}
     </select> 
+    
     
     <select id="getReportOneLineListByParam" resultType="ReportOneLine">
     	SELECT 
@@ -385,9 +372,6 @@
 			AA.pileNo ,
 			AA.pileStandard ,
 			AA.drillingDepth ,
-			AA.directDrillingDepth ,
-			AA.stDrillingDepth ,
-			AA.sdDrillingDepth ,
 			AA.intrusionDepth ,
 			AA.balance ,
 			AA.connectLength ,
@@ -460,9 +444,6 @@
 			pileNo , 
 			pileStandard , 
 			drillingDepth , 
-			directDrillingDepth ,
-			stDrillingDepth , 
-			sdDrillingDepth , 
 			intrusionDepth , 
 			balance , 
 			connectLength , 
@@ -535,9 +516,6 @@
 		            A.pileNo , 
 		            A.pileStandard , 
 		            A.drillingDepth , 
-		            A.directDrillingDepth ,
-		            A.stDrillingDepth , 
-		            A.sdDrillingDepth , 
 		            A.intrusionDepth , 
 		            A.balance , 
 		            A.connectLength , 
@@ -617,282 +595,7 @@
 						 pileNo,
                          location 
                     FROM TB_REPORT
-				   WHERE deviceIdx IN (SELECT TD.ID FROM TB_DEVICE TD WHERE TD.constructionIdx = (
-							SELECT constructionIdx FROM TB_DEVICE WHERE ID IN (SELECT deviceIdx FROM TB_REPORT WHERE deviceIdx = ${param.id}) GROUP BY constructionIdx)
-                        )
-					 AND isDel = 0
-				GROUP BY pileNo, location) CC 
-		              ON AA.pileNo  = CC.pileNo
-					 AND AA.location  = CC.location	
-		   WHERE 1=1
-		    ORDER BY AA.createDate DESC
-           LIMIT #{pageSize} OFFSET #{startRow}
-    </select> 
-    
-    <select id="getReportOneLineExtensivePileUsageListByParam" resultType="ReportOneLine">
-    	SELECT 
-			BB.cnt as duplicated,
-		    IFNULL(CC.cnt, 0) as totalDuplicated,
-            ifnull(getZoneNameForSamsung(TRIM(AA.pileNo)), 'ept') as zone,
-			AA.name ,
-			AA.longCalYn ,
-			AA.ubcYn ,
-			AA.lavelNo ,
-			AA.machineNumber , 
-			AA.id ,
-			AA.deviceIdx ,
-			AA.currentDateTime ,
-			AA.location ,
-			AA.pileNo ,
-			AA.pileStandard ,
-			AA.drillingDepth ,
-			AA.directDrillingDepth ,
-			AA.stDrillingDepth ,
-			AA.sdDrillingDepth ,
-			AA.intrusionDepth ,
-			AA.balance ,
-			AA.connectLength ,
-			AA.managedStandard ,
-			AA.avgPenetrationValue ,
-			AA.totalPenetrationValue ,
-			AA.hammaT ,
-			AA.fallMeter ,
-			AA.pileType ,
-			AA.method ,
-			AA.totalConnectWidth ,
-			AA.ultimateBearingCapacity ,
-			AA.crossSection ,
-			AA.hammaEfficiency ,
-			AA.modulusElasticity ,
-			AA.createDate, 
-			AA.isDel ,
-			AA.isDuple , 
-            AA.bigo ,
-			AA.sprCol1 ,
-			AA.constructionIdx ,
-			
-			AA.peOne ,
-            AA.peTwo ,
-            AA.peThree ,
-            AA.peFour ,
-            AA.peFive ,
-            AA.peSix ,
-            AA.peSeven ,
-            AA.peEight ,
-            AA.peNine ,
-            AA.peTen , 
-            
-            AA.peidOne,
-            AA.peidTwo,
-            AA.peidThree,
-            AA.peidFour,
-            AA.peidFive,
-            AA.peidSix,
-            AA.peidSeven,
-            AA.peidEight,
-            AA.peidNine,
-            AA.peidTen ,
-            
-            AA.piOne ,
-            AA.piTwo ,
-            AA.piThree ,
-            AA.piFour ,
-            AA.piFive ,
-            AA.piSix ,
-            AA.piSeven ,
-            
-            AA.pidOne ,
-            AA.pidTwo ,
-            AA.pidThree ,
-            AA.pidFour ,
-            AA.pidFive ,
-            AA.pidSix ,
-            AA.pidSeven ,
-            
-            AA.peLength
-            
-		FROM (
-		SELECT    
-		    name , 
-			longCalYn , 
-			ubcYn , 
-			lavelNo ,
-			machineNumber , 
-			id , 
-			deviceIdx , 
-			currentDateTime , 
-			location , 
-			pileNo , 
-			pileStandard , 
-			drillingDepth , 
-			directDrillingDepth ,
-			stDrillingDepth , 
-			sdDrillingDepth , 
-			intrusionDepth , 
-			balance , 
-			connectLength , 
-			managedStandard , 
-			avgPenetrationValue , 
-			totalPenetrationValue , 
-			hammaT , 
-			fallMeter , 
-			pileType , 
-			method , 
-			totalConnectWidth , 
-			ultimateBearingCapacity , 
-			crossSection , 
-			hammaEfficiency , 
-			modulusElasticity , 
-			isDel,
-			isDuple, 
-			role , 
-			IF(bigo = 'null','', bigo) as bigo ,
-			IF(sprCol1 = 'null','', sprCol1) as sprCol1 ,
-			createDate,
-			constructionIdx,
-			
-			peOne,
-            peTwo,
-            peThree,
-            peFour,
-            peFive,
-            peSix,
-            peSeven,
-            peEight,
-            peNine,
-            peTen ,
-            
-            peidOne,
-            peidTwo,
-            peidThree,
-            peidFour,
-            peidFive,
-            peidSix,
-            peidSeven,
-            peidEight,
-            peidNine,
-            peidTen ,
-             
-            piOne,
-            piTwo,
-            piThree,
-            piFour,
-            piFive ,
-            piSix ,
-            piSeven ,
-            
-            pidOne,
-            pidTwo,
-            pidThree,
-            pidFour,
-            pidFive ,
-            pidSix ,
-            pidSeven ,
-            
-            peLength
-			FROM ( 
-				SELECT 
-					C.name as name , 
-                    C.longCalYn , 
-                    C.ubcYn , 
-		            B.lavelNo as lavelNo ,
-		            B.machineNumber as machineNumber , 
-		            A.id , 
-		            A.deviceIdx , 
-		            A.currentDateTime , 
-		            A.location , 
-		            A.pileNo , 
-		            A.pileStandard , 
-		            A.drillingDepth , 
-		            A.directDrillingDepth ,
-		            A.stDrillingDepth , 
-		            A.sdDrillingDepth , 
-		            A.intrusionDepth , 
-		            A.balance , 
-		            A.connectLength , 
-		            A.managedStandard , 
-		            A.avgPenetrationValue , 
-		            A.totalPenetrationValue , 
-		            A.hammaT , 
-		            A.fallMeter , 
-		            A.pileType , 
-		            A.method , 
-		            A.totalConnectWidth , 
-		            A.ultimateBearingCapacity , 
-		            A.crossSection , 
-		            A.hammaEfficiency , 
-		            A.modulusElasticity , 
-					A.isDel,
-                    A.isDuple, 
-		            C.role , 
-		            IF(A.bigo = 'null','', A.bigo) as bigo ,
-		            IF(A.sprCol1 = 'null','', A.sprCol1) as sprCol1 ,
-                    A.createDate ,
-		            B.constructionIdx ,
-	            	
-	                
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 0,1) as peOne,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 1,1) as peTwo,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 2,1) as peThree,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 3,1) as peFour,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 4,1) as peFive,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 5,1) as peSix,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 6,1) as peSeven,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 7,1) as peEight,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 8,1) as peNine,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 9,1) as peTen ,
-	                
-	                (SELECT  IF(id = 0, '', id) as id  FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 0,1) as peidOne,
-	                (SELECT  IF(id = 0, '', id) as id  FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 1,1) as peidTwo,
-	                (SELECT  IF(id = 0, '', id) as id  FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 2,1) as peidThree,
-	                (SELECT  IF(id = 0, '', id) as id  FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 3,1) as peidFour,
-	                (SELECT  IF(id = 0, '', id) as id  FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 4,1) as peidFive,
-	                (SELECT  IF(id = 0, '', id) as id  FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 5,1) as peidSix,
-	                (SELECT  IF(id = 0, '', id) as id  FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 6,1) as peidSeven,
-	                (SELECT  IF(id = 0, '', id) as id  FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 7,1) as peidEight,
-	                (SELECT  IF(id = 0, '', id) as id  FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 8,1) as peidNine,
-	                (SELECT  IF(id = 0, '', id) as id  FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 9,1) as peidTen , 
-	                
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "단본" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piOne,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "하단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piTwo,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 0,1),'') as piThree,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 1,1),'') as piFour,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 2,1),'') as piFive,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 3,1),'') as piSix,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "상단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piSeven,
-	                
-	                ifnull((SELECT IF(id = 0, '', id) as id FROM TB_PIECE WHERE reportIdx = A.id and name = "단본"),'') as pidOne,
-	                ifnull((SELECT IF(id = 0, '', id) as id FROM TB_PIECE WHERE reportIdx = A.id and name = "하단"),'') as pidTwo,
-	                ifnull((SELECT IF(id = 0, '', id) as id FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 0,1),'') as pidThree,
-	                ifnull((SELECT IF(id = 0, '', id) as id FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 1,1),'') as pidFour,
-	                ifnull((SELECT IF(id = 0, '', id) as id FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 2,1),'') as pidFive,
-	                ifnull((SELECT IF(id = 0, '', id) as id FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 3,1),'') as pidSix,
-	                ifnull((SELECT IF(id = 0, '', id) as id FROM TB_PIECE WHERE reportIdx = A.id and name = "상단"),'') as pidSeven,
-	                
-	                (SELECT SUM(CASE WHEN VALUE IS NULL THEN 0 ELSE 1 END) AS peLength FROM TB_PENETRATION  WHERE reportIdx = A.id LIMIT 5) as peLength
-		            
-				FROM TB_REPORT A , TB_DEVICE B, TB_CONSTRUCTION C 
-		        <include refid="condition"/>
-			ORDER BY A.createDate DESC ) as TB) AA LEFT OUTER JOIN
-				 (SELECT COUNT(*) as cnt,
-						 deviceIdx,  
-                         pileNo,
-                         location 
-                    FROM TB_REPORT
 				   WHERE deviceIdx = ${param.id}
-					 AND isDel = 0
-				GROUP BY deviceIdx, pileNo, location) BB 
-		              ON AA.deviceIdx  = BB.deviceIdx
-					 AND AA.pileNo  = BB.pileNo
-					 AND AA.location  = BB.location
-				LEFT OUTER JOIN
-				 (SELECT COUNT(*) as cnt,
-						 pileNo,
-                         location 
-                    FROM TB_REPORT
-				   WHERE deviceIdx IN (SELECT TD.ID FROM TB_DEVICE TD WHERE TD.constructionIdx = (
-							SELECT constructionIdx FROM TB_DEVICE WHERE ID IN (SELECT deviceIdx FROM TB_REPORT WHERE deviceIdx = ${param.id}) GROUP BY constructionIdx)
-                        )
 					 AND isDel = 0
 				GROUP BY pileNo, location) CC 
 		              ON AA.pileNo  = CC.pileNo
@@ -958,9 +661,6 @@
 			pileNo ,
 			pileStandard ,
 			drillingDepth ,
-			directDrillingDepth ,
-			stDrillingDepth ,
-			sdDrillingDepth ,
 			intrusionDepth ,
 			balance ,
 			connectLength ,
@@ -1025,9 +725,6 @@
 				A.location , A.pileNo ,
 				A.pileStandard ,
 				A.drillingDepth ,
-				A.directDrillingDepth ,
-				A.stDrillingDepth ,
-				A.sdDrillingDepth ,
 				A.intrusionDepth ,
 				A.balance ,
 				A.connectLength ,
@@ -1184,9 +881,6 @@
 			pileNo ,
 			pileStandard ,
 			drillingDepth ,
-			directDrillingDepth ,
-			stDrillingDepth ,
-			sdDrillingDepth ,
 			intrusionDepth ,
 			balance ,
 			connectLength ,
@@ -1246,9 +940,6 @@
 				A.location , A.pileNo ,
 				A.pileStandard ,
 				A.drillingDepth ,
-				A.directDrillingDepth ,
-				A.stDrillingDepth ,
-				A.sdDrillingDepth ,
 				A.intrusionDepth ,
 				A.balance ,
 				A.connectLength ,
@@ -1392,9 +1083,6 @@
 			pileNo ,
 			pileStandard ,
 			drillingDepth ,
-			directDrillingDepth ,
-			stDrillingDepth ,
-			sdDrillingDepth ,
 			intrusionDepth ,
 			balance ,
 			connectLength ,
@@ -1427,9 +1115,6 @@
 				A.location , A.pileNo ,
 				A.pileStandard ,
 				A.drillingDepth ,
-				A.directDrillingDepth ,
-				A.stDrillingDepth ,
-				A.sdDrillingDepth ,
 				A.intrusionDepth ,
 				A.balance ,
 				A.connectLength ,
@@ -1484,195 +1169,6 @@
     </select>
     
     <!-- 10회 전체출력 --> 
-    <select id="getListByParamExtensivePileUsageExcelAll" resultType="ReportOneLine">
-		SELECT 
-			BB.cnt as duplicated,
-		    IFNULL(CC.cnt, 0) as totalDuplicated,
-			AA.name ,
-		    AA.lavelNo ,
-		    AA.machineNumber , 
-		    AA.id , 
-		    AA.deviceIdx ,
-		    AA.currentDateTime ,
-		    AA.location ,
-		    AA.pileNo ,
-		    AA.pileStandard ,
-		    AA.drillingDepth ,
-		    AA.directDrillingDepth ,
-		    AA.stDrillingDepth ,
-		    AA.sdDrillingDepth ,
-		    AA.intrusionDepth ,
-		    AA.balance ,
-		    AA.connectLength ,
-		    AA.managedStandard , 
-		    AA.avgPenetrationValue , 
-		    AA.totalPenetrationValue , 
-		    AA.hammaT , 
-		    AA.fallMeter , 
-		    AA.pileType , 
-		    AA.method , 
-		    AA.totalConnectWidth , 
-		    AA.ultimateBearingCapacity , 
-		    AA.crossSection , 
-		    AA.hammaEfficiency , 
-		    AA.modulusElasticity , 
-		    AA.createDate , 
-		    AA.role, 
-		    AA.isDel, 
-		    AA.bigo, 
-		    AA.sprCol1, 
-		    AA.peOne,
-		    AA.peTwo, 
-		    AA.peThree, 
-		    AA.peFour, 
-		    AA.peFive, 
-		    AA.peSix,
-		    AA.peSeven, 
-		    AA.peEight, 
-		    AA.peNine, 
-		    AA.peTen, 
-		    AA.piOne, 
-		    AA.piTwo, 
-		    AA.piThree, 
-		    AA.piFour, 
-		    AA.piFive, 
-		    AA.piSix, 
-		    AA.piSeven, 
-		    AA.constructionIdx 
-		FROM (
-		SELECT    
-		    name ,
-		    lavelNo ,
-		    machineNumber , 
-		    id , 
-		    deviceIdx ,
-		    currentDateTime ,
-		    location ,
-		    pileNo ,
-		    pileStandard ,
-		    drillingDepth ,
-		    directDrillingDepth ,
-		    stDrillingDepth ,
-		    sdDrillingDepth ,
-		    intrusionDepth ,
-		    balance ,
-		    connectLength ,
-		    managedStandard , 
-		    avgPenetrationValue , 
-		    totalPenetrationValue , 
-		    hammaT , 
-		    fallMeter , 
-		    pileType , 
-		    method , 
-		    totalConnectWidth , 
-		    ultimateBearingCapacity , 
-		    crossSection , 
-		    hammaEfficiency , 
-		    modulusElasticity , 
-		    createDate , 
-		    role, 
-		    isDel, 
-		    bigo, 
-		    sprCol1, 
-		    peOne,
-		    peTwo, 
-		    peThree, 
-		    peFour, 
-		    peFive, 
-		    peSix,
-		    peSeven, 
-		    peEight, 
-		    peNine, 
-		    peTen, 
-		    piOne, 
-		    piTwo, 
-		    piThree, 
-		    piFour, 
-		    piFive, 
-		    piSix, 
-		    piSeven, 
-		    constructionIdx 
-			FROM ( 
-				SELECT 
-					C.name as name , 
-		            B.lavelNo as lavelNo ,
-		            B.machineNumber as machineNumber , 
-		            A.id , 
-		            A.deviceIdx , 
-		            A.currentDateTime , 
-		            A.location , 
-		            A.pileNo , 
-		            A.pileStandard , 
-		            A.drillingDepth , 
-		            A.directDrillingDepth ,
-		            A.stDrillingDepth , 
-		            A.sdDrillingDepth , 
-		            A.intrusionDepth , 
-		            A.balance , 
-		            A.connectLength , 
-		            A.managedStandard , 
-		            A.avgPenetrationValue , 
-		            A.totalPenetrationValue , 
-		            A.hammaT , 
-		            A.fallMeter , 
-		            A.pileType , 
-		            A.method , 
-		            A.isDel, 
-		            A.totalConnectWidth , 
-		            A.ultimateBearingCapacity , 
-		            A.crossSection , 
-		            A.hammaEfficiency , 
-		            A.modulusElasticity , 
-					(SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 0,1) as peOne,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 1,1) as peTwo,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 2,1) as peThree,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 3,1) as peFour,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 4,1) as peFive,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 5,1) as peSix,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 6,1) as peSeven,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 7,1) as peEight,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 8,1) as peNine,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 9,1) as peTen , 
-	                
-                    ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "단본" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piOne,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "하단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piTwo,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 0,1),'') as piThree,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 1,1),'') as piFour,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 2,1),'') as piFive,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 3,1),'') as piSix,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "상단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piSeven,
-					A.createDate,
-		            C.role , 
-		            IF(A.bigo = 'null','',A.bigo) as bigo ,
-		            IF(A.sprCol1 = 'null','',A.sprCol1) as sprCol1 ,
-		            B.constructionIdx 
-				FROM TB_REPORT A , TB_DEVICE B, TB_CONSTRUCTION C 
-		        WHERE A.deviceIdx = B.id 
-		         AND B.constructionIdx = C.id 
-		         and C.id = #{param.constructionIdx} 
-		         and A.isdel = 0 
-			ORDER BY A.createDate asc ) as TB) AA LEFT OUTER JOIN
-				 (select count(*) as cnt, deviceIdx,  pileNo, location from TB_REPORT
-					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} )
-					   and isDel = 0
-				     group by deviceIdx, pileNo, location) BB 
-		             ON AA.deviceIdx  = BB.deviceIdx
-					AND	AA.pileNo  = BB.pileNo
-					AND	AA.location  = BB.location
-				LEFT OUTER JOIN
-				 (select count(*) as cnt, pileNo, location from TB_REPORT
-					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} AND isDel = 0 AND conduct = 0 )
-					   and isDel = 0
-				     group by pileNo, location) CC 
-		             ON AA.pileNo  = CC.pileNo
-					AND	AA.location  = CC.location	
-		    <include refid="allExcelCondition"/>
-		    ORDER BY AA.machineNumber , AA.createDate ASC
-    </select> 
-    
-    
-    
-    <!-- 10회 전체출력 --> 
     <select id="getListByParamExcelAllBig" resultType="ReportOneLine">
 		SELECT 
 			BB.cnt as duplicated,
@@ -1687,9 +1183,6 @@
 		    AA.pileNo ,
 		    AA.pileStandard ,
 		    AA.drillingDepth ,
-		    AA.directDrillingDepth ,
-		    AA.stDrillingDepth ,
-		    AA.sdDrillingDepth ,
 		    AA.intrusionDepth ,
 		    AA.balance ,
 		    AA.connectLength ,
@@ -1738,9 +1231,6 @@
 		    pileNo ,
 		    pileStandard ,
 		    drillingDepth ,
-		    directDrillingDepth ,
-		    stDrillingDepth ,
-		    sdDrillingDepth ,
 		    intrusionDepth ,
 		    balance ,
 		    connectLength ,
@@ -1789,9 +1279,6 @@
 		            A.pileNo , 
 		            A.pileStandard , 
 		            A.drillingDepth , 
-		            A.directDrillingDepth ,
-		            A.stDrillingDepth , 
-		            A.sdDrillingDepth , 
 		            A.intrusionDepth , 
 		            A.balance , 
 		            A.connectLength , 
@@ -1851,191 +1338,7 @@
 		    <include refid="allExcelCondition"/>
 		    ORDER BY AA.machineNumber , AA.createDate ASC
     </select> 
-    <!-- 10회 전체출력 --> 
-    <select id="getListByParamExtensivePileUsageExcelAllBig" resultType="ReportOneLine">
-		SELECT 
-			BB.cnt as duplicated,
-		    IFNULL(CC.cnt, 0) as totalDuplicated,
-			AA.name ,
-		    AA.lavelNo ,
-		    AA.machineNumber , 
-		    AA.id , 
-		    AA.deviceIdx ,
-		    AA.currentDateTime ,
-		    AA.location ,
-		    AA.pileNo ,
-		    AA.pileStandard ,
-		    AA.drillingDepth ,
-		    AA.directDrillingDepth ,
-		    AA.stDrillingDepth ,
-		    AA.sdDrillingDepth ,
-		    AA.intrusionDepth ,
-		    AA.balance ,
-		    AA.connectLength ,
-		    AA.managedStandard , 
-		    AA.avgPenetrationValue , 
-		    AA.totalPenetrationValue , 
-		    AA.hammaT , 
-		    AA.fallMeter , 
-		    AA.pileType , 
-		    AA.method , 
-		    AA.totalConnectWidth , 
-		    AA.ultimateBearingCapacity , 
-		    AA.crossSection , 
-		    AA.hammaEfficiency , 
-		    AA.modulusElasticity , 
-		    AA.createDate , 
-		    AA.role, 
-		    AA.isDel, 
-		    AA.bigo, 
-		    AA.sprCol1, 
-		    AA.peOne,
-		    AA.peTwo, 
-		    AA.peThree, 
-		    AA.peFour, 
-		    AA.peFive, 
-		    AA.peSix,
-		    AA.peSeven, 
-		    AA.peEight, 
-		    AA.peNine, 
-		    AA.peTen, 
-		    AA.piOne, 
-		    AA.piTwo, 
-		    AA.piThree, 
-		    AA.piFour, 
-		    AA.piFive, 
-		    AA.piSix, 
-		    AA.piSeven, 
-		    AA.constructionIdx 
-		FROM (
-		SELECT    
-		    name ,
-		    lavelNo ,
-		    machineNumber , 
-		    id , 
-		    deviceIdx ,
-		    currentDateTime ,
-		    location ,
-		    pileNo ,
-		    pileStandard ,
-		    drillingDepth ,
-		    directDrillingDepth ,
-		    stDrillingDepth ,
-		    sdDrillingDepth ,
-		    intrusionDepth ,
-		    balance ,
-		    connectLength ,
-		    managedStandard , 
-		    avgPenetrationValue , 
-		    totalPenetrationValue , 
-		    hammaT , 
-		    fallMeter , 
-		    pileType , 
-		    method , 
-		    totalConnectWidth , 
-		    ultimateBearingCapacity , 
-		    crossSection , 
-		    hammaEfficiency , 
-		    modulusElasticity , 
-		    createDate , 
-		    role, 
-		    isDel, 
-		    bigo, 
-		    sprCol1, 
-		    peOne,
-		    peTwo, 
-		    peThree, 
-		    peFour, 
-		    peFive, 
-		    peSix,
-		    peSeven, 
-		    peEight, 
-		    peNine, 
-		    peTen, 
-		    piOne, 
-		    piTwo, 
-		    piThree, 
-		    piFour, 
-		    piFive, 
-		    piSix, 
-		    piSeven, 
-		    constructionIdx 
-			FROM ( 
-				SELECT 
-					C.name as name , 
-		            B.lavelNo as lavelNo ,
-		            B.machineNumber as machineNumber , 
-		            A.id , 
-		            A.deviceIdx , 
-		            A.currentDateTime , 
-		            A.location , 
-		            A.pileNo , 
-		            A.pileStandard , 
-		            A.drillingDepth , 
-		            A.directDrillingDepth ,
-		            A.stDrillingDepth , 
-		            A.sdDrillingDepth , 
-		            A.intrusionDepth , 
-		            A.balance , 
-		            A.connectLength , 
-		            A.managedStandard , 
-		            A.avgPenetrationValue , 
-		            A.totalPenetrationValue , 
-		            A.hammaT , 
-		            A.fallMeter , 
-		            A.pileType , 
-		            A.method , 
-		            A.isDel, 
-		            A.totalConnectWidth , 
-		            A.ultimateBearingCapacity , 
-		            A.crossSection , 
-		            A.hammaEfficiency , 
-		            A.modulusElasticity , 
-					(SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 0,1) as peOne,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 1,1) as peTwo,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 2,1) as peThree,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 3,1) as peFour,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 4,1) as peFive,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 5,1) as peSix,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 6,1) as peSeven,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 7,1) as peEight,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 8,1) as peNine,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 9,1) as peTen , 
-                    ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "단본" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piOne,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "하단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piTwo,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 0,1),'') as piThree,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 1,1),'') as piFour,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 2,1),'') as piFive,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 3,1),'') as piSix,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "상단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piSeven,
-					A.createDate,
-		            C.role , 
-		            IF(A.bigo = 'null','',A.bigo) as bigo ,
-		            IF(A.sprCol1 = 'null','',A.sprCol1) as sprCol1 ,
-		            B.constructionIdx 
-				FROM TB_REPORT A , TB_DEVICE B, TB_CONSTRUCTION C 
-		        WHERE A.deviceIdx = B.id 
-		         AND B.constructionIdx = C.id 
-		         and C.id = #{param.constructionIdx} 
-		         and A.isdel = 0 
-			ORDER BY A.createDate asc ) as TB) AA LEFT OUTER JOIN
-				 (select count(*) as cnt, deviceIdx,  pileNo, location from TB_REPORT
-					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} )
-					   and isDel = 0
-				     group by deviceIdx, pileNo, location) BB 
-		             ON AA.deviceIdx  = BB.deviceIdx
-					AND	AA.pileNo  = BB.pileNo
-					AND	AA.location  = BB.location
-				LEFT OUTER JOIN
-				 (select count(*) as cnt, pileNo, location from TB_REPORT
-					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} AND isDel = 0 AND conduct = 0 )
-					   and isDel = 0
-				     group by pileNo, location) CC 
-		             ON AA.pileNo  = CC.pileNo
-					AND	AA.location  = CC.location	
-		    <include refid="allExcelCondition"/>
-		    ORDER BY AA.machineNumber , AA.createDate ASC
-    </select> 
+    
     
     <!-- 5회 전체출력 -->
      <select id="getListByParamExcelAll" resultType="ReportOneLine">
@@ -2052,9 +1355,6 @@
 		    AA.pileNo ,
 		    AA.pileStandard ,
 		    AA.drillingDepth ,
-		    AA.directDrillingDepth ,
-		    AA.stDrillingDepth ,
-		    AA.sdDrillingDepth ,
 		    AA.intrusionDepth ,
 		    AA.balance ,
 		    AA.connectLength ,
@@ -2098,9 +1398,6 @@
 		    pileNo ,
 		    pileStandard ,
 		    drillingDepth ,
-		    directDrillingDepth ,
-		    stDrillingDepth ,
-		    sdDrillingDepth ,
 		    intrusionDepth ,
 		    balance ,
 		    connectLength ,
@@ -2144,9 +1441,6 @@
 		            A.pileNo , 
 		            A.pileStandard , 
 		            A.drillingDepth , 
-		            A.directDrillingDepth ,
-		            A.stDrillingDepth , 
-		            A.sdDrillingDepth , 
 		            A.intrusionDepth , 
 		            A.balance , 
 		            A.connectLength , 
@@ -2202,192 +1496,7 @@
 		    ORDER BY AA.machineNumber , AA.createDate ASC
     </select> 
     
-     <!-- 일일기록지 > 10회 출력 > 중단 많은 버전--> 
-    <select id="getListByParamExtensivePileUsageExcelTen" resultType="ReportOneLine">
-		SELECT 
-			BB.cnt as duplicated,
-		    IFNULL(CC.cnt, 0) as totalDuplicated,
-			AA.name ,
-		    AA.lavelNo ,
-		    AA.machineNumber , 
-		    AA.id , 
-		    AA.deviceIdx ,
-		    AA.currentDateTime ,
-		    AA.location ,
-		    AA.pileNo ,
-		    AA.pileStandard ,
-		    AA.drillingDepth ,
-		    AA.directDrillingDepth ,
-		    AA.stDrillingDepth ,
-		    AA.sdDrillingDepth ,
-		    AA.intrusionDepth ,
-		    AA.balance ,
-		    AA.connectLength ,
-		    AA.managedStandard , 
-		    AA.avgPenetrationValue , 
-		    AA.totalPenetrationValue , 
-		    AA.hammaT , 
-		    AA.fallMeter , 
-		    AA.pileType , 
-		    AA.method , 
-		    AA.totalConnectWidth , 
-		    AA.ultimateBearingCapacity , 
-		    AA.crossSection , 
-		    AA.hammaEfficiency , 
-		    AA.modulusElasticity , 
-		    AA.createDate , 
-		    AA.role, 
-		    AA.isDel, 
-		    AA.bigo, 
-		    AA.sprCol1, 
-		    AA.peOne,
-		    AA.peTwo, 
-		    AA.peThree, 
-		    AA.peFour, 
-		    AA.peFive, 
-		    AA.peSix,
-		    AA.peSeven, 
-		    AA.peEight, 
-		    AA.peNine, 
-		    AA.peTen, 
-		    AA.piOne, 
-		    AA.piTwo, 
-		    AA.piThree, 
-		    AA.piFour, 
-		    AA.piFive, 
-		    AA.piSix, 
-		    AA.piSeven, 
-		    AA.constructionIdx 
-		FROM (
-		SELECT    
-		    name ,
-		    lavelNo ,
-		    machineNumber , 
-		    id , 
-		    deviceIdx ,
-		    currentDateTime ,
-		    location ,
-		    pileNo ,
-		    pileStandard ,
-		    drillingDepth ,
-		    directDrillingDepth ,
-		    stDrillingDepth ,
-		    sdDrillingDepth ,
-		    intrusionDepth ,
-		    balance ,
-		    connectLength ,
-		    managedStandard , 
-		    avgPenetrationValue , 
-		    totalPenetrationValue , 
-		    hammaT , 
-		    fallMeter , 
-		    pileType , 
-		    method , 
-		    totalConnectWidth , 
-		    ultimateBearingCapacity , 
-		    crossSection , 
-		    hammaEfficiency , 
-		    modulusElasticity , 
-		    createDate , 
-		    role, 
-		    isDel, 
-		    bigo, 
-		    sprCol1, 
-		    peOne,
-		    peTwo, 
-		    peThree, 
-		    peFour, 
-		    peFive, 
-		    peSix,
-		    peSeven, 
-		    peEight, 
-		    peNine, 
-		    peTen, 
-		    piOne, 
-		    piTwo, 
-		    piThree, 
-		    piFour, 
-		    piFive, 
-		    piSix, 
-		    piSeven, 
-		    constructionIdx 
-			FROM ( 
-				SELECT 
-					C.name as name , 
-		            B.lavelNo as lavelNo ,
-		            B.machineNumber as machineNumber , 
-		            A.id , 
-		            A.deviceIdx , 
-		            A.currentDateTime , 
-		            A.location , 
-		            A.pileNo , 
-		            A.pileStandard , 
-		            A.drillingDepth , 
-		            A.directDrillingDepth ,
-		            A.stDrillingDepth , 
-		            A.sdDrillingDepth , 
-		            A.intrusionDepth , 
-		            A.balance , 
-		            A.connectLength , 
-		            A.managedStandard , 
-		            A.avgPenetrationValue , 
-		            A.totalPenetrationValue , 
-		            A.hammaT , 
-		            A.fallMeter , 
-		            A.pileType , 
-		            A.method , 
-		            A.isDel, 
-		            A.totalConnectWidth , 
-		            A.ultimateBearingCapacity , 
-		            A.crossSection , 
-		            A.hammaEfficiency , 
-		            A.modulusElasticity , 
-					(SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 0,1) as peOne,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 1,1) as peTwo,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 2,1) as peThree,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 3,1) as peFour,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 4,1) as peFive,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 5,1) as peSix,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 6,1) as peSeven,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 7,1) as peEight,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 8,1) as peNine,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 9,1) as peTen , 
-                    ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "단본" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piOne,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "하단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piTwo,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 0,1),'') as piThree,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 1,1),'') as piFour,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 2,1),'') as piFive,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 3,1),'') as piSix,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "상단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piSeven,
-					A.createDate,
-		            C.role , 
-		            IF(A.bigo = 'null','',A.bigo) as bigo ,
-		            IF(A.sprCol1 = 'null','',A.sprCol1) as sprCol1 ,
-		            B.constructionIdx 
-				FROM TB_REPORT A , TB_DEVICE B, TB_CONSTRUCTION C 
-		        WHERE A.deviceIdx = B.id 
-		         AND B.constructionIdx = C.id 
-		         and C.id = #{param.constructionIdx} 
-		         and A.isdel = 0 
-		ORDER BY A.createDate asc ) as TB) AA LEFT OUTER JOIN
-				 (select count(*) as cnt, deviceIdx,  pileNo, location from TB_REPORT
-					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} )
-					   and isDel = 0
-				     group by deviceIdx, pileNo, location) BB 
-		             ON AA.deviceIdx  = BB.deviceIdx
-					AND	AA.pileNo  = BB.pileNo
-					AND	AA.location  = BB.location
-				LEFT OUTER JOIN
-				 (select count(*) as cnt, pileNo, location from TB_REPORT
-					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} AND isDel = 0 AND conduct = 0 )
-					   and isDel = 0
-				     group by pileNo, location) CC 
-		             ON AA.pileNo  = CC.pileNo
-					AND	AA.location  = CC.location	
-		    <include refid="allExcelCondition"/>
-		    	AND AA.deviceIdx = ${param.id}
-		    ORDER BY AA.machineNumber , AA.createDate ASC
-    </select> 
+    
     
     <!-- 일일기록지 > 10회 출력 --> 
     <select id="getListByParamExcelTen" resultType="ReportOneLine">
@@ -2404,9 +1513,6 @@
 		    AA.pileNo ,
 		    AA.pileStandard ,
 		    AA.drillingDepth ,
-		    AA.directDrillingDepth ,
-		    AA.stDrillingDepth ,
-		    AA.sdDrillingDepth ,
 		    AA.intrusionDepth ,
 		    AA.balance ,
 		    AA.connectLength ,
@@ -2455,9 +1561,6 @@
 		    pileNo ,
 		    pileStandard ,
 		    drillingDepth ,
-		    directDrillingDepth ,
-		    stDrillingDepth ,
-		    sdDrillingDepth ,
 		    intrusionDepth ,
 		    balance ,
 		    connectLength ,
@@ -2506,9 +1609,6 @@
 		            A.pileNo , 
 		            A.pileStandard , 
 		            A.drillingDepth , 
-		            A.directDrillingDepth ,
-		            A.stDrillingDepth , 
-		            A.sdDrillingDepth , 
 		            A.intrusionDepth , 
 		            A.balance , 
 		            A.connectLength , 
@@ -2570,177 +1670,6 @@
 		    ORDER BY AA.machineNumber , AA.createDate ASC
     </select> 
     
-    <!-- 일일기록지 > 5회 출력 > 중단 많은 버전 -->
-     <select id="getListByParamExtensivePileUsageExcelFive" resultType="ReportOneLine">
-    	SELECT 
-			BB.cnt as duplicated,
-		    IFNULL(CC.cnt, 0) as totalDuplicated,
-			AA.name ,
-		    AA.lavelNo ,
-		    AA.machineNumber , 
-		    AA.id , 
-		    AA.deviceIdx ,
-		    AA.currentDateTime ,
-		    AA.location ,
-		    AA.pileNo ,
-		    AA.pileStandard ,
-		    AA.drillingDepth ,
-		    AA.directDrillingDepth ,
-		    AA.stDrillingDepth ,
-		    AA.sdDrillingDepth ,
-		    AA.intrusionDepth ,
-		    AA.balance ,
-		    AA.connectLength ,
-		    AA.managedStandard , 
-		    AA.avgPenetrationValue , 
-		    AA.totalPenetrationValue , 
-		    AA.hammaT , 
-		    AA.fallMeter , 
-		    AA.pileType , 
-		    AA.method , 
-		    AA.totalConnectWidth , 
-		    AA.ultimateBearingCapacity , 
-		    AA.crossSection , 
-		    AA.hammaEfficiency , 
-		    AA.modulusElasticity , 
-		    AA.createDate , 
-		    AA.role, 
-		    AA.isDel, 
-		    AA.bigo, 
-		    AA.sprCol1, 
-		    AA.peOne,
-		    AA.peTwo, 
-		    AA.peThree, 
-		    AA.peFour, 
-		    AA.peFive, 
-		    AA.piOne, 
-		    AA.piTwo, 
-		    AA.piThree, 
-		    AA.piFour, 
-		    AA.piFive, 
-		    AA.piSix, 
-		    AA.piSeven, 
-		    AA.constructionIdx 
-		FROM (
-		SELECT    
-		    name ,
-		    lavelNo ,
-		    machineNumber , 
-		    id , 
-		    deviceIdx ,
-		    currentDateTime ,
-		    location ,
-		    pileNo ,
-		    pileStandard ,
-		    drillingDepth ,
-		    directDrillingDepth ,
-		    stDrillingDepth ,
-		    sdDrillingDepth ,
-		    intrusionDepth ,
-		    balance ,
-		    connectLength ,
-		    managedStandard , 
-		    avgPenetrationValue , 
-		    totalPenetrationValue , 
-		    hammaT , 
-		    fallMeter , 
-		    pileType , 
-		    method , 
-		    totalConnectWidth , 
-		    ultimateBearingCapacity , 
-		    crossSection , 
-		    hammaEfficiency , 
-		    modulusElasticity , 
-		    createDate , 
-		    role, 
-		    isDel, 
-		    bigo, 
-		    sprCol1, 
-		    peOne,
-		    peTwo, 
-		    peThree, 
-		    peFour, 
-		    peFive, 
-		    piOne, 
-		    piTwo, 
-		    piThree, 
-		    piFour, 
-		    piFive, 
-		    piSix, 
-		    piSeven, 
-		    constructionIdx 
-			FROM ( 
-				SELECT 
-					C.name as name , 
-		            B.lavelNo as lavelNo ,
-		            B.machineNumber as machineNumber , 
-		            A.id , 
-		            A.deviceIdx , 
-		            A.currentDateTime , 
-		            A.location , 
-		            A.pileNo , 
-		            A.pileStandard , 
-		            A.drillingDepth , 
-		            A.directDrillingDepth ,
-		            A.stDrillingDepth , 
-		            A.sdDrillingDepth , 
-		            A.intrusionDepth , 
-		            A.balance , 
-		            A.connectLength , 
-		            A.managedStandard , 
-		            A.avgPenetrationValue , 
-		            A.totalPenetrationValue , 
-		            A.hammaT , 
-		            A.fallMeter , 
-		            A.pileType , 
-		            A.method , 
-		            A.isDel, 
-		            A.totalConnectWidth , 
-		            A.ultimateBearingCapacity , 
-		            A.crossSection , 
-		            A.hammaEfficiency , 
-		            A.modulusElasticity , 
-					(SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 0,1) as peOne,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 1,1) as peTwo,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 2,1) as peThree,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 3,1) as peFour,
-	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 4,1) as peFive,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "단본" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piOne,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "하단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piTwo,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 0,1),'') as piThree,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 1,1),'') as piFour,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 2,1),'') as piFive,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 3,1),'') as piSix,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "상단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piSeven,
-					A.createDate,
-		            C.role , 
-		            IF(A.bigo = 'null','',A.bigo) as bigo ,
-		            IF(A.sprCol1 = 'null','',A.sprCol1) as sprCol1 ,
-		            B.constructionIdx 
-				FROM TB_REPORT A , TB_DEVICE B, TB_CONSTRUCTION C 
-		        WHERE A.deviceIdx = B.id 
-		         AND B.constructionIdx = C.id 
-		         and C.id = #{param.constructionIdx} 
-		         and A.isdel = 0 
-			ORDER BY A.createDate asc ) as TB) AA LEFT OUTER JOIN
-					 (select count(*) as cnt, deviceIdx,  pileNo, location from TB_REPORT
-					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} )
-					   and isDel = 0
-				     group by deviceIdx, pileNo, location) BB 
-		             ON AA.deviceIdx  = BB.deviceIdx
-					AND	AA.pileNo  = BB.pileNo
-					AND	AA.location  = BB.location
-				LEFT OUTER JOIN
-				 (select count(*) as cnt, pileNo, location from TB_REPORT
-					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} AND isDel = 0 AND conduct = 0 )
-					   and isDel = 0
-				     group by pileNo, location) CC 
-		             ON AA.pileNo  = CC.pileNo
-					AND	AA.location  = CC.location	
-		    <include refid="allExcelCondition"/>
-		    	AND AA.deviceIdx = ${param.id}
-		    ORDER BY AA.machineNumber , AA.createDate ASC
-    </select> 
     
     <!-- 일일기록지 > 5회 출력 -->
      <select id="getListByParamExcelFive" resultType="ReportOneLine">
@@ -2757,9 +1686,6 @@
 		    AA.pileNo ,
 		    AA.pileStandard ,
 		    AA.drillingDepth ,
-		    AA.directDrillingDepth ,
-		    AA.stDrillingDepth ,
-		    AA.sdDrillingDepth ,
 		    AA.intrusionDepth ,
 		    AA.balance ,
 		    AA.connectLength ,
@@ -2803,9 +1729,6 @@
 		    pileNo ,
 		    pileStandard ,
 		    drillingDepth ,
-		    directDrillingDepth ,
-		    stDrillingDepth ,
-		    sdDrillingDepth ,
 		    intrusionDepth ,
 		    balance ,
 		    connectLength ,
@@ -2849,9 +1772,6 @@
 		            A.pileNo , 
 		            A.pileStandard , 
 		            A.drillingDepth , 
-		            A.directDrillingDepth ,
-		            A.stDrillingDepth , 
-		            A.sdDrillingDepth , 
 		            A.intrusionDepth , 
 		            A.balance , 
 		            A.connectLength , 
@@ -2912,103 +1832,24 @@
     
     <insert id="insert" parameterType="Report">
 	    INSERT INTO TB_REPORT
-	    ( 
-	    	deviceIdx,
-	    	currentDateTime,
-	    	location,
-	    	pileNo,
-	    	pileStandard,
-	    	drillingDepth,
-	    	<choose>
-	    		<when test="directDrillingDepth != null and directDrillingDepth != '' and directDrillingDepth != null and directDrillingDepth != ''">
-	    			directDrillingDepth , 
-	    		</when>
-	    	</choose>
-	    	<choose>
-	    		<when test="stDrillingDepth != null and stDrillingDepth != '' and stDrillingDepth != null and stDrillingDepth != ''">
-	    			stDrillingDepth , 
-	    		</when>
-	    	</choose>
-	    	<choose>
-	    		<when test="sdDrillingDepth != null and sdDrillingDepth != '' and sdDrillingDepth != null and sdDrillingDepth != ''">
-	    			sdDrillingDepth , 
-	    		</when>
-	    	</choose>
-	    	intrusionDepth,
-	    	balance,
-	    	connectLength,
-	    	managedStandard,
-	    	avgPenetrationValue,
-	    	totalPenetrationValue,
-	    	hammaT,
-	    	fallMeter,
-	    	pileType,
-	    	method,
-	    	totalConnectWidth,
-	    	ultimateBearingCapacity,
-	    	crossSection,
-	    	hammaEfficiency,
-	    	modulusElasticity 
+	    ( deviceIdx, currentDateTime, location, pileNo , pileStandard, drillingDepth , intrusionDepth, balance, connectLength, managedStandard, avgPenetrationValue, totalPenetrationValue, hammaT, fallMeter, pileType, method, totalConnectWidth, ultimateBearingCapacity, crossSection , hammaEfficiency , modulusElasticity 
+	    	
 	    	<choose>
 	    		<when test="bigo != null and bigo != '' and bigo != null and bigo != ''">
 	    		, bigo 
 	    		</when>
 	    	</choose>
-	    	<choose>
-	    		<when test="sprCol1 != null and sprCol1 != '' and sprCol1 != null and sprCol1 != ''">
-	    		, sprCol1 
-	    		</when>
-	    	</choose>
 	    	
 	    	, createDate  )
 	     VALUES 
-	     ( 
-	     	#{deviceIdx},
-	     	#{currentDateTime},
-	     	#{location},
-	     	#{pileNo},
-	     	#{pileStandard},
-	     	#{drillingDepth},
-	     	<choose>
-	    		<when test="directDrillingDepth != null and directDrillingDepth != '' and directDrillingDepth != null and directDrillingDepth != ''">
-	    			#{directDrillingDepth} , 
-	    		</when>
-	    	</choose>
-	     	<choose>
-	    		<when test="stDrillingDepth != null and stDrillingDepth != '' and stDrillingDepth != null and stDrillingDepth != ''">
-	    			#{stDrillingDepth} , 
-	    		</when>
-	    	</choose>
-	    	<choose>
-	    		<when test="sdDrillingDepth != null and sdDrillingDepth != '' and sdDrillingDepth != null and sdDrillingDepth != ''">
-	    			#{sdDrillingDepth} ,
-	    		</when>
-	    	</choose>
-	     	#{intrusionDepth},
-	     	#{balance},
-	     	#{connectLength},
-	     	#{managedStandard},
-	     	#{avgPenetrationValue},
-	     	#{totalPenetrationValue},
-	     	#{hammaT},
-	     	#{fallMeter},
-	     	#{pileType},
-	     	#{method},
-	     	#{totalConnectWidth},
-	     	#{ultimateBearingCapacity},
-	     	#{crossSection},
-	     	#{hammaEfficiency},
-	     	#{modulusElasticity} 
+	     ( #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo} , #{pileStandard},  #{drillingDepth} , #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter},  #{pileType}, #{method}, #{totalConnectWidth},  #{ultimateBearingCapacity} , #{crossSection} , #{hammaEfficiency} , #{modulusElasticity} 
+	     	
 	     	<choose>
 	    		<when test="bigo != null and bigo != '' and bigo != null and bigo != ''">
 	    		,  #{bigo} 
 	    		</when>
 	    	</choose>
-	    	<choose>
-	    		<when test="sprCol1 != null and sprCol1 != '' and sprCol1 != null and sprCol1 != ''">
-	    		, #{sprCol1}  
-	    		</when>
-	    	</choose>
+	     	
 	     	, now() )
 	    <selectKey resultType="int" keyProperty="id" order="AFTER">
         SELECT LAST_INSERT_ID()
@@ -3017,206 +1858,41 @@
     
     <insert id="insertOrigin" parameterType="Report">
 	    INSERT INTO TB_REPORT_ORIGIN
-	    ( 
-	    	id, 
-	    	deviceIdx, 
-	    	currentDateTime, 
-	    	location, 
-	    	pileNo , 
-	    	pileStandard, 
-	    	drillingDepth ,
-   			<choose>
-	    		<when test="directDrillingDepth != null and directDrillingDepth != '' and directDrillingDepth != null and directDrillingDepth != ''">
-	    			directDrillingDepth , 
-	    		</when>
-	    	</choose>
-	    	<choose>
-	    		<when test="stDrillingDepth != null and stDrillingDepth != '' and stDrillingDepth != null and stDrillingDepth != ''">
-	    			stDrillingDepth , 
-	    		</when>
-	    	</choose>
-	    	<choose>
-	    		<when test="sdDrillingDepth != null and sdDrillingDepth != '' and sdDrillingDepth != null and sdDrillingDepth != ''">
-	    			sdDrillingDepth , 
-	    		</when>
-	    	</choose>
-	    	intrusionDepth, 
-	    	balance, 
-	    	connectLength, 
-	    	managedStandard, 
-	    	avgPenetrationValue, 
-	    	totalPenetrationValue, 
-	    	hammaT, 
-	    	fallMeter, 
-	    	pileType, 
-	    	method, 
-	    	totalConnectWidth, 
-	    	ultimateBearingCapacity, 
-	    	crossSection , 
-	    	hammaEfficiency , 
-	    	modulusElasticity 
+	    ( id, deviceIdx, currentDateTime, location, pileNo , pileStandard, drillingDepth , intrusionDepth, balance, connectLength, managedStandard, avgPenetrationValue, totalPenetrationValue, hammaT, fallMeter, pileType, method, totalConnectWidth, ultimateBearingCapacity, crossSection , hammaEfficiency , modulusElasticity 
+	    	
 	    	<choose>
 	    		<when test="bigo != null and bigo != '' and bigo != null and bigo != ''">
 	    		, bigo 
 	    		</when>
 	    	</choose>
-	    	<choose>
-	    		<when test="sprCol1 != null and sprCol1 != '' and sprCol1 != null and sprCol1 != ''">
-	    		, sprCol1 
-	    		</when>
-	    	</choose>
-	    	, createDate  
-	    )
-	    VALUES 
-	    ( 
-     		#{id}, 
-	     	#{deviceIdx}, 
-	     	#{currentDateTime}, 
-	     	#{location}, 
-	     	#{pileNo} , 
-	     	#{pileStandard},  
-	     	#{drillingDepth} ,
-	     	<choose>
-	    		<when test="directDrillingDepth != null and directDrillingDepth != '' and directDrillingDepth != null and directDrillingDepth != ''">
-	    			#{directDrillingDepth} , 
-	    		</when>
-	    	</choose>
-	     	<choose>
-	    		<when test="stDrillingDepth != null and stDrillingDepth != '' and stDrillingDepth != null and stDrillingDepth != ''">
-	    			#{stDrillingDepth} , 
-	    		</when>
-	    	</choose>
-	    	<choose>
-	    		<when test="sdDrillingDepth != null and sdDrillingDepth != '' and sdDrillingDepth != null and sdDrillingDepth != ''">
-	    			#{sdDrillingDepth} ,
-	    		</when>
-	    	</choose> 
-	     	#{intrusionDepth}, 
-	     	#{balance}, 
-	     	#{connectLength}, 
-	     	#{managedStandard}, 
-	     	#{avgPenetrationValue}, 
-	     	#{totalPenetrationValue}, 
-	     	#{hammaT}, 
-	     	#{fallMeter},  
-	     	#{pileType}, 
-	     	#{method}, 
-	     	#{totalConnectWidth},  
-	     	#{ultimateBearingCapacity} , 
-	     	#{crossSection} , 
-	     	#{hammaEfficiency} , 
-	     	#{modulusElasticity} 
+	    	
+	    	, createDate  )
+	     VALUES 
+	     ( #{id}, #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo} , #{pileStandard},  #{drillingDepth} , #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter},  #{pileType}, #{method}, #{totalConnectWidth},  #{ultimateBearingCapacity} , #{crossSection} , #{hammaEfficiency} , #{modulusElasticity} 
+	     	
 	     	<choose>
 	    		<when test="bigo != null and bigo != '' and bigo != null and bigo != ''">
 	    		,  #{bigo} 
 	    		</when>
 	    	</choose>
-	     	<choose>
-	    		<when test="sprCol1 != null and sprCol1 != '' and sprCol1 != null and sprCol1 != ''">
-	    		, #{sprCol1}  
-	    		</when>
-	    	</choose>
+	     	
 	     	, now() )
     </insert>
     
     <insert id="insert2" parameterType="Report">
 	    INSERT INTO TB_REPORT
-	    ( 
-	    	deviceIdx,
-	      	currentDateTime,
-	      	location,
-	      	pileNo,
-	      	pileStandard,
-	      	drillingDepth,
-	      	<choose>
-	    		<when test="directDrillingDepth != null and directDrillingDepth != '' and directDrillingDepth != null and directDrillingDepth != ''">
-	    			directDrillingDepth , 
-	    		</when>
-	    	</choose>
-	      	<choose>
-	    		<when test="stDrillingDepth != null and stDrillingDepth != '' and stDrillingDepth != null and stDrillingDepth != ''">
-	    			stDrillingDepth , 
-	    		</when>
-	    	</choose>
-	    	<choose>
-	    		<when test="sdDrillingDepth != null and sdDrillingDepth != '' and sdDrillingDepth != null and sdDrillingDepth != ''">
-	    			sdDrillingDepth , 
-	    		</when>
-	    	</choose>
-	      	intrusionDepth,
-	      	balance,
-	      	connectLength,
-	      	managedStandard,
-	      	avgPenetrationValue,
-	      	totalPenetrationValue,
-	      	hammaT,
-	      	fallMeter,
-	      	pileType, 
-	      	method, 
-	      	totalConnectWidth, 
-	      	ultimateBearingCapacity, 
-	      	crossSection, 
-	      	hammaEfficiency, 
-	      	modulusElasticity
-	      	 
+	    ( deviceIdx, currentDateTime, location, pileNo , pileStandard, drillingDepth , intrusionDepth, balance, connectLength, managedStandard, avgPenetrationValue, totalPenetrationValue, hammaT, fallMeter, pileType, method, totalConnectWidth, ultimateBearingCapacity , crossSection , hammaEfficiency , modulusElasticity 
 	    	<choose>
 	    		<when test="bigo != null and bigo != '' and bigo != null and bigo != ''">
 	    		, bigo 
 	    		</when>
 	    	</choose>
-	    	<choose>
-	    		<when test="sprCol1 != null and sprCol1 != '' and sprCol1 != null and sprCol1 != ''">
-	    		, sprCol1 
-	    		</when>
-	    	</choose>
-	    	, createDate  
-	    )
-	    VALUES 
-	    ( 
-	     	#{deviceIdx}, 
-	     	#{currentDateTime}, 
-	     	#{location}, 
-	     	#{pileNo} , 
-	     	#{pileStandard},  
-	     	#{drillingDepth} , 
-	     	<choose>
-	    		<when test="directDrillingDepth != null and directDrillingDepth != '' and directDrillingDepth != null and directDrillingDepth != ''">
-	    			#{directDrillingDepth} , 
-	    		</when>
-	    	</choose>
-	     	<choose>
-	    		<when test="stDrillingDepth != null and stDrillingDepth != '' and stDrillingDepth != null and stDrillingDepth != ''">
-	    			#{stDrillingDepth} , 
-	    		</when>
-	    	</choose>
-	    	<choose>
-	    		<when test="sdDrillingDepth != null and sdDrillingDepth != '' and sdDrillingDepth != null and sdDrillingDepth != ''">
-	    			#{sdDrillingDepth} ,
-	    		</when>
-	    	</choose>
-	     	#{intrusionDepth}, 
-	     	#{balance}, 
-	     	#{connectLength}, 
-	     	#{managedStandard}, 
-	     	#{avgPenetrationValue}, 
-	     	#{totalPenetrationValue}, 
-	     	#{hammaT}, 
-	     	#{fallMeter},  
-	     	#{pileType}, 
-	     	#{method}, 
-	     	#{totalConnectWidth},   
-	     	#{ultimateBearingCapacity}, 
-	     	#{crossSection} , 
-	     	#{hammaEfficiency} , 
-	     	#{modulusElasticity} 
+	    	, createDate  )
+	     VALUES 
+	     ( #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo} , #{pileStandard},  #{drillingDepth} , #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter},  #{pileType}, #{method}, #{totalConnectWidth},   #{ultimateBearingCapacity}, #{crossSection} , #{hammaEfficiency} , #{modulusElasticity} 
 	     	<choose>
 	    		<when test="bigo != null and bigo != '' and bigo != null and bigo != ''">
 	    		,  #{bigo} 
-	    		</when>
-	    	</choose>
-	    	<choose>
-	    		<when test="sprCol1 != null and sprCol1 != '' and sprCol1 != null and sprCol1 != ''">
-	    		, #{sprCol1}  
 	    		</when>
 	    	</choose>
 	     	, #{createDate} )
@@ -3228,239 +1904,23 @@
     
      <insert id="insert2Origin" parameterType="Report">
 	    INSERT INTO TB_REPORT_ORIGIN
-	    ( 
-	    	id, 
-	    	deviceIdx, 
-	    	currentDateTime, 
-	    	location, 
-	    	pileNo , 
-	    	pileStandard, 
-	    	drillingDepth , 
-	    	<choose>
-	    		<when test="directDrillingDepth != null and directDrillingDepth != '' and directDrillingDepth != null and directDrillingDepth != ''">
-	    			directDrillingDepth , 
-	    		</when>
-	    	</choose>
-	    	<choose>
-	    		<when test="stDrillingDepth != null and stDrillingDepth != '' and stDrillingDepth != null and stDrillingDepth != ''">
-	    		 	stDrillingDepth , 
-	    		</when>
-	    	</choose>
-	    	<choose>
-	    		<when test="sdDrillingDepth != null and sdDrillingDepth != '' and sdDrillingDepth != null and sdDrillingDepth != ''">
-	    			sdDrillingDepth , 
-	    		</when>
-	    	</choose>
-	    	intrusionDepth, 
-	    	balance, 
-	    	connectLength, 
-	    	managedStandard, 
-	    	avgPenetrationValue, 
-	    	totalPenetrationValue, 
-	    	hammaT, 
-	    	fallMeter, 
-	    	pileType, 
-	    	method, 
-	    	totalConnectWidth, 
-	    	ultimateBearingCapacity , 
-	    	crossSection , 
-	    	hammaEfficiency , 
-	    	modulusElasticity 
+	    ( id, deviceIdx, currentDateTime, location, pileNo , pileStandard, drillingDepth , intrusionDepth, balance, connectLength, managedStandard, avgPenetrationValue, totalPenetrationValue, hammaT, fallMeter, pileType, method, totalConnectWidth, ultimateBearingCapacity , crossSection , hammaEfficiency , modulusElasticity 
 	    	<choose>
 	    		<when test="bigo != null and bigo != '' and bigo != null and bigo != ''">
 	    		, bigo 
 	    		</when>
 	    	</choose>
-	    	<choose>
-	    		<when test="sprCol1 != null and sprCol1 != '' and sprCol1 != null and sprCol1 != ''">
-	    		, sprCol1 
-	    		</when>
-	    	</choose>
-	    	, createDate  
-	    ) 
-	    VALUES 
-	    ( 
-	    	#{id}, 
-	    	#{deviceIdx}, 
-	    	#{currentDateTime}, 
-	    	#{location}, 
-	    	#{pileNo} , 
-	    	#{pileStandard},  
-	    	#{drillingDepth} ,
-	    	<choose>
-	    		<when test="directDrillingDepth != null and directDrillingDepth != '' and directDrillingDepth != null and directDrillingDepth != ''">
-	    			#{directDrillingDepth} , 
-	    		</when>
-	    	</choose>
-	    	<choose>
-	    		<when test="stDrillingDepth != null and stDrillingDepth != '' and stDrillingDepth != null and stDrillingDepth != ''">
-	    			#{stDrillingDepth} , 
-	    		</when>
-	    	</choose>
-	    	<choose>
-	    		<when test="sdDrillingDepth != null and sdDrillingDepth != '' and sdDrillingDepth != null and sdDrillingDepth != ''">
-	    			#{sdDrillingDepth} ,
-	    		</when>
-	    	</choose> 
-	    	#{intrusionDepth}, 
-	    	#{balance}, 
-	    	#{connectLength}, 
-	    	#{managedStandard}, 
-	    	#{avgPenetrationValue}, 
-	    	#{totalPenetrationValue}, 
-	    	#{hammaT}, 
-	    	#{fallMeter},  
-	    	#{pileType}, 
-	    	#{method}, 
-	    	#{totalConnectWidth},   
-	    	#{ultimateBearingCapacity}, 
-	    	#{crossSection} , 
-	    	#{hammaEfficiency} , 
-	    	#{modulusElasticity} 
+	    	, createDate  )
+	     VALUES 
+	     ( #{id}, #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo} , #{pileStandard},  #{drillingDepth} , #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter},  #{pileType}, #{method}, #{totalConnectWidth},   #{ultimateBearingCapacity}, #{crossSection} , #{hammaEfficiency} , #{modulusElasticity} 
 	     	<choose>
 	    		<when test="bigo != null and bigo != '' and bigo != null and bigo != ''">
 	    		,  #{bigo} 
 	    		</when>
 	    	</choose>
-	    	<choose>
-	    		<when test="sprCol1 != null and sprCol1 != '' and sprCol1 != null and sprCol1 != ''">
-	    		, #{sprCol1}  
-	    		</when>
-	    	</choose>
 	     	, #{createDate} )
     </insert> 
     
-    
-    <select id="getTodayListByPdfExtensivePileUsage" resultType="ReportOneLine">
-    	SELECT 
-    		id 
-		    , deviceIdx 
-		    , constructionIdx 
-		    , machineNumber 
-		    , currentDateTime 
-			,(	select count(*) 
-				from TB_REPORT 
-		        WHERE TB_REPORT.deviceIdx = TB.deviceIdx 
-		        and TB_REPORT.pileNo = TB.pileNo 
-		        and TB_REPORT.location = TB.location 
-		        and TB_REPORT.isDel = 0) as duplicated 
-			,(	SELECT count(*) 
-				FROM TB_REPORT 
-		        WHERE TB_REPORT.pileNo = TB.pileNo 
-		        AND TB_REPORT.location = TB.location 
-		        AND TB_REPORT.isDel = 0 
-		        AND TB_REPORT.deviceIdx in ( SELECT TBD.id FROM TB_DEVICE TBD WHERE TBD.constructionIdx = TB.constructionIdx AND TBD.isDel = 0 AND TBD.conduct = 0 )) as totalDuplicated
-			,(
-				SELECT IF(role = 0, CONCAT(CONCAT(IFNULL((SELECT groupName from TB_GROUP WHERE TB_GROUP.idx = TB_CONSTRUCTION.groupIdx), '')
-					, CONCAT(' ',NAME)) 
-		            , CONCAT(' ',LOCATION)), LOCATION) AS NAME
-				FROM TB_CONSTRUCTION WHERE id = TB.constructionIdx
-		    )  as name 
-		    , lavelNo 
-		    , location 
-		    , pileNo 
-		    , pileStandard 
-		    , drillingDepth 
-		    , directDrillingDepth 
-		    , intrusionDepth 
-		    , balance 
-		    , connectLength 
-		    , managedStandard 
-		    , avgPenetrationValue 
-		    , totalPenetrationValue 
-		    , hammaT 
-		    , fallMeter 
-		    , pileType 
-		    , method 
-		    , totalConnectWidth 
-		    , ultimateBearingCapacity 
-		    , crossSection 
-		    , hammaEfficiency 
-		    , modulusElasticity 
-		    , createDate 
-		    , role
-		    , isDel
-		    , bigo
-		    , sprCol1
-		    , peOne
-		    , peTwo
-		    , peThree
-		    , peFour
-		    , peFive
-		    , peSix
-			, peSeven
-			, peEight
-			, peNine
-			, peTen
-		    , piOne
-		    , piTwo
-		    , piThree
-		    , piFour
-		    , piFive
-		    , piSix
-		    , piSeven
-		FROM ( SELECT C.name as name 
-				, B.lavelNo as lavelNo
-                , B.machineNumber as machineNumber 
-                , A.id 
-                , A.deviceIdx 
-                , A.currentDateTime 
-                , A.location 
-                , A.pileNo 
-                , A.pileStandard 
-                , A.drillingDepth 
-                , A.directDrillingDepth 
-                , A.intrusionDepth 
-                , A.balance 
-                , A.connectLength 
-                , A.managedStandard 
-                , A.avgPenetrationValue 
-                , A.totalPenetrationValue 
-                , A.hammaT 
-                , A.fallMeter 
-                , A.pileType 
-                , A.method 
-                , A.isDel
-                , A.totalConnectWidth 
-                , A.ultimateBearingCapacity 
-                , A.crossSection 
-                , A.hammaEfficiency 
-                , A.modulusElasticity 
-                , (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 0,1)  as peOne
-                , (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 1,1)  as peTwo
-                , (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 2,1)  as peThree
-                , (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 3,1)  as peFour
-                , (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 4,1)  as peFive
-                , (SELECT VALUE  FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 5,1) as peSix
-	            , (SELECT VALUE  FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 6,1) as peSeven
-	            , (SELECT VALUE  FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 7,1) as peEight
-	            , (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 8,1)  as peNine
-	            , (SELECT VALUE  FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 9,1) as peTen
-                , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "단본" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piOne
-                , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "하단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piTwo
-                , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 0,1),'') as piThree
-                , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 1,1),'') as piFour
-                , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 2,1),'') as piFive
-                , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 3,1),'') as piSix
-                , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "상단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piSeven
-                , A.createDate
-                , C.role 
-                , IF(A.bigo = 'null','',A.bigo) as bigo 
-                , IF(A.sprCol1 = 'null','',A.sprCol1) as sprCol1 
-                , B.constructionIdx 
-			 FROM TB_REPORT A , TB_DEVICE B, TB_CONSTRUCTION C
-            WHERE 1=1
-			   AND A.deviceIdx = B.id 
-                 AND B.constructionIdx = C.id 
-                 AND C.id = #{constructionIdx} 
-                 AND B.machineNumber = #{machineNumber} 
-                 AND A.currentDateTime = #{currentDateTime}
-                 AND A.isdel = 0 
-               ORDER BY A.createDate asc ) as TB 
-		WHERE 1=1 ORDER BY machineNumber , createDate ASC
-		 
-    
-    </select>
     
     <select id="getTodayListByPdf" resultType="ReportOneLine">
     	SELECT 
@@ -3492,7 +1952,6 @@
 		    , pileNo 
 		    , pileStandard 
 		    , drillingDepth 
-		    , directDrillingDepth 
 		    , intrusionDepth 
 		    , balance 
 		    , connectLength 
@@ -3538,7 +1997,6 @@
                 , A.pileNo 
                 , A.pileStandard 
                 , A.drillingDepth 
-                , A.directDrillingDepth 
                 , A.intrusionDepth 
                 , A.balance 
                 , A.connectLength 
@@ -3589,131 +2047,6 @@
     
     </select>
     
-    <select id="getMachineListByPdfExtensivePileUsage" resultType="ReportOneLine">
-    	SELECT 
-    		id 
-		    , deviceIdx 
-		    , constructionIdx 
-		    , machineNumber 
-		    , currentDateTime 
-			,(	select count(*) 
-				from TB_REPORT 
-		        WHERE TB_REPORT.deviceIdx = TB.deviceIdx 
-		        and TB_REPORT.pileNo = TB.pileNo 
-		        and TB_REPORT.location = TB.location 
-		        and TB_REPORT.isDel = 0) as duplicated 
-			,(	SELECT count(*) 
-				FROM TB_REPORT 
-		        WHERE TB_REPORT.pileNo = TB.pileNo 
-		        AND TB_REPORT.location = TB.location 
-		        AND TB_REPORT.isDel = 0 
-		        AND TB_REPORT.deviceIdx in ( SELECT TBD.id FROM TB_DEVICE TBD WHERE TBD.constructionIdx = TB.constructionIdx AND TBD.isDel = 0 AND TBD.conduct = 0 )) as totalDuplicated
-			,(
-				SELECT IF(role = 0, CONCAT(CONCAT(IFNULL((SELECT groupName from TB_GROUP WHERE TB_GROUP.idx = TB_CONSTRUCTION.groupIdx), '')
-					, CONCAT(' ',NAME)) 
-		            , CONCAT(' ',LOCATION)), LOCATION) AS NAME
-				FROM TB_CONSTRUCTION WHERE id = TB.constructionIdx
-		    )  as name 
-		    , lavelNo 
-		    , location 
-		    , pileNo 
-		    , pileStandard 
-		    , drillingDepth 
-		    , directDrillingDepth
-		    , intrusionDepth 
-		    , balance 
-		    , connectLength 
-		    , managedStandard 
-		    , avgPenetrationValue 
-		    , totalPenetrationValue 
-		    , hammaT 
-		    , fallMeter 
-		    , pileType 
-		    , method 
-		    , totalConnectWidth 
-		    , ultimateBearingCapacity 
-		    , crossSection 
-		    , hammaEfficiency 
-		    , modulusElasticity 
-		    , createDate 
-		    , role
-		    , isDel
-		    , bigo
-		    , sprCol1
-		    , peOne
-		    , peTwo
-		    , peThree
-		    , peFour
-		    , peFive
-		    , peSix
-			, peSeven
-			, peEight
-			, peNine
-			, peTen
-		    , piOne
-		    , piTwo
-		    , piThree
-		    , piFour
-		    , piFive
-		FROM ( SELECT C.name as name 
-				, B.lavelNo as lavelNo
-                , B.machineNumber as machineNumber 
-                , A.id 
-                , A.deviceIdx 
-                , A.currentDateTime 
-                , A.location 
-                , A.pileNo 
-                , A.pileStandard 
-                , A.drillingDepth 
-                , A.directDrillingDepth 
-                , A.intrusionDepth 
-                , A.balance 
-                , A.connectLength 
-                , A.managedStandard 
-                , A.avgPenetrationValue 
-                , A.totalPenetrationValue 
-                , A.hammaT 
-                , A.fallMeter 
-                , A.pileType 
-                , A.method 
-                , A.isDel
-                , A.totalConnectWidth 
-                , A.ultimateBearingCapacity 
-                , A.crossSection 
-                , A.hammaEfficiency 
-                , A.modulusElasticity 
-                , (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 0,1)  as peOne
-                , (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 1,1)  as peTwo
-                , (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 2,1)  as peThree
-                , (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 3,1)  as peFour
-                , (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 4,1)  as peFive
-                , (SELECT VALUE  FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 5,1) as peSix
-	            , (SELECT VALUE  FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 6,1) as peSeven
-	            , (SELECT VALUE  FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 7,1) as peEight
-	            , (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 8,1)  as peNine
-	            , (SELECT VALUE  FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 9,1) as peTen
-                , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "단본" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piOne
-                , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "하단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piTwo
-                , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 0,1),'') as piThree
-                , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 1,1),'') as piFour
-                , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 2,1),'') as piFive
-                , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 3,1),'') as piSix
-                , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "상단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piSeven
-                , A.createDate
-                , C.role 
-                , IF(A.bigo = 'null','',A.bigo) as bigo 
-                , IF(A.sprCol1 = 'null','',A.sprCol1) as sprCol1 
-                , B.constructionIdx 
-			 FROM TB_REPORT A , TB_DEVICE B, TB_CONSTRUCTION C
-            WHERE 1=1
-			  AND A.deviceIdx = B.id 
-                 AND B.constructionIdx = C.id 
-                 AND C.id = #{constructionIdx} 
-                 AND B.machineNumber = #{machineNumber} 
-                 AND A.isdel = 0 
-               ORDER BY A.createDate asc ) as TB 
-		WHERE 1=1 ORDER BY machineNumber , createDate ASC
-    </select>
     
     <select id="getMachineListByPdf" resultType="ReportOneLine">
     	SELECT 
@@ -3745,7 +2078,6 @@
 		    , pileNo 
 		    , pileStandard 
 		    , drillingDepth 
-		    , directDrillingDepth
 		    , intrusionDepth 
 		    , balance 
 		    , connectLength 
@@ -3791,7 +2123,6 @@
                 , A.pileNo 
                 , A.pileStandard 
                 , A.drillingDepth 
-                , A.directDrillingDepth 
                 , A.intrusionDepth 
                 , A.balance 
                 , A.connectLength 
@@ -3945,7 +2276,7 @@
 			WHERE A.id = B.constructionIdx
 			AND B.id = C.deviceIdx
 			AND C.id = D.reportIdx
-			AND A.ID = #{constructionIdx}
+			AND A.ID = #{param.constructionIdx}
 			AND D.value > 0
 		GROUP BY D.reportIdx HAVING  COUNT(*) > 5) A
     </select>

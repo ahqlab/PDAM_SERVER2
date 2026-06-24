@@ -124,7 +124,7 @@ function setGroupName(){
 .actionGrid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    gap: 6px;
     width: 100%;
     box-sizing: border-box;
 }
@@ -134,8 +134,8 @@ function setGroupName(){
     align-items: center;
     justify-content: center;
     gap: 8px;
-    min-height: 44px;
-    padding: 8px;
+    min-height: 38px;
+    padding: 6px;
     border-radius: 8px;
     font-size: 14px;
     font-weight: 600;
@@ -174,9 +174,9 @@ function setGroupName(){
 .actionBtn.c-block img { filter: brightness(10); }
 
 .actionBadge {
-    font-size: 14px;
+    font-size: 12px;
     line-height: 1.6;
-    padding: 2px 10px;
+    padding: 2px 8px;
     border-radius: 8px;
     font-weight: 700;
     white-space: nowrap;
@@ -199,25 +199,34 @@ function setGroupName(){
 .listArea .listUl.two li.ccard:nth-of-type(even) {
     background: #fff;
 }
-.ccard-head,
-.ccard .postit,
+.ccard-headWrap,
 .ccard-infoArea,
 .ccard-actionArea {
     flex: 1 1 0;
     min-width: 0;
 }
+.ccard-headWrap {
+    flex: 0 0 50%;
+    max-width: 50%;
+    display: flex;
+    align-items: stretch;
+    gap: 20px;
+    padding-right: 20px;
+    border-right: 1px solid #f0f0f0;
+    box-sizing: border-box;
+}
 .ccard-head {
-    flex: 6.5 1 0;
+    flex: 0 1 auto;
+    min-width: 0;
 }
 .ccard .postit {
-    flex: 3.5 1 0;
+    flex: 0 0 240px;
+    min-width: 160px;
 }
 .ccard-infoArea,
 .ccard-actionArea {
-    flex: 5 1 0;
+    flex: 0 1 25%;
 }
-.ccard-head,
-.ccard .postit,
 .ccard-infoArea {
     padding-right: 20px;
     border-right: 1px solid #f0f0f0;
@@ -250,48 +259,49 @@ function setGroupName(){
 .ccard .postit {
     width: auto;
     min-height: 0;
+    max-height: 150px;
+    overflow-y: auto;
     margin: 0;
     box-sizing: border-box;
 }
 .ccard-infoArea {
+    display: grid;
+    grid-template-columns: 7fr 3fr;
+    gap: 10px 20px;
+    align-content: center;
+}
+.ccard-infoCell {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 6px;
+    min-width: 0;
 }
-.ccard-infoRow {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 10px;
-}
-.ccard-infoLabel {
-    font-size: 15px;
-    color: #999;
-    width: 90px;
-    flex-shrink: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: flex-start;
-    text-align: left;
-}
-.ccard-infoValue {
-    font-size: 19px;
+.ccard-infoTitle {
+    font-size: 17px;
     font-weight: 700;
     color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
-.ccard-infoTel {
+.ccard-infoSub {
     display: inline-flex;
     align-items: center;
     gap: 5px;
     font-size: 16px;
     color: #555;
 }
-.ccard-infoTel img {
+.ccard-infoSub.strong {
+    font-size: 15px;
+    font-weight: 400;
+    color: #333;
+}
+.ccard-infoSub img {
     width: 16px;
     height: 16px;
 }
-.ccard-account {
-    padding-top: 10px;
+.ccard-infoDivider {
+    grid-column: 1 / -1;
     border-top: 1px dashed #e5e5e5;
 }
 .ccard-actionArea {
@@ -301,8 +311,8 @@ function setGroupName(){
 }
 .company .listArea .listUl li.ccard .ccard-select select.state {
     width: 100%;
-    height: 44px;
-    line-height: 42px;
+    height: 38px;
+    line-height: 36px;
     padding: 0 10px;
     border: 1px solid #ccc;
     border-radius: 8px;
@@ -318,15 +328,24 @@ function setGroupName(){
     .company .listArea .listUl li.ccard {
         flex-wrap: wrap;
     }
-    .ccard-head,
-    .ccard .postit,
+    .ccard-headWrap,
     .ccard-infoArea,
     .ccard-actionArea {
         flex: 1 1 100%;
+        max-width: 100%;
+        min-width: 0;
         padding-right: 0;
         padding-bottom: 14px;
         border-right: none;
         border-bottom: 1px solid #f0f0f0;
+    }
+    .ccard-headWrap {
+        flex-direction: column;
+        gap: 14px;
+    }
+    .ccard .postit {
+        flex: 0 1 auto;
+        min-width: 0;
     }
     .ccard-actionArea {
         padding-bottom: 0;
@@ -397,6 +416,7 @@ function setGroupName(){
 					<c:choose>
 						<c:when test="${sessionInfo.role == 0}">
 						<li class="ccard">
+							<div class="ccard-headWrap">
 							<div class="ccard-head">
 								<span class="ccard-date">${domain.createDate}</span>
 								<a class="ccard-name" href="${pageContext.request.contextPath}/device/list?constructionIdx=${domain.id}">
@@ -418,40 +438,44 @@ function setGroupName(){
 								<div name="memoArea">
 								</div>
 							</div>
+							</div>
 
 							<div class="ccard-infoArea">
-									<div class="ccard-infoRow">
-										<span class="ccard-infoLabel" style="letter-spacing: 2px;">협력사 소장</span>
-										<span class="ccard-infoValue">${domain.conManager}</span>
-										<span class="ccard-infoTel">
-											<img src="${pageContext.request.contextPath}/new/img/call.png" />${domain.conContact}
-										</span>
-									</div>
-									<div class="ccard-infoRow">
-										<span class="ccard-infoLabel" style="letter-spacing: 2px;">협력사 담당</span>
-										<span class="ccard-infoValue">${domain.manager}</span>
-										<span class="ccard-infoTel">
-											<img src="${pageContext.request.contextPath}/new/img/call.png" />${domain.contact}
-										</span>
-									</div>
-									<div class="ccard-infoRow ccard-account">
-										<span class="ccard-infoLabel" style="letter-spacing: 16.35px;">아이디</span>
-										<span class="ccard-infoValue">${domain.userId}</span>
-									</div>
-									<div class="ccard-infoRow">
-										<span class="ccard-infoLabel" style="letter-spacing: 8px;">비밀번호</span>
-										<span class="ccard-infoValue">
-											<c:choose>
-												<c:when test="${domain.userId == 'admin'}">
-													*******
-												</c:when>
-												<c:otherwise>
-													${domain.password}
-												</c:otherwise>
-											</c:choose>
-										</span>
+								<div class="ccard-infoCell">
+									<div class="ccard-infoTitle" style="margin: 0px; padding: 0px;">소장 : ${domain.conManager}</div>
+									<div class="ccard-infoSub strong">
+										<img src="${pageContext.request.contextPath}/new/img/call.png" style="width:10px; height: 10px;" />
+										${domain.conContact}
 									</div>
 								</div>
+								<div class="ccard-infoCell">
+									<div class="ccard-infoTitle" style="padding-top: 5px;">아이디</div>
+									<div class="ccard-infoSub strong">
+										<img src="${pageContext.request.contextPath}/new/img/user_icon.png" style="width:10px; height: 10px;"/>${domain.userId}
+									</div>
+								</div>
+								<div class="ccard-infoDivider"></div>
+								<div class="ccard-infoCell">
+									<div class="ccard-infoTitle">담당 : ${domain.manager}</div>
+									<div class="ccard-infoSub strong">
+										<img src="${pageContext.request.contextPath}/new/img/call.png" style="width:10px; height: 10px;"/>${domain.contact}
+									</div>
+								</div>
+								<div class="ccard-infoCell">
+									<div class="ccard-infoTitle" style="padding-top: 5px;">비밀번호</div>
+									<div class="ccard-infoSub strong">
+										<img src="${pageContext.request.contextPath}/new/img/password.png" style="width:10px; height: 10px;"/>
+										<c:choose>
+											<c:when test="${domain.userId == 'admin'}">
+												*******
+											</c:when>
+											<c:otherwise>
+												${domain.password}
+											</c:otherwise>
+										</c:choose>
+									</div>
+								</div>
+							</div>
 
 								<div class="ccard-actionArea">
 									<div class="actionGrid">
@@ -461,12 +485,24 @@ function setGroupName(){
 												기기등록
 											</span>
 										</a>
-										<a class="actionBtn c-info" href="javascript:getConstructionInfo('${domain.id}','${domain.fcIdx}');">
-											<span class="btnLabel">
-												<img src="${pageContext.request.contextPath}/new/img/user.png" />
-												정보변경
-											</span>
-										</a>
+										<c:choose>
+											<c:when test="${domain.settingRequired > 0}">
+												<a class="actionBtn c-info" href="${pageContext.request.contextPath}/construction/settings?constructionIdx=${domain.id}">
+													<span class="btnLabel">
+														<img src="${pageContext.request.contextPath}/new/img/user.png" />
+														정보변경
+													</span>
+												</a>
+											</c:when>
+											<c:otherwise>
+												<a class="actionBtn c-info" href="javascript:getConstructionInfo('${domain.id}','${domain.fcIdx}');">
+													<span class="btnLabel">
+														<img src="${pageContext.request.contextPath}/new/img/user.png" />
+														정보변경
+													</span>
+												</a>
+											</c:otherwise>
+										</c:choose>
 										<a class="actionBtn c-memo" href="javascript:showMemoPop('${domain.id}', '${domain.userId}', '${status.index}');">
 											<span class="btnLabel">
 												<img src="${pageContext.request.contextPath}/new/img/memo_icon.png" />
@@ -507,6 +543,25 @@ function setGroupName(){
 												</c:otherwise>
 											</c:choose>
 										</a>
+										<c:if test="${domain.contractRequired > 0}">
+										<a class="actionBtn c-block ${domain.contractSkipYn == 1 ? 'on' : ''}" href="javascript:toggleContractSkip('${domain.id}', ${domain.contractSkipYn});">
+											<span class="btnLabel">
+												<img src="${pageContext.request.contextPath}/new/img/alertIcon.png" />
+												<c:choose>
+													<c:when test="${domain.contractSkipYn == 1}">계약 우회 해제</c:when>
+													<c:otherwise>계약 우회 허용</c:otherwise>
+												</c:choose>
+											</span>
+											<c:choose>
+												<c:when test="${domain.contractSkipYn == 1}">
+													<span class="actionBadge orange">우회중</span>
+												</c:when>
+												<c:otherwise>
+													<span class="actionBadge green">계약대상</span>
+												</c:otherwise>
+											</c:choose>
+										</a>
+										</c:if>
 										<div class="selectArea ccard-select">
 											<select id="conductSel" class="state" onchange="conductSel('${domain.id}', this.value)">
 												<option value="0" ${domain.conduct == 0 ? 'selected="selected"' : '' }>시행</option>
@@ -638,12 +693,24 @@ function setGroupName(){
 												기기등록
 											</span>
 										</a>
-										<a class="actionBtn c-info" href="javascript:getConstructionInfo('${domain.id}','${domain.fcIdx}');">
-											<span class="btnLabel">
-												<img src="${pageContext.request.contextPath}/new/img/user.png" />
-												정보변경
-											</span>
-										</a>
+										<c:choose>
+											<c:when test="${domain.settingRequired > 0}">
+												<a class="actionBtn c-info" href="${pageContext.request.contextPath}/construction/settings?constructionIdx=${domain.id}">
+													<span class="btnLabel">
+														<img src="${pageContext.request.contextPath}/new/img/user.png" />
+														정보변경
+													</span>
+												</a>
+											</c:when>
+											<c:otherwise>
+												<a class="actionBtn c-info" href="javascript:getConstructionInfo('${domain.id}','${domain.fcIdx}');">
+													<span class="btnLabel">
+														<img src="${pageContext.request.contextPath}/new/img/user.png" />
+														정보변경
+													</span>
+												</a>
+											</c:otherwise>
+										</c:choose>
 										<a class="actionBtn c-memo" href="javascript:showMemoPop('${domain.id}', '${domain.userId}', '${status.index}');">
 											<span class="btnLabel">
 												<img src="${pageContext.request.contextPath}/new/img/memo_icon.png" />
@@ -684,8 +751,27 @@ function setGroupName(){
 												</c:otherwise>
 											</c:choose>
 										</a>
+										<c:if test="${domain.contractRequired > 0}">
+										<a class="actionBtn c-block full ${domain.contractSkipYn == 1 ? 'on' : ''}" href="javascript:toggleContractSkip('${domain.id}', ${domain.contractSkipYn});">
+											<span class="btnLabel">
+												<img src="${pageContext.request.contextPath}/new/img/alertIcon.png" />
+												<c:choose>
+													<c:when test="${domain.contractSkipYn == 1}">계약 우회 해제</c:when>
+													<c:otherwise>계약 우회 허용</c:otherwise>
+												</c:choose>
+											</span>
+											<c:choose>
+												<c:when test="${domain.contractSkipYn == 1}">
+													<span class="actionBadge orange">우회중</span>
+												</c:when>
+												<c:otherwise>
+													<span class="actionBadge green">계약대상</span>
+												</c:otherwise>
+											</c:choose>
+										</a>
+										</c:if>
 									</div>
-									
+
 									<div class="selectArea">
 										<select id="conductSel" class="state"  onchange="conductSel('${domain.id}', this.value)">
 											<option value="0" ${domain.conduct == 0 ? 'selected="selected"' : '' }>시행</option>
@@ -1170,8 +1256,8 @@ function getMemo(){
 			async : false,
 			success : function(data) {
 				if(data.length > 0){
-					$("div[name=postit]").eq(i).css("display","block"); 
-					
+					$("div[name=postit]").eq(i).css("display","block");
+
 					$("div[name=postit]").eq(i).find("div[name=memoArea]").html("");
 					$.each(data, function(index, item) {
 						
@@ -2073,6 +2159,25 @@ function conductSel(idx, selectVal){
 			}
 		});
 	}
+}
+
+function toggleContractSkip(idx, currentSkipYn){
+	var newVal = currentSkipYn == 1 ? 0 : 1;
+	var msg = newVal == 1
+		? '이 협력사는 계약 관리 대상입니다.\n계약 프로세스를 건너뛰고 로그인을 허용하시겠습니까?'
+		: '계약 우회를 해제하시겠습니까?\n다시 계약 프로세스가 적용됩니다.';
+	if(!confirm(msg)) return;
+	jQuery.ajax({
+		type : "POST",
+		url : "${pageContext.request.contextPath}/construction/update/contractSkip",
+		data: { id : idx, skipYn : newVal },
+		dataType : "JSON",
+		success : function(data) {
+			if(data){ alert('변경이 완료되었습니다.'); location.reload(); }
+			else{ alert('변경에 실패했습니다.'); }
+		},
+		error : function(xhr, status, error) { alert('변경 중 오류가 발생했습니다.'); }
+	});
 }
 
 function toggleBlocked(idx, currentBlockedYn){

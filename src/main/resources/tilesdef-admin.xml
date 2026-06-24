@@ -46,7 +46,12 @@
 		<put-attribute name="content" value="/WEB-INF/views/simple/report/{1}.jsp" />
 		<put-attribute name="nav" value="/WEB-INF/views/simple/report/nav.jsp" />
 	</definition>
-	
+
+	<definition name="trashbin/**" extends="commomLayout">
+		<put-attribute name="content" value="/WEB-INF/views/trashbin/{1}.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/report/nav.jsp" />
+	</definition>
+
 	
 	<definition name="ips/**" extends="commomLayout">
 		<put-attribute name="content" value="/WEB-INF/views/ips/{1}.jsp" />

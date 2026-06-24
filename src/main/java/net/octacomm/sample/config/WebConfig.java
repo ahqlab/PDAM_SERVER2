@@ -178,6 +178,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 		registry.addInterceptor(contractInterceptor)
 						.addPathPatterns("/**")
 						.excludePathPatterns("/login")
+						.excludePathPatterns("/logout")
 						.excludePathPatterns("/contract/sign-view")
 						.excludePathPatterns("/contract/sign")
 						.excludePathPatterns("/contract/pdf")

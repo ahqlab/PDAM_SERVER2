@@ -56,7 +56,7 @@ public class DeviceController extends AbstractDeviceCRUDController<DeviceMapper,
 		if(role > 0) {
 			model.addAttribute("menuIndex", 0);
 		}else{
-			model.addAttribute("menuIndex", 1);   
+			model.addAttribute("menuIndex", 1);
 		}
 	}
 

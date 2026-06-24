@@ -25,4 +25,6 @@ public class SessionInfo implements Domain{
 	
 	private boolean showPdfYn;
 
+	private boolean settingRequired;
+
 }
