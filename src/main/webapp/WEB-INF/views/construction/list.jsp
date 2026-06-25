@@ -543,7 +543,7 @@ function setGroupName(){
 												</c:otherwise>
 											</c:choose>
 										</a>
-										<c:if test="${domain.contractRequired > 0 and domain.contractCount == 0}">
+										<c:if test="${domain.contractRequired > 0 and domain.contractCount == 0}" >
 										<a class="actionBtn c-block ${domain.contractSkipYn == 1 ? 'on' : ''}" href="javascript:toggleContractSkip('${domain.id}', ${domain.contractSkipYn});">
 											<span class="btnLabel">
 												<img src="${pageContext.request.contextPath}/new/img/alertIcon.png" />
