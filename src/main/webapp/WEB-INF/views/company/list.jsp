@@ -97,6 +97,15 @@
 	cursor:default;
 	color:#ccc;
 }
+.listArea {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    padding: 20px;
+}
+#companyTbody tr:hover {
+    background-color: #f9f9f9;
+}
 </style>
 </div>
 
@@ -229,7 +238,7 @@ function renderList() {
 	renderPagination(filtered.length);
 }
 
-function renderPagination(totalItems) {
+/* function renderPagination(totalItems) {
 	var totalPages = Math.ceil(totalItems / PAGE_SIZE);
 	var wrap = $('#companyPagination');
 	if (totalPages <= 1) { wrap.html(''); return; }
@@ -241,11 +250,38 @@ function renderPagination(totalItems) {
 	}
 	html += '<button class="pageBtn" onclick="goPage(' + (currentPage + 1) + ')"' + (currentPage >= totalPages ? ' disabled' : '') + '>다음</button>';
 	wrap.html(html);
+} */
+
+function renderPagination(totalItems) {
+	var totalPages = Math.ceil(totalItems / PAGE_SIZE);
+	var wrap = $('#companyPagination');
+	if (totalPages <= 1) { wrap.html(''); return; }
+
+	var blockSize = 10; 
+	var currentBlock = Math.ceil(currentPage / blockSize); 
+	var totalBlocks = Math.ceil(totalPages / blockSize); 
+
+	var startPage = (currentBlock - 1) * blockSize + 1;
+	var endPage = Math.min(currentBlock * blockSize, totalPages); 
+
+	var html = '';
+	if (currentBlock > 1) {
+		html += '<button class="pageBtn" onclick="goPage(' + (startPage - 1) + ')">prev</button>';
+	}
+	for (var p = startPage; p <= endPage; p++) {
+		html += '<button class="pageBtn' + (p === currentPage ? ' active' : '') + '" onclick="goPage(' + p + ')">' + p + '</button>';
+	}
+	if (currentBlock < totalBlocks) {
+		html += '<button class="pageBtn" onclick="goPage(' + (endPage + 1) + ')">next</button>';
+	}
+
+	wrap.html(html);
 }
 
 function goPage(p) {
-	var totalPages = Math.ceil(getFilteredData().length / PAGE_SIZE) || 1;
-	if (p < 1 || p > totalPages || p === currentPage) return;
+	/* var totalPages = Math.ceil(getFilteredData().length / PAGE_SIZE) || 1;
+	if (p < 1 || p > totalPages || p === currentPage) return; */
+	if (p < 1 || p === currentPage) return;
 	currentPage = p;
 	renderList();
 }
