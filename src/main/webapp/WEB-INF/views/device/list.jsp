@@ -897,7 +897,8 @@ function changeSpareDevice(targetId, changeId, constructionIdx){
 					</c:when>
 					<c:otherwise>
 						<c:if test="${useExcel}"><div class="printBtn" onclick="javascript:downloadAllReport(${sessionInfo.constructionIdx});">기록지 전체 출력</div></c:if>
-						<c:if test="${sessionInfo.role == 1}">
+						<%-- <c:if test="${sessionInfo.role == 1}"> --%>
+						<c:if test="${sessionScope.isHiddenManager}">
 							<div id="contractDownloadBtn" class="printBtn" onclick="openContractDownload()" style="background-color:#28a745;margin-left:10px;display:none;">계약서 다운로드</div>
 						</c:if>
 					</c:otherwise>
