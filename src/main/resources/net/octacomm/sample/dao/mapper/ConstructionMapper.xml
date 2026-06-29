@@ -85,6 +85,13 @@
 			, IFNULL((SELECT COUNT(*) FROM TB_CONTRACT_CONFIG c WHERE A.createDate >= c.APPLY_FROM_DATE), 0) AS contractRequired
 			, IFNULL((SELECT COUNT(*) FROM TB_CONSTRUCTION_SETTING_CONFIG c WHERE A.createDate >= c.APPLY_FROM_DATE), 0) AS settingRequired
 			, IFNULL((SELECT skipYn FROM TB_CONTRACT_SKIP WHERE constructionIdx = A.id), 0) AS contractSkipYn
+			, IFNULL((
+                SELECT CASE WHEN C.STATUS = 'SIGNED' THEN 1 ELSE 0 END 
+                FROM TB_CONTRACT C 
+                WHERE C.CONSTRUCTION_IDX = A.id AND C.isDel = 0 
+                ORDER BY C.CONTRACT_IDX DESC 
+                LIMIT 1
+            ), 0) AS latestContractSignedYn
 			, B.groupName
     	FROM TB_CONSTRUCTION A, TB_GROUP B
     	<include refid="condition"/>

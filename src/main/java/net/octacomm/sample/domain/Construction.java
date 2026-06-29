@@ -64,6 +64,8 @@ public class Construction implements Domain{
 	//계약 관리 대상이어도 계약 프로세스 우회(로그인 허용) 여부 (TB_CONTRACT_SKIP)
 	private int contractSkipYn;
 
+	// 최신 계약서 서명 여부: 1=서명됨, 0=그 외
+    private int latestContractSignedYn;
 }
 
 

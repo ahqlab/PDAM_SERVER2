@@ -185,6 +185,7 @@ function setGroupName(){
 .actionBadge.orange { background: #f0ad4e; color: #333; }
 .actionBadge.gray { background: #ccc; color: #333; }
 .actionBadge.red { background: #d9534f; color: #fff; }
+.actionBadge.ivory { background: #FFF8E7; color: #333; }
 
 /* 협력사 카드 (관리자) - 4분할 가로 배치 */
 .company .listArea .listUl li.ccard {
@@ -515,15 +516,22 @@ function setGroupName(){
 												계약서 관리
 											</span>
 											<c:choose>
-												<c:when test="${domain.contractRequired == 0}">
+												<%-- <c:when test="${domain.contractRequired == 0}">
 													<span class="actionBadge gray">대상아님</span>
-												</c:when>
+												</c:when> --%>
 												<c:when test="${domain.contractCount > 0}">
-													<span class="actionBadge green">등록됨</span>
-												</c:when>
-												<c:otherwise>
-													<span class="actionBadge orange">미등록</span>
-												</c:otherwise>
+            										<c:choose>
+										                <c:when test="${domain.latestContractSignedYn == 1}">
+										                    <span class="actionBadge green">서명됨</span>
+										                </c:when>
+										                <c:otherwise>
+										                    <span class="actionBadge ivory">등록됨</span>
+										                </c:otherwise>
+										            </c:choose>
+										        </c:when>
+												<c:when test="${domain.contractRequired != 0}">
+										            <span class="actionBadge orange">미등록</span>
+										        </c:when>
 											</c:choose>
 										</a>
 										<a class="actionBtn c-block ${domain.blockedYn == 1 ? 'on' : ''}" href="javascript:toggleBlocked('${domain.id}', ${domain.blockedYn});">
