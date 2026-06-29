@@ -53,16 +53,14 @@ public class Construction implements Domain{
 	private int blockedYn;
 	//등록된 계약서 건수
 	private int contractCount;
-	//계약 관리 대상 여부 (TB_CONTRACT_CONFIG.APPLY_FROM_DATE 이후 등록)
-	private int contractRequired;
 	//MOU 체결한 빔파트너스 의 관리여부
 	//private int vimManaged;
 
 	//고도화 설정 관리 대상 여부 (TB_CONSTRUCTION_SETTING_CONFIG.APPLY_FROM_DATE 이후 등록)
 	private int settingRequired;
 
-	//계약 관리 대상이어도 계약 프로세스 우회(로그인 허용) 여부 (TB_CONTRACT_SKIP)
-	private int contractSkipYn;
+	//계약서 적용 대상 여부 (관리자가 버튼으로 지정, TB_CONTRACT_TARGET). 1이면 계약 프로세스 적용
+	private int contractTargetYn;
 
 }
 

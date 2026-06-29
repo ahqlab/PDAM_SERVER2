@@ -82,9 +82,8 @@
 			, A.showPdfYn
 			, IFNULL((SELECT blockedYn FROM TB_CONSTRUCTION_BLOCK WHERE constructionIdx = A.id), 0) AS blockedYn
 			, IFNULL((SELECT COUNT(*) FROM TB_CONTRACT WHERE CONSTRUCTION_IDX = A.id AND isDel = 0), 0) AS contractCount
-			, IFNULL((SELECT COUNT(*) FROM TB_CONTRACT_CONFIG c WHERE A.createDate >= c.APPLY_FROM_DATE), 0) AS contractRequired
 			, IFNULL((SELECT COUNT(*) FROM TB_CONSTRUCTION_SETTING_CONFIG c WHERE A.createDate >= c.APPLY_FROM_DATE), 0) AS settingRequired
-			, IFNULL((SELECT skipYn FROM TB_CONTRACT_SKIP WHERE constructionIdx = A.id), 0) AS contractSkipYn
+			, IFNULL((SELECT targetYn FROM TB_CONTRACT_TARGET WHERE constructionIdx = A.id), 0) AS contractTargetYn
 			, B.groupName
     	FROM TB_CONSTRUCTION A, TB_GROUP B
     	<include refid="condition"/>

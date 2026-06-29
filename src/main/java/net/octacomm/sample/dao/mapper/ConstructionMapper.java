@@ -89,13 +89,13 @@ public interface ConstructionMapper extends CRUDMapper<Construction, Constructio
 	@Select("SELECT IFNULL((SELECT blockedYn FROM TB_CONSTRUCTION_BLOCK WHERE constructionIdx = #{id}), 0)")
 	int getBlockedYn(@Param("id") int id);
 
-	// 계약 관리 대상이어도 계약 프로세스를 건너뛰고 로그인 허용할 현장(예외) 여부. 1이면 우회.
-	@Select("SELECT IFNULL((SELECT skipYn FROM TB_CONTRACT_SKIP WHERE constructionIdx = #{id}), 0)")
-	int getContractSkipYn(@Param("id") int id);
+	// 계약서 적용 대상 여부. 1이면 관리자가 지정한 계약 대상 현장.
+	@Select("SELECT IFNULL((SELECT targetYn FROM TB_CONTRACT_TARGET WHERE constructionIdx = #{id}), 0)")
+	int getContractTargetYn(@Param("id") int id);
 
-	@Update("INSERT INTO TB_CONTRACT_SKIP (constructionIdx, skipYn) VALUES (#{id}, #{skipYn}) "
-			+ "ON DUPLICATE KEY UPDATE skipYn = #{skipYn}")
-	int updateContractSkipYn(@Param("id") int id, @Param("skipYn") int skipYn);
+	@Update("INSERT INTO TB_CONTRACT_TARGET (constructionIdx, targetYn) VALUES (#{id}, #{targetYn}) "
+			+ "ON DUPLICATE KEY UPDATE targetYn = #{targetYn}")
+	int updateContractTargetYn(@Param("id") int id, @Param("targetYn") int targetYn);
 		
 	@Select("\r\n" + 
 			"SELECT \r\n" + 
@@ -114,8 +114,9 @@ public interface ConstructionMapper extends CRUDMapper<Construction, Constructio
 	@Select(" SELECT * FROM TB_CONSTRUCTION WHERE ID = #{id}  AND now() > DATE_ADD(createDate, INTERVAL 14 DAY) ")
 	Construction findByIdAndCreateDate(@Param("id") int id);
 
-	@Select("SELECT COUNT(*) FROM TB_CONSTRUCTION t, TB_CONTRACT_CONFIG c WHERE t.id = #{id} AND t.createDate >= c.APPLY_FROM_DATE")
-	int isContractRequired(@Param("id") int id);
+	// 계약 게이팅용: 이 현장이 계약서 적용 대상으로 지정됐는지. 1이면 계약 프로세스 적용.
+	@Select("SELECT IFNULL((SELECT targetYn FROM TB_CONTRACT_TARGET WHERE constructionIdx = #{id}), 0)")
+	int isContractTarget(@Param("id") int id);
 
 	@Select("SELECT COUNT(*) FROM TB_CONSTRUCTION t, TB_CONSTRUCTION_SETTING_CONFIG c WHERE t.id = #{id} AND t.createDate >= c.APPLY_FROM_DATE")
 	int isSettingRequired(@Param("id") int id);

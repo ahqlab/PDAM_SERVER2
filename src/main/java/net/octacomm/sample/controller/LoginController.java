@@ -174,11 +174,10 @@ public class LoginController {
 					//Group group = groupMapper.selectByUserId(result.getUserId());
 					return "redirect:" + DEFAULT_GROUP_TARGET_URL;
 				}
-				// 계약 기능 비활성 / 기존 공사(APPLY_FROM_DATE 이전 등록) / 계약 우회 지정 현장이면 바로 통과
+				// 계약 기능 비활성 / 계약서 적용 대상으로 지정되지 않은 현장이면 바로 통과
 				ContractConfig contractConfig = contractConfigMapper.getConfig();
 				if (contractConfig == null || contractConfig.getUseContractYn() == 0
-						|| conMapper.isContractRequired(result.getId()) == 0
-						|| conMapper.getContractSkipYn(result.getId()) == 1) {
+						|| conMapper.isContractTarget(result.getId()) == 0) {
 					return "redirect:" + DEFAULT_TARGET_URL + "?constructionIdx=" + result.getId();
 				}
 

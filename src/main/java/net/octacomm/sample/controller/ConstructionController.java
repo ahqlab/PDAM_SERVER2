@@ -105,12 +105,12 @@ public class ConstructionController extends AbstractConstructionCRUDController<C
 	}
 
 	@ResponseBody
-	@RequestMapping(value = "/update/contractSkip", method = RequestMethod.POST)
-	public boolean updateContractSkipYn(@RequestParam("id") int id, @RequestParam("skipYn") int skipYn,
+	@RequestMapping(value = "/update/contractTarget", method = RequestMethod.POST)
+	public boolean updateContractTargetYn(@RequestParam("id") int id, @RequestParam("targetYn") int targetYn,
 			HttpSession session) {
 		int role = (Integer) session.getAttribute("role");
 		if (role != 0) return false;
-		return mapper.updateContractSkipYn(id, skipYn) > 0;
+		return mapper.updateContractTargetYn(id, targetYn) > 0;
 	}
 	
 	@ResponseBody

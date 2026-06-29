@@ -515,7 +515,7 @@ function setGroupName(){
 												계약서 관리
 											</span>
 											<c:choose>
-												<c:when test="${domain.contractRequired == 0}">
+												<c:when test="${domain.contractTargetYn == 0}">
 													<span class="actionBadge gray">대상아님</span>
 												</c:when>
 												<c:when test="${domain.contractCount > 0}">
@@ -543,21 +543,21 @@ function setGroupName(){
 												</c:otherwise>
 											</c:choose>
 										</a>
-										<c:if test="${domain.contractRequired > 0 and domain.contractCount == 0}">
-										<a class="actionBtn c-block ${domain.contractSkipYn == 1 ? 'on' : ''}" href="javascript:toggleContractSkip('${domain.id}', ${domain.contractSkipYn});">
+										<c:if test="${domain.contractCount == 0}">
+										<a class="actionBtn c-block ${domain.contractTargetYn == 1 ? 'on' : ''}" href="javascript:toggleContractTarget('${domain.id}', ${domain.contractTargetYn});">
 											<span class="btnLabel">
 												<img src="${pageContext.request.contextPath}/new/img/alertIcon.png" />
 												<c:choose>
-													<c:when test="${domain.contractSkipYn == 1}">계약 우회 해제</c:when>
-													<c:otherwise>계약 우회 허용</c:otherwise>
+													<c:when test="${domain.contractTargetYn == 1}">계약서 적용 해제</c:when>
+													<c:otherwise>계약서 적용 대상 지정</c:otherwise>
 												</c:choose>
 											</span>
 											<c:choose>
-												<c:when test="${domain.contractSkipYn == 1}">
-													<span class="actionBadge orange">우회중</span>
+												<c:when test="${domain.contractTargetYn == 1}">
+													<span class="actionBadge green">적용중</span>
 												</c:when>
 												<c:otherwise>
-													<span class="actionBadge green">계약대상</span>
+													<span class="actionBadge gray">미적용</span>
 												</c:otherwise>
 											</c:choose>
 										</a>
@@ -723,7 +723,7 @@ function setGroupName(){
 												계약서 관리
 											</span>
 											<c:choose>
-												<c:when test="${domain.contractRequired == 0}">
+												<c:when test="${domain.contractTargetYn == 0}">
 													<span class="actionBadge gray">대상아님</span>
 												</c:when>
 												<c:when test="${domain.contractCount > 0}">
@@ -751,21 +751,21 @@ function setGroupName(){
 												</c:otherwise>
 											</c:choose>
 										</a>
-										<c:if test="${domain.contractRequired > 0}">
-										<a class="actionBtn c-block full ${domain.contractSkipYn == 1 ? 'on' : ''}" href="javascript:toggleContractSkip('${domain.id}', ${domain.contractSkipYn});">
+										<c:if test="${domain.contractCount == 0}">
+										<a class="actionBtn c-block full ${domain.contractTargetYn == 1 ? 'on' : ''}" href="javascript:toggleContractTarget('${domain.id}', ${domain.contractTargetYn});">
 											<span class="btnLabel">
 												<img src="${pageContext.request.contextPath}/new/img/alertIcon.png" />
 												<c:choose>
-													<c:when test="${domain.contractSkipYn == 1}">계약 우회 해제</c:when>
-													<c:otherwise>계약 우회 허용</c:otherwise>
+													<c:when test="${domain.contractTargetYn == 1}">계약서 적용 해제</c:when>
+													<c:otherwise>계약서 적용 대상 지정</c:otherwise>
 												</c:choose>
 											</span>
 											<c:choose>
-												<c:when test="${domain.contractSkipYn == 1}">
-													<span class="actionBadge orange">우회중</span>
+												<c:when test="${domain.contractTargetYn == 1}">
+													<span class="actionBadge green">적용중</span>
 												</c:when>
 												<c:otherwise>
-													<span class="actionBadge green">계약대상</span>
+													<span class="actionBadge gray">미적용</span>
 												</c:otherwise>
 											</c:choose>
 										</a>
@@ -1182,7 +1182,6 @@ $(document).ready(function() {
              $('input[type="checkbox"][name="conduct"]').prop('checked', false);
              $(this).prop('checked', true);
          }
-         
      });
 	 
 	 setMemoToday();
@@ -2161,16 +2160,16 @@ function conductSel(idx, selectVal){
 	}
 }
 
-function toggleContractSkip(idx, currentSkipYn){
-	var newVal = currentSkipYn == 1 ? 0 : 1;
+function toggleContractTarget(idx, currentTargetYn){
+	var newVal = currentTargetYn == 1 ? 0 : 1;
 	var msg = newVal == 1
-		? '이 협력사는 계약 관리 대상입니다.\n계약 프로세스를 건너뛰고 로그인을 허용하시겠습니까?'
-		: '계약 우회를 해제하시겠습니까?\n다시 계약 프로세스가 적용됩니다.';
+		? '이 현장을 계약서 적용 대상으로 지정하시겠습니까?\n다음 로그인부터 계약 프로세스가 적용됩니다.'
+		: '계약서 적용 대상에서 해제하시겠습니까?\n계약 프로세스 없이 바로 로그인됩니다.';
 	if(!confirm(msg)) return;
 	jQuery.ajax({
 		type : "POST",
-		url : "${pageContext.request.contextPath}/construction/update/contractSkip",
-		data: { id : idx, skipYn : newVal },
+		url : "${pageContext.request.contextPath}/construction/update/contractTarget",
+		data: { id : idx, targetYn : newVal },
 		dataType : "JSON",
 		success : function(data) {
 			if(data){ alert('변경이 완료되었습니다.'); location.reload(); }
