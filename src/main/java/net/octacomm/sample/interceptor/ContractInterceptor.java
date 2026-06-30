@@ -55,23 +55,14 @@ public class ContractInterceptor extends HandlerInterceptorAdapter {
 		ContractConfig config = contractConfigMapper.getConfig();
 		if (config == null || config.getUseContractYn() == 0) return true;
 
-		// 2. 이 공사가 계약 로직 대상인지 확인 (APPLY_FROM_DATE 이후 등록 여부)
-		if (constructionMapper.isContractRequired(constructionIdx) == 0) return true;
-
-		// 2-1. 계약 대상이어도 예외(TB_CONTRACT_SKIP)로 지정된 현장은 계약 프로세스를 건너뛰고 로그인 허용
-		if (constructionMapper.getContractSkipYn(constructionIdx) == 1) return true;
+		// 2. 계약서가 등록된 현장만 계약 로직 적용 (없으면 통과)
+		List<Contract> contracts = contractMapper.getListByConstructionIdx(constructionIdx);
+		if (contracts.isEmpty()) return true;
 
 		// 3. 계약서 서명 대기 상태 → 서명 페이지
 		Contract draft = contractMapper.getDraftByConstructionIdx(constructionIdx);
 		if (draft != null) {
 			response.sendRedirect(request.getContextPath() + "/contract/sign-view");
-			return false;
-		}
-
-		// 4. 계약서 자체가 없음 → 접근 차단
-		List<Contract> contracts = contractMapper.getListByConstructionIdx(constructionIdx);
-		if (contracts.isEmpty()) {
-			response.sendRedirect(request.getContextPath() + "/contract/required");
 			return false;
 		}
 

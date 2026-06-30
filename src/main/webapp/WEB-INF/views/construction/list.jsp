@@ -185,7 +185,17 @@ function setGroupName(){
 .actionBadge.orange { background: #f0ad4e; color: #333; }
 .actionBadge.gray { background: #ccc; color: #333; }
 .actionBadge.red { background: #d9534f; color: #fff; }
-.actionBadge.ivory { background: #FFF8E7; color: #333; }
+
+/* 관리자 보호 버튼 비밀번호 모달 */
+.actionPw-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 99999; align-items: center; justify-content: center; }
+.actionPw-box { background: #fff; border-radius: 10px; padding: 24px 20px; width: 90%; max-width: 340px; box-shadow: 0 8px 24px rgba(0,0,0,0.25); box-sizing: border-box; }
+.actionPw-title { font-size: 16px; font-weight: bold; margin-bottom: 14px; color: #222; }
+.actionPw-input { width: 100%; height: 44px; padding: 0 12px; font-size: 15px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+.actionPw-error { min-height: 18px; margin-top: 8px; font-size: 13px; color: #d9534f; }
+.actionPw-btns { display: flex; gap: 8px; margin-top: 16px; }
+.actionPw-btns button { flex: 1; height: 44px; border: none; border-radius: 6px; font-size: 15px; cursor: pointer; }
+.actionPw-cancel { background: #eee; color: #333; }
+.actionPw-ok { background: #004058; color: #fff; }
 
 /* 협력사 카드 (관리자) - 4분할 가로 배치 */
 .company .listArea .listUl li.ccard {
@@ -592,31 +602,23 @@ function setGroupName(){
 												메모등록
 											</span>
 										</a>
-										<a class="actionBtn c-contract" href="${pageContext.request.contextPath}/contract/manage?constructionIdx=${domain.id}">
+										<a class="actionBtn c-contract" href="javascript:openContractManage('${pageContext.request.contextPath}/contract/manage?constructionIdx=${domain.id}');">
 											<span class="btnLabel">
 												<span class="btnIcon">&#128196;</span>
 												계약서 관리
 											</span>
-											<c:choose>
-												<%-- <c:when test="${domain.contractRequired == 0}">
-													<span class="actionBadge gray">대상아님</span>
-												</c:when> --%>
-												<c:when test="${domain.contractCount > 0}">
-            										<c:choose>
-										                <c:when test="${domain.latestContractSignedYn == 1}">
-										                    <span class="actionBadge green">서명됨</span>
-										                </c:when>
-										                <c:otherwise>
-										                    <span class="actionBadge ivory">등록됨</span>
-										                </c:otherwise>
-										            </c:choose>
-										        </c:when>
-												<c:when test="${domain.contractRequired != 0}">
-										            <span class="actionBadge orange">미등록</span>
-										        </c:when>
-											</c:choose>
+											<c:if test="${domain.contractCount > 0}">
+												<c:choose>
+													<c:when test="${domain.latestContractSignedYn == 1}">
+														<span class="actionBadge green">서명됨</span>
+													</c:when>
+													<c:otherwise>
+														<span class="actionBadge orange">등록됨</span>
+													</c:otherwise>
+												</c:choose>
+											</c:if>
 										</a>
-										<a class="actionBtn c-block ${domain.blockedYn == 1 ? 'on' : ''}" href="javascript:toggleBlocked('${domain.id}', ${domain.blockedYn});">
+										<a class="actionBtn c-block ${domain.blockedYn == 1 ? 'on' : ''}" href="javascript:guardedBlocked('${domain.id}', ${domain.blockedYn});">
 											<span class="btnLabel">
 												<img src="${pageContext.request.contextPath}/new/img/alertIcon.png" />
 												<c:choose>
@@ -633,25 +635,6 @@ function setGroupName(){
 												</c:otherwise>
 											</c:choose>
 										</a>
-										<c:if test="${domain.contractRequired > 0 and domain.contractCount == 0}">
-										<a class="actionBtn c-block ${domain.contractSkipYn == 1 ? 'on' : ''}" href="javascript:toggleContractSkip('${domain.id}', ${domain.contractSkipYn});">
-											<span class="btnLabel">
-												<img src="${pageContext.request.contextPath}/new/img/alertIcon.png" />
-												<c:choose>
-													<c:when test="${domain.contractSkipYn == 1}">계약 우회 해제</c:when>
-													<c:otherwise>계약 우회 허용</c:otherwise>
-												</c:choose>
-											</span>
-											<c:choose>
-												<c:when test="${domain.contractSkipYn == 1}">
-													<span class="actionBadge orange">우회중</span>
-												</c:when>
-												<c:otherwise>
-													<span class="actionBadge green">계약대상</span>
-												</c:otherwise>
-											</c:choose>
-										</a>
-										</c:if>
 										<div class="selectArea ccard-select">
 											<select id="conductSel" class="state" onchange="conductSel('${domain.id}', this.value)">
 												<option value="0" ${domain.conduct == 0 ? 'selected="selected"' : '' }>시행</option>
@@ -813,24 +796,23 @@ function setGroupName(){
 												메모등록
 											</span>
 										</a>
-										<a class="actionBtn c-contract" href="${pageContext.request.contextPath}/contract/manage?constructionIdx=${domain.id}">
+										<a class="actionBtn c-contract" href="javascript:openContractManage('${pageContext.request.contextPath}/contract/manage?constructionIdx=${domain.id}');">
 											<span class="btnLabel">
 												<span class="btnIcon">&#128196;</span>
 												계약서 관리
 											</span>
-											<c:choose>
-												<c:when test="${domain.contractRequired == 0}">
-													<span class="actionBadge gray">대상아님</span>
-												</c:when>
-												<c:when test="${domain.contractCount > 0}">
-													<span class="actionBadge green">등록됨</span>
-												</c:when>
-												<c:otherwise>
-													<span class="actionBadge orange">미등록</span>
-												</c:otherwise>
-											</c:choose>
+											<c:if test="${domain.contractCount > 0}">
+												<c:choose>
+													<c:when test="${domain.latestContractSignedYn == 1}">
+														<span class="actionBadge green">서명됨</span>
+													</c:when>
+													<c:otherwise>
+														<span class="actionBadge orange">등록됨</span>
+													</c:otherwise>
+												</c:choose>
+											</c:if>
 										</a>
-										<a class="actionBtn c-block full ${domain.blockedYn == 1 ? 'on' : ''}" href="javascript:toggleBlocked('${domain.id}', ${domain.blockedYn});">
+										<a class="actionBtn c-block full ${domain.blockedYn == 1 ? 'on' : ''}" href="javascript:guardedBlocked('${domain.id}', ${domain.blockedYn});">
 											<span class="btnLabel">
 												<img src="${pageContext.request.contextPath}/new/img/alertIcon.png" />
 												<c:choose>
@@ -847,25 +829,6 @@ function setGroupName(){
 												</c:otherwise>
 											</c:choose>
 										</a>
-										<c:if test="${domain.contractRequired > 0}">
-										<a class="actionBtn c-block full ${domain.contractSkipYn == 1 ? 'on' : ''}" href="javascript:toggleContractSkip('${domain.id}', ${domain.contractSkipYn});">
-											<span class="btnLabel">
-												<img src="${pageContext.request.contextPath}/new/img/alertIcon.png" />
-												<c:choose>
-													<c:when test="${domain.contractSkipYn == 1}">계약 우회 해제</c:when>
-													<c:otherwise>계약 우회 허용</c:otherwise>
-												</c:choose>
-											</span>
-											<c:choose>
-												<c:when test="${domain.contractSkipYn == 1}">
-													<span class="actionBadge orange">우회중</span>
-												</c:when>
-												<c:otherwise>
-													<span class="actionBadge green">계약대상</span>
-												</c:otherwise>
-											</c:choose>
-										</a>
-										</c:if>
 									</div>
 
 									<div class="selectArea">
@@ -1183,7 +1146,20 @@ function setGroupName(){
 
 			<div class="popLayer"></div>
 			</div>
-			
+
+			<!-- 관리자 보호 버튼(계약서 관리/이용제한) 비밀번호 모달 -->
+			<div id="actionPwOverlay" class="actionPw-overlay" style="display:none;">
+				<div class="actionPw-box">
+					<div class="actionPw-title">비밀번호 확인</div>
+					<input type="password" id="actionPwInput" class="actionPw-input" placeholder="비밀번호를 입력하세요." autocomplete="off" />
+					<div id="actionPwError" class="actionPw-error"></div>
+					<div class="actionPw-btns">
+						<button type="button" class="actionPw-cancel" onclick="closeActionPw();">취소</button>
+						<button type="button" class="actionPw-ok" onclick="submitActionPw();">확인</button>
+					</div>
+				</div>
+			</div>
+
 			<!--//컨텐츠-->
 			<div class="popup_layer" id="popup_layer" style="display: none;">
 				<div class="popup_box">
@@ -1291,7 +1267,6 @@ $(document).ready(function() {
              $('input[type="checkbox"][name="conduct"]').prop('checked', false);
              $(this).prop('checked', true);
          }
-         
      });
 	 
 	 setMemoToday();
@@ -2558,23 +2533,63 @@ function conductSel(idx, selectVal){
 	}
 }
 
-function toggleContractSkip(idx, currentSkipYn){
-	var newVal = currentSkipYn == 1 ? 0 : 1;
-	var msg = newVal == 1
-		? '이 협력사는 계약 관리 대상입니다.\n계약 프로세스를 건너뛰고 로그인을 허용하시겠습니까?'
-		: '계약 우회를 해제하시겠습니까?\n다시 계약 프로세스가 적용됩니다.';
-	if(!confirm(msg)) return;
+// 관리자 보호 버튼 공통 비밀번호 게이트: 모달로 비번 입력 → 서버 검증 → 성공 시 onSuccess 실행
+var _actionPwCallback = null;
+
+function withActionPassword(onSuccess){
+	_actionPwCallback = onSuccess;
+	$('#actionPwError').text('');
+	$('#actionPwInput').val('');
+	$('#actionPwOverlay').css('display', 'flex');
+	setTimeout(function(){ $('#actionPwInput').focus(); }, 50);
+}
+
+function closeActionPw(){
+	$('#actionPwOverlay').css('display', 'none');
+	_actionPwCallback = null;
+}
+
+function submitActionPw(){
+	var pw = $('#actionPwInput').val();
+	if(pw === ''){ $('#actionPwError').text('비밀번호를 입력하세요.'); return; }
 	jQuery.ajax({
 		type : "POST",
-		url : "${pageContext.request.contextPath}/construction/update/contractSkip",
-		data: { id : idx, skipYn : newVal },
+		url : "${pageContext.request.contextPath}/construction/verifyActionPassword",
+		data : { password : pw },
 		dataType : "JSON",
-		success : function(data) {
-			if(data){ alert('변경이 완료되었습니다.'); location.reload(); }
-			else{ alert('변경에 실패했습니다.'); }
+		success : function(ok){
+			if(ok){
+				var cb = _actionPwCallback;
+				closeActionPw();
+				if(cb) cb();
+			} else {
+				$('#actionPwError').text('비밀번호가 일치하지 않습니다.');
+				$('#actionPwInput').val('').focus();
+			}
 		},
-		error : function(xhr, status, error) { alert('변경 중 오류가 발생했습니다.'); }
+		error : function(xhr, status, error){ $('#actionPwError').text('확인 중 오류가 발생했습니다.'); }
 	});
+}
+
+// Enter 제출 / ESC 닫기 / 오버레이 빈 곳 클릭 닫기
+$(document).on('keydown', '#actionPwInput', function(e){
+	if(e.key === 'Enter' || e.keyCode === 13){ e.preventDefault(); submitActionPw(); }
+});
+$(document).on('keydown', function(e){
+	if($('#actionPwOverlay').css('display') !== 'none' && (e.key === 'Escape' || e.keyCode === 27)){ closeActionPw(); }
+});
+$(document).on('click', '#actionPwOverlay', function(e){
+	if(e.target === this){ closeActionPw(); }
+});
+
+// 계약서 관리: 비번 확인 후 이동
+function openContractManage(url){
+	withActionPassword(function(){ location.href = url; });
+}
+
+// 이용제한 설정: 비번 확인 후 토글 실행
+function guardedBlocked(idx, currentBlockedYn){
+	withActionPassword(function(){ toggleBlocked(idx, currentBlockedYn); });
 }
 
 function toggleBlocked(idx, currentBlockedYn){

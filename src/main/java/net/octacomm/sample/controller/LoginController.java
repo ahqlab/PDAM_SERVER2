@@ -174,28 +174,26 @@ public class LoginController {
 					//Group group = groupMapper.selectByUserId(result.getUserId());
 					return "redirect:" + DEFAULT_GROUP_TARGET_URL;
 				}
-				// 계약 기능 비활성 / 기존 공사(APPLY_FROM_DATE 이전 등록) / 계약 우회 지정 현장이면 바로 통과
+				// 계약 기능이 비활성이면 바로 통과
 				ContractConfig contractConfig = contractConfigMapper.getConfig();
-				if (contractConfig == null || contractConfig.getUseContractYn() == 0
-						|| conMapper.isContractRequired(result.getId()) == 0
-						|| conMapper.getContractSkipYn(result.getId()) == 1) {
+				if (contractConfig == null || contractConfig.getUseContractYn() == 0) {
 					return "redirect:" + DEFAULT_TARGET_URL + "?constructionIdx=" + result.getId();
 				}
 
-				// 계약 로직 대상 공사
+				// 계약서가 등록된 현장만 계약 프로세스 적용 (없으면 바로 통과)
 				List<Contract> contracts = contractMapper.getListByConstructionIdx(result.getId());
-				if (!contracts.isEmpty()) {
-					Contract draft = contractMapper.getDraftByConstructionIdx(result.getId());
-					if (draft != null) {
-						session.setAttribute("contractStatus", "DRAFT");
-						return "redirect:/contract/sign-view";
-					}
-					session.setAttribute("contractStatus", "SIGNED");
+				if (contracts.isEmpty()) {
 					return "redirect:" + DEFAULT_TARGET_URL + "?constructionIdx=" + result.getId();
 				}
 
-				// 계약서 없음 → 접근 차단 페이지
-				return "redirect:/contract/required";
+				// 서명 대기(draft) 상태면 서명 페이지로, 서명 완료면 통과
+				Contract draft = contractMapper.getDraftByConstructionIdx(result.getId());
+				if (draft != null) {
+					session.setAttribute("contractStatus", "DRAFT");
+					return "redirect:/contract/sign-view";
+				}
+				session.setAttribute("contractStatus", "SIGNED");
+				return "redirect:" + DEFAULT_TARGET_URL + "?constructionIdx=" + result.getId();
 			}
 
 			model.addAttribute("errorMessage", "아이디가 비밀번호를 확인하세요.");

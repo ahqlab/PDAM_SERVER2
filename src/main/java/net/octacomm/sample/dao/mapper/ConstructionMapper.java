@@ -89,15 +89,11 @@ public interface ConstructionMapper extends CRUDMapper<Construction, Constructio
 	@Select("SELECT IFNULL((SELECT blockedYn FROM TB_CONSTRUCTION_BLOCK WHERE constructionIdx = #{id}), 0)")
 	int getBlockedYn(@Param("id") int id);
 
-	// 계약 관리 대상이어도 계약 프로세스를 건너뛰고 로그인 허용할 현장(예외) 여부. 1이면 우회.
-	@Select("SELECT IFNULL((SELECT skipYn FROM TB_CONTRACT_SKIP WHERE constructionIdx = #{id}), 0)")
-	int getContractSkipYn(@Param("id") int id);
+	// 관리자 보호 버튼(계약서 관리/이용제한) 공통 비밀번호 검증. 1이면 일치.
+	@Select("SELECT COUNT(*) FROM TB_ACTION_PASSWORD WHERE id = 1 AND password = #{password}")
+	int verifyActionPassword(@Param("password") String password);
 
-	@Update("INSERT INTO TB_CONTRACT_SKIP (constructionIdx, skipYn) VALUES (#{id}, #{skipYn}) "
-			+ "ON DUPLICATE KEY UPDATE skipYn = #{skipYn}")
-	int updateContractSkipYn(@Param("id") int id, @Param("skipYn") int skipYn);
-		
-	@Select("\r\n" + 
+	@Select("\r\n" +
 			"SELECT \r\n" + 
 			"	IFNULL((SELECT fcName FROM TB_FRANCHISE WHERE idx =  A.fcIdx ), '없음') AS fcName\r\n" + 
 			"    , A.secretCode\r\n" + 
@@ -113,9 +109,6 @@ public interface ConstructionMapper extends CRUDMapper<Construction, Constructio
 
 	@Select(" SELECT * FROM TB_CONSTRUCTION WHERE ID = #{id}  AND now() > DATE_ADD(createDate, INTERVAL 14 DAY) ")
 	Construction findByIdAndCreateDate(@Param("id") int id);
-
-	@Select("SELECT COUNT(*) FROM TB_CONSTRUCTION t, TB_CONTRACT_CONFIG c WHERE t.id = #{id} AND t.createDate >= c.APPLY_FROM_DATE")
-	int isContractRequired(@Param("id") int id);
 
 	@Select("SELECT COUNT(*) FROM TB_CONSTRUCTION t, TB_CONSTRUCTION_SETTING_CONFIG c WHERE t.id = #{id} AND t.createDate >= c.APPLY_FROM_DATE")
 	int isSettingRequired(@Param("id") int id);
