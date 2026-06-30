@@ -335,6 +335,83 @@ function setGroupName(){
     background: #fff;
     box-sizing: border-box;
 }
+/* =========================================
+   카카오톡 스타일 뱃지 & 메모 리스트 CSS
+   ========================================= */
+
+/* 1. 메모 알림 뱃지 */
+.memo-badge { 
+	background-color: #f00; 
+	color: #fff; 
+	border-radius: 50%; 
+	padding: 2px 7px; 
+	font-size: 12px; 
+	font-weight: bold;
+	margin-left: 5px; 
+}
+
+/* 2. 메모 리스트 한 줄 영역 (날짜 부분) */
+.memo-list-item { 
+	border-bottom: 1px solid #ddd; 
+	padding: 12px 10px; 
+}
+.memo-list-item:hover { 
+	background: #f9f9f9; 
+}
+
+/* 3. 메모 상세 내용 박스 */
+.memo-detail { 
+	display: block; 
+	padding: 15px; 
+	background: #fdfdfd; 
+	border: 1px solid #eee; 
+	margin-top: 8px; 
+	font-size: 14px; 
+	white-space: pre-wrap; /* 메모 작성 시 엔터(줄바꿈) 적용되게 유지 */
+	border-radius: 4px;
+	max-height: 250px;     /* 내용이 너무 길면 자체 스크롤 생성 */
+	overflow-y: auto;
+	cursor: pointer;       /* 마우스 올리면 손가락(클릭 가능) 모양으로 변경 */
+}
+
+
+/* =========================================
+   모달(팝업) 창 기본 레이아웃 CSS
+   ========================================= */
+
+.modal-overlay { 
+	display: none; 
+	position: fixed; 
+	top: 0; left: 0; 
+	width: 100%; height: 100%; 
+	background: rgba(0,0,0,0.5); 
+	z-index: 9999; 
+}
+.modal-content { 
+	width: 400px; 
+	background: #fff; 
+	margin: 100px auto; 
+	padding: 20px; 
+	border-radius: 8px; 
+	max-height: 80vh; 
+	overflow-y: auto; 
+	position: relative; 
+}
+.modal-header { 
+	display: flex; 
+	justify-content: space-between; 
+	align-items: center; 
+	margin-bottom: 15px; 
+}
+.modal-header h3 { 
+	margin: 0; 
+	font-size: 18px; 
+}
+
+.popUp04 .popCont {
+        padding-top: 15px; 
+    }
+
 @media (max-width: 1400px) {
     .company .listArea .listUl li.ccard {
         flex-wrap: wrap;
@@ -428,27 +505,32 @@ function setGroupName(){
 						<c:when test="${sessionInfo.role == 0}">
 						<li class="ccard">
 							<div class="ccard-headWrap">
-							<div class="ccard-head">
-								<span class="ccard-date">${domain.createDate}</span>
-								<a class="ccard-name" href="${pageContext.request.contextPath}/device/list?constructionIdx=${domain.id}">
-									<c:choose>
-										<c:when test="${sessionInfo.userId eq 'ji2177'}">
-											${domain.location}
-										</c:when>
-										<c:otherwise>
-											[${domain.name}] ${domain.location}
-										</c:otherwise>
-									</c:choose>
-								</a>
-								<p class="ccard-addr">${domain.address}</p>
-							</div>
-
-							<div id="postit" name="postit" class="postit" style="display: none;">
-								<input type="hidden" name="constructionIdx" value="${domain.id}">
-								<input type="hidden" name="userId" value="${domain.userId}">
-								<div name="memoArea">
+								<div class="ccard-head">
+									<span class="ccard-date">${domain.createDate}</span>
+									<a class="ccard-name" href="${pageContext.request.contextPath}/device/list?constructionIdx=${domain.id}">
+										<c:choose>
+											<c:when test="${sessionInfo.userId eq 'ji2177'}">
+												${domain.location}
+											</c:when>
+											<c:otherwise>
+												[${domain.name}] ${domain.location}
+											</c:otherwise>
+										</c:choose>
+									</a>
+									<p class="ccard-addr">${domain.address}</p>
 								</div>
-							</div>
+	
+								<%-- <div id="postit" name="postit" class="postit" style="display: none;">
+									<input type="hidden" name="constructionIdx" value="${domain.id}">
+									<input type="hidden" name="userId" value="${domain.userId}">
+									<div name="memoArea"></div>
+								</div> --%>
+								<div style="display:flex; align-items:center; margin-top:10px; margin-left: auto;">
+									<button type="button" class="actionBtn c-memo" style="width:130px; border:none;" onclick="openMemoListModal('${domain.id}', '${domain.userId}')">
+										<img src="${pageContext.request.contextPath}/new/img/memo_icon.png" style="width:16px;"/>
+										메모 보기 <span class="memo-badge" data-id="${domain.id}" style="display:none;">0</span>
+									</button>
+								</div>
 							</div>
 
 							<div class="ccard-infoArea">
@@ -607,11 +689,17 @@ function setGroupName(){
 						</c:choose>
 						<c:choose>
 							<c:when test="${sessionInfo.role == 0 or sessionInfo.role == 3 }">
-								<div id="postit" name="postit" class="postit" style="margin-left: 20px; display: none;">
+								<%-- <div id="postit" name="postit" class="postit" style="margin-left: 20px; display: none;">
 									<input type="hidden" name="constructionIdx" value="${domain.id}">
 									<input type="hidden" name="userId" value="${domain.userId}">
 									<div name="memoArea">
 									</div>
+								</div> --%>
+								<div style="display:flex; align-items:center; margin-top:10px; margin-left:20px;">
+								    <button type="button" class="actionBtn c-memo" style="width:130px; font-weight:bold; border:none;" onclick="openMemoListModal('${domain.id}', '${domain.userId}')">
+								        <img src="${pageContext.request.contextPath}/new/img/memo_icon.png" style="width:16px;"/>
+								       	 메모 보기 <span class="memo-badge" data-id="${domain.id}" style="display:none;">0</span>
+								    </button>
 								</div>
 							</c:when>
 						</c:choose>	 
@@ -1093,8 +1181,11 @@ function setGroupName(){
 			</div>
 			
 			<div class="popUp popUp04">
-				<div class="popTit">
-					<p>메모장</p>
+				<div class="popTit"style="position: relative;">
+			        <span onclick="goBackToMemoList()" style="position: absolute; left: 20px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 15px; font-weight: bold; display: flex; align-items: center; color: #fff;">
+			            <span style="font-size: 20px; margin-right: 5px;">&#8592;</span>
+			        </span>
+					<p style="padding-left: 20px;">메모장</p>
 					<img class="popClose" src="${pageContext.request.contextPath}/new/img/popclose.png" />
 				</div>
 				<div class="popCont">
@@ -1118,6 +1209,16 @@ function setGroupName(){
 				</div>
 			</div>
 			
+			<div class="popUp popUp05">
+			    <div class="popTit">
+			        <p>메모 목록</p>
+			        <img class="popClose" src="${pageContext.request.contextPath}/new/img/popclose.png" />
+			    </div>
+			    <div class="popCont" style=" overflow-y: auto; padding: 20px;">
+			        <div id="memoListContainer">
+			            </div>
+			    </div>
+			</div>
 			
 			
 <!-- 팝업 -->
@@ -1190,9 +1291,9 @@ $('.mlist a').on('click', function(e){
 	}
 });
 
-function deleteMemo(id){
+function deleteMemo(id, constructionIdx){
 	
-	var result = confirm("삭제하시겠습니까?");
+	/* var result = confirm("삭제하시겠습니까?");
 	if(result){
 		jQuery.ajax({
 			type : "POST",
@@ -1215,12 +1316,28 @@ function deleteMemo(id){
 		}); 
 		return;
 	}
-	return;
+	return; */
+	
+	if(confirm("메모를 삭제하시겠습니까?")){
+		jQuery.ajax({
+			type : "POST",
+			url : "${pageContext.request.contextPath}/memo/deleteAjax",
+			data: { id : id }, 
+			dataType : "JSON",
+			success : function(data) {
+				if(data == true){
+					alert('삭제되었습니다.');
+					loadMemoList(constructionIdx);
+					getMemo();
+				}
+			}
+		}); 
+	}
 }
 
 function getMemo(){
-	
-	var length = $("div[name=postit]").length;
+
+	/* var length = $("div[name=postit]").length;
 	var role = ${sessionInfo.role};
 	
 	for (var i = 0; i < length; i++) {
@@ -1274,14 +1391,28 @@ function getMemo(){
 				alert("에러발생 1 ");
 			}
 		});
-	}
+	} */
 	
+	$(".memo-badge").each(function() {
+        var badge = $(this);
+        var constructionIdx = badge.attr("data-id");
+        jQuery.ajax({
+            type : "GET",
+            data: { constructionIdx : constructionIdx },
+            url : "${pageContext.request.contextPath}/memo/list",
+            dataType : "JSON",
+            success : function(data) {
+                badge.text(data.length);
+                if(data.length > 0) { badge.show(); } else { badge.hide(); }
+            }
+        });
+    });
 	 
 }
 
 function saveMemo(){
 	
-	var memoId = $("#memoId").val();
+	/* var memoId = $("#memoId").val();
 	var userId = $("#memoUserId").val();
 	var constructionIdx = $("#memoConstructionIdx").val();
 	var index = $("#memoIndex").val();
@@ -1354,11 +1485,39 @@ function saveMemo(){
 			}
 		}); 
 	}
-	/**
+
+	return; */
 	
+	var memoId = $("#memoId").val();
+	var userId = $("#memoUserId").val();
+	var constructionIdx = $("#memoConstructionIdx").val();
 	
-	**/
-	return;
+	var myObject = new Object(); 
+	myObject.id = new Number(memoId == "" ? 0 : memoId);
+	myObject.userId = userId;
+	myObject.constructionIdx = new Number(constructionIdx);
+	myObject.content = $("#memoContent").val();
+	myObject.memoDate = $("#memoDate").val();
+	myObject.createDate = ''; myObject.modifyDate = '';
+	
+	var url = memoId == "" ? "/memo/registAjax" : "/memo/updateAjax";
+	
+	jQuery.ajax({
+		type : "POST",
+		url : "${pageContext.request.contextPath}" + url,
+		contentType : "application/json",
+		async : false,
+		data: JSON.stringify(myObject),
+		success : function(data) {	
+			if(data == 1){
+				$('.popUp04').hide(); // 작성 팝업 닫기
+				$("#memoContent").val("");
+				setMemoToday();
+				getMemo(); // 뱃지 업데이트
+				openMemoListModal(constructionIdx, userId); // 리스트 다시 열기
+			}
+		}
+	});
 }
 
 function setMemoToday(){
@@ -1376,8 +1535,8 @@ function showUpdateMemoPop(id, constructionIdx,  memoDate, content){
 	$("#memoConstructionIdx").val(constructionIdx);
 	$("#memoDate").val(memoDate);
 	$("#memoContent").val(content);
-	
-	$('.popUp04').show();
+	$('.popUp05').hide(); // 리스트 팝업 숨김
+	$('.popUp04').show(); // 작성 팝업 열기
 	$('.popLayer').show();
 	$('body').css('overflow', 'hidden');
 }
@@ -1393,6 +1552,236 @@ function showMemoPop(constructionIdx, userId, index){
 	$("#memoUserId").val(userId);
 	$("#memoIndex").val(index);
 	$("#memoContent").val("");
+}
+
+//팝업 열기 및 리스트 가져오기
+function openMemoListModal(constructionIdx, userId) {
+    $('#memoListContainer').data('constructionIdx', constructionIdx);
+    $('#memoListContainer').data('userId', userId);
+    loadMemoList(constructionIdx);
+    $('.popUp05').show();
+    $('.popLayer').show();
+    $('body').css('overflow', 'hidden');
+}
+
+//1. [수정] 버튼 클릭 시 입력창으로 변환
+function enableInlineEdit(memoId) {
+    var detailDiv = $('#memo-detail-' + memoId);
+    var editArea = $('#memo-edit-' + memoId);
+    
+    // 숨겨둔 원본 텍스트를 textarea 안에 넣기
+    var originalContent = detailDiv.attr('data-content').replace(/\\n/g, '\n');
+    $('#inline-textarea-' + memoId).val(originalContent);
+    
+    // 화면 전환 (텍스트 숨기고 입력창 보이기)
+    detailDiv.hide();
+    editArea.show();
+    detailDiv.siblings('div').find('.action-btns').hide(); // 수정 중엔 우측 상단 수정/삭제 버튼 숨김
+}
+
+// 2. [취소] 버튼 클릭 시 원래대로 복구
+function cancelInlineEdit(memoId) {
+    $('#memo-edit-' + memoId).hide();
+    $('#memo-detail-' + memoId).show();
+    $('#memo-detail-' + memoId).siblings('div').find('.action-btns').show();
+}
+
+// 3. [저장] 버튼 클릭 시 AJAX로 바로 저장
+function saveInlineMemo(memoId, userId, constructionIdx, memoDate) {
+    var newContent = $('#inline-textarea-' + memoId).val();
+    
+    if(newContent.trim() == "") {
+        alert("메모 내용을 입력하세요.");
+        return;
+    }
+    
+    var myObject = {
+        id: Number(memoId),
+        userId: userId,
+        constructionIdx: Number(constructionIdx),
+        content: newContent,
+        memoDate: memoDate,
+        createDate: '', modifyDate: ''
+    };
+    
+    jQuery.ajax({
+        type: "POST",
+        url: "${pageContext.request.contextPath}/memo/updateAjax",
+        contentType: "application/json",
+        data: JSON.stringify(myObject),
+        success: function(data) {
+            if(data == 1) {
+                // 저장 성공 시 리스트만 조용히 다시 불러옴 (모달 유지)
+                loadMemoList(constructionIdx);
+            } else {
+                alert("수정에 실패했습니다.");
+            }
+        }
+    });
+}
+
+//1. 선택 삭제
+function deleteSelectedMemos(constructionIdx) {
+    var selectedIds = [];
+    $('.memo-checkbox:checked').each(function() {
+        selectedIds.push($(this).val());
+    });
+    
+    if(selectedIds.length === 0) {
+        alert("삭제할 메모를 체크박스에서 선택해주세요.");
+        return;
+    }
+    
+    if(confirm("선택한 " + selectedIds.length + "개의 메모를 삭제하시겠습니까?")) {
+        executeBatchDelete(selectedIds, constructionIdx);
+    }
+}
+
+// 2. 전체 삭제
+function executeBatchDelete(constructionIdx) {
+    var allIds = [];
+    $('.memo-checkbox').each(function() {
+        allIds.push($(this).val());
+    });
+    
+    if(allIds.length === 0) {
+        alert("삭제할 메모가 없습니다.");
+        return;
+    }
+    
+    if(confirm("전체 " + allIds.length + "개의 메모를 모두 삭제하시겠습니까? (이 작업은 되돌릴 수 없습니다.)")) {
+        executeBatchDelete(allIds, constructionIdx);
+    }
+}
+
+// 3. 다중 삭제 실행 (기존 서버 로직을 반복 호출하여 안전하게 삭제)
+function executeBatchDelete(ids, constructionIdx) {
+    var deletedCount = 0;
+    var expectedCount = ids.length;
+    
+    ids.forEach(function(id) {
+        jQuery.ajax({
+            type: "POST",
+            url: "${pageContext.request.contextPath}/memo/deleteAjax",
+            data: { id: id },
+            dataType: "JSON",
+            success: function(data) {
+                if(data == true) deletedCount++;
+            },
+            complete: function() {
+                expectedCount--;
+                if(expectedCount === 0) {
+                    alert(deletedCount + "개의 메모가 삭제되었습니다.");
+                    loadMemoList(constructionIdx); // 리스트 갱신
+                    getMemo(); // 알림 뱃지 갱신
+                }
+            }
+        });
+    });
+}
+
+
+//전체 선택/해제 토글
+function toggleAllMemos(source) {
+    $('.memo-checkbox').prop('checked', source.checked);
+}
+
+//메모 작성창에서 리스트 팝업으로 뒤로 가기
+function goBackToMemoList() {
+    var constructionIdx = $("#memoConstructionIdx").val();
+    var userId = $("#memoUserId").val();
+    
+    $('.popUp04').hide(); // 현재 작성 팝업창 닫기
+    openMemoListModal(constructionIdx, userId); // 메모 리스트 팝업창 다시 열기
+}
+
+//리스트 AJAX 로딩
+function loadMemoList(constructionIdx) {
+    jQuery.ajax({
+        type: "GET",
+        data: { constructionIdx: constructionIdx },
+        url: "${pageContext.request.contextPath}/memo/list",
+        dataType: "JSON",
+        success: function(data) {
+            var container = $('#memoListContainer');
+            container.empty();
+            var role = ${sessionInfo.role};
+            
+            container.data('constructionIdx', constructionIdx);
+
+            var topBarHtml = '<div style="display: flex; padding-top: 50px; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #ddd;">';
+            
+            if (role == 0 || role == 3) {
+                topBarHtml += 
+                    '<div style="display: flex; align-items: center;">' +
+                        '<label style="cursor:pointer; display:flex; align-items:center; margin-right:15px; font-size:13px; font-weight:bold;">' +
+                            '<input type="checkbox" id="checkAllMemos" style="width:16px; height:16px; margin-right:5px; cursor:pointer;" onclick="toggleAllMemos(this)">' +
+                        '</label>' +
+                        '<button type="button" onclick="deleteSelectedMemos(\'' + constructionIdx + '\')" style="background:#d9534f; color:#fff; border:none; padding:6px 15px; border-radius:4px; cursor:pointer; font-weight:bold;">삭제</button>' +
+                    '</div>';
+            } else {
+                topBarHtml += '<div></div>'; 
+            }
+
+            topBarHtml += 
+                '<div style="text-align: right;">' +
+                    '<button type="button" class="actionBtn c-memo" style="width: auto; display: inline-flex; padding: 8px 15px; border: none;" onclick="triggerMemoRegist()">' +
+                        '<img src="${pageContext.request.contextPath}/new/img/memo_icon.png" style="width:14px; margin-right:5px;"/> 메모 작성' +
+                    '</button>' +
+                '</div>' +
+            '</div>';
+
+            container.append(topBarHtml);
+
+            var listHtml = '<div>';
+            
+            if(data.length > 0) {
+                $.each(data, function(index, item) {
+                    var safeContent = item.content.replace(/\n/g, '\\n').replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                    
+                    var checkboxHtml = "";
+                    var editBtn = "";
+                    
+                    if (role == 0 || role == 3) {
+                        checkboxHtml = '<input type="checkbox" class="memo-checkbox" value="' + item.id + '" style="margin-right:10px; cursor:pointer; width:16px; height:16px;">';
+                        editBtn = '<a href="javascript:void(0);" onclick="enableInlineEdit(\'' + item.id + '\');" style="color:#337ab7;">[수정]</a>';
+                    }
+                    
+                    listHtml += 
+                        '<div class="memo-list-item">' +
+                            '<div style="display:flex; justify-content:space-between; align-items:center;">' +
+                                '<div style="display:flex; align-items:center;">' +
+                                    checkboxHtml + 
+                                    '<strong style="color:#077b9c; font-size:15px;">' + item.memoDate + '</strong>' + 
+                                '</div>' +
+                                '<span class="action-btns" style="font-size:12px; font-weight:bold;">' + editBtn + '</span>' +
+                            '</div>' +
+                            '<div class="memo-detail" id="memo-detail-' + item.id + '" data-content="' + safeContent + '">' + item.content + '</div>' +
+                            
+                            '<div class="memo-edit-area" id="memo-edit-' + item.id + '" style="display:none; margin-top:8px;">' +
+                                '<textarea id="inline-textarea-' + item.id + '" style="width:100%; border:1px solid #ccc; padding:10px; border-radius:4px; box-sizing:border-box; min-height:80px; font-family:inherit;"></textarea>' +
+                                '<div style="text-align:right; margin-top:5px;">' +
+                                    '<button type="button" onclick="saveInlineMemo(\'' + item.id + '\', \'' + item.userId + '\', \'' + item.constructionIdx + '\', \'' + item.memoDate + '\')" style="background:#337ab7; color:#fff; border:none; padding:5px 12px; border-radius:4px; cursor:pointer; margin-right:5px;">저장</button>' +
+                                    '<button type="button" onclick="cancelInlineEdit(\'' + item.id + '\')" style="background:#888; color:#fff; border:none; padding:5px 12px; border-radius:4px; cursor:pointer;">취소</button>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>';
+                });
+            } else {
+                listHtml += "<p style='text-align:center; padding:30px; color:#888;'>등록된 메모가 없습니다.</p>";
+            }
+            
+            listHtml += '</div>';
+            container.append(listHtml);
+        }
+    });
+}
+// 팝업 내 메모 작성 버튼 클릭
+function triggerMemoRegist() {
+    var cIdx = $('#memoListContainer').data('constructionIdx');
+    var uId = $('#memoListContainer').data('userId');
+    $('.popUp05').hide();
+    showMemoPop(cIdx, uId, 0); 
 }
 
 function deviceRegistFormCheck(){
