@@ -104,15 +104,15 @@ public class ConstructionController extends AbstractConstructionCRUDController<C
 		return mapper.updateBlockedYn(id, blockedYn) > 0;
 	}
 
+	// 관리자 보호 버튼(계약서 관리/이용제한) 공통 비밀번호 검증
 	@ResponseBody
-	@RequestMapping(value = "/update/contractTarget", method = RequestMethod.POST)
-	public boolean updateContractTargetYn(@RequestParam("id") int id, @RequestParam("targetYn") int targetYn,
-			HttpSession session) {
-		int role = (Integer) session.getAttribute("role");
-		if (role != 0) return false;
-		return mapper.updateContractTargetYn(id, targetYn) > 0;
+	@RequestMapping(value = "/verifyActionPassword", method = RequestMethod.POST)
+	public boolean verifyActionPassword(@RequestParam("password") String password, HttpSession session) {
+		Object role = session.getAttribute("role");
+		if (role == null || (Integer) role != 0) return false;
+		return mapper.verifyActionPassword(password) > 0;
 	}
-	
+
 	@ResponseBody
 	@RequestMapping(value = "/get/list", method = RequestMethod.GET)
 	public List<Construction> getList(HttpSession session) {

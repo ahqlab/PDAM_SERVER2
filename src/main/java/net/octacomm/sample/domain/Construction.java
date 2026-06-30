@@ -59,9 +59,6 @@ public class Construction implements Domain{
 	//고도화 설정 관리 대상 여부 (TB_CONSTRUCTION_SETTING_CONFIG.APPLY_FROM_DATE 이후 등록)
 	private int settingRequired;
 
-	//계약서 적용 대상 여부 (관리자가 버튼으로 지정, TB_CONTRACT_TARGET). 1이면 계약 프로세스 적용
-	private int contractTargetYn;
-
 	// 최신 계약서 서명 여부: 1=서명됨, 0=그 외
     private int latestContractSignedYn;
 }
