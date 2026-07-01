@@ -107,7 +107,7 @@ ol {
 
 option {background: #fff; color: #000;}
 
-/* 로고 */
+/* 濡쒓퀬 */
 .mTop {
 	background: #fff;
 	padding: 0 5%;
@@ -151,7 +151,7 @@ option {background: #fff; color: #000;}
     top: 20px;
 }
 
-/* 왼쪽 메뉴 */
+/* �쇊履� 硫붾돱 */
 .left-menu {
 	position: fixed;
     top: 0;
@@ -230,7 +230,7 @@ width: 155px;
 	font-weight: 600;
 }
 
-/* 팝업 */
+/* �뙘�뾽 */
 .popLayer {
 	position: fixed;
 	top: 0;
@@ -405,7 +405,7 @@ border: 1px solid #d1d1d1;
 .logPop .logPopBtn > a.bg01 {background: #8691a7;} 
 .logPop .logPopBtn > a.bg02 {background: #077b9c;} 
 
-/* 컨텐츠 */
+/* 而⑦뀗痢� */
 .section-right {
 	width: 100%;
 	padding: 30px 5% 40px;
@@ -477,7 +477,7 @@ border: 1px solid #d1d1d1;
 	font-weight: 600;
 }
 
-/* 검색 */
+/* 寃��깋 */
 .searchArea input::placeholder {
 	color: #839fca !important;
 }
@@ -591,7 +591,7 @@ height: 35px;
     margin-left: 5px;
 }
 
-/* 검색 키워드 */
+/* 寃��깋 �궎�썙�뱶 */
 .keywordArea {    
 overflow: hidden;
     padding-top: 20px;
@@ -621,7 +621,7 @@ font-size: 13px;
 	width: 12px;
 }
 
-/* 검색된 리스트 */
+/* 寃��깋�맂 由ъ뒪�듃 */
 .listArea {
 	width: 100%;
 }
@@ -656,7 +656,7 @@ font-size: 13px;
     padding-top: 15px;
 }
 
-/* 협력사 리스트 */
+/* �삊�젰�궗 由ъ뒪�듃 */
 .company .listArea .listUl li {
 	width: 100%;
 }
@@ -746,7 +746,7 @@ font-size: 14px;
 .company .listArea .listUl li:nth-of-type(even) .listRight {border-top: 1px solid #bbe0ef;}
 
 
-/* 가맹점 리스트 */
+/* 媛�留뱀젏 由ъ뒪�듃 */
 .franchise .listArea .listUl li {
 	width: 100%;
 	margin-right: 2%;
@@ -782,7 +782,7 @@ color: #000;
 	width: 100%;
 }
 
-/* 시공사 리스트 */
+/* �떆怨듭궗 由ъ뒪�듃 */
 .builder .listArea .listUl li {
 	width: 100%;
 	cursor: pointer;
@@ -853,7 +853,7 @@ color: #000;
     margin-bottom: 10px;
 }
 
-/* 라디오버튼 디자인 */
+/* �씪�뵒�삤踰꾪듉 �뵒�옄�씤 */
 .checkArea {
 	display: -webkit-box;
     display: -ms-flexbox;
@@ -910,13 +910,13 @@ color: #000;
 	background: #077b9c;
 }
 
-/* 두개마다 색상 변경 */
+/* �몢媛쒕쭏�떎 �깋�긽 蹂�寃� */
 .listArea .listUl.two li:nth-of-type(even),
 .listArea .listUl.cross li:nth-of-type(even) {background: #ebf7fa;}
 .listArea .listUl.cross li:nth-of-type(even) .franIcon {background: #fff;}
 .builder .listArea .listUl.cross li:nth-of-type(even) img {background: #fff;}
 
-/* 페이징 버튼 */
+/* �럹�씠吏� 踰꾪듉 */
 
 .pagingArea {
 	display: -webkit-box;
@@ -1001,7 +1001,7 @@ color: #000;
     background: #077b9c;
 	color: #fff;
 }
-/* 로그인 */
+/* 濡쒓렇�씤 */
 .loginArea {
 	height: 100vh;
 	background: #fff;
@@ -1205,7 +1205,7 @@ color: #000;
 
 
 
-/* 찾기 / 가입 */
+/* 李얘린 / 媛��엯 */
 .line {
 	background: #d1d1d1;
 	display: block;
@@ -1442,7 +1442,34 @@ color: #000;
 
 .viewTable table tr td input[type=checkbox] {
     vertical-align: middle;
-	margin-left: 10px;
+    margin-left: 23px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border-radius: 0;
+    width: 18px;
+    height: 18px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    cursor: pointer;
+    position: relative;
+}
+
+.viewTable table tr td input[type=checkbox]:checked {
+    background-color: #007aff; 
+    border-color: #007aff;
+}
+
+.viewTable table tr td input[type=checkbox]:checked::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 6px;
+    width: 4px;
+    height: 9px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
 }
 
 .viewTable table tr td .tableChange {
@@ -1642,15 +1669,15 @@ height: 25px;
 
 .viewTable05::-webkit-scrollbar {
 	display: block;
-	width: 0; /*스크롤바의 너비*/
+	width: 0; /*�뒪�겕濡ㅻ컮�쓽 �꼫鍮�*/
 	height: 10px;
 }
 .viewTable05::-webkit-scrollbar-thumb {
- background-color: #077b9c; /*스크롤바의 색상*/
+ background-color: #077b9c; /*�뒪�겕濡ㅻ컮�쓽 �깋�긽*/
 }
  
 .viewTable05::-webkit-scrollbar-track {
-  background-color: #fff; /*스크롤바 트랙 색상*/
+  background-color: #fff; /*�뒪�겕濡ㅻ컮 �듃�옓 �깋�긽*/
 }
 
 .view .bottomBtn {
@@ -1680,7 +1707,7 @@ height: 25px;
     margin-left: 5px;
 }
 
-/* 테이블 넓이 */
+/* �뀒�씠釉� �꼻�씠 */
 .viewTable01 {
 	width: 1200px;
 }
@@ -1724,7 +1751,7 @@ height: 25px;
 	margin-top: 30px;
 }
 
-/* 공지사항 */
+/* 怨듭��궗�빆 */
 .table_board_for {
 	table-layout: fixed;
     width: 100%;
@@ -1895,7 +1922,7 @@ table td.text_left {
     transform: rotate(180deg);
 }
 
-/* 글쓰기 */
+/* 湲��벐湲� */
 .goWrite {
 	width: 95px;
     height: 30px;
