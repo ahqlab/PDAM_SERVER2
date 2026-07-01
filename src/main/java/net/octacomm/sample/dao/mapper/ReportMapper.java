@@ -236,7 +236,10 @@ public interface ReportMapper extends CRUDMapper<Report, ReportParam, Integer> {
 	List<ReportOneLine> getTodayListByPdfExtensivePileUsage(@Param("constructionIdx") int constructionIdx, @Param("machineNumber") String machineNumber, @Param("currentDateTime") String currentDateTime);
 
 	List<ReportOneLine> getMachineListByPdf(@Param("constructionIdx") int constructionIdx, @Param("machineNumber") String machineNumber);
-	
+
+	// 전체 출력(머신 무관, 현장 전체) PDF용
+	List<ReportOneLine> getAllListByPdf(@Param("constructionIdx") int constructionIdx);
+
 	List<ReportOneLine> getMachineListByPdfExtensivePileUsage(@Param("constructionIdx") int constructionIdx, @Param("machineNumber") String machineNumber);
 
 	List<ReportOneLine> getListByParamExcelTen(@Param("param") ReportParam param);

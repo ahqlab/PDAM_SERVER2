@@ -43,7 +43,7 @@
 					<th>모델명</th>
 					<td>${domain.modelName}</td>
 					<th>공급기간</th>
-					<td>${domain.supplyDeadline}</td>
+					<td>${not empty domain.supplyDeadline ? domain.supplyDeadline : '서명 시 자동 기재'}</td>
 				</tr>
 				<tr>
 					<th>사용료</th>

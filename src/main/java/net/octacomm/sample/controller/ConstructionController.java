@@ -52,6 +52,12 @@ public class ConstructionController extends AbstractConstructionCRUDController<C
 	public void setActiveMenu(Model model) {
 	    model.addAttribute("menuIndex", 0);
 	}
+
+	// 신규 등록 현장이 settingRequired 대상이면 등록 팝업의 옛 플래그(시간/극한/원데이터/기록지PDF) 필드를 숨긴다.
+	@ModelAttribute
+	public void setNewSettingRequired(Model model) {
+	    model.addAttribute("newSettingRequired", mapper.isSettingRequiredNow() > 0);
+	}
 	
 	
 	@ResponseBody

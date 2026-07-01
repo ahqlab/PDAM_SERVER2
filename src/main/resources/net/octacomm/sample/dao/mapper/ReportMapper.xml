@@ -3839,6 +3839,130 @@
 		WHERE 1=1 ORDER BY machineNumber , createDate ASC;
     
     </select>
+
+    <select id="getAllListByPdf" resultType="ReportOneLine">
+    	SELECT 
+    		id 
+		    , deviceIdx 
+		    , constructionIdx 
+		    , machineNumber 
+		    , currentDateTime 
+			,(	select count(*) 
+				from TB_REPORT 
+		        WHERE TB_REPORT.deviceIdx = TB.deviceIdx 
+		        and TB_REPORT.pileNo = TB.pileNo 
+		        and TB_REPORT.location = TB.location 
+		        and TB_REPORT.isDel = 0) as duplicated 
+			,(	SELECT count(*) 
+				FROM TB_REPORT 
+		        WHERE TB_REPORT.pileNo = TB.pileNo 
+		        AND TB_REPORT.location = TB.location 
+		        AND TB_REPORT.isDel = 0 
+		        AND TB_REPORT.deviceIdx in ( SELECT TBD.id FROM TB_DEVICE TBD WHERE TBD.constructionIdx = TB.constructionIdx AND TBD.isDel = 0 AND TBD.conduct = 0 )) as totalDuplicated
+			,(
+				SELECT IF(role = 0, CONCAT(CONCAT(IFNULL((SELECT groupName from TB_GROUP WHERE TB_GROUP.idx = TB_CONSTRUCTION.groupIdx), '')
+					, CONCAT(' ',NAME)) 
+		            , CONCAT(' ',LOCATION)), LOCATION) AS NAME
+				FROM TB_CONSTRUCTION WHERE id = TB.constructionIdx
+		    )  as name 
+		    , lavelNo 
+		    , location 
+		    , pileNo 
+		    , pileStandard 
+		    , drillingDepth 
+		    , directDrillingDepth
+		    , intrusionDepth 
+		    , balance 
+		    , connectLength 
+		    , managedStandard 
+		    , avgPenetrationValue 
+		    , totalPenetrationValue 
+		    , hammaT 
+		    , fallMeter 
+		    , pileType 
+		    , method 
+		    , totalConnectWidth 
+		    , ultimateBearingCapacity 
+		    , crossSection 
+		    , hammaEfficiency 
+		    , modulusElasticity 
+		    , createDate 
+		    , role
+		    , isDel
+		    , bigo
+		    , sprCol1
+		    , peOne
+		    , peTwo
+		    , peThree
+		    , peFour
+		    , peFive
+		    , peSix
+			, peSeven
+			, peEight
+			, peNine
+			, peTen
+		    , piOne
+		    , piTwo
+		    , piThree
+		    , piFour
+		    , piFive
+		FROM ( SELECT C.name as name 
+				, B.lavelNo as lavelNo
+                , B.machineNumber as machineNumber 
+                , A.id 
+                , A.deviceIdx 
+                , A.currentDateTime 
+                , A.location 
+                , A.pileNo 
+                , A.pileStandard 
+                , A.drillingDepth 
+                , A.directDrillingDepth 
+                , A.intrusionDepth 
+                , A.balance 
+                , A.connectLength 
+                , A.managedStandard 
+                , A.avgPenetrationValue 
+                , A.totalPenetrationValue 
+                , A.hammaT 
+                , A.fallMeter 
+                , A.pileType 
+                , A.method 
+                , A.isDel
+                , A.totalConnectWidth 
+                , A.ultimateBearingCapacity 
+                , A.crossSection 
+                , A.hammaEfficiency 
+                , A.modulusElasticity 
+                , (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 0,1)  as peOne
+                , (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 1,1)  as peTwo
+                , (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 2,1)  as peThree
+                , (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 3,1)  as peFour
+                , (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 4,1)  as peFive
+                , (SELECT VALUE  FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 5,1) as peSix
+	            , (SELECT VALUE  FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 6,1) as peSeven
+	            , (SELECT VALUE  FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 7,1) as peEight
+	            , (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 8,1)  as peNine
+	            , (SELECT VALUE  FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 9,1) as peTen
+                , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "단본" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piOne
+                , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "하단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piTwo
+                , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 0,1),'') as piThree
+                , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 1,1),'') as piFour
+                , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "상단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piFive
+                , A.createDate
+                , C.role 
+                , IF(A.bigo = 'null','',A.bigo) as bigo 
+                , IF(A.sprCol1 = 'null','',A.sprCol1) as sprCol1 
+                , B.constructionIdx 
+			 FROM TB_REPORT A , TB_DEVICE B, TB_CONSTRUCTION C
+            WHERE 1=1
+			  AND A.deviceIdx = B.id 
+                 AND B.constructionIdx = C.id 
+                 AND C.id = #{constructionIdx} 
+                 AND A.isdel = 0 
+               ORDER BY A.createDate asc ) as TB 
+		WHERE 1=1 ORDER BY machineNumber , createDate ASC;
+    
+    </select>
     
     
     <insert id="insertG" parameterType="GReport">

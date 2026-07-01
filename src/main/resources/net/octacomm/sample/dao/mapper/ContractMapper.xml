@@ -61,7 +61,7 @@
 		 REQ_TEL, REQ_REPRESENTATIVE, SITE_MANAGER, STATUS, CREATED_AT, isDel)
 		VALUES
 		(#{constructionIdx}, #{contractType}, #{contractNo}, #{siteName}, #{companyName}, #{modelName},
-		 #{supplyDeadline}, #{dailyFee}, #{reqTradeName}, #{reqAddress}, #{reqBusinessNo},
+		 '', #{dailyFee}, #{reqTradeName}, #{reqAddress}, #{reqBusinessNo},
 		 #{reqTel}, #{reqRepresentative}, #{siteManager}, 'DRAFT', NOW(), 0)
 	</insert>
 
@@ -93,7 +93,6 @@
 		    SITE_NAME         = #{siteName},
 		    COMPANY_NAME      = #{companyName},
 		    MODEL_NAME        = #{modelName},
-		    SUPPLY_DEADLINE   = #{supplyDeadline},
 		    DAILY_FEE         = #{dailyFee},
 		    REQ_TRADE_NAME    = #{reqTradeName},
 		    REQ_ADDRESS       = #{reqAddress},
@@ -180,6 +179,7 @@
 		UPDATE TB_CONTRACT
 		SET STATUS          = 'DRAFT',
 		    SIGNED_AT       = NULL,
+		    SUPPLY_DEADLINE = NULL,
 		    BUYER_SIGNATURE = NULL,
 		    CONTRACT_PDF    = NULL
 		WHERE CONTRACT_IDX = #{contractIdx}
@@ -196,6 +196,7 @@
 		UPDATE TB_CONTRACT
 		SET BUYER_SIGNATURE = #{buyerSignature},
 		    SITE_MANAGER    = #{siteManager},
+		    SUPPLY_DEADLINE = CONCAT(DATE_FORMAT(NOW(), '%Y-%m-%d'), ' ~ 공사 종료시까지'),
 		    STATUS = 'SIGNED', SIGNED_AT = NOW()
 		WHERE CONTRACT_IDX = #{contractIdx}
 	</update>

@@ -412,6 +412,57 @@ function setGroupName(){
         padding-top: 15px; 
     }
 
+.filterArea {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
+}
+.filterArea .filterChip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0;
+    padding: 8px 15px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: #fff;
+    font-size: 15px;
+    line-height: 1;
+    cursor: pointer;
+    user-select: none;
+    transition: background .15s, color .15s, border-color .15s;
+}
+.filterArea .filterChip:hover {
+    background: rgba(255, 255, 255, 0.22);
+}
+.filterArea .filterChip input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: #077b9c;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+/* 체크된 칩은 흰 배경 + 청록 글씨로 강조 (지원 브라우저) */
+.filterArea .filterChip:has(input:checked) {
+    background: #fff;
+    border-color: #fff;
+    color: #077b9c;
+    font-weight: 700;
+}
+.filterArea .filterDivider {
+    width: 1px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.4);
+    margin: 0 4px;
+}
+
 @media (max-width: 1400px) {
     .company .listArea .listUl li.ccard {
         flex-wrap: wrap;
@@ -492,6 +543,19 @@ function setGroupName(){
 						</div>
 					</div>
 				</div>
+				<c:if test="${sessionInfo.role == 0}">
+				<div class="filterArea">
+					<label class="filterChip"><input type="checkbox" name="hasMemo" value="1" onchange="filterSubmit();" ${domainParam.hasMemo == 1 ? 'checked' : ''}><span class="chipText">메모 있는 현장</span></label>
+					<span class="filterDivider"></span>
+					<label class="filterChip"><input type="checkbox" name="contractRegistered" value="1" onchange="filterSubmit();" ${domainParam.contractRegistered == 1 ? 'checked' : ''}><span class="chipText">계약서 등록</span></label>
+					<label class="filterChip"><input type="checkbox" name="contractSigned" value="1" onchange="filterSubmit();" ${domainParam.contractSigned == 1 ? 'checked' : ''}><span class="chipText">계약서 서명</span></label>
+					<span class="filterDivider"></span>
+					<label class="filterChip"><input type="checkbox" name="blockedOnly" value="1" onchange="filterSubmit();" ${domainParam.blockedOnly == 1 ? 'checked' : ''}><span class="chipText">이용제한 현장</span></label>
+					<span class="filterDivider"></span>
+					<label class="filterChip"><input type="checkbox" name="conductActive" value="1" onchange="filterSubmit();" ${domainParam.conductActive == 1 ? 'checked' : ''}><span class="chipText">시행</span></label>
+					<label class="filterChip"><input type="checkbox" name="conductDone" value="1" onchange="filterSubmit();" ${domainParam.conductDone == 1 ? 'checked' : ''}><span class="chipText">종료</span></label>
+				</div>
+				</c:if>
 				</form:form>
 			</div>
 			
@@ -602,6 +666,8 @@ function setGroupName(){
 												메모등록
 											</span>
 										</a>
+										<%-- 종료(conduct==1) 현장은 계약서 관리/이용제한 버튼 숨김, 시행(conduct==0)이면 노출 --%>
+										<c:if test="${domain.conduct == 0}">
 										<a class="actionBtn c-contract" href="javascript:openContractManage('${pageContext.request.contextPath}/contract/manage?constructionIdx=${domain.id}');">
 											<span class="btnLabel">
 												<span class="btnIcon">&#128196;</span>
@@ -635,6 +701,7 @@ function setGroupName(){
 												</c:otherwise>
 											</c:choose>
 										</a>
+										</c:if>
 										<div class="selectArea ccard-select">
 											<select id="conductSel" class="state" onchange="conductSel('${domain.id}', this.value)">
 												<option value="0" ${domain.conduct == 0 ? 'selected="selected"' : '' }>시행</option>
@@ -932,6 +999,7 @@ function setGroupName(){
 						<p class="inputTxt02">보안코드</p>
 						<input type="text" autocomplete="off" class="Input02" id="secretCode"  name="secretCode"  placeholder="보안코드를 입력하세요.">
 					</div>
+					<c:if test="${not newSettingRequired}">
 					<div class="inputArea02 mb-20">
 						<p class="inputTxt02">시간출력여부</p>
 						<select class="Input02"  id="longCalYn" name="longCalYn">
@@ -945,14 +1013,14 @@ function setGroupName(){
 							<option value="0">N</option>
 							<option value="1">Y</option>
 						</select>
-					</div>	
+					</div>
 					<div class="inputArea02 mb-20">
 						<p class="inputTxt02">원데이터제공</p>
 						<select class="Input02" id="originDataYn" name="originDataYn">
 							<option value="0">N</option>
 							<option value="1">Y</option>
 						</select>
-					</div>	
+					</div>
 					<div class="inputArea02 mb-20">
 						<p class="inputTxt02">기록지PDF여부</p>
 						<select class="Input02" id="showPdfYn" name="showPdfYn">
@@ -960,7 +1028,8 @@ function setGroupName(){
 							<option value="1">수정모드</option>
 							<option value="2">수정모드 + 일반모드</option>
 						</select>
-					</div>	
+					</div>
+					</c:if>
 					<div class="popAdd" onclick="javascript:conRegistFormCheck();" >등록</div>
 				</div>
 				
@@ -2123,10 +2192,11 @@ function registConstruction(){
 	    myObject.fcIdx = new Number(0);
 	    </c:otherwise>
 	</c:choose>
-	myObject.longCalYn = new Number($("#regForm select[name='longCalYn'] option:selected").val());
-	myObject.ubcYn = new Number($("#regForm select[name='ubcYn'] option:selected").val());
-	myObject.originDataYn = new Number($("#regForm select[name='originDataYn'] option:selected").val());
-	myObject.showPdfYn = new Number($("#regForm select[name='showPdfYn'] option:selected").val());
+	// settingRequired 현장은 아래 필드가 화면에서 숨겨지므로(값 없음) 0으로 기본 처리
+	myObject.longCalYn = new Number($("#regForm select[name='longCalYn'] option:selected").val() || 0);
+	myObject.ubcYn = new Number($("#regForm select[name='ubcYn'] option:selected").val() || 0);
+	myObject.originDataYn = new Number($("#regForm select[name='originDataYn'] option:selected").val() || 0);
+	myObject.showPdfYn = new Number($("#regForm select[name='showPdfYn'] option:selected").val() || 0);
 	
 	var result = 0;
 	jQuery.ajax({
@@ -2470,6 +2540,12 @@ function submitFun(){
 	$('#searchForm').submit();
 }
 
+// 체크박스 필터: 조건 변경 시 항상 1페이지부터 다시 조회
+function filterSubmit(){
+	$('#searchForm #currentPage').val(1);
+	$('#searchForm').submit();
+}
+
 function duplicateContactCheck(){
 	
 	if($('#userId').val() == ''){
@@ -2523,6 +2599,8 @@ function conductSel(idx, selectVal){
 			success : function(data) {
 				if(data){
 					alert('변경이 완료되었습니다.');
+					// 상태 변경(시행/종료)에 따라 계약서 관리/이용제한 버튼 노출이 달라지므로 목록 갱신
+					$('#searchForm').submit();
 				}
 			},
 			complete : function(data) {

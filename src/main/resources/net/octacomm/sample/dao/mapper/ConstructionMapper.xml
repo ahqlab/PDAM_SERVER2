@@ -39,10 +39,34 @@
         		</if>
        		</if>
        		<if test="param.startDate != null and param.startDate != '' and param.endDate != null and param.endDate != ''">
-       			and date_format(A.createDate, '%Y-%m-%d') between  #{param.startDate}  and  #{param.endDate} 
+       			and date_format(A.createDate, '%Y-%m-%d') between  #{param.startDate}  and  #{param.endDate}
        		</if>
-     		<if test="param.role == 1"> 
-     			and A.id = #{param.constructionIdx} 
+       		<!-- 상단 검색영역 체크박스 필터 (AND 결합) -->
+       		<if test="param.hasMemo == 1">
+       			and exists (select 1 from TB_MEMO m where m.constructionIdx = A.id)
+       		</if>
+       		<!-- 계약서 상태: 같은 묶음 안에서는 OR (등록됨=미서명 / 서명됨) -->
+       		<if test="param.contractRegistered == 1 and param.contractSigned != 1">
+       			and exists (select 1 from TB_CONTRACT c where c.CONSTRUCTION_IDX = A.id and c.isDel = 0)
+       			and IFNULL((SELECT CASE WHEN C.STATUS = 'SIGNED' THEN 1 ELSE 0 END FROM TB_CONTRACT C WHERE C.CONSTRUCTION_IDX = A.id AND C.isDel = 0 ORDER BY C.CONTRACT_IDX DESC LIMIT 1), 0) = 0
+       		</if>
+       		<if test="param.contractSigned == 1 and param.contractRegistered != 1">
+       			and IFNULL((SELECT CASE WHEN C.STATUS = 'SIGNED' THEN 1 ELSE 0 END FROM TB_CONTRACT C WHERE C.CONSTRUCTION_IDX = A.id AND C.isDel = 0 ORDER BY C.CONTRACT_IDX DESC LIMIT 1), 0) = 1
+       		</if>
+       		<if test="param.contractRegistered == 1 and param.contractSigned == 1">
+       			and exists (select 1 from TB_CONTRACT c where c.CONSTRUCTION_IDX = A.id and c.isDel = 0)
+       		</if>
+       		<if test="param.blockedOnly == 1">
+       			and exists (select 1 from TB_CONSTRUCTION_BLOCK b where b.constructionIdx = A.id and b.blockedYn = 1)
+       		</if>
+       		<if test="param.conductActive == 1 and param.conductDone != 1">
+       			and A.conduct = 0
+       		</if>
+       		<if test="param.conductDone == 1 and param.conductActive != 1">
+       			and A.conduct = 1
+       		</if>
+     		<if test="param.role == 1">
+     			and A.id = #{param.constructionIdx}
      		</if>
        </where>
 	</sql>

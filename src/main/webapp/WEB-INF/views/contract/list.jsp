@@ -35,7 +35,7 @@
 									<c:when test="${item.contractType == 'DAILY'}">일사용료</c:when>
 									<c:otherwise>월사용료</c:otherwise>
 								</c:choose>
-								&nbsp;|&nbsp; 공급기간: ${item.supplyDeadline}
+								&nbsp;|&nbsp; 공급기간: ${not empty item.supplyDeadline ? item.supplyDeadline : '서명 시 자동 기재'}
 							</p>
 						</div>
 						<div class="listRight">

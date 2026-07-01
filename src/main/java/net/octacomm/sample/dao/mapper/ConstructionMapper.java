@@ -113,6 +113,10 @@ public interface ConstructionMapper extends CRUDMapper<Construction, Constructio
 	@Select("SELECT COUNT(*) FROM TB_CONSTRUCTION t, TB_CONSTRUCTION_SETTING_CONFIG c WHERE t.id = #{id} AND t.createDate >= c.APPLY_FROM_DATE")
 	int isSettingRequired(@Param("id") int id);
 
+	// 지금(신규 등록 시점) 등록되는 현장이 settingRequired 대상인지 여부. (APPLY_FROM_DATE 이후면 대상)
+	@Select("SELECT COUNT(*) FROM TB_CONSTRUCTION_SETTING_CONFIG c WHERE now() >= c.APPLY_FROM_DATE")
+	int isSettingRequiredNow();
+
 	@Update("UPDATE " + TABLE_NAME + " SET password = #{password} WHERE id = #{id}")
 	int updatePasswordById(@Param("id") int id, @Param("password") String password);
 
