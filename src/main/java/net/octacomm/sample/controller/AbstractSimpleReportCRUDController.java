@@ -10,10 +10,12 @@ import net.octacomm.logger.Log;
 import net.octacomm.sample.dao.CRUDMapper;
 import net.octacomm.sample.dao.mapper.ConstructionMapper;
 import net.octacomm.sample.dao.mapper.ReportMapper;
+import net.octacomm.sample.dao.mapper.SimpleReportMapper;
 import net.octacomm.sample.domain.Construction;
 import net.octacomm.sample.domain.ConstructionSetting;
 import net.octacomm.sample.domain.Domain;
 import net.octacomm.sample.domain.DomainParam;
+import net.octacomm.sample.domain.ReportParam;
 import net.octacomm.sample.domain.SessionInfo;
 import net.octacomm.sample.utils.Pagination;
 import net.octacomm.sample.utils.SimpleReportPagination;
@@ -130,7 +132,11 @@ public abstract class AbstractSimpleReportCRUDController<M extends CRUDMapper<D,
 		}
 		model.addAttribute("page", page);
 		model.addAttribute("domainList", domainList);
-		
+
+		// 총 시공량(전체 파일 수) - 목록 상단 표시용
+		if (mapper instanceof SimpleReportMapper) {
+			model.addAttribute("totalConstruction", ((SimpleReportMapper) mapper).getTotalConstruction((ReportParam) param));
+		}
 	}
 
 	@RequestMapping(value = URL_REGIST, method = RequestMethod.GET)

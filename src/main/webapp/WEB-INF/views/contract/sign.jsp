@@ -49,7 +49,7 @@
 			</tr>
 			<tr>
 				<th style="${TH}">모델명</th><td style="${TD}">${contract.modelName}</td>
-				<th style="${TH}">공급기간</th><td style="${TD}">${contract.supplyDeadline}</td>
+				<th style="${TH}">공급기간</th><td style="${TD}"><c:choose><c:when test="${not empty contract.supplyDeadline}">${contract.supplyDeadline}</c:when><c:otherwise><jsp:useBean id="today" class="java.util.Date"/><fmt:formatDate value="${today}" pattern="yyyy-MM-dd"/> ~ 공사 종료시까지</c:otherwise></c:choose></td>
 			</tr>
 			<tr>
 				<th style="${TH}">사용료</th><td style="${TD}" colspan="3">${contract.dailyFee}</td>

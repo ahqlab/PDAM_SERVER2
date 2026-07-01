@@ -32,8 +32,8 @@
 	
 	<select id="getCountByParam" resultType="_int">
 		SELECT COUNT(*) FROM  (
-			SELECT 
-				A.currentDateTime, 
+			SELECT
+				A.currentDateTime,
 				count(*) as todayConstruction
 			FROM
 				TB_REPORT A,
@@ -41,6 +41,16 @@
 				TB_CONSTRUCTION C
 			<include refid="condition"/>
 		GROUP BY A.currentDateTime) AS AA
+    </select>
+
+	<!-- 총 시공량: getCountByParam과 동일 조건으로 GROUP BY 없이 전체 파일 수 -->
+	<select id="getTotalConstruction" resultType="_int">
+		SELECT COUNT(*)
+		FROM
+			TB_REPORT A,
+			TB_DEVICE B,
+			TB_CONSTRUCTION C
+		<include refid="condition"/>
     </select>
    
     <select id="getListByParam" resultType="SimpleReport">

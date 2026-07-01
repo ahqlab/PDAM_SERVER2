@@ -875,6 +875,10 @@ function downloadDrivingRecoredBook(root, constructionIdx, machineNumber, curren
 				if(data.length > 0){//
 					
 					var doc = new jspdf.jsPDF("p", "mm", "a4");  //이렇게 바꾸어 줍니다!!!! 
+
+					// 한글 폰트는 문서당 1회만 등록 (대량 출력 메모리 개선)
+					doc.addFileToVFS('malgun.ttf', _fonts);
+					doc.addFont('malgun.ttf','malgun', 'normal');
 				   
 					$.each(data, function(index, item) {
 						var constructionName = item.name;
@@ -925,7 +929,6 @@ function downloadDrivingRecoredBook(root, constructionIdx, machineNumber, curren
 					    }
 					   
 					   // piece.push(item.piSeven);
-					    console.log(piece.length);
 					    for (var y = 0; y < piece.length; y++) {
 					    	if(piece[y].value != ''){
 					    		if(piece[y] != ''){
@@ -975,8 +978,6 @@ function downloadDrivingRecoredBook(root, constructionIdx, machineNumber, curren
 				    	var pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
 						var pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
 				    	
-					    doc.addFileToVFS('malgun.ttf', _fonts); 
-					    doc.addFont('malgun.ttf','malgun', 'normal');
 					    doc.setFont('malgun'); 
 					    
 					    //doc.text(15, 15, '파일 항타기록지' , 'center'); // 글씨입력(시작x, 시작y, 내용)
@@ -1049,16 +1050,17 @@ function downloadDrivingRecoredBook(root, constructionIdx, machineNumber, curren
 					});
 					doc.save(createFileName() + '.pdf');
 				}//
-		
+
 			},
 			complete : function(data) {
-			
+
 			},
 			error : function(xhr, status, error) {
-				
+
 			}
 		});
 	}
+
 }
 
 
@@ -1077,21 +1079,41 @@ function calGongSac(totalConnectWidth, intrusionDepth, drillingDepth, constructi
 }
 
 
+// 전체 출력용 데이터 수집: 머신번호가 있으면 해당 머신, 없으면 호기 목록을 받아 머신별로 모은다.
+function gatherDrivingReportData(root, constructionIdx, machineNumber){
+	var result = [];
+	if(machineNumber){
+		jQuery.ajax({ type:"POST", url: root + "/report/machine/list",
+			data:{ constructionIdx: constructionIdx, machineNumber: machineNumber },
+			dataType:"JSON", async:false,
+			success:function(d){ if(d) result = d; } });
+		return result;
+	}
+	var machines = [];
+	jQuery.ajax({ type:"POST", url: root + "/device/get/list",
+		data:{ constructionIdx: constructionIdx }, dataType:"JSON", async:false,
+		success:function(devs){ $.each(devs, function(i, dv){ if(dv.machineNumber) machines.push(dv.machineNumber); }); } });
+	$.each(machines, function(i, mn){
+		jQuery.ajax({ type:"POST", url: root + "/report/machine/list",
+			data:{ constructionIdx: constructionIdx, machineNumber: mn },
+			dataType:"JSON", async:false,
+			success:function(d){ if(d && d.length) result = result.concat(d); } });
+	});
+	return result;
+}
+
 function downloadDrivingAllRecoredBook(root, constructionIdx, machineNumber){
-	
-	if(confirm("전체 기록지를 출력하시겠습니까?")){
-		jQuery.ajax({
-			type : "POST",
-			url : root + "/report/machine/list",
-			data: { 
-				constructionIdx : constructionIdx,
-				machineNumber : machineNumber
-			}, 
-			dataType : "JSON", // 옵션이므로 JSON으로 받을게 아니면 안써도 됨
-			success : function(data) {
+
+	// 현장 전체(machineNumber 빈값)는 호기(머신) 단위로 데이터를 모은다 - 각 쿼리가 작아 빠름, 한 쿼리 폭발 방지
+	var data = gatherDrivingReportData(root, constructionIdx, machineNumber);
+
 				if(data.length > 0){//
 					
 					var doc = new jspdf.jsPDF("p", "mm", "a4");  //이렇게 바꾸어 줍니다!!!! 
+
+					// 한글 폰트는 문서당 1회만 등록 (대량 출력 메모리 개선)
+					doc.addFileToVFS('malgun.ttf', _fonts);
+					doc.addFont('malgun.ttf','malgun', 'normal');
 				   
 					$.each(data, function(index, item) {
 						 var constructionName = item.name;
@@ -1111,6 +1133,7 @@ function downloadDrivingAllRecoredBook(root, constructionIdx, machineNumber){
 						var currentManagedStandard = item.managedStandard;
 						var currentAvgPenetrationValue = item.avgPenetrationValue;
 						var currentTotalPenetrationValue = item.totalPenetrationValue;
+						var currentGongSac = gongSacFixExp(item.balance, calGongSac(item.totalConnectWidth, item.intrusionDepth, item.drillingDepth, constructionIdx), constructionIdx);
 						
 						
 						
@@ -1122,11 +1145,13 @@ function downloadDrivingAllRecoredBook(root, constructionIdx, machineNumber){
 					    piece.push(item.piThree); 
 					    piece.push(item.piFour); 
 					    piece.push(item.piFive);
-					    piece.push(item.piSix);
-					    piece.push(item.piSeven);
-					    
-					    
-					    console.log(piece.length);
+					    if(item.piSix != null){
+					    	piece.push(item.piSix);
+					    }
+					    if(item.piSeven != null){
+					    	piece.push(item.piSeven);
+					    }
+
 					    for (var y = 0; y < piece.length; y++) {
 					    	if(piece[y].value != ''){
 					    		if(piece[y] != ''){
@@ -1153,8 +1178,6 @@ function downloadDrivingAllRecoredBook(root, constructionIdx, machineNumber){
 				    	var pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
 						var pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
 				    	
-					    doc.addFileToVFS('malgun.ttf', _fonts); 
-					    doc.addFont('malgun.ttf','malgun', 'normal');
 					    doc.setFont('malgun'); 
 					    
 					    //doc.text(15, 15, '파일 항타기록지' , 'center'); // 글씨입력(시작x, 시작y, 내용)
@@ -1207,17 +1230,6 @@ function downloadDrivingAllRecoredBook(root, constructionIdx, machineNumber){
 						}
 					});
 					doc.save(createFileName() + '.pdf');
-				}//
-		
-			},
-			complete : function(data) {
-			
-			},
-			error : function(xhr, status, error) {
-				
-			}
-		});
-	}
-	
+				}
 }
 

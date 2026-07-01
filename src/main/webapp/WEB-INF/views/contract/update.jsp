@@ -43,7 +43,7 @@
 			</div>
 			<div class="inputArea02 mb-20">
 				<p class="inputTxt02">공급기간</p>
-				<input type="text" name="supplyDeadline" class="Input02" value="${domain.supplyDeadline}" />
+				<span style="color:#555;">${not empty domain.supplyDeadline ? domain.supplyDeadline : '계약서 서명일 ~ 공사 종료시까지 (서명 시 자동 기재)'}</span>
 			</div>
 			<div class="inputArea02 mb-20">
 				<p class="inputTxt02">사용료</p>

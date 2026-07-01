@@ -11,7 +11,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=no">
 	<meta name="google" content="notranslate">
 	<title>PDAM system</title>
-	<meta name="description" content="ÆÄÀÏ Ç×Å¸ °üÀÔ·® ÀÚµ¿ÃøÁ¤ ½Ã½ºÅÛ">
+	<meta name="description" content="ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Å¸ ï¿½ï¿½ï¿½Ô·ï¿½ ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ã½ï¿½ï¿½ï¿½">
 	<meta name="keywords" content="PDAM system">
     <meta property="og:title" content="PDAM system">
 	<meta property="og:image" content="../img/kakao.jpg?=v8"> 
@@ -95,4 +95,4 @@
 	<script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.min.js"></script>
 	
-	<script src="${pageContext.request.contextPath}/new/js/drbPdf.js?20240115"></script>
+	<script src="${pageContext.request.contextPath}/new/js/drbPdf.js?20260630"></script>

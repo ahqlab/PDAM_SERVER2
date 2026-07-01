@@ -553,16 +553,44 @@ function getQuantityResult(){
 
 
 
+// 기록지 전체 출력: Excel / PDF 선택 모달
+var _exportConId = 0;
 function downloadAllReport(conId){
-	var result = confirm("전체 출력하시겠습니까?");
-	if(result){
-		if(conId <= 0){
-			alert('에러가 발생했습니다.');
-			return;
-		}
-		location.href = '${pageContext.request.contextPath}/report/download/all/excel?constructionIdx=' + conId;
-	}	
+	if(conId <= 0){
+		alert('에러가 발생했습니다.');
+		return;
+	}
+	_exportConId = conId;
+	$('#exportChoiceOverlay').css('display', 'flex');
 }
+function closeExportChoice(){
+	$('#exportChoiceOverlay').css('display', 'none');
+}
+// Excel: 기존 서버 다운로드 로직
+function exportAllExcel(){
+	var conId = _exportConId;
+	closeExportChoice();
+	location.href = '${pageContext.request.contextPath}/report/download/all/excel?constructionIdx=' + conId;
+}
+// PDF: 전체 출력 로직(머신 무관) 연결
+function exportAllPdf(){
+	var conId = _exportConId;
+	closeExportChoice();
+	if(!confirm("전체 기록지를 PDF로 출력하시겠습니까?\n건수가 많으면 시간이 걸릴 수 있습니다.")) return;
+	showPdfLoading();
+	// 동기(블로킹) 생성이라 setTimeout으로 한 박자 양보 → 로딩 화면을 먼저 그린 뒤 작업 시작
+	setTimeout(function(){
+		try {
+			downloadDrivingAllRecoredBook('${pageContext.request.contextPath}', conId, '');
+		} catch(e) {
+			alert('PDF 생성 중 오류가 발생했습니다.');
+		} finally {
+			hidePdfLoading();
+		}
+	}, 60);
+}
+function showPdfLoading(){ $('#pdfLoadingOverlay').css('display', 'flex'); }
+function hidePdfLoading(){ $('#pdfLoadingOverlay').css('display', 'none'); }
 
 function formCheck(){
 	//숫자와 문자 포함 형태의 6~12자리 이내의 암호 정규식
@@ -2257,3 +2285,43 @@ $(document).on('click', "input[type='checkbox'][name='changeDeivceCk']", functio
   	
 
 </script>
+<!-- 기록지 전체 출력: Excel / PDF 선택 모달 -->
+<style>
+.exportChoice-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 99999; align-items: center; justify-content: center; }
+.exportChoice-box { background: #fff; border-radius: 10px; padding: 24px 20px; width: 90%; max-width: 360px; box-shadow: 0 8px 24px rgba(0,0,0,0.25); box-sizing: border-box; text-align: center; }
+.exportChoice-title { font-size: 16px; font-weight: bold; margin-bottom: 6px; color: #222; }
+.exportChoice-desc { font-size: 13px; color: #666; margin-bottom: 18px; }
+.exportChoice-btns { display: flex; gap: 10px; }
+.exportChoice-btns button { flex: 1; height: 48px; border: none; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; color: #fff; }
+.exportChoice-excel { background: #258348; }
+.exportChoice-pdf { background: #004058; }
+.exportChoice-cancel { margin-top: 12px; background: none; border: none; color: #888; font-size: 13px; cursor: pointer; }
+</style>
+<div id="exportChoiceOverlay" class="exportChoice-overlay" style="display:none;">
+	<div class="exportChoice-box">
+		<div class="exportChoice-title">기록지 전체 출력</div>
+		<div class="exportChoice-desc">출력 형식을 선택하세요.</div>
+		<div class="exportChoice-btns">
+			<button type="button" class="exportChoice-excel" onclick="exportAllExcel();">Excel</button>
+			<button type="button" class="exportChoice-pdf" onclick="exportAllPdf();">PDF</button>
+		</div>
+		<button type="button" class="exportChoice-cancel" onclick="closeExportChoice();">취소</button>
+	</div>
+</div>
+
+<!-- 기록지 PDF 생성 중 로딩 표시 -->
+<style>
+.pdfLoading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.55); z-index: 100000; align-items: center; justify-content: center; }
+.pdfLoading-box { background: #fff; border-radius: 12px; padding: 30px 34px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+.pdfLoading-spinner { width: 46px; height: 46px; margin: 0 auto 16px; border: 5px solid #e0e0e0; border-top-color: #004058; border-radius: 50%; animation: pdfSpin 0.9s linear infinite; }
+@keyframes pdfSpin { to { transform: rotate(360deg); } }
+.pdfLoading-title { font-size: 16px; font-weight: bold; color: #222; margin-bottom: 6px; }
+.pdfLoading-desc { font-size: 13px; color: #777; }
+</style>
+<div id="pdfLoadingOverlay" class="pdfLoading-overlay" style="display:none;">
+	<div class="pdfLoading-box">
+		<div class="pdfLoading-spinner"></div>
+		<div class="pdfLoading-title">기록지 PDF를 생성하고 있습니다</div>
+		<div class="pdfLoading-desc">건수가 많으면 다소 시간이 걸릴 수 있습니다.<br/>창을 닫지 말고 잠시만 기다려 주세요.</div>
+	</div>
+</div>

@@ -38,7 +38,7 @@
 			</div>
 			<div class="inputArea02 mb-20">
 				<p class="inputTxt02">공급기간</p>
-				<input type="text" name="supplyDeadline" class="Input02" placeholder="예) 2025.01.01 ~ 2025.12.31" />
+				<span style="color:#555;">계약서 서명일 ~ 공사 종료시까지 <span style="color:#999;">(서명 시 자동 기재)</span></span>
 			</div>
 			<div class="inputArea02 mb-20">
 				<p class="inputTxt02">사용료</p>
