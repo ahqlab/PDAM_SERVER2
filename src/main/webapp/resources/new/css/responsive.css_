@@ -107,7 +107,7 @@ ol {
 
 option {background: #fff; color: #000;}
 
-/* 濡쒓퀬 */
+/* 로고 */
 .mTop {
 	background: #fff;
 	padding: 0 5%;
@@ -151,7 +151,7 @@ option {background: #fff; color: #000;}
     top: 20px;
 }
 
-/* �쇊履� 硫붾돱 */
+/* 왼쪽 메뉴 */
 .left-menu {
 	position: fixed;
     top: 0;
@@ -230,7 +230,7 @@ width: 155px;
 	font-weight: 600;
 }
 
-/* �뙘�뾽 */
+/* 팝업 */
 .popLayer {
 	position: fixed;
 	top: 0;
@@ -405,7 +405,7 @@ border: 1px solid #d1d1d1;
 .logPop .logPopBtn > a.bg01 {background: #8691a7;} 
 .logPop .logPopBtn > a.bg02 {background: #077b9c;} 
 
-/* 而⑦뀗痢� */
+/* 컨텐츠 */
 .section-right {
 	width: 100%;
 	padding: 30px 5% 40px;
@@ -477,7 +477,7 @@ border: 1px solid #d1d1d1;
 	font-weight: 600;
 }
 
-/* 寃��깋 */
+/* 검색 */
 .searchArea input::placeholder {
 	color: #839fca !important;
 }
@@ -591,7 +591,7 @@ height: 35px;
     margin-left: 5px;
 }
 
-/* 寃��깋 �궎�썙�뱶 */
+/* 검색 키워드 */
 .keywordArea {    
 overflow: hidden;
     padding-top: 20px;
@@ -621,7 +621,7 @@ font-size: 13px;
 	width: 12px;
 }
 
-/* 寃��깋�맂 由ъ뒪�듃 */
+/* 검색된 리스트 */
 .listArea {
 	width: 100%;
 }
@@ -656,7 +656,7 @@ font-size: 13px;
     padding-top: 15px;
 }
 
-/* �삊�젰�궗 由ъ뒪�듃 */
+/* 협력사 리스트 */
 .company .listArea .listUl li {
 	width: 100%;
 }
@@ -746,7 +746,7 @@ font-size: 14px;
 .company .listArea .listUl li:nth-of-type(even) .listRight {border-top: 1px solid #bbe0ef;}
 
 
-/* 媛�留뱀젏 由ъ뒪�듃 */
+/* 가맹점 리스트 */
 .franchise .listArea .listUl li {
 	width: 100%;
 	margin-right: 2%;
@@ -782,7 +782,7 @@ color: #000;
 	width: 100%;
 }
 
-/* �떆怨듭궗 由ъ뒪�듃 */
+/* 시공사 리스트 */
 .builder .listArea .listUl li {
 	width: 100%;
 	cursor: pointer;
@@ -853,7 +853,7 @@ color: #000;
     margin-bottom: 10px;
 }
 
-/* �씪�뵒�삤踰꾪듉 �뵒�옄�씤 */
+/* 라디오버튼 디자인 */
 .checkArea {
 	display: -webkit-box;
     display: -ms-flexbox;
@@ -910,14 +910,13 @@ color: #000;
 	background: #077b9c;
 }
 
-/* �몢媛쒕쭏�떎 �깋�긽 蹂�寃� */
+/* 두개마다 색상 변경 */
 .listArea .listUl.two li:nth-of-type(even),
 .listArea .listUl.cross li:nth-of-type(even) {background: #ebf7fa;}
 .listArea .listUl.cross li:nth-of-type(even) .franIcon {background: #fff;}
 .builder .listArea .listUl.cross li:nth-of-type(even) img {background: #fff;}
 
-/* �럹�씠吏� 踰꾪듉 */
-
+/* 페이징 버튼 */
 .pagingArea {
 	display: -webkit-box;
     display: -ms-flexbox;
@@ -1001,7 +1000,8 @@ color: #000;
     background: #077b9c;
 	color: #fff;
 }
-/* 濡쒓렇�씤 */
+
+/* 로그인 */
 .loginArea {
 	height: 100vh;
 	background: #fff;
@@ -1205,7 +1205,7 @@ color: #000;
 
 
 
-/* 李얘린 / 媛��엯 */
+/* 찾기 / 가입 */
 .line {
 	background: #d1d1d1;
 	display: block;
@@ -1669,15 +1669,15 @@ height: 25px;
 
 .viewTable05::-webkit-scrollbar {
 	display: block;
-	width: 0; /*�뒪�겕濡ㅻ컮�쓽 �꼫鍮�*/
+	width: 0; /*스크롤바의 너비*/
 	height: 10px;
 }
 .viewTable05::-webkit-scrollbar-thumb {
- background-color: #077b9c; /*�뒪�겕濡ㅻ컮�쓽 �깋�긽*/
+ background-color: #077b9c; /*스크롤바의 색상*/
 }
  
 .viewTable05::-webkit-scrollbar-track {
-  background-color: #fff; /*�뒪�겕濡ㅻ컮 �듃�옓 �깋�긽*/
+  background-color: #fff; /*스크롤바 트랙 색상*/
 }
 
 .view .bottomBtn {
@@ -1707,7 +1707,7 @@ height: 25px;
     margin-left: 5px;
 }
 
-/* �뀒�씠釉� �꼻�씠 */
+/* 테이블 넓이 */
 .viewTable01 {
 	width: 1200px;
 }
@@ -1751,7 +1751,7 @@ height: 25px;
 	margin-top: 30px;
 }
 
-/* 怨듭��궗�빆 */
+/* 공지사항 */
 .table_board_for {
 	table-layout: fixed;
     width: 100%;
@@ -1922,7 +1922,7 @@ table td.text_left {
     transform: rotate(180deg);
 }
 
-/* 湲��벐湲� */
+/* 글쓰기 */
 .goWrite {
 	width: 95px;
     height: 30px;
