@@ -66,7 +66,11 @@
 			                	</a>
 			                    <span>${domain.title}</span>
 			                </div>
-			                <button onclick="downloadFromQR('${domain.id}')">다운로드</button>
+			                <%-- <button onclick="downloadFromQR('${domain.id}')">다운로드</button> --%>
+			                <div class="list-btn-area">
+							    <button type="button" class="btn-download" onclick="downloadFromQR('${domain.id}')">다운로드</button>
+							    <button type="button" class="btn-delete" onclick="deleteQR('${domain.id}')">삭제</button>
+							</div>
 			            </li>
 		            </c:forEach>
 	            	<%@ include file="/WEB-INF/views/common/pagination.jsp" %>
@@ -81,6 +85,26 @@ function downloadFromQR(id){
 	  window.location.href = "${pageContext.request.contextPath}/qr/download?id=" + id;
 }
 
+function deleteQR(id) {
+    if (confirm("정말 이 QR 코드를 삭제하시겠습니까?")) {
+        $.ajax({
+            url: "${pageContext.request.contextPath}/qr/delete",
+            type: "POST", 
+            data: { id: id },
+            success: function(response) {
+                if(response) {
+                    alert("삭제가 완료되었습니다.");
+                    location.reload();
+                } else {
+                    alert("삭제에 실패했습니다.");
+                }
+            },
+            error: function(xhr, status, error) {
+                alert("삭제 중 오류가 발생했습니다: " + xhr.statusText);
+            }
+        });
+    }
+}
 
 function downloadQR() {
     const qrImage = document.getElementById('qrImage');
@@ -296,13 +320,41 @@ function generateQR() {
         align-items: center;
     }
 
-    .qr-list button {
+    /* .qr-list button {
         padding: 5px 10px;
         border: none;
         border-radius: 5px;
         background-color: #28a745;
         color: white;
         cursor: pointer;
+    } */
+    
+    .qr-list .list-btn-area {
+        display: flex;
+        gap: 5px;
+    }
+
+    .qr-list button {
+        padding: 5px 10px;
+        border: none;
+        border-radius: 5px;
+        color: white;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .btn-download {
+        background-color: #28a745;
+    }
+    .btn-download:hover {
+        background-color: #1e7e34;
+    }
+
+    .btn-delete {
+        background-color: #dc3545;
+    }
+    .btn-delete:hover {
+        background-color: #c82333;
     }
      .qr-result {
         margin-top: 20px;

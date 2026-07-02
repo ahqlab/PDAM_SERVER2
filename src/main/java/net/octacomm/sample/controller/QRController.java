@@ -321,6 +321,18 @@ public class QRController {
 	    return savedFileName; // 서버에 저장된 안전한 이름 리턴
 	}
 	
+	@ResponseBody
+	@RequestMapping(value = "/delete", method = RequestMethod.POST)
+	public boolean deleteQR(@RequestParam("id") int id) {
+	    try {
+	        int result = weQrcodeMapper.delete(id); 
+	        return result > 0;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return false;
+	    }
+	}
+	
 	@ModelAttribute
 	public void setSessionInfo(Model model, HttpSession session) {
 		SessionInfo sessionInfo = new SessionInfo();
