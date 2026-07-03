@@ -590,7 +590,7 @@ function setGroupName(){
 									<div name="memoArea"></div>
 								</div> --%>
 								<div style="display:flex; align-items:center; margin-top:10px; margin-left: auto;">
-									<button type="button" class="actionBtn c-memo" style="width:130px; border:none;" onclick="openMemoListModal('${domain.id}', '${domain.userId}')">
+									<button type="button" class="actionBtn c-memo" style="width:130px; border:none; display:none;" onclick="openMemoListModal('${domain.id}', '${domain.userId}')">
 										<img src="${pageContext.request.contextPath}/new/img/memo_icon.png" style="width:16px;"/>
 										메모 보기 <span class="memo-badge" data-id="${domain.id}" style="display:none;">0</span>
 									</button>
@@ -763,7 +763,7 @@ function setGroupName(){
 									</div>
 								</div> --%>
 								<div style="display:flex; align-items:center; margin-top:10px; margin-left:20px;">
-								    <button type="button" class="actionBtn c-memo" style="width:130px; font-weight:bold; border:none;" onclick="openMemoListModal('${domain.id}', '${domain.userId}')">
+								    <button type="button" class="actionBtn c-memo" style="width:130px; font-weight:bold; border:none; display:none;" onclick="openMemoListModal('${domain.id}', '${domain.userId}')">
 								        <img src="${pageContext.request.contextPath}/new/img/memo_icon.png" style="width:16px;"/>
 								       	 메모 보기 <span class="memo-badge" data-id="${domain.id}" style="display:none;">0</span>
 								    </button>
@@ -1464,6 +1464,7 @@ function getMemo(){
 	
 	$(".memo-badge").each(function() {
         var badge = $(this);
+        var memoBtn = badge.closest("button");   // 메모 보기 버튼
         var constructionIdx = badge.attr("data-id");
         jQuery.ajax({
             type : "GET",
@@ -1472,7 +1473,14 @@ function getMemo(){
             dataType : "JSON",
             success : function(data) {
                 badge.text(data.length);
-                if(data.length > 0) { badge.show(); } else { badge.hide(); }
+                // 메모가 있을 때만 '메모 보기' 버튼과 배지를 노출
+                if(data.length > 0) {
+                    badge.show();
+                    memoBtn.show();
+                } else {
+                    badge.hide();
+                    memoBtn.hide();
+                }
             }
         });
     });
