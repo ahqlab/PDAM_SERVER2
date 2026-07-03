@@ -917,7 +917,6 @@ color: #000;
 .builder .listArea .listUl.cross li:nth-of-type(even) img {background: #fff;}
 
 /* 페이징 버튼 */
-
 .pagingArea {
 	display: -webkit-box;
     display: -ms-flexbox;
@@ -1001,6 +1000,7 @@ color: #000;
     background: #077b9c;
 	color: #fff;
 }
+
 /* 로그인 */
 .loginArea {
 	height: 100vh;
@@ -1442,7 +1442,34 @@ color: #000;
 
 .viewTable table tr td input[type=checkbox] {
     vertical-align: middle;
-	margin-left: 10px;
+    margin-left: 23px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border-radius: 0;
+    width: 18px;
+    height: 18px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    cursor: pointer;
+    position: relative;
+}
+
+.viewTable table tr td input[type=checkbox]:checked {
+    background-color: #007aff; 
+    border-color: #007aff;
+}
+
+.viewTable table tr td input[type=checkbox]:checked::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 6px;
+    width: 4px;
+    height: 9px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
 }
 
 .viewTable table tr td .tableChange {

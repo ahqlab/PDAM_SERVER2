@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.Delete;
 
 import net.octacomm.sample.dao.CRUDMapper;
 import net.octacomm.sample.domain.DefaultParam;
@@ -38,4 +39,6 @@ public interface WeQrcodeMapper extends CRUDMapper<WeQrcode, WeQrcodeParam, Inte
 	@Update("UPDATE TB_WE_QRCODE SET qrSaveFilename = #{qrSaveFilename} WHERE id = #{qrId}")
 	int updateQrCode(@Param("qrId") String prId , @Param("qrSaveFilename") String qrSaveFilename);
 	
+	@Delete("DELETE FROM TB_WE_QRCODE WHERE id = #{id}")
+	int delete(@Param("id") int id);
 }
