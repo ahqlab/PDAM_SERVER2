@@ -323,9 +323,28 @@ public class QRController {
 	
 	@ResponseBody
 	@RequestMapping(value = "/delete", method = RequestMethod.POST)
-	public boolean deleteQR(@RequestParam("id") int id) {
+	public boolean deleteQR(@RequestParam("id") int id, HttpServletRequest request, HttpSession session) {
+	    // /qr/** 는 로그인 인터셉터에서 제외되어 있으므로(QR 스캔용 공개 경로),
+	    // 파괴적인 삭제는 여기서 직접 로그인 여부를 확인한다.
+	    if (session.getAttribute("userId") == null) {
+	        return false;
+	    }
 	    try {
-	        int result = weQrcodeMapper.delete(id); 
+	        // DB 행 삭제 전에 실제 업로드 파일도 함께 제거하여 orphan 파일을 방지
+	        WeQrcode domain = weQrcodeMapper.get(id);
+	        int result = weQrcodeMapper.delete(id);
+	        if (result > 0 && domain != null && domain.getQrSaveFilename() != null) {
+	            String path;
+	            if (RELEASE_TO_SERVER) {
+	                path = request.getServletContext().getRealPath("/uploads") + "/" + domain.getQrSaveFilename();
+	            } else {
+	                path = "D:/PDGM/uploads/" + domain.getQrSaveFilename();
+	            }
+	            File file = new File(path);
+	            if (file.exists()) {
+	                file.delete();
+	            }
+	        }
 	        return result > 0;
 	    } catch (Exception e) {
 	        e.printStackTrace();
