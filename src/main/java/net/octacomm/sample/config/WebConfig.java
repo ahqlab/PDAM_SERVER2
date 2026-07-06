@@ -190,6 +190,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 						.excludePathPatterns("/j_spring_security_check")
 						.excludePathPatterns("/mobile/device/login")
 						.excludePathPatterns("/mobile/device/all/list")
+						.excludePathPatterns("/mobile/ble/device/map")
 						.excludePathPatterns("/api/get/report/list")
 						.excludePathPatterns("/api/get/auth/check")
 						.excludePathPatterns("/mobile/regist/report")

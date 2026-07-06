@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import net.octacomm.sample.dao.mapper.BleDeviceMapMapper;
 import net.octacomm.sample.dao.mapper.DeviceMapper;
 import net.octacomm.sample.dao.mapper.FallMeterMapper;
 import net.octacomm.sample.dao.mapper.OriginFallMeterMapper;
@@ -26,6 +27,7 @@ import net.octacomm.sample.dao.mapper.PileStandardMapper;
 import net.octacomm.sample.dao.mapper.PileTicknessMapper;
 import net.octacomm.sample.dao.mapper.ReportMapper;
 import net.octacomm.sample.dao.mapper.ReportWithFallMeterMapper;
+import net.octacomm.sample.domain.BleDeviceMap;
 import net.octacomm.sample.domain.CommonListResponse;
 import net.octacomm.sample.domain.CommonResponse;
 import net.octacomm.sample.domain.Device;
@@ -92,8 +94,11 @@ public class MobileController {
 	
 	@Autowired
 	private PileSelectMethodValueMapper pileSelectMethodValueMapper;
-	
-	
+
+	@Autowired
+	private BleDeviceMapMapper bleDeviceMapMapper;
+
+
 	
 	//PDAM에서 온라인 에서 다이렉트로 보내는 곳
 	@ResponseBody
@@ -457,6 +462,16 @@ public class MobileController {
 	public CommonListResponse<Device> allList(){
 		CommonListResponse<Device> response = new CommonListResponse<Device>();
 		response.setDomain(deviceMapper.getList());
+		response.setResultMessage("성공");
+		return response;
+	}
+
+	// BLE 장비 매핑(blueNo↔MAC) 전체 목록. 앱이 온라인일 때 받아서 캐시 → 스캔 시엔 캐시만 사용(지연 0).
+	@ResponseBody
+	@RequestMapping(value = "/ble/device/map", method = RequestMethod.GET)
+	public CommonListResponse<BleDeviceMap> bleDeviceMap(){
+		CommonListResponse<BleDeviceMap> response = new CommonListResponse<BleDeviceMap>();
+		response.setDomain(bleDeviceMapMapper.getList());
 		response.setResultMessage("성공");
 		return response;
 	}
