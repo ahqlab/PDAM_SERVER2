@@ -518,7 +518,7 @@ function setGroupName(){
 					</c:choose>
 				</div>
 				<!--검색-->
-				<form:form id="searchForm" commandName="domainParam" method="POST">
+				<form:form id="searchForm" commandName="domainParam" method="GET">
 				<div class="searchArea">
 					<div class="searchArea01">
 						<form:select path="searchField">
@@ -923,7 +923,7 @@ function setGroupName(){
 			</div>
 			<!--//검색된 리스트 5개씩 노출-->
 
-			<!--페이징-->			
+			<!--페이징(서버 페이징: 페이지 이동은 GET 방식이라 POST 재제출 경고가 없음)-->
 			<%@ include file="/WEB-INF/views/common/pagination.jsp" %>
 			<!--//페이징-->
 

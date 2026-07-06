@@ -6,8 +6,19 @@
 	<sql id="conditionByVim">
         <where>
         	A.groupIdx = B.idx and A.isDel = 0
+        	<!-- 검색: 컬럼명은 화이트리스트(choose)로, 검색어는 #{} 바인딩으로 처리하여 SQL 인젝션을 방지한다. -->
         	<if test="param.searchField != null and param.searchField != '' and param.searchWord != null and param.searchWord != ''">
-     			and ${param.searchField} like '%${param.searchWord}%'
+     			<choose>
+     				<when test="param.searchField == 'name'">
+     					and A.name like concat('%', #{param.searchWord}, '%')
+     				</when>
+     				<when test="param.searchField == 'location'">
+     					and A.location like concat('%', #{param.searchWord}, '%')
+     				</when>
+     				<when test="param.searchField == 'manager'">
+     					and A.manager like concat('%', #{param.searchWord}, '%')
+     				</when>
+     			</choose>
        		</if>
        		<if test="param.startDate != null and param.startDate != '' and param.endDate != null and param.endDate != ''">
        			and date_format(A.createDate, '%Y-%m-%d') between  #{param.startDate}  and  #{param.endDate} 
@@ -30,13 +41,25 @@
        		<if test="param.fcIdx != null and param.fcIdx != '' and param.fcIdx != null and param.fcIdx != ''">
        			and A.fcIdx = #{param.fcIdx}
        		</if>
+        	<!-- 검색: 컬럼명은 화이트리스트(choose)로, 검색어는 #{} 바인딩으로 처리하여 SQL 인젝션을 방지한다. -->
         	<if test="param.searchField != null and param.searchField != '' and param.searchWord != null and param.searchWord != ''">
-     			<if test="param.searchField == 'manager'">
-        			and ( A.manager like  '%${param.searchWord}%' or A.conManager like  '%${param.searchWord}%')
-        		</if>
-        		<if test="param.searchField != 'manager'">
-       				and ${param.searchField} like '%${param.searchWord}%'
-        		</if>
+     			<choose>
+     				<when test="param.searchField == 'manager'">
+        				and ( A.manager like concat('%', #{param.searchWord}, '%') or A.conManager like concat('%', #{param.searchWord}, '%') )
+        			</when>
+        			<when test="param.searchField == 'name'">
+        				and A.name like concat('%', #{param.searchWord}, '%')
+        			</when>
+        			<when test="param.searchField == 'location'">
+        				and A.location like concat('%', #{param.searchWord}, '%')
+        			</when>
+        			<when test="param.searchField == 'address'">
+        				and A.address like concat('%', #{param.searchWord}, '%')
+        			</when>
+        			<when test="param.searchField == 'groupName'">
+        				and B.groupName like concat('%', #{param.searchWord}, '%')
+        			</when>
+     			</choose>
        		</if>
        		<if test="param.startDate != null and param.startDate != '' and param.endDate != null and param.endDate != ''">
        			and date_format(A.createDate, '%Y-%m-%d') between  #{param.startDate}  and  #{param.endDate}
