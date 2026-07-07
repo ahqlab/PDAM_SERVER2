@@ -5,3 +5,5 @@ target/
 .settings/
 .vscode/
 logs/
+pom.xml
+.metadata/
