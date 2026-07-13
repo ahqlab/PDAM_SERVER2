@@ -29,6 +29,82 @@
 	  padding: 2px 4px;
 	  margin: 0;
 	}
+	
+	.popUp04 {
+	    display: none;
+	    position: fixed !important;
+	    top: 50%;
+	    left: 50%;
+	    transform: translate(-50%, -50%);
+	    width: 95%;
+	    max-width: 1000px; 
+	    max-height: 90vh;
+	    overflow-y: auto;  
+	    z-index: 9999;
+	    background: #fff;
+	    flex-direction: column;
+	}
+	
+	.popUp04.is-visible {
+	    display: flex;
+	}
+	
+	.popUp04 .signTable {
+	    width: 100% !important;
+	    border-collapse: collapse;
+	    table-layout: fixed;
+	    border: 1px solid #ccc;
+	    margin-top: 10px;
+	    margin-bottom: 10px;
+	}
+	
+	.popUp04 .signTable td, 
+	.popUp04 .signTable th {
+	    border: 1px solid #ccc;
+	    padding: 6px !important;
+	    text-align: center;
+	    overflow: hidden;
+	    word-break: break-all;
+	}
+	
+	.popUp04 .viewTh { 
+	    background: #eee; 
+	    font-weight: bold; 
+	}
+	
+	.popUp04 .tdInput {
+	    width: 100% !important;
+	    border: none !important;
+	    text-align: center;
+	    box-sizing: border-box;
+	    background: transparent;
+	    font-size: 14px;
+	    padding: 5px;
+	}
+	
+	.popUp04 .mid-group {
+	    display: none; 
+	}
+	
+	@media screen and (max-width: 767px) {
+	    .popUp04 {
+	        width: 98%;
+	        padding: 5px;
+	    }
+	    
+	    .popUp04 .tdInput {
+	        font-size: 13px; 
+	    }
+	    
+	    .popCont {
+	        overflow-x: auto;
+	    }
+	    
+	    .popUp04 .signTable {
+	        min-width: 600px;
+	    }
+	}
+	
 </style>
 
 <script>
@@ -1483,6 +1559,225 @@
 	    downloadDrivingOneRecoredBook(hitOption);
 	}
 	
+	function openNewReportPopup() {
+	    $('.copy-input').val(""); 
+	    $('#copy_rownum').val("신규");
+	    
+	    $('#saveBtn').attr('onclick', "submitReport('new')");
+	    $('#saveBtn').text('신규 데이터 저장');
+
+	    $('.mid-group').hide();
+	    $('#mainTitle').attr('colspan', '5');
+	    $('#footer_total').attr('colspan', '1');
+	    $('#footer_connect').attr('colspan', '2');
+	    
+	    var isBig = ${isBig};
+	    if (isBig > 0) {
+	        $('.meas-big-group').show();
+	    } else {
+	        $('.meas-big-group').hide();
+	    }
+
+	    $('.popUp04').find('.popTit p').text('신규 기록지 작성');
+	    $('.popUp04').css('display', 'flex');
+	    $('.popLayer').show();
+	    $('body').css('overflow', 'hidden');
+	}
+	
+	
+	function copyAndInsertReport(element) {
+	    var $tr = $(element).closest('tr');
+	    
+	    $('.copy-input').each(function() {
+	        var name = $(this).attr('name'); 
+	        if (!name || name === "piece") return; 
+	        var $target = $tr.find('input[name*="' + name + '"]').not('[name*="Id"]').not('[name*="Name"]');
+	        var idx = $(this).attr('data-idx');
+	        if ($target.length > 0) {
+	            if (idx !== undefined && idx !== false) {
+	                $(this).val($target.eq(parseInt(idx)).val() || "");
+	            } else {
+	                $(this).val($target.first().val() || "");
+	            }
+	        }
+	    });
+
+	    var pieceInputs = $tr.find('input[name*="piece["]'); 
+	    var copyInputs = ['copy_piOne', 'copy_piTwo', 'copy_piThree', 'copy_piFour', 'copy_piFive', 'copy_piSix', 'copy_piSeven'];
+	    
+	    for(var i = 0; i < copyInputs.length; i++) {
+	        var val = (i < pieceInputs.length) ? pieceInputs.eq(i).val() : "";
+	        $('#' + copyInputs[i]).val(val || "");
+	    }
+
+	    var hasExtraMid = ($('#copy_piFive').val().trim() !== "" && $('#copy_piFive').val() !== "0") || 
+	                      ($('#copy_piSix').val().trim() !== "" && $('#copy_piSix').val() !== "0");
+
+	    if (hasExtraMid) {
+	        $('.mid-group').css('display', 'table-cell');
+	        $('#mainTitle').attr('colspan', '7');
+	        $('#footer_total').attr('colspan', '2');
+	        $('#footer_connect').attr('colspan', '3');
+	    } else {
+	        $('.mid-group').hide();
+	        $('#copy_piFive').val("");
+	        $('#copy_piSix').val("");
+	        
+	        $('#mainTitle').attr('colspan', '5');
+	        $('#footer_total').attr('colspan', '1');
+	        $('#footer_connect').attr('colspan', '2');
+	    }
+
+	    var originalDate = $tr.find('td').eq(2).text().trim();
+	    $('#copy_createDate').val(originalDate);
+	    $('#copy_currentDateTime').val(originalDate);
+	    
+	    var $drillTd = $tr.find('input[name="drillingDepth"]').closest('td');
+	    if($drillTd.length > 0) {
+	        $('#copy_connectLength').val($drillTd.prev().text().trim());          
+	        $('#copy_totalConnectWidth').val($drillTd.prev().prev().text().trim()); 
+	    }
+	            
+	    var isBig = ${isBig};
+	    if (isBig > 0) {
+	        $('.meas-big-group').show();
+	    } else {
+	        $('.meas-big-group').hide();
+	    }
+	    
+	    var $hammaTd = $tr.find('input[name="hammaT"]').closest('td');
+	    if($hammaTd.length > 0) {
+	        $('#copy_gongSac').val($hammaTd.prev().text().trim());          
+	        $('#copy_balance').val($hammaTd.prev().prev().text().trim());  
+	    }
+
+	    var $effTd = $tr.find('input[name="hammaEfficiency"]').closest('td');
+	    if($effTd.length > 0) {
+	        $('#copy_ultimateBearingCapacity').val($effTd.prev().text().trim()); 
+	    }
+
+	    $('#copy_avgPenetrationValue').val($tr.find('#avgPenetrationValue').val());
+	    $('#copy_totalPenetrationValue').val($tr.find('#totalPenetrationValue').val());
+	    
+	    $('.popUp04').css('display', 'flex');
+	    $('.popLayer').show();
+	    $('body').css('overflow', 'hidden');
+	    $('#saveBtn').attr('onclick', "submitReport('copy')");
+	    $('#saveBtn').text('수정 데이터 저장 및 복사');
+	}
+
+
+	function submitReport(mode) {
+	    var pieces = [];
+	    var pieceIds = ['copy_piOne', 'copy_piTwo', 'copy_piThree', 'copy_piFour', 'copy_piFive', 'copy_piSix', 'copy_piSeven'];
+
+	    var validInputs = [];
+	    for (var i = 0; i < pieceIds.length; i++) {
+	        var $el = $('#' + pieceIds[i]);
+	        if ($el.is(':visible') && $el.val().trim() !== "") {
+	            validInputs.push($el.val().trim());
+	        }
+	    }
+
+	    for (var i = 0; i < validInputs.length; i++) {
+	        var name;
+	        if (i === 0) {
+	            name = '단본';
+	        } else if (i === 1) {
+	            name = '하단';
+	        } else if (i === validInputs.length - 1) {
+	            name = '상단';
+	        } else {
+	            name = '중단';
+	        }
+
+	        pieces.push({ 
+	            name: name, 
+	            value: validInputs[i], 
+	            id: 0, 
+	            reportIdx: 0 
+	        });
+	    }
+	    var createDateVal = $('#copy_createDate').val();
+	    var currentDateTimeVal = createDateVal ? createDateVal.substring(0, 10) : null;
+	    
+	    var penetrationss = [];
+	    var measIds = ['copy_meas1', 'copy_meas2', 'copy_meas3', 'copy_meas4', 'copy_meas5', 
+	                   'copy_meas6', 'copy_meas7', 'copy_meas8', 'copy_meas9', 'copy_meas10'];
+	    
+	    for (var j = 0; j < measIds.length; j++) {
+	        var val = $('#' + measIds[j]).val();
+	        if (${isBig} == 0 && j >= 5) break; 
+	        if (val) {
+	            penetrationss.push({
+	                name: (j + 1) + "회",
+	                value: val,
+	                id: 0,
+	                reportIdx: 0
+	            });
+	        }
+	    }
+
+	    var data = {
+	        deviceIdx: Number($('input[name="deviceIdx"]').first().val() || 0), 
+	        currentDateTime: currentDateTimeVal,
+	        createDate: createDateVal,
+	        pileType: $('#copy_pileType').val() || "null",
+	        method: $('#copy_method').val() || "null",
+	        location: $('#copy_location').val() || "null",
+	        pileNo: $('#copy_pileNo').val() || "null",
+	        pileStandard: $('#copy_pileStandard').val() || "null",
+	        piece: pieces,
+	        penetrations: penetrationss,
+	        drillingDepth: $('#copy_drillingDepth').val() || "0",
+	        intrusionDepth: $('#copy_intrusionDepth').val() || "0",
+	        balance: $('#copy_balance').val() || "0",
+	        gongSac: $('#copy_gongSac').val() || "0",
+	        hammaT: $('#copy_hammaT').val() || "0",
+	        fallMeter: $('#copy_fallMeter').val() || "0",
+	        managedStandard: $('#copy_managedStandard').val() || "0",
+	        avgPenetrationValue: $('#copy_avgPenetrationValue').val() || "0",
+	        totalPenetrationValue: $('#copy_totalPenetrationValue').val() || "0",
+	        ultimateBearingCapacity: $('#copy_ultimateBearingCapacity').val() || "0",
+	        hammaEfficiency: $('#copy_hammaEfficiency').val() || "0",
+	        modulusElasticity: $('#copy_modulusElasticity').val() || "0",
+	        crossSection: $('#copy_crossSection').val() || "0",
+	        sprCol1: $('#copy_sprCol1').val() || "null", 
+	        bigo: $('#copy_bigo').val() || "null"        
+	    };
+
+	    var url = (mode === 'new') ? "${pageContext.request.contextPath}/report/insertNew" : "${pageContext.request.contextPath}/report/insertCopied";
+	    var confirmMsg = (mode === 'new') ? "현재 입력된 내용으로 새로운 기록을 추가하시겠습니까?" : "현재 입력된 내용으로 복사하여 기록을 추가하시겠습니까?";
+	    var successMsg = (mode === 'new') ? "성공적으로 새 데이터가 추가되었습니다." : "성공적으로 복사되어 새 데이터가 추가되었습니다.";
+
+	    console.log("전송 데이터:", data);
+	    if (!confirm(confirmMsg)) {
+	        return;
+	    }
+
+	    jQuery.ajax({
+	        type: "POST",
+	        url: url, 
+	        data: JSON.stringify(data), 
+	        dataType: "JSON", 
+	        contentType: "application/json",
+	        success: function(result) {
+	            if (result) {
+	                alert(successMsg);
+	                $('.popUp04').hide();
+	                $('.popLayer').hide();
+	                location.reload(); 
+	            } else {
+	                alert("데이터 추가 중 서버 오류가 발생했습니다.");
+	            }
+	        },
+	        error: function(xhr, status, error) {
+	            alert("서버와 통신 중 문제가 발생했습니다.");
+	            console.log(error); 
+	        }
+	    });
+	}
+
 </script>
 <!--컨텐츠-->
 <div class="section-right" >
@@ -1650,7 +1945,8 @@
 								</td>
 							</c:when>
 						</c:choose>
-						<td rowspan="2">순번</td>
+						<!-- <td rowspan="2">순번</td> -->
+						<td rowspan="2" ondblclick="openNewReportPopup();" style="cursor: pointer;">순번</td>
 						<td rowspan="2" style="width: 100px;">시공일</td>
 						<td rowspan="2">파일종류</td>
 						<td rowspan="2">시공공법</td>
@@ -1943,7 +2239,19 @@
 									</td>
 								</c:when>
 							</c:choose>
-							<td>${domain.rownum}</td>
+							<%-- <td>${domain.rownum}</td> --%>
+						    <c:choose>
+						    	<c:when test="${sessionInfo.role == 0}">
+						        	<td ondblclick="javascript:copyAndInsertReport(this);" 
+						            	style="cursor: pointer; color: #00adef; font-weight: bold;">
+						                ${domain.rownum}
+						                
+						            </td>
+						        </c:when>
+						            <c:otherwise>
+						                <td>${domain.rownum}</td>
+						        	</c:otherwise>
+							</c:choose>
 							<td  style="width: 100px;">
 								<c:choose>
 									<c:when test="${sessionInfo.role == 0}">
@@ -3113,6 +3421,132 @@
 				<div class="popAdd" onclick="javascript:registExcelSignRoomCheck();">등록</div>
 			</div>
 		</div>
+	</div>
+	
+	<div class="popUp popUp04">
+	    <div class="popTit">
+	        <p>기록지 복사 → 추가</p>
+	        <img class="popClose" src="${pageContext.request.contextPath}/new/img/popclose.png" />
+	    </div>
+	
+	    <div class="popCont">
+	        <table class="signTable" style="padding:10px">
+	            <tr><th colspan="7" style="background:#eee; padding:10px;">기본 및 파일 정보</th></tr>
+				<tr>
+				    <td class="viewTh" colspan="1">순번</td><td colspan="2"><input type="text" class="tdInput copy-input" id="copy_rownum" readonly /></td>
+				    <td class="viewTh" colspan="1">시공일</td><td colspan="3"><input type="text" class="tdInput copy-input" id="copy_createDate" name="createDate" /></td>
+				</tr>
+				<tr>
+				    <td class="viewTh" colspan="1">파일종류</td><td colspan="2"><input type="text" class="tdInput copy-input" id="copy_pileType" name="pileType" /></td>
+				    <td class="viewTh" colspan="1">시공공법</td><td colspan="3"><input type="text" class="tdInput copy-input" id="copy_method" name="method" /></td>
+				</tr>
+				<tr>
+				    <td class="viewTh" colspan="1">시공위치</td><td colspan="2"><input type="text" class="tdInput copy-input" id="copy_location" name="location" /></td>
+				    <td class="viewTh" colspan="1">파일번호</td><td colspan="3"><input type="text" class="tdInput copy-input" id="copy_pileNo" name="pileNo" /></td>
+				</tr>
+				<tr>
+				    <td class="viewTh" colspan="2">파일규격</td><td colspan="5"><input type="text" class="tdInput copy-input" id="copy_pileStandard" name="pileStandard" /></td>
+				</tr>
+			</table>
+				
+			<table class="signTable" style="padding-top:10px;">
+			    <tr><th id="mainTitle" colspan="7" style="background:#eee; padding:10px;">파일 상세 구분 (단위: M/개소)</th></tr>
+			    <tr>
+			        <td class="viewTh">단본(M)</td>
+			        <td class="viewTh">하단(M)</td>
+			        <td class="viewTh">중단1(M)</td>
+			        <td class="viewTh">중단2(M)</td>
+			        <td class="viewTh mid-group" style="display:none;">중단3(M)</td>
+			        <td class="viewTh mid-group" style="display:none;">중단4(M)</td>
+			        <td class="viewTh">상단(M)</td>
+			    </tr>
+			    <tr>
+			        <td><input type="text" class="tdInput copy-input" id="copy_piOne" name="piece" /></td>
+			        <td><input type="text" class="tdInput copy-input" id="copy_piTwo" name="piece" /></td>
+			        <td><input type="text" class="tdInput copy-input" id="copy_piThree" name="piece" /></td>
+			        <td><input type="text" class="tdInput copy-input" id="copy_piFour" name="piece" /></td>
+			        <td class="mid-group" style="display:none;"><input type="text" class="tdInput copy-input" id="copy_piFive" name="piece" /></td>
+			        <td class="mid-group" style="display:none;"><input type="text" class="tdInput copy-input" id="copy_piSix" name="piece" /></td>
+			        <td><input type="text" class="tdInput copy-input" id="copy_piSeven" name="piece" /></td>
+			    </tr>
+			    <tr>
+			        <td class="viewTh">합계(M)</td>
+			        <td id="footer_total" colspan="2" style="text-align:center;"><label id="copy_totalConnectWidth">자동으로 생성됩니다.</label></td>
+			        <td class="viewTh">이음(개소)</td>
+			        <td id="footer_connect" colspan="3" style="text-align:center;"><label id="copy_connectLength">자동으로 생성됩니다.</label></td>
+			    </tr>
+			</table>
+			<table class="signTable">
+	            <tr><th colspan="7" style="background:#eee; padding:10px;">관입 및 측정 데이터</th></tr>
+	            <tr>
+	                <td class="viewTh">천공깊이</td><td class="viewTh">관입깊이</td><td class="viewTh">파일잔량</td><td class="viewTh">공삭공</td>
+	                <td class="viewTh">해머무게</td><td class="viewTh">낙하높이</td><td class="viewTh">관리기준</td>
+	            </tr>
+	            <tr>
+	                <td><input type="text" class="tdInput copy-input" id="copy_drillingDepth" name="drillingDepth" /></td>
+	                <td><input type="text" class="tdInput copy-input" id="copy_intrusionDepth" name="intrusionDepth" /></td>
+	                <td><input type="text" class="tdInput copy-input" id="copy_balance" /></td>
+	                <td><input type="text" class="tdInput copy-input" id="copy_gongSac" /></td>
+	                <td><input type="text" class="tdInput copy-input" id="copy_hammaT" name="hammaT" /></td>
+	                <td><input type="text" class="tdInput copy-input" id="copy_fallMeter" name="fallMeter" /></td>
+	                <td><input type="text" class="tdInput copy-input" id="copy_managedStandard" name="managedStandard" /></td>
+	            </tr>
+			</table>
+	            
+			<table class="signTable">
+	            <tr>
+				    <td class="viewTh" style="width:20%">1회(mm)</td>
+				    <td class="viewTh" style="width:20%">2회(mm)</td>
+				    <td class="viewTh" style="width:20%">3회(mm)</td>
+				    <td class="viewTh" style="width:20%">4회(mm)</td>
+				    <td class="viewTh" style="width:20%">5회(mm)</td>
+				</tr>
+				<tr>
+				    <td><input type="text" class="tdInput copy-input" id="copy_meas1" name="penetrations" data-idx="0" /></td>
+				    <td><input type="text" class="tdInput copy-input" id="copy_meas2" name="penetrations" data-idx="1" /></td>
+				    <td><input type="text" class="tdInput copy-input" id="copy_meas3" name="penetrations" data-idx="2" /></td>
+				    <td><input type="text" class="tdInput copy-input" id="copy_meas4" name="penetrations" data-idx="3" /></td>
+				    <td><input type="text" class="tdInput copy-input" id="copy_meas5" name="penetrations" data-idx="4" /></td>
+				</tr>
+				
+				<tr class="meas-big-group" style="display:none;">
+				    <td class="viewTh" style="width:20%">6회(mm)</td>
+				    <td class="viewTh" style="width:20%">7회(mm)</td>
+				    <td class="viewTh" style="width:20%">8회(mm)</td>
+				    <td class="viewTh" style="width:20%">9회(mm)</td>
+				    <td class="viewTh" style="width:20%">10회(mm)</td>
+				</tr>
+				<tr class="meas-big-group" style="display:none;">
+				    <td><input type="text" class="tdInput copy-input" id="copy_meas6" name="penetrations" data-idx="5" /></td>
+				    <td><input type="text" class="tdInput copy-input" id="copy_meas7" name="penetrations" data-idx="6" /></td>
+				    <td><input type="text" class="tdInput copy-input" id="copy_meas8" name="penetrations" data-idx="7" /></td>
+				    <td><input type="text" class="tdInput copy-input" id="copy_meas9" name="penetrations" data-idx="8" /></td>
+				    <td><input type="text" class="tdInput copy-input" id="copy_meas10" name="penetrations" data-idx="9" /></td>
+				</tr>
+				</table>
+				<table class="signTable">
+	            <tr>
+	                <td class="viewTh" style="width:20%">평균관입</td><td style="width:30%"><label for="copy_avgPenetrationValue">자동으로 생성됩니다.</label></td>
+	                <td class="viewTh" style="width:20%">최종관입</td><td style="width:30%"><label for="copy_totalPenetrationValue">자동으로 생성됩니다.</label></td>
+	            </tr>
+	            <tr>
+	                <td class="viewTh" style="width:20%">극한지지력</td><td style="width:30%"><input type="text" class="tdInput copy-input" id="copy_ultimateBearingCapacity" name="ultimateBearingCapacity" /></td>
+	                <td class="viewTh" style="width:20%">해머효율</td><td style="width:30%"><input type="text" class="tdInput copy-input" id="copy_hammaEfficiency" name="hammaEfficiency" /></td>
+	            </tr>
+	            <tr>
+	                <td class="viewTh" style="width:20%">탄성계수</td><td style="width:30%"><input type="text" class="tdInput copy-input" id="copy_modulusElasticity" name="modulusElasticity" /></td>
+	                <td class="viewTh" style="width:20%">단면적</td><td style="width:30%"><input type="text" class="tdInput copy-input" id="copy_crossSection" name="crossSection" /></td>
+	            </tr>
+	            <tr>
+	                <td class="viewTh">메모</td><td colspan="6"><input type="text" class="tdInput copy-input" id="copy_sprCol1" name="sprCol1" /></td>
+	            </tr>
+	            <tr>
+	                <td class="viewTh">비고</td><td colspan="6"><input type="text" class="tdInput copy-input" id="copy_bigo" name="bigo" /></td>
+	            </tr>
+	        </table>
+	        <!-- <div onclick="javascript:submitReport('copy');" style="margin-top:20px; background:#077b9c; color:#fff; text-align:center; padding:15px; cursor:pointer; font-weight:bold;">수정 데이터 저장 및 복사</div> -->
+	        <div id="saveBtn" onclick="javascript:submitReport('copy');" style="margin-top:20px; background:#077b9c; color:#fff; text-align:center; padding:15px; cursor:pointer; font-weight:bold;">저장</div>
+	    </div>
 	</div>
 	
 	<div id="drivingRecordOverlay" style="display:none;"></div>

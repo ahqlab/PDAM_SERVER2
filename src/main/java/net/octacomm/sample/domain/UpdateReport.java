@@ -55,6 +55,8 @@ public class UpdateReport implements Domain {
 	
 	private String createDate;
 	
+	private String currentDateTime;
+	
 	private float gongSac;
    //단면적
     private String crossSection;

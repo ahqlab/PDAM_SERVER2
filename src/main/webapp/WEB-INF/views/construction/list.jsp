@@ -527,6 +527,7 @@ function setGroupName(){
 		                    <form:option value="manager">현장 담당자 & 소장</form:option>
 		                    <form:option value="address">현장주소</form:option>
 		                    <form:option value="groupName">시공사</form:option>
+		                    <form:option value="bluetoothNo">블루투스 No</form:option>
 						</form:select>
 						<form:input path="searchWord" class="searchin"  placeholder="검색어를 입력하세요."/>
 						<form:hidden path="currentPage"/>

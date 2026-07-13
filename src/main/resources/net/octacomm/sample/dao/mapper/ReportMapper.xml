@@ -4074,5 +4074,38 @@
 		GROUP BY D.reportIdx HAVING  COUNT(*) > 5) A
     </select>
     
+    <insert id="insertCopiedReport" parameterType="net.octacomm.sample.domain.UpdateReport">
+	    INSERT INTO TB_REPORT 
+	    (
+	        deviceIdx, currentDateTime, location, pileNo, pileStandard, 
+	        drillingDepth, directDrillingDepth, stDrillingDepth, sdDrillingDepth, 
+	        intrusionDepth, balance, connectLength, managedStandard, 
+	        avgPenetrationValue, totalPenetrationValue, hammaT, fallMeter, 
+	        pileType, method, totalConnectWidth, ultimateBearingCapacity, 
+	        crossSection, hammaEfficiency, modulusElasticity, bigo, sprCol1, createDate
+	    )
+	    VALUES 
+	    (
+	        #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo}, #{pileStandard}, 
+	        #{drillingDepth}, #{directDrillingDepth}, #{stDrillingDepth}, #{sdDrillingDepth}, 
+	        #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, 
+	        #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter}, 
+	        #{pileType}, #{method}, #{totalConnectWidth}, #{ultimateBearingCapacity}, 
+	        #{crossSection}, #{hammaEfficiency}, #{modulusElasticity}, #{bigo}, #{sprCol1}, #{createDate}
+	    )
+	    
+	    <selectKey keyProperty="id" resultType="int" order="AFTER">
+	        SELECT LAST_INSERT_ID()
+	    </selectKey>
+	</insert>
+	<insert id="insertPiece" parameterType="net.octacomm.sample.domain.Piece">
+        INSERT INTO TB_PIECE (reportIdx, name, value)
+        VALUES (#{reportIdx}, #{name}, #{value})
+    </insert>
+
+    <insert id="insertPenetration" parameterType="net.octacomm.sample.domain.Penetration">
+        INSERT INTO TB_PENETRATION (reportIdx, value)
+        VALUES (#{reportIdx}, #{value})
+    </insert>
     
 </mapper>
