@@ -59,6 +59,9 @@
         			<when test="param.searchField == 'groupName'">
         				and B.groupName like concat('%', #{param.searchWord}, '%')
         			</when>
+        			<when test="param.searchField == 'bluetoothNo'">
+	                    and exists (select 1 from TB_DEVICE D where D.constructionIdx = A.id and D.bluetoothNo like concat('%', #{param.searchWord}, '%') )
+	                </when>
      			</choose>
        		</if>
        		<if test="param.startDate != null and param.startDate != '' and param.endDate != null and param.endDate != ''">
