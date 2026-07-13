@@ -1257,4 +1257,38 @@ public class ReportController{
 		sessionInfo.setShowPdfYn((Boolean) session.getAttribute("showPdfYn"));	
 	    model.addAttribute("sessionInfo", sessionInfo);
 	}
+	
+	/* SuperAdmin 혹은 권한 있는 사용자가 새로운 기록을 등록/복사 */
+	
+	@Transactional
+	@ResponseBody
+	@RequestMapping(value = {"/insertCopied", "/insertNew"}, method = RequestMethod.POST)
+	public boolean insertReport(@RequestBody UpdateReport newReport, HttpSession session) {
+	    Integer role = (Integer) session.getAttribute("role");
+	    if (role == null || role != 0) {
+	        return false;
+	    }
+	    
+	    try {
+	        mapper.insertCopiedReport(newReport);
+	        int newReportId = newReport.getId(); 
+
+	        if (newReport.getPiece() != null) {
+	            for (Piece piece : newReport.getPiece()) {
+	                piece.setReportIdx(newReportId);
+	                mapper.insertPiece(piece);
+	            }
+	        }
+	        if (newReport.getPenetrations() != null) {
+	            for (Penetration pntr : newReport.getPenetrations()) {
+	                pntr.setReportIdx(newReportId);  
+	                mapper.insertPenetration(pntr);
+	            }
+	        }
+	        return true; 
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return false;
+	    }
+	}
 }

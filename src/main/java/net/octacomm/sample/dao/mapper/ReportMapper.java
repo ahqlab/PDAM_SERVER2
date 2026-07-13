@@ -14,6 +14,8 @@ import net.octacomm.sample.domain.ApiReport;
 import net.octacomm.sample.domain.Construction;
 import net.octacomm.sample.domain.ConstructionParam;
 import net.octacomm.sample.domain.GReport;
+import net.octacomm.sample.domain.Penetration;
+import net.octacomm.sample.domain.Piece;
 import net.octacomm.sample.domain.Report;
 import net.octacomm.sample.domain.ReportMaxCount;
 import net.octacomm.sample.domain.ReportOneLine;
@@ -268,5 +270,9 @@ public interface ReportMapper extends CRUDMapper<Report, ReportParam, Integer> {
 
 	@Select("SELECT constructionIdx FROM TB_DEVICE WHERE ID =  (SELECT deviceIdx FROM TB_REPORT WHERE ID = #{reportIdx})")
 	int getConstructionIdx(@Param("reportIdx") int reportIdx);
-
+	
+	void insertCopiedReport(UpdateReport updateReport);
+	void insertPiece(Piece piece);
+	void insertPenetration(Penetration pntr);
+	
 }
