@@ -2249,8 +2249,8 @@
 							<%-- <td>${domain.rownum}</td> --%>
 						    <c:choose>
 						    	<c:when test="${sessionInfo.role == 0}">
-						        	<td ondblclick="javascript:copyAndInsertReport(this);" 
-						            	style="cursor: pointer; color: #00adef; font-weight: bold;">
+						        	<td ondblclick="javascript:copyAndInsertReport(this);"
+						            	style="cursor: pointer; color: #000; font-weight: bold;">
 						                ${domain.rownum}
 						                
 						            </td>

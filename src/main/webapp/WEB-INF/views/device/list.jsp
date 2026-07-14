@@ -88,6 +88,36 @@
 		#groupName        { font-size: 1rem !important; }
 		#constructionAddress { font-size: 0.85rem !important; }
 	}
+
+	/* 좁은 데스크탑 폭(사이드바로 콘텐츠가 좁아지는 구간):
+	   제목/버튼 영역을 세로로 나누고, 버튼은 줄바꿈되 글자 단위로 깨지지 않게 함 */
+	@media (min-width: 1024px) and (max-width: 1500px) {
+		.titArea {
+			flex-direction: column;
+			align-items: flex-start;
+		}
+		.titBtnArea {
+			margin-left: 0;
+			margin-top: 12px;
+			flex-wrap: wrap;
+			gap: 8px;
+			width: 100%;
+		}
+		.titBtnArea select,
+		.titBtnArea .printBtn,
+		.titBtnArea .printBtn02,
+		.titBtnArea .printPdfBtn {
+			margin-left: 0 !important;
+			margin-right: 0 !important;
+			white-space: nowrap;
+			flex-shrink: 0;
+		}
+	}
+
+	/* 기기 목록 표: 폭이 좁아지면 헤더가 세로로 깨지는 대신 가로 스크롤로 표시.
+	   헤더/셀 줄바꿈을 막아 내용 너비를 유지하고, 컨테이너가 좁을 때만 스크롤 발생. */
+	.viewTable01 .tableScroll { overflow-x: auto; }
+	#userListTable th, #userListTable td { white-space: nowrap; }
 </style>
 <script type="text/javascript">
 $( document ).ready( function() 
