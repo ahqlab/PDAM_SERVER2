@@ -143,6 +143,12 @@
 		<put-attribute name="nav" value="/WEB-INF/views/contractClause/nav.jsp" />
 	</definition>
 
+	<!-- 접속 차단 페이지: 메뉴(계약서 서명 등) 없이 안내만 노출 -->
+	<definition name="contract/blocked" extends="commomLayout">
+		<put-attribute name="content" value="/WEB-INF/views/contract/blocked.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/common/emptyNav.jsp" />
+	</definition>
+
 	<definition name="contract/**" extends="commomLayout">
 		<put-attribute name="content" value="/WEB-INF/views/contract/{1}.jsp" />
 		<put-attribute name="nav" value="/WEB-INF/views/contract/nav.jsp" />

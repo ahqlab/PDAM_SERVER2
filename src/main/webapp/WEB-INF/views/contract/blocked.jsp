@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/views/common/tagLib.jsp" %>
-<div class="section-right">
+<%-- 접속 차단 페이지는 nav가 없으므로 section-right의 nav 폭(300px) 오프셋/우측정렬을 해제하여 전체 폭 사용 --%>
+<div class="section-right" style="width:100%;float:none;">
     <%@ include file="/WEB-INF/views/common/welcomeMsg.jsp" %>
     <div style="display:flex;align-items:center;justify-content:center;min-height:60vh;">
         <div style="background:#fff;border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,0.1);padding:48px 40px;text-align:center;max-width:460px;width:100%;">

@@ -22,8 +22,8 @@
 	<meta property="og:type" content="website">
 
 	<link href="${pageContext.request.contextPath}/new/css/reset.css" rel="stylesheet" />
-	<link href="${pageContext.request.contextPath}/new/css/style.css" rel="stylesheet" media="screen and (min-width:1024px)">
-	<link href="${pageContext.request.contextPath}/new/css/responsive.css" rel="stylesheet" media="screen and (max-width:1023px)">
+	<link href="${pageContext.request.contextPath}/new/css/style.css?v=20260703" rel="stylesheet" media="screen and (min-width:1024px)">
+	<link href="${pageContext.request.contextPath}/new/css/responsive.css?v=20260703" rel="stylesheet" media="screen and (max-width:1023px)">
 	<link href="${pageContext.request.contextPath}/new/css/custom.css" rel="stylesheet"  rel="stylesheet" media="screen and (min-width:1024px)"/>
 	<link href="${pageContext.request.contextPath}/new/css/responsiveCustom.css" rel="stylesheet"  rel="stylesheet" media="screen and (max-width:1023px)"/>
 	<link href="${pageContext.request.contextPath}/new/css/popup.css" rel="stylesheet" />

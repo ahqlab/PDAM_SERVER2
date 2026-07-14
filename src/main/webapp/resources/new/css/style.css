@@ -607,6 +607,14 @@ option {background: #fff; color: #000;}
 
 .searchArea02 .searchBtn { margin-left: 15px;}
 
+/* 좁은 데스크탑 폭(사이드바로 콘텐츠가 좁아지는 구간)에서 단일 검색영역이
+   쪼그라들어 검색어 입력창이 잘리는 문제 방지.
+   다중 입력(위치/날짜 등)을 쓰는 .type01 검색영역은 제외. */
+@media (min-width:1024px) and (max-width:1500px){
+	.searchArea01:not(.type01){ width:100%; margin-right:0; }
+	.searchArea01:not(.type01) input{ flex:1 1 auto; width:auto; }
+}
+
 /* 검색 키워드 */
 .keywordArea {    
 	overflow: hidden;
@@ -1757,6 +1765,27 @@ option {background: #fff; color: #000;}
 }
 
 .view .searchArea01.type01 input {width: calc(100% / 2 - 40px);}
+
+/* 좁은 데스크탑 폭(사이드바로 콘텐츠가 좁아지는 구간): 다중입력(type01) 검색영역도
+   시공위치/파일번호/공법/날짜가 잘리지 않게 함.
+   - 텍스트 검색과 날짜 검색을 세로로 분리(.searchArea display:block)
+   - 입력창은 적당히 늘되 상한(max-width)을 둬 홀로 남아도 과하게 커지지 않게 함
+   (위 .view .searchArea01.type01 input 규칙보다 뒤에 두어 폭 지정을 덮어씀) */
+@media (min-width:1024px) and (max-width:1500px){
+	/* 1행: 시공위치/파일번호/공법(3등분, 줄바꿈 없음) + 검색버튼
+	   2행: 날짜 검색란 */
+	.view .searchArea{ display:block; }
+	.view .searchArea01.type01{
+		width:100%; margin-right:0;
+		display:flex; flex-wrap:nowrap; align-items:center; gap:8px;
+	}
+	.view .searchArea01.type01 input{
+		flex:1 1 0; min-width:0; width:auto; margin-right:0;
+	}
+	/* 날짜 검색란: 행 전체 폭 사용, 시작일/종료일 입력창이 남는 공간을 균등하게 채움 */
+	.view .searchArea02{ margin-top:10px; display:flex; align-items:center; width:100%; gap:8px; }
+	.view .searchArea02 .inputDate{ flex:1 1 0; min-width:0; width:auto; }
+}
 
 .view .listCount {
 	padding-left: 15px;
