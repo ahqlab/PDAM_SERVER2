@@ -17,8 +17,13 @@
     	<include refid="condition"/>
     </select>
    
+    <!--
+        행마다 도는 상관 서브쿼리(deviceAmount/franchAmount/cprtCompanyAmount/spareDeviceAmount)를
+        각 테이블 1회 스캔 + GROUP BY 집계 후 LEFT JOIN 하도록 최적화.
+        COUNT 결과(없으면 0)와 출력 컬럼/정렬은 기존 상관 서브쿼리 버전과 동일.
+    -->
     <select id="getListByParam" resultType="Group">
-		SELECT 
+		SELECT
 		   idx,
 	       groupName,
 	       deviceAmount,
@@ -35,56 +40,47 @@
 				THEN 0
 				ELSE 1
 			END) as newContent
-		FROM (SELECT idx,
-		             groupName,
-		             (SELECT COUNT(*)
-		              FROM (SELECT *
-		                    FROM TB_CONSTRUCTION
-		                    WHERE isDel = 0 AND conduct = 0) A,
-		                   TB_DEVICE B
-		              WHERE     A.ID = B.constructionIdx
-		                    AND A.groupIdx = idx
-		                    AND B.isDel = 0
-		                    AND B.conduct = 0)
-		                AS deviceAmount,
-		             (SELECT COUNT(*)
-		              FROM (SELECT *
-		                    FROM TB_CONSTRUCTION
-		                    WHERE isDel = 0 AND conduct = 0) A,
-		                   TB_DEVICE B
-		              WHERE     A.ID = B.constructionIdx
-		                    AND A.groupIdx = idx
-		                    AND B.isDel = 0
-		                    AND B.conduct = 2)
-		                AS franchAmount,
-		             (SELECT COUNT(*)
-		              FROM TB_CONSTRUCTION A
-		              WHERE A.groupIdx = idx AND A.conduct = 0 AND A.isDel = 0)
-		                AS cprtCompanyAmount,
-		             (  SELECT COUNT(*) 
-		                  FROM TB_SPARE_DEVICE TSD 
-		                 WHERE TSD.constructionIdx in ( 
-							SELECT TC.id 
-							  FROM TB_CONSTRUCTION TC 
-							 WHERE  TC.groupIdx = TB_GROUP.idx 
-							   AND TC.conduct = 0 
-							   AND TC.isDel = 0)
-						   AND TSD.type = 0 and TSD.status = 0
-					 ) as spareDeviceAmount,   
-		             isDel,
-		             createDate,
-		             lastModifiedDate
-		      FROM TB_GROUP
+		FROM (SELECT g.idx           AS idx,
+		             g.groupName      AS groupName,
+		             IFNULL(dev.cnt, 0) AS deviceAmount,
+		             IFNULL(fr.cnt, 0)  AS franchAmount,
+		             IFNULL(cpr.cnt, 0) AS cprtCompanyAmount,
+		             IFNULL(sp.cnt, 0)  AS spareDeviceAmount,
+		             g.isDel          AS isDel,
+		             g.createDate     AS createDate,
+		             g.lastModifiedDate AS lastModifiedDate
+		      FROM TB_GROUP g
+		      LEFT JOIN (SELECT A.groupIdx AS groupIdx, COUNT(*) AS cnt
+		                 FROM TB_CONSTRUCTION A
+		                 JOIN TB_DEVICE B ON A.ID = B.constructionIdx
+		                 WHERE A.isDel = 0 AND A.conduct = 0
+		                   AND B.isDel = 0 AND B.conduct = 0
+		                 GROUP BY A.groupIdx) dev ON dev.groupIdx = g.idx
+		      LEFT JOIN (SELECT A.groupIdx AS groupIdx, COUNT(*) AS cnt
+		                 FROM TB_CONSTRUCTION A
+		                 JOIN TB_DEVICE B ON A.ID = B.constructionIdx
+		                 WHERE A.isDel = 0 AND A.conduct = 0
+		                   AND B.isDel = 0 AND B.conduct = 2
+		                 GROUP BY A.groupIdx) fr ON fr.groupIdx = g.idx
+		      LEFT JOIN (SELECT A.groupIdx AS groupIdx, COUNT(*) AS cnt
+		                 FROM TB_CONSTRUCTION A
+		                 WHERE A.conduct = 0 AND A.isDel = 0
+		                 GROUP BY A.groupIdx) cpr ON cpr.groupIdx = g.idx
+		      LEFT JOIN (SELECT TC.groupIdx AS groupIdx, COUNT(*) AS cnt
+		                 FROM TB_SPARE_DEVICE TSD
+		                 JOIN TB_CONSTRUCTION TC ON TC.id = TSD.constructionIdx
+		                 WHERE TC.conduct = 0 AND TC.isDel = 0
+		                   AND TSD.type = 0 AND TSD.status = 0
+		                 GROUP BY TC.groupIdx) sp ON sp.groupIdx = g.idx
 		      <include refid="condition"/>
-		      ORDER BY idx DESC
 		     ) NN
-		ORDER BY	 
+		ORDER BY
 			CASE
 			 	WHEN timdDiff <![CDATA[<]]> 5
 				THEN 0
 				ELSE 1
 			END asc , FIELD(idx, 161, 10000, idx) ASC , FIELD(fieldSort, '000') ASC, idx DESC
 			LIMIT #{pageSize} OFFSET #{startRow}
-    </select>   
+    </select>
     
 </mapper>

@@ -1,5 +1,15 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/views/common/tagLib.jsp" %>
+<style>
+/* 좁은 데스크탑 폭: 검색줄(선택/검색어)과 날짜줄(시작~종료)을 2줄로 분리 */
+@media (min-width:1024px) and (max-width:1600px){
+	.searchArea{ display:block !important; }
+	.searchArea01{ width:100% !important; margin-right:0 !important; display:flex; align-items:center; gap:8px; }
+	.searchArea01 .searchin{ flex:1 1 0 !important; min-width:0; width:auto !important; }
+	.searchArea02{ margin-top:10px !important; display:flex !important; align-items:center; width:100% !important; gap:8px; }
+	.searchArea02 .inputDate{ flex:1 1 0 !important; min-width:0; width:auto !important; }
+}
+</style>
 <script type="text/javascript">
 $( document ).ready( function() {
     $('#submitBtn').click( function() {

@@ -3,8 +3,13 @@
 <script>
 $( document ).ready( function() {
     $('#submitBtn').click( function() {
-    	$('#searchForm').submit();
+    	searchGroup();
     });
+    // 검색어 입력 후 Enter 시에도 폼 재전송(POST) 대신 클라이언트 검색
+    $('#searchWord').on('keydown', function(e){
+        if(e.keyCode === 13){ e.preventDefault(); searchGroup(); }
+    });
+    loadGroupList();
   });
   
 function checkDuplicateGroupName(){
@@ -69,7 +74,7 @@ function checkDuplicateGroupName(){
 					$('.popUp').hide();
 					$('.popLayer').hide();
 					$('body').css('overflow', 'auto');
-					$('#searchForm').submit();
+					loadGroupList();
 				}
 			},
 			error : function(xhr, status, error) {
@@ -92,7 +97,7 @@ function checkDuplicateGroupName(){
 				</div>
 				
 				<!--검색-->
-				<form:form id="searchForm" commandName="domainParam" method="POST">
+				<form:form id="searchForm" commandName="domainParam" method="POST" onsubmit="return false;">
 					<div class="searchArea">
 						<div class="searchArea01">
 							<form:hidden path="currentPage"/>
@@ -103,6 +108,7 @@ function checkDuplicateGroupName(){
 							<div class="searchBtn">
 								<img id="submitBtn" src="${pageContext.request.contextPath}/new/img/search.png" style="cursor:pointer;">
 							</div>
+							<button type="button" id="resetBtn" class="btnAll" onclick="resetGroup();">전체</button>
 						</div>
 					</div>
 				</form:form>
@@ -134,64 +140,12 @@ function checkDuplicateGroupName(){
 					<!-- <div class="buildDown">시행 협력사 정보</div> -->
 				</div>
 				
-				<ul class="listUl cross" >
-				
-					<c:forEach var="domain" items="${domainList}"  varStatus="status">
-					<c:choose>
-						<c:when test="${domain.newContent == 0}">
-							<li style="background-color: #fff9c7; padding: 15px 15px;" onclick="location.href='${pageContext.request.contextPath}/construction/list?groupIdx=${domain.idx}'">	
-						</c:when>
-						<c:otherwise>
-							<li style="padding: 15px 15px;" onclick="location.href='${pageContext.request.contextPath}/construction/list?groupIdx=${domain.idx}'">
-						</c:otherwise>
-					</c:choose>
-						
-						<p class="buildTxt">
-							${domain.groupName}
-							<c:choose>
-								<c:when test="${domain.newContent == 0}">
-									<font color="red">new</font>	
-								</c:when>
-							</c:choose>
-						</p>
-						<div class="CountArea01">
-							<div class="CountBox01">
-								<img src="${pageContext.request.contextPath}/new/img/buildIcon01.png" />
-								<div>
-									<p class="s1">협력사</p>
-									<p class="s2">${domain.cprtCompanyAmount} 개</p>
-								</div>
-							</div>
-							<div class="CountBox01">
-								<img src="${pageContext.request.contextPath}/new/img/buildIcon02.png" />
-								<div>
-									<p class="s1">본사 운영장비</p>
-									<p class="s2">${domain.deviceAmount} 대</p>
-								</div>
-							</div>
-							<div class="CountBox01">
-								<img src="${pageContext.request.contextPath}/new/img/buildIcon03.png" />
-								<div>
-									<p class="s1">가맹 운영장비</p>
-									<p class="s2">${domain.franchAmount} 대</p>
-								</div>
-							</div>
-							<div class="CountBox01">
-								<img src="${pageContext.request.contextPath}/new/img/buildIcon04.png" />
-								<div>
-									<p class="s1">예비용 장비</p>
-									<p class="s2">${domain.spareDeviceAmount} 대</p>
-								</div>
-							</div>
-						</div>
-					</li>
-					</c:forEach>
-				</ul>
+				<ul id="groupList" class="listUl cross"></ul>
 			</div>
 			<!--//검색된 리스트 10개씩 노출-->
 
-			<!--페이징-->			
-			<%@ include file="/WEB-INF/views/common/pagination.jsp" %>
+			<!--페이징(클라이언트 사이드)-->
+			<div id="groupPagination" class="pagingArea"></div>
 			<!--//페이징-->
 		</div>
 		<!--//컨텐츠-->
@@ -219,6 +173,193 @@ function checkDuplicateGroupName(){
 		
 		
 		
+<!-- 시공사 목록: 클라이언트 사이드 페이징 (POST 재제출 방지) -->
+<style>
+.groupSpinner{
+	display:inline-block;width:18px;height:18px;vertical-align:middle;margin-right:6px;
+	border:3px solid #e0e0e0;border-top-color:#077b9c;border-radius:50%;
+	animation:groupSpin 0.8s linear infinite;
+}
+@keyframes groupSpin{ to{ transform:rotate(360deg); } }
+
+/* 검색영역 '전체' 버튼 (검색 아이콘 버튼과 높이/모서리 통일) */
+.btnAll{
+	height:50px;
+	padding:0 22px;
+	margin-left:10px;
+	border:none;
+	border-radius:7px;
+	background:#fff;
+	color:#077b9c;
+	font-size:16px;
+	font-weight:600;
+	white-space:nowrap;
+	cursor:pointer;
+	flex-shrink:0;
+	transition:background 0.15s;
+}
+.btnAll:hover{ background:#eaf6f9; }
+@media (max-width:1023px){
+	.btnAll{ height:35px; padding:0 12px; margin-left:6px; font-size:13px; }
+}
+
+/* 시공사 카드 집계 라벨: 글자 단위 줄바꿈 방지 */
+.builder .listArea .listUl li .CountBox01 .s1,
+.builder .listArea .listUl li .CountBox01 .s2 { white-space:nowrap; }
+
+/* 좁은 데스크탑 폭(사이드바로 콘텐츠가 좁아지는 구간)에서는 카드를 1열로 전환 */
+@media (min-width:1024px) and (max-width:1500px){
+	.builder .listArea .listUl li{
+		width:100%;
+		float:none;
+		margin-right:0;
+		padding:15px 25px;
+	}
+	/* 검색영역 축소 방지는 전역 style.css로 이관 (.searchArea01:not(.type01)) */
+}
+</style>
+<script>
+(function(){
+	var ctx = '${pageContext.request.contextPath}';
+	var PAGE_SIZE = 10;
+	var BLOCK_SIZE = 10;
+	var allGroupData = [];
+	var currentPage = 1;
+
+	function escGroup(s){
+		return String(s == null ? '' : s)
+			.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+			.replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+	}
+
+	function getFilteredData(){
+		var keyword = $.trim($('#searchWord').val() || '').toLowerCase();
+		if(!keyword) return allGroupData;
+		return $.grep(allGroupData, function(g){
+			return String(g.groupName || '').toLowerCase().indexOf(keyword) !== -1;
+		});
+	}
+
+	function countBox(icon, label, value){
+		return '<div class="CountBox01">'
+			+ '<img src="' + ctx + '/new/img/' + icon + '" />'
+			+ '<div><p class="s1">' + label + '</p><p class="s2">' + value + '</p></div>'
+			+ '</div>';
+	}
+
+	function renderList(){
+		var filtered = getFilteredData();
+		var $list = $('#groupList');
+
+		if(!filtered || filtered.length === 0){
+			$list.html('<li style="padding:24px;text-align:center;color:#999;list-style:none;">'
+				+ (allGroupData.length === 0 ? '등록된 시공사가 없습니다.' : '검색 결과가 없습니다.') + '</li>');
+			renderPagination(0);
+			return;
+		}
+
+		var totalPages = Math.ceil(filtered.length / PAGE_SIZE) || 1;
+		if(currentPage > totalPages) currentPage = totalPages;
+		var startIdx = (currentPage - 1) * PAGE_SIZE;
+		var pageData = filtered.slice(startIdx, startIdx + PAGE_SIZE);
+
+		var html = '';
+		$.each(pageData, function(i, g){
+			var isNew = (g.newContent == 0);
+			var liStyle = isNew ? 'background-color:#fff9c7; padding:15px 15px;' : 'padding:15px 15px;';
+			html += '<li style="' + liStyle + '" onclick="location.href=\'' + ctx + '/construction/list?groupIdx=' + g.idx + '\'">'
+				+   '<p class="buildTxt">' + escGroup(g.groupName) + (isNew ? ' <font color="red">new</font>' : '') + '</p>'
+				+   '<div class="CountArea01">'
+				+     countBox('buildIcon01.png', '협력사', (g.cprtCompanyAmount || 0) + ' 개')
+				+     countBox('buildIcon02.png', '본사 운영장비', (g.deviceAmount || 0) + ' 대')
+				+     countBox('buildIcon03.png', '가맹 운영장비', (g.franchAmount || 0) + ' 대')
+				+     countBox('buildIcon04.png', '예비용 장비', (g.spareDeviceAmount || 0) + ' 대')
+				+   '</div>'
+				+ '</li>';
+		});
+		$list.html(html);
+		renderPagination(filtered.length);
+	}
+
+	function renderPagination(totalItems){
+		var totalPages = Math.ceil(totalItems / PAGE_SIZE);
+		var $wrap = $('#groupPagination');
+		if(totalPages <= 1){ $wrap.html(''); return; }
+
+		var currentBlock = Math.ceil(currentPage / BLOCK_SIZE);
+		var totalBlocks = Math.ceil(totalPages / BLOCK_SIZE);
+		var startPage = (currentBlock - 1) * BLOCK_SIZE + 1;
+		var endPage = Math.min(currentBlock * BLOCK_SIZE, totalPages);
+
+		var html = '';
+		if(currentBlock > 1){
+			html += '<a href="javascript:void(0)" class="prevBtn" onclick="groupGoPage(' + (startPage - 1) + ')">'
+				+ '<img class="prev" src="' + ctx + '/new/img/arrow-prev.png" />prev</a>';
+		}
+		for(var p = startPage; p <= endPage; p++){
+			if(p === currentPage){
+				html += '<a href="#" class="pageNm on" onclick="return false;">' + p + '</a>';
+			}else{
+				html += '<a href="javascript:void(0)" class="pageNm" onclick="groupGoPage(' + p + ')">' + p + '</a>';
+			}
+		}
+		if(currentBlock < totalBlocks){
+			html += '<a href="javascript:void(0)" class="nextBtn" onclick="groupGoPage(' + (endPage + 1) + ')">'
+				+ 'next<img class="next" src="' + ctx + '/new/img/arrow-next.png" /></a>';
+		}
+		$wrap.html(html);
+	}
+
+	// 인라인 onclick 및 상단 검색 핸들러에서 호출하므로 전역으로 노출
+	window.groupGoPage = function(p){
+		if(p < 1 || p === currentPage) return;
+		currentPage = p;
+		try { sessionStorage.setItem('groupCurrentPage', p); } catch(e){}
+		renderList();
+	};
+
+	window.searchGroup = function(){
+		currentPage = 1;
+		try {
+			sessionStorage.setItem('groupCurrentPage', 1);
+			sessionStorage.setItem('groupSearchWord', $('#searchWord').val() || '');
+		} catch(e){}
+		renderList();
+	};
+
+	// 전체: 검색어를 지우고 전체 목록을 1페이지부터 표시
+	window.resetGroup = function(){
+		$('#searchWord').val('');
+		currentPage = 1;
+		try {
+			sessionStorage.setItem('groupCurrentPage', 1);
+			sessionStorage.removeItem('groupSearchWord');
+		} catch(e){}
+		renderList();
+	};
+
+	window.loadGroupList = function(){
+		// 전체 집계 조회에 시간이 걸리므로 로딩 표시 (CSS 스피너)
+		$('#groupList').html('<li style="padding:40px;text-align:center;color:#999;list-style:none;">'
+			+ '<span class="groupSpinner"></span> 목록을 불러오는 중입니다...</li>');
+		$('#groupPagination').html('');
+		$.getJSON(ctx + '/group/ajax/list', function(data){
+			allGroupData = data || [];
+			// 뒤로가기 등으로 재진입 시 이전 검색어/페이지 복원
+			var savedWord = null, savedPage = null;
+			try {
+				savedWord = sessionStorage.getItem('groupSearchWord');
+				savedPage = sessionStorage.getItem('groupCurrentPage');
+			} catch(e){}
+			if(savedWord !== null) $('#searchWord').val(savedWord);
+			currentPage = savedPage ? parseInt(savedPage, 10) : 1;
+			if(!currentPage || currentPage < 1) currentPage = 1;
+			renderList();
+		});
+	};
+})();
+</script>
+
 <!-- 팝업 -->
 <script>
 $('.popUp').hide();

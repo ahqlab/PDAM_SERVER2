@@ -41,6 +41,15 @@ public class GroupController extends AbstractGroupCRUDController<GroupMapper, Gr
 	public List<Group> getList(HttpSession session) {
 		return mapper.getList();
 	}
+
+	// 클라이언트 사이드 페이징용: 집계 필드 포함 전체 시공사 목록을 JSON으로 반환
+	@ResponseBody
+	@RequestMapping(value = "/ajax/list", method = RequestMethod.GET)
+	public List<Group> ajaxList(HttpSession session) {
+		GroupParam param = new GroupParam();
+		param.setRole((int) session.getAttribute("role"));
+		return mapper.getListByParam(0, Integer.MAX_VALUE, param);
+	}
 	
 	@Override
 	protected String getRedirectUrl(HttpServletRequest request, HttpSession session) {

@@ -531,6 +531,9 @@ function setGroupName(){
 						</form:select>
 						<form:input path="searchWord" class="searchin"  placeholder="검색어를 입력하세요."/>
 						<form:hidden path="currentPage"/>
+						<%-- 현재 시공사(groupIdx)/가맹점(fcIdx) 컨텍스트를 검색·필터·페이징 제출 시에도 유지 (값 0이면 전체 조회로 취급됨) --%>
+						<form:hidden path="groupIdx"/>
+						<form:hidden path="fcIdx"/>
 						<div class="searchBtn">
 							<img id="submitBtn" src="${pageContext.request.contextPath}/new/img/search.png" style="cursor:pointer;" onclick="javascript:submitFun();">
 						</div>
@@ -1773,6 +1776,18 @@ function goBackToMemoList() {
     openMemoListModal(constructionIdx, userId); // 메모 리스트 팝업창 다시 열기
 }
 
+//createDate(등록 시각) 문자열에서 HH:mm 추출
+function extractMemoTime(dt) {
+    if (!dt) return '';
+    var s = String(dt).replace('T', ' ');
+    var parts = s.split(' ');
+    if (parts.length < 2) return '';
+    var hm = parts[1].split('.')[0].split(':');
+    if (hm.length < 2) return '';
+    var hh = hm[0], mm = hm[1], ss = hm.length > 2 ? hm[2] : '00';
+    return hh + ':' + mm + ':' + ss;
+}
+
 //리스트 AJAX 로딩
 function loadMemoList(constructionIdx) {
     jQuery.ajax({
@@ -1816,7 +1831,8 @@ function loadMemoList(constructionIdx) {
             if(data.length > 0) {
                 $.each(data, function(index, item) {
                     var safeContent = item.content.replace(/\n/g, '\\n').replace(/'/g, "\\'").replace(/"/g, "&quot;");
-                    
+                    var memoTime = extractMemoTime(item.createDate);
+
                     var checkboxHtml = "";
                     var editBtn = "";
                     
@@ -1830,7 +1846,9 @@ function loadMemoList(constructionIdx) {
                             '<div style="display:flex; justify-content:space-between; align-items:center;">' +
                                 '<div style="display:flex; align-items:center;">' +
                                     checkboxHtml + 
-                                    '<strong style="color:#077b9c; font-size:15px;">' + item.memoDate + '</strong>' + 
+                                    '<strong style="color:#077b9c; font-size:15px;">' + item.memoDate +
+                                        (memoTime ? ' ' + memoTime : '') +
+                                    '</strong>' +
                                 '</div>' +
                                 '<span class="action-btns" style="font-size:12px; font-weight:bold;">' + editBtn + '</span>' +
                             '</div>' +
