@@ -105,6 +105,33 @@
 	    }
 	}
 	
+	.popUp05 {
+	    display: none;
+	    position: fixed !important;
+	    top: 50%;
+	    left: 50%;
+	    transform: translate(-50%, -50%);
+	    width: 90%;
+	    max-width: 500px;
+	    z-index: 9999;
+	    background: #fff;
+	    flex-direction: column;
+	    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+	}
+	@media screen and (max-width: 767px) {
+    .popUp05 {
+        width: 95%; 
+        max-height: 90vh;
+        overflow-y: auto;
+        border-radius: 8px; 
+    }
+    
+    .popUp05 #popDate_newDate {
+        font-size: 16px !important; 
+        height: 48px !important;
+    }
+}
+	
 </style>
 
 <script>
@@ -1777,6 +1804,74 @@
 	        }
 	    });
 	}
+	
+	function openDateUpdatePopup(td) {
+		var $tr = $(td).closest('tr');
+		var id = $tr.find('#id').val();
+		if (!id) return;
+
+		var rownum = $tr.find('td').eq(1).text().trim(); 
+		var currentDate = $(td).text().trim();
+
+		$('#popDate_reportId').val(id);
+		$('#popDate_rownum').text(rownum);
+		$('#popDate_currentDate').text(currentDate);
+		$('#popDate_newDate').val(currentDate);
+
+		$('.popUp05').css('display', 'flex');
+		$('.popLayer').show();
+		$('body').css('overflow', 'hidden');
+		
+		setTimeout(function() { $('#popDate_newDate').focus(); }, 100);
+	}
+
+	function closeDateUpdatePopup() {
+		$('.popUp05').hide();
+		$('.popLayer').hide();
+		$('body').css('overflow', 'auto');
+	}
+
+	function submitDateUpdate() {
+		var id = $('#popDate_reportId').val();
+		var newDate = $('#popDate_newDate').val().trim();
+
+		if (!newDate) {
+			$('#popDate_newDate').focus();
+			return;
+		}
+
+		if (!confirm("시공일을 '" + newDate + "'(으)로 수정하시겠습니까?")) {
+			return;
+		}
+
+		var dateOnly = newDate.split(" ")[0];
+		
+		var reports = [{
+			id: Number(id),
+			createDate: newDate,
+			currentDateTime: dateOnly
+		}];
+
+		jQuery.ajax({
+			type : "POST",
+			url : "${pageContext.request.contextPath}/report/update/date", 
+			data : JSON.stringify(reports[0]),
+			dataType : "JSON",
+			contentType : "application/json",
+			success : function(data) {
+				if(data == true){
+					alert('시공일이 성공적으로 수정되었습니다.');
+					closeDateUpdatePopup();
+					pageReload();
+				} else {
+					alert('수정에 실패했습니다.');
+				}
+			},
+			error : function(xhr, status, error) {
+				alert('서버 통신 중 오류가 발생했습니다.');
+			}
+		});
+	}
 
 </script>
 <!--컨텐츠-->
@@ -2259,7 +2354,9 @@
 						                <td>${domain.rownum}</td>
 						        	</c:otherwise>
 							</c:choose>
-							<td  style="width: 100px;">
+							<!-- <td  style="width: 100px;"> -->
+							<td style="width: 100px;<c:if test="${sessionInfo.role == 0}"> cursor: pointer;</c:if>"
+								<c:if test="${sessionInfo.role == 0}">ondblclick="javascript:openDateUpdatePopup(this);"</c:if>>
 								<c:choose>
 									<c:when test="${sessionInfo.role == 0}">
 											<c:set var = "dateTime" value = "${domain.createDate}"/>
@@ -3554,6 +3651,34 @@
 	        <!-- <div onclick="javascript:submitReport('copy');" style="margin-top:20px; background:#077b9c; color:#fff; text-align:center; padding:15px; cursor:pointer; font-weight:bold;">수정 데이터 저장 및 복사</div> -->
 	        <div id="saveBtn" onclick="javascript:submitReport('copy');" style="margin-top:20px; background:#077b9c; color:#fff; text-align:center; padding:15px; cursor:pointer; font-weight:bold;">저장</div>
 	    </div>
+	</div>
+	
+	<div class="popUp popUp05">
+		<div class="popTit">
+			<p>시공일 수정</p>
+			<img class="popClose" src="${pageContext.request.contextPath}/new/img/popclose.png" onclick="closeDateUpdatePopup();" style="cursor:pointer;" />
+		</div>
+	
+		<div class="popCont" >
+			<table class="signTable" >
+				<colgroup>
+					<col width="40%">
+					<col width="60%">
+				</colgroup>
+				<tr>
+					<th class="viewTh">현재 시공일</th>
+					<td id="popDate_currentDate" style="text-align: center;"></td>
+				</tr>
+				<tr>
+					<th class="viewTh">변경할 시공일</th>
+					<td style="padding: 7px !important;">
+						<input type="hidden" id="popDate_reportId" value="" />
+						<input type="text" id="popDate_newDate" class="tdInput" style="border: 1px solid #ccc !important; border-radius: 4px; width:100% !important; height: 50px; font-weight: bold; font-size:16px; text-align: center; background: #fff; box-sizing: border-box; outline-color: #00adef;" />
+					</td>
+				</tr>
+			</table>
+			<div onclick="javascript:submitDateUpdate();" style="margin-top: 30px; background: #077b9c; color: #fff; text-align: center; padding: 12px; cursor: pointer; font-weight: bold;">수정</div>
+		</div>
 	</div>
 	
 	<div id="drivingRecordOverlay" style="display:none;"></div>
