@@ -1946,7 +1946,14 @@
 							</c:when>
 						</c:choose>
 						<!-- <td rowspan="2">순번</td> -->
-						<td rowspan="2" ondblclick="openNewReportPopup();" style="cursor: pointer;">순번</td>
+						<c:choose>
+							<c:when test="${sessionInfo.role == 0}">
+								<td rowspan="2" ondblclick="openNewReportPopup();" style="cursor: pointer; ">순번</td>	
+							</c:when>
+							<c:otherwise>
+								<td rowspan="2">순번</td>
+							</c:otherwise>
+						</c:choose>
 						<td rowspan="2" style="width: 100px;">시공일</td>
 						<td rowspan="2">파일종류</td>
 						<td rowspan="2">시공공법</td>
