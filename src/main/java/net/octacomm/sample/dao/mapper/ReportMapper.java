@@ -275,4 +275,5 @@ public interface ReportMapper extends CRUDMapper<Report, ReportParam, Integer> {
 	void insertPiece(Piece piece);
 	void insertPenetration(Penetration pntr);
     int updateDateOnly(UpdateReport report);
+    int updateChangeDevice(Report report);
 }

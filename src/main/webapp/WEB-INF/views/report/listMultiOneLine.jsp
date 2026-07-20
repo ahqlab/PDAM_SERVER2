@@ -119,18 +119,56 @@
 	    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 	}
 	@media screen and (max-width: 767px) {
-    .popUp05 {
-        width: 95%; 
-        max-height: 90vh;
-        overflow-y: auto;
-        border-radius: 8px; 
-    }
-    
-    .popUp05 #popDate_newDate {
-        font-size: 16px !important; 
-        height: 48px !important;
-    }
-}
+		.popUp05 {
+			width: 95%; 
+			max-height: 90vh;
+			overflow-y: auto;
+			border-radius: 8px; 
+		}
+		.popUp05 #popDate_newDate {
+			font-size: 16px !important; 
+			height: 48px !important;
+		}
+	}
+	.popUp06 {
+		display: none;
+		position: fixed !important;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		width: 95%;
+		max-width: 950px;
+		z-index: 9999;
+		background: #fff;
+		flex-direction: column;
+		box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+		border-radius: 8px;
+	}
+	.popUp06 .table-scroll-area {
+		max-height: 55vh;
+		overflow-y: auto;
+		margin-top: 10px;
+		border: 1px solid #ccc;
+	}
+	.popUp06 .row-date-input, .popUp06 .row-device-select {
+		border: 1px solid #ccc !important;
+		border-radius: 4px;
+		width: 100% !important;
+		height: 38px;
+		font-weight: bold;
+		font-size: 14px;
+		text-align: center;
+		background: #fff;
+		box-sizing: border-box;
+	}
+	.popUp06 .signTable th, .popUp06 .signTable td {
+		text-align: center !important;
+		vertical-align: middle !important;
+	}
+	@media screen and (max-width: 767px) {
+		.popUp06 { width: 95%; max-height: 90vh; }
+		.popUp06 .row-date-input, .popUp06 .row-device-select { font-size: 13px; height: 34px; }
+	}
 	
 </style>
 
@@ -1586,6 +1624,26 @@
 	    downloadDrivingOneRecoredBook(hitOption);
 	}
 	
+	function openCopyReportPopup() {
+		var $checkedBox = $('input[name="selectOne"]:checked');
+		if ($checkedBox.length !== 1) {
+			alert('복사할 기록지를 1개만 체크해주세요.');
+			return;
+		}
+		copyAndInsertReport($checkedBox[0]);
+	}
+
+	function openDateEditPopupBtn() {
+		var $checkedBox = $('input[name="selectOne"]:checked');
+		if ($checkedBox.length !== 1) {
+			alert('시공일을 수정할 기록지를 1개만 체크해주세요.');
+			return;
+		}
+		var $tr = $checkedBox.closest('tr');
+		var tdElement = $tr.find('input#id').closest('td')[0];
+		openDateUpdatePopup(tdElement);
+	}
+	
 	function openNewReportPopup() {
 	    $('.copy-input').val(""); 
 	    $('#copy_rownum').val("신규");
@@ -1718,91 +1776,103 @@
 	            name = '중단';
 	        }
 
-	        pieces.push({ 
-	            name: name, 
-	            value: validInputs[i], 
-	            id: 0, 
-	            reportIdx: 0 
-	        });
-	    }
-	    var createDateVal = $('#copy_createDate').val();
-	    var currentDateTimeVal = createDateVal ? createDateVal.substring(0, 10) : null;
-	    
-	    var penetrationss = [];
-	    var measIds = ['copy_meas1', 'copy_meas2', 'copy_meas3', 'copy_meas4', 'copy_meas5', 
-	                   'copy_meas6', 'copy_meas7', 'copy_meas8', 'copy_meas9', 'copy_meas10'];
-	    
-	    for (var j = 0; j < measIds.length; j++) {
-	        var val = $('#' + measIds[j]).val();
-	        if (${isBig} == 0 && j >= 5) break; 
-	        if (val) {
-	            penetrationss.push({
-	                name: (j + 1) + "회",
-	                value: val,
-	                id: 0,
-	                reportIdx: 0
-	            });
-	        }
-	    }
+			pieces.push({ 
+				name: name, 
+				value: validInputs[i], 
+				id: 0, 
+				reportIdx: 0 
+			});
+		}
+		var createDateVal = ($('#copy_createDate').val() || "").trim();
+		var dateRegex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]) (0\d|1\d|2[0-3]):([0-5]\d):([0-5]\d)$/;
 
-	    var data = {
-	        deviceIdx: Number($('input[name="deviceIdx"]').first().val() || 0), 
-	        currentDateTime: currentDateTimeVal,
-	        createDate: createDateVal,
-	        pileType: $('#copy_pileType').val() || "null",
-	        method: $('#copy_method').val() || "null",
-	        location: $('#copy_location').val() || "null",
-	        pileNo: $('#copy_pileNo').val() || "null",
-	        pileStandard: $('#copy_pileStandard').val() || "null",
-	        piece: pieces,
-	        penetrations: penetrationss,
-	        drillingDepth: $('#copy_drillingDepth').val() || "0",
-	        intrusionDepth: $('#copy_intrusionDepth').val() || "0",
-	        balance: $('#copy_balance').val() || "0",
-	        gongSac: $('#copy_gongSac').val() || "0",
-	        hammaT: $('#copy_hammaT').val() || "0",
-	        fallMeter: $('#copy_fallMeter').val() || "0",
-	        managedStandard: $('#copy_managedStandard').val() || "0",
-	        avgPenetrationValue: $('#copy_avgPenetrationValue').val() || "0",
-	        totalPenetrationValue: $('#copy_totalPenetrationValue').val() || "0",
-	        ultimateBearingCapacity: $('#copy_ultimateBearingCapacity').val() || "0",
-	        hammaEfficiency: $('#copy_hammaEfficiency').val() || "0",
-	        modulusElasticity: $('#copy_modulusElasticity').val() || "0",
-	        crossSection: $('#copy_crossSection').val() || "0",
-	        sprCol1: $('#copy_sprCol1').val() || "null", 
-	        bigo: $('#copy_bigo').val() || "null"        
-	    };
+		if (!dateRegex.test(createDateVal)) {
+			alert('시공일은 "YYYY-MM-DD HH:mm:ss" 형식으로 입력해야 합니다.\n(예: 2026-07-15 14:30:00)');
+			$('#copy_createDate').focus();
+			return;
+		}
+		var currentDateTimeVal = createDateVal ? createDateVal.substring(0, 10) : null;
+		
+		var penetrationss = [];
+		var measIds = ['copy_meas1', 'copy_meas2', 'copy_meas3', 'copy_meas4', 'copy_meas5', 
+					   'copy_meas6', 'copy_meas7', 'copy_meas8', 'copy_meas9', 'copy_meas10'];
+		
+		for (var j = 0; j < measIds.length; j++) {
+			var val = $('#' + measIds[j]).val();
+			if ('${isBig}' === '0' && j >= 5) break; 
+			if (val) {
+				penetrationss.push({
+					name: (j + 1) + "회",
+					value: val,
+					id: 0,
+					reportIdx: 0
+				});
+			}
+		}
 
-	    var url = (mode === 'new') ? "${pageContext.request.contextPath}/report/insertNew" : "${pageContext.request.contextPath}/report/insertCopied";
-	    var confirmMsg = (mode === 'new') ? "현재 입력된 내용으로 새로운 기록을 추가하시겠습니까?" : "현재 입력된 내용으로 복사하여 기록을 추가하시겠습니까?";
-	    var successMsg = (mode === 'new') ? "성공적으로 새 데이터가 추가되었습니다." : "성공적으로 복사되어 새 데이터가 추가되었습니다.";
+		var data = {
+			deviceIdx: Number($('input[name="deviceIdx"]').first().val() || 0), 
+			currentDateTime: currentDateTimeVal,
+			createDate: createDateVal,
+			pileType: $('#copy_pileType').val() || "null",
+			method: $('#copy_method').val() || "null",
+			location: $('#copy_location').val() || "null",
+			pileNo: $('#copy_pileNo').val() || "null",
+			pileStandard: $('#copy_pileStandard').val() || "null",
+			piece: pieces,
+			penetrations: penetrationss,
+			drillingDepth: $('#copy_drillingDepth').val() || "0",
+			intrusionDepth: $('#copy_intrusionDepth').val() || "0",
+			balance: $('#copy_balance').val() || "0",
+			gongSac: $('#copy_gongSac').val() || "0",
+			hammaT: $('#copy_hammaT').val() || "0",
+			fallMeter: $('#copy_fallMeter').val() || "0",
+			managedStandard: $('#copy_managedStandard').val() || "0",
+			avgPenetrationValue: $('#copy_avgPenetrationValue').val() || "0",
+			totalPenetrationValue: $('#copy_totalPenetrationValue').val() || "0",
+			ultimateBearingCapacity: $('#copy_ultimateBearingCapacity').val() || "0",
+			hammaEfficiency: $('#copy_hammaEfficiency').val() || "0",
+			modulusElasticity: $('#copy_modulusElasticity').val() || "0",
+			crossSection: $('#copy_crossSection').val() || "0",
+			sprCol1: $('#copy_sprCol1').val() || "null", 
+			bigo: $('#copy_bigo').val() || "null"        
+		};
 
-	    console.log("전송 데이터:", data);
-	    if (!confirm(confirmMsg)) {
-	        return;
-	    }
+		var url = (mode === 'new') ? "${pageContext.request.contextPath}/report/insertNew" : "${pageContext.request.contextPath}/report/insertCopied";
+		var confirmMsg = (mode === 'new') ? "현재 입력된 내용으로 새로운 기록을 추가하시겠습니까?" : "현재 입력된 내용으로 기록지를 추가하시겠습니까?";
+		var successMsg = (mode === 'new') ? "새 기록지가 추가되었습니다." : "새 기록지가 추가되었습니다.";
 
-	    jQuery.ajax({
-	        type: "POST",
-	        url: url, 
-	        data: JSON.stringify(data), 
-	        dataType: "JSON", 
-	        contentType: "application/json",
-	        success: function(result) {
-	            if (result) {
-	                alert(successMsg);
-	                $('.popUp04').hide();
-	                $('.popLayer').hide();
-	                location.reload(); 
-	            } else {
-	                alert("데이터 추가 중 서버 오류가 발생했습니다.");
-	            }
-	        },
-	        error: function(xhr, status, error) {
-	            alert("서버와 통신 중 문제가 발생했습니다.");
-	            console.log(error); 
-	        }
-	    });
+		console.log("전송 데이터:", data);
+		if (!confirm(confirmMsg)) {
+			return;
+		}
+
+		var $btn = $('#saveBtn');
+		$btn.prop('disabled', true).css({'pointer-events': 'none', 'opacity': '0.5'});
+
+		jQuery.ajax({
+			type: "POST",
+			url: url, 
+			data: JSON.stringify(data), 
+			dataType: "JSON", 
+			contentType: "application/json",
+			success: function(result) {
+				if (result) {
+					alert(successMsg);
+					$('.popUp04').hide();
+					$('.popLayer').hide();
+					location.reload(); 
+				} else {
+					alert("데이터 추가 중 서버 오류가 발생했습니다.");
+					$btn.prop('disabled', false).css({'pointer-events': '', 'opacity': ''});
+				}
+			},
+			error: function(xhr, status, error) {
+				alert("서버와 통신 중 문제가 발생했습니다.");
+				console.log(error); 
+				$btn.prop('disabled', false).css({'pointer-events': '', 'opacity': ''});
+			}
+		});
 	}
 	
 	function openDateUpdatePopup(td) {
@@ -1811,7 +1881,7 @@
 		if (!id) return;
 
 		var rownum = $tr.find('td').eq(1).text().trim(); 
-		var currentDate = $(td).text().trim();
+		var currentDate = $(td).text().trim().replace(/\s+/g, ' ');
 
 		$('#popDate_reportId').val(id);
 		$('#popDate_rownum').text(rownum);
@@ -1852,6 +1922,9 @@
 			currentDateTime: dateOnly
 		}];
 
+		var $btn = $('.popUp05 [onclick*="submitDateUpdate"]');
+		$btn.prop('disabled', true).css({'pointer-events': 'none', 'opacity': '0.5'});
+
 		jQuery.ajax({
 			type : "POST",
 			url : "${pageContext.request.contextPath}/report/update/date", 
@@ -1865,13 +1938,177 @@
 					pageReload();
 				} else {
 					alert('수정에 실패했습니다.');
+					$btn.prop('disabled', false).css({'pointer-events': '', 'opacity': ''});
 				}
 			},
 			error : function(xhr, status, error) {
 				alert('서버 통신 중 오류가 발생했습니다.');
+				console.error(error);
+				$btn.prop('disabled', false).css({'pointer-events': '', 'opacity': ''});
 			}
 		});
 	}
+
+	function openDeviceChangePopup() {
+		var selectedRows = [];
+		var deleteCd = 1;
+
+		$('#reportTable tr').each(function() {
+			if ($(this).find('#isDel').val() == deleteCd) return;
+			if ($(this).find('#selectOne').is(':checked')) {
+				var id = $(this).find('#id').val();
+				var deviceIdx = $(this).find('#deviceIdx').val();
+				var rownum = $(this).find('td').eq(1).text().trim();
+				var dateStr = $(this).find('td').eq(2).text().trim().replace(/\s+/g, ' ');
+				
+				if (id) {
+					selectedRows.push({
+						id: id,
+						deviceIdx: deviceIdx,
+						rownum: rownum,
+						origDate: dateStr
+					});
+				}
+			}
+		});
+
+		if (selectedRows.length === 0) {
+			alert('수정 및 이전할 기록지를 체크박스로 선택해주세요.');
+			return;
+		}
+
+		loadConstructionDevicesAndRender(selectedRows);
+
+		$('.popUp06').css('display', 'flex');
+		$('.popLayer').show();
+		$('body').css('overflow', 'hidden');
+	}
+
+	function closeDeviceChangePopup() {
+		$('.popUp06').hide();
+		$('.popLayer').hide();
+		$('body').css('overflow', 'auto');
+	}
+
+	function loadConstructionDevicesAndRender(selectedRows) {
+		var conIdx = '${param.constructionIdx}' !== '' ? '${param.constructionIdx}' : '${sessionInfo.constructionIdx}';
+		
+		$.ajax({
+			type: "POST",
+			url: "${pageContext.request.contextPath}/device/get/list",
+			data: { constructionIdx: conIdx },
+			dataType: "JSON",
+			success: function(data) {
+				globalDeviceList = data || [];
+				var bulkHtml = '<option value="">-- 호기 일괄 선택 --</option>';
+				$.each(globalDeviceList, function(i, dev) {
+					bulkHtml += '<option value="' + dev.id + '">' + dev.machineNumber + '</option>';
+				});
+				$('#popDevice_bulkDevice').html(bulkHtml);
+
+				var tbodyHtml = '';
+				$.each(selectedRows, function(index, row) {
+					var origDeviceName = '알 수 없음';
+					var selectOptions = '<option value="">-- 호기 선택 --</option>';
+					
+					$.each(globalDeviceList, function(i, dev) {
+						var isSelected = (Number(dev.id) === Number(row.deviceIdx)) ? 'selected' : '';
+						if (isSelected) origDeviceName = dev.machineNumber;
+						selectOptions += '<option value="' + dev.id + '" ' + isSelected + '>' + dev.machineNumber + '</option>';
+					});
+
+					tbodyHtml += '<tr class="edit-row" data-id="' + row.id + '">';
+					tbodyHtml += '  <td style="text-align:center; vertical-align:middle; font-size:15px; color:#333; line-height:1.5; padding:8px;"><b>[' + origDeviceName + ']</b><br>' + row.origDate + '</td>';
+					tbodyHtml += '  <td style="text-align:center; vertical-align:middle; padding:6px;"><select class="row-device-select row-dev-val" style="width:95% !important;">' + selectOptions + '</select></td>';
+					tbodyHtml += '  <td style="text-align:center; vertical-align:middle; padding:6px;"><input type="text" class="row-date-input row-date-val" value="' + row.origDate + '" placeholder="YYYY-MM-DD HH:mm:ss" style="width:95% !important;" /></td>';
+					tbodyHtml += '</tr>';
+				});
+
+				$('#popDevice_tbody').html(tbodyHtml);
+			},
+			error: function() {
+				alert("호기 목록을 불러오는 중 오류가 발생했습니다.");
+			}
+		});
+	}
+
+	function applyBulkDevice(val) {
+		if (!val) return;
+		$('#popDevice_tbody .row-dev-val').val(val);
+	}
+
+	function submitDeviceChange() {
+		var reports = [];
+		var hasError = false;
+		var dateRegex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]) (0\d|1\d|2[0-3]):([0-5]\d):([0-5]\d)$/;
+
+		$('#popDevice_tbody .edit-row').each(function() {
+			var id = $(this).attr('data-id');
+			var newDeviceIdx = $(this).find('.row-dev-val').val();
+			var newDate = $(this).find('.row-date-val').val().trim();
+
+			if (!newDeviceIdx) {
+				alert('호기가 선택되지 않은 항목이 있습니다.');
+				$(this).find('.row-dev-val').focus();
+				hasError = true;
+				return false;
+			}
+			if (!newDate) {
+				alert('시공일이 입력되지 않은 항목이 있습니다.');
+				$(this).find('.row-date-val').focus();
+				hasError = true;
+				return false;
+			}
+			if (!dateRegex.test(newDate)) {
+				alert('시공일은 "YYYY-MM-DD HH:mm:ss" 형식으로 입력해야 합니다.\n(예: 2026-07-15 14:30:00)');
+				$(this).find('.row-date-val').focus();
+				hasError = true;
+				return false;
+			}
+
+			var dateOnly = newDate.split(" ")[0];
+
+			reports.push({
+				id: Number(id),
+				deviceIdx: Number(newDeviceIdx),
+				createDate: newDate,
+				currentDateTime: dateOnly
+			});
+		});
+
+		if (hasError) return;
+
+		if (!confirm("총 " + reports.length + "건의 기록지를 입력된 호기 및 시공일로 수정하시겠습니까?")) {
+			return;
+		}
+
+		var $btn = $('.popUp06 #saveBtn');
+		$btn.prop('disabled', true).css({'pointer-events': 'none', 'opacity': '0.5'});
+
+		$.ajax({
+			type: "POST",
+			url: "${pageContext.request.contextPath}/report/update/changeDeviceMulti",
+			data: JSON.stringify(reports),
+			dataType: "JSON",
+			contentType: "application/json",
+			success: function(res) {
+				if (res === true) {
+					alert('선택한 기록지들이 성공적으로 수정 및 이전되었습니다.');
+					closeDeviceChangePopup();
+					pageReload();
+				} else {
+					alert('기록지 수정 처리에 실패했습니다.');
+					$btn.prop('disabled', false).css({'pointer-events': '', 'opacity': ''});
+				}
+			},
+			error: function(xhr, status, error) {
+				alert('서버 통신 중 오류가 발생했습니다.');
+				console.error(error);
+				$btn.prop('disabled', false).css({'pointer-events': '', 'opacity': ''});
+			}
+		});
+	}
+	
 
 </script>
 <!--컨텐츠-->
@@ -1944,6 +2181,14 @@
 					</td>
 					<td class="s_td">&nbsp;호기별 중복(시공위치, 파일번호)</td>
 					<td class="t_td" rowspan="4" >
+						<c:if test="${sessionScope.isSystemAdmin}">
+							<div class="tableCArea" style="display: flex; flex-wrap: wrap; gap: 5px; justify-content: flex-end; margin-bottom: 10px;">
+								<div class="btnType02 bg02" onclick="javascript:openDeviceChangePopup();" style="width: 120px; background: #F08080; color:#fff; border: 1px solid #F08080; margin: 0;">호기 이전</div>
+								<div class="btnType02 bg02" onclick="javascript:openCopyReportPopup();" style="width: 90px; background: #4CAF50; color:#fff; border: 1px solid #4CAF50; margin: 0;">기록지 복사</div>
+								<div class="btnType02 bg02" onclick="javascript:openNewReportPopup();" style="width: 90px; background: #2196F3; color:#fff; border: 1px solid #2196F3; margin: 0;">기록지 추가</div>
+								<div class="btnType02 bg02" onclick="javascript:openDateEditPopupBtn();" style="width: 90px; background: #9C27B0; color:#fff; border: 1px solid #9C27B0; margin: 0;">시공일 수정</div>
+							</div>
+						</c:if> 
 						<div class="tableCArea">
 							<c:choose>												 
 								<c:when test="${sessionInfo.role == 0 || sessionInfo.hiddenManager == true || sessionInfo.role == 3}">
@@ -2000,6 +2245,14 @@
 				</tr>
 				<tr>
 					<td colspan="2">
+						<c:if test="${sessionScope.isSystemAdmin}">
+							<div class="tableCArea" style="display: flex; flex-wrap: wrap; gap: 5px; justify-content: flex-end; margin-bottom: 8px; width: 100%;">
+								<div class="btnType02 bg02" onclick="javascript:openDeviceChangePopup();" style="width: 120px; background: #F08080; color:#fff; border: 1px solid #F08080; margin: 0;">호기 이전</div>
+								<div class="btnType02 bg02" onclick="javascript:openCopyReportPopup();" style="width: 90px; background: #4CAF50; color:#fff; border: 1px solid #4CAF50; margin: 0;">기록지 복사</div>
+								<div class="btnType02 bg02" onclick="javascript:openNewReportPopup();" style="width: 90px; background: #2196F3; color:#fff; border: 1px solid #2196F3; margin: 0;">기록지 추가</div>
+								<div class="btnType02 bg02" onclick="javascript:openDateEditPopupBtn();" style="width: 90px; background: #9C27B0; color:#fff; border: 1px solid #9C27B0; margin: 0;">시공일 수정</div>
+							</div>
+						</c:if>
 						<div class="tableCArea" style="margin-bottom: 0px;">
 							<c:choose>												 
 								<c:when test="${sessionInfo.role == 0 || sessionInfo.hiddenManager == true || sessionInfo.role == 3}">
@@ -2042,7 +2295,7 @@
 						</c:choose>
 						<!-- <td rowspan="2">순번</td> -->
 						<c:choose>
-							<c:when test="${sessionInfo.role == 0}">
+							<c:when test="${sessionScope.isSystemAdmin}">
 								<td rowspan="2" ondblclick="openNewReportPopup();" style="cursor: pointer; ">순번</td>	
 							</c:when>
 							<c:otherwise>
@@ -2343,7 +2596,7 @@
 							</c:choose>
 							<%-- <td>${domain.rownum}</td> --%>
 						    <c:choose>
-						    	<c:when test="${sessionInfo.role == 0}">
+						    	<c:when test="${sessionScope.isSystemAdmin}">
 						        	<td ondblclick="javascript:copyAndInsertReport(this);"
 						            	style="cursor: pointer; color: #000; font-weight: bold;">
 						                ${domain.rownum}
@@ -2356,7 +2609,7 @@
 							</c:choose>
 							<!-- <td  style="width: 100px;"> -->
 							<td style="width: 100px;<c:if test="${sessionInfo.role == 0}"> cursor: pointer;</c:if>"
-								<c:if test="${sessionInfo.role == 0}">ondblclick="javascript:openDateUpdatePopup(this);"</c:if>>
+								<c:if test="${sessionScope.isSystemAdmin}">ondblclick="javascript:openDateUpdatePopup(this);"</c:if>>
 								<c:choose>
 									<c:when test="${sessionInfo.role == 0}">
 											<c:set var = "dateTime" value = "${domain.createDate}"/>
@@ -3678,6 +3931,40 @@
 				</tr>
 			</table>
 			<div onclick="javascript:submitDateUpdate();" style="margin-top: 30px; background: #077b9c; color: #fff; text-align: center; padding: 12px; cursor: pointer; font-weight: bold;">수정</div>
+		</div>
+	</div>
+	
+	<div class="popUp popUp06">
+		<div class="popTit">
+			<p>기록지 호기 수정/이전</p>
+			<img class="popClose" src="${pageContext.request.contextPath}/new/img/popclose.png" onclick="closeDeviceChangePopup();" style="cursor:pointer;" />
+		</div>
+		<div class="popCont">
+			<div style="background: #f8f9fa; padding: 10px 15px; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+				<div style="display: flex; gap: 6px; margin-left: auto;">
+					<select id="popDevice_bulkDevice" class="row-device-select" style="width: 150px !important; height: 32px;" onchange="applyBulkDevice(this.value);">
+						<option value="">-- 호기 일괄 선택 --</option>
+					</select>
+				</div>
+			</div>
+			<div class="table-scroll-area">
+				<table class="signTable" style="margin: 0; width: 100% !important;">
+					<colgroup>
+						<col width="35%">
+						<col width="25%">
+						<col width="40%">
+					</colgroup>
+					<thead>
+						<tr class="viewTh" style="position: sticky; top: 0; z-index: 10;">
+							<th>기존 호기 / 시공일</th>
+							<th>해당 현장 호기 목록</th>
+							<th>년-월-일 시간</th>
+						</tr>
+					</thead>
+					<tbody id="popDevice_tbody"></tbody>
+				</table>
+			</div>
+			<div onclick="javascript:submitDeviceChange();" style="margin-top: 20px; background:#077b9c; color:#fff; text-align: center; padding: 14px; cursor: pointer; font-weight: bold; font-size: 16px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">개별 이전 및 수정 저장</div>
 		</div>
 	</div>
 	
