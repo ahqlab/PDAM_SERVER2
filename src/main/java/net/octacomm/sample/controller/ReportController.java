@@ -1291,4 +1291,18 @@ public class ReportController{
 	        return false;
 	    }
 	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/update/date", method = RequestMethod.POST)
+	public boolean updateReportDate(@RequestBody UpdateReport report, HttpSession session) {
+	    Integer role = (Integer) session.getAttribute("role");
+	    if (role == null || role != 0) return false;
+
+	    try {
+	        return mapper.updateDateOnly(report) > 0;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return false;
+	    }
+	}
 }

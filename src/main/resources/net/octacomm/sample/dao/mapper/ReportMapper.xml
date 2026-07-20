@@ -4108,4 +4108,10 @@
         VALUES (#{reportIdx}, #{value})
     </insert>
     
+    <update id="updateDateOnly" parameterType="net.octacomm.sample.domain.UpdateReport">
+	    UPDATE TB_REPORT 
+	    SET createDate = #{createDate},
+	        currentDateTime = #{currentDateTime}
+	    WHERE id = #{id}
+	</update>
 </mapper>
