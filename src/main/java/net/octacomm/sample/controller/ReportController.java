@@ -1308,7 +1308,10 @@ public class ReportController{
 	
 	@ResponseBody
 	@RequestMapping(value = "/update/changeDeviceMulti", method = RequestMethod.POST)
-	public boolean changeDeviceMulti(@RequestBody List<Report> reportList) {
+	public boolean changeDeviceMulti(@RequestBody List<Report> reportList, HttpSession session) {
+		Integer role = (Integer) session.getAttribute("role");
+		if (role == null || role != 0) return false;
+
 		int successCount = 0;
 		for (Report report : reportList) {
 			successCount += mapper.updateChangeDevice(report);
