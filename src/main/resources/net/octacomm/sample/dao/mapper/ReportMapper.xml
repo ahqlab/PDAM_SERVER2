@@ -4114,4 +4114,13 @@
 	        currentDateTime = #{currentDateTime}
 	    WHERE id = #{id}
 	</update>
+	
+	<update id="updateChangeDevice" parameterType="net.octacomm.sample.domain.Report">
+		UPDATE TB_REPORT
+		SET 
+			deviceIdx = #{deviceIdx},
+			createDate = #{createDate},
+			currentDateTime = #{currentDateTime}
+		WHERE id = #{id}
+	</update>
 </mapper>

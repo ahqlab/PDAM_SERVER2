@@ -3,6 +3,12 @@
 <div style="text-align: right; margin: 10px;">
 	 <%-- <font color="blue">${sessionInfo.userName}</font> 계정으로 로그인하셨습니다. --%>
 	 <c:choose>
+	 	
+	 	<%-- 시스템관리자 --%>
+	    <c:when test="${sessionScope.isSystemAdmin}">
+	        <font color="blue">시스템관리자</font> 계정으로 로그인하셨습니다.
+	    </c:when>	
+	 	
         <%-- role == 0 : 슈퍼관리자 --%>
         <c:when test="${sessionInfo.role eq 0}">
             <font color="blue">슈퍼관리자</font> 계정으로 로그인하셨습니다.

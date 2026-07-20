@@ -1305,4 +1305,14 @@ public class ReportController{
 	        return false;
 	    }
 	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/update/changeDeviceMulti", method = RequestMethod.POST)
+	public boolean changeDeviceMulti(@RequestBody List<Report> reportList) {
+		int successCount = 0;
+		for (Report report : reportList) {
+			successCount += mapper.updateChangeDevice(report);
+		}
+		return successCount == reportList.size();
+	}
 }
