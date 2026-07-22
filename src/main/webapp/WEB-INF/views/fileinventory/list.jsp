@@ -9,6 +9,16 @@
 	.searchArea02{ margin-top:10px !important; display:flex !important; align-items:center; width:100% !important; gap:8px; }
 	.searchArea02 .inputDate{ flex:1 1 0 !important; min-width:0; width:auto !important; }
 }
+.popInput02 {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    width: 100%;
+}
+
+.popInput02 .inputArea02 {
+    flex: 1 1 auto;
+    min-width: 130px;
+}
 </style>
 <script type="text/javascript">
 $( document ).ready( function() {
@@ -553,6 +563,15 @@ function checkValidation(){
 							<form:hidden path="fiIdx" value=""/>
 						</div>
 						<div class="inputArea02 mr-2">
+							<p class="inputTxt02">종류</p>
+							<form:select path="pileType" class="Input02" onchange="javascript:onPileTypeChange(this.value);">
+								<form:option value="PHC">PHC</form:option>
+								<form:option value="STEEL">STEEL</form:option>
+								<form:option value="UHC">UHC</form:option>
+								<form:option value="UPHC">UPHC</form:option>
+							</form:select>
+						</div>
+						<div class="inputArea02 mr-2">
 							<p class="inputTxt02">규격</p>
 							<form:select path="pileStandard" class="Input02" id="phcPileStandardSelect">
 								<form:option value="400">400</form:option>
@@ -608,12 +627,12 @@ function checkValidation(){
 										<tr>
 											<th style="padding: 10px 0px 10px 0px;">
 											종류
-											<form:select path="pileType" class="thInput" onchange="javascript:onPileTypeChange(this.value);">
+											<%-- <form:select path="pileType" class="thInput" onchange="javascript:onPileTypeChange(this.value);">
 												<form:option value="PHC">PHC</form:option>
 												<form:option value="STEEL">STEEL</form:option>
 												<form:option value="UHC">UHC</form:option>
 												<form:option value="UPHC">UPHC</form:option>
-											</form:select>
+											</form:select> --%>
 											</th>
 											<th>5m</th>
 											<th>6m</th>
