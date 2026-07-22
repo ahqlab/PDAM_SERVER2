@@ -100,4 +100,5 @@ public class SimpleReport implements Domain {
 		this.balance = balance;
 	}
 	
+	private int trashCount;
 }

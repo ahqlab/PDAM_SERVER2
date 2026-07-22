@@ -147,7 +147,12 @@
 								</c:if>
 								<c:if test="${showTrash}">
 									<td style="width: ${colWidth};">
-										<a href="${pageContext.request.contextPath}/trashbin/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${conIdx}" class="tableCheck">휴지통</a>
+										<a href="${pageContext.request.contextPath}/trashbin/list?id=${param.id}&date=${domain.currentDateTime}&constructionIdx=${conIdx}" class="tableCheck">
+											휴지통
+											<c:if test="${domain.trashCount > 0}">
+							                	<span class="trash-badge">${domain.trashCount}</span>
+							            	</c:if>
+							            </a>
 									</td>
 								</c:if>
 							</tr>
@@ -192,6 +197,21 @@
 </div>
 <!--//컨텐츠-->
 
+<!-- 스타일 -->
+<style>
+.trash-badge { 
+    background-color: #f00; 
+    color: #fff; 
+    border-radius: 10px;
+    padding: 4px 8px; 
+    font-size: 12px; 
+    font-weight: bold;
+    margin-left: 5px; 
+    display: inline-block;
+    line-height: 1;
+}
+</style>
+<!--//스타일 -->
 
 <!-- 팝업 -->
 <script>
