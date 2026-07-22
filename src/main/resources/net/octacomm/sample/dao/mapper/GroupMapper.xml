@@ -83,4 +83,11 @@
 			LIMIT #{pageSize} OFFSET #{startRow}
     </select>
     
+    <update id="updateGroupName" parameterType="Group">
+		UPDATE TB_GROUP
+		   SET groupName = #{groupName},
+		       lastModifiedDate = NOW()
+		 WHERE idx = #{idx}
+	</update>
+    
 </mapper>

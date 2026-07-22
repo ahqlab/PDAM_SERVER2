@@ -22,7 +22,7 @@ public interface GroupMapper extends CRUDMapper<Group, GroupParam, Integer>{
 	
 	public String TABLE_NAME = " TB_GROUP ";
 	
-	public String UPDATE_VALUES = " groupName = #{groupName} , isDel = #{isDel} lastModifiedDate = now() ";
+	public String UPDATE_VALUES = " groupName = #{groupName} , isDel = #{isDel}, lastModifiedDate = now() ";
 	
 	public String SELECT_FIELDS = " idx, groupName,  isDel,  createDate, lastModifiedDate ";
 	
@@ -58,8 +58,10 @@ public interface GroupMapper extends CRUDMapper<Group, GroupParam, Integer>{
 	@Select("SELECT * FROM TB_GROUP WHERE userId = #{userId}")
 	Group selectByUserId(@Param("userId") String userId);
 
-	@Update("UPDATE TB_GROUP SET groupName = '자이C&A' WHERE idx = 26")
-	int updateGroupName();
+	/*
+	 * @Update("UPDATE TB_GROUP SET groupName = '자이C&A' WHERE idx = 26") int
+	 * updateGroupName();
+	 */
 	
 	@Select("SELECT count(*) FROM TB_GROUP A WHERE A.groupName = #{groupName} AND A.isDel = 0")
 	int getCountByGroupName(String groupName);
@@ -77,5 +79,6 @@ public interface GroupMapper extends CRUDMapper<Group, GroupParam, Integer>{
 			"    AND TSD.TYPE = 0 AND TSD.STATUS = 0 ")
 	int getTotalSpareDeviceCount();
 	
-
+	int updateGroupName(Group group);
+	
 }
