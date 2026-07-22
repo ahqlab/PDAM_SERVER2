@@ -2871,8 +2871,8 @@
 									<c:choose>
 										<c:when test="${isBig > 0}">
 											<c:choose>
-												<c:when test="${domain.peOne >= domain.managedStandard}">
-													<td style="background-color: red;">
+												<c:when test="${domain.peOne + 0 >= domain.managedStandard + 0}">
+													<td style="background-color: red; color: white;">
 												</c:when>
 												<c:otherwise>
 													<td>
@@ -2883,8 +2883,8 @@
 												<input type="hidden" id="penetrationsId[${status.index}]" name="penetrationsId[${status.index}]" value="${domain.peidOne}">
 											</td>
 											<c:choose>
-												<c:when test="${domain.peTwo >= domain.managedStandard}">
-													<td style="background-color: red;">
+												<c:when test="${domain.peTwo + 0 >= domain.managedStandard + 0}">
+													<td style="background-color: red; color: white;">
 												</c:when>
 												<c:otherwise>
 													<td>
@@ -2896,8 +2896,8 @@
 												
 											</td>
 											<c:choose>
-												<c:when test="${domain.peThree >= domain.managedStandard}">
-													<td style="background-color: red;">
+												<c:when test="${domain.peThree + 0 >= domain.managedStandard + 0}">
+													<td style="background-color: red; color: white;">
 												</c:when>
 												<c:otherwise>
 													<td>
@@ -2909,8 +2909,8 @@
 												
 											</td>
 											<c:choose>
-												<c:when test="${domain.peFour >= domain.managedStandard}">
-													<td style="background-color: red;">
+												<c:when test="${domain.peFour + 0 >= domain.managedStandard + 0}">
+													<td style="background-color: red; color: white;">
 												</c:when>
 												<c:otherwise>
 													<td>
@@ -2922,8 +2922,8 @@
 												
 											</td>
 											<c:choose>
-												<c:when test="${domain.peFive >= domain.managedStandard}">
-													<td style="background-color: red;">
+												<c:when test="${domain.peFive + 0 >= domain.managedStandard + 0}">
+													<td style="background-color: red; color: white;">
 												</c:when>
 												<c:otherwise>
 													<td>
@@ -2935,8 +2935,8 @@
 												
 											</td>
 											<c:choose>
-												<c:when test="${domain.peSix >= domain.managedStandard}">
-													<td style="background-color: red;">
+												<c:when test="${domain.peSix + 0 >= domain.managedStandard + 0}">
+													<td style="background-color: red; color: white;">
 												</c:when>
 												<c:otherwise>
 													<td>
@@ -2948,8 +2948,8 @@
 												
 											</td>
 											<c:choose>
-												<c:when test="${domain.peSeven >= domain.managedStandard}">
-													<td style="background-color: red;">
+												<c:when test="${domain.peSeven + 0 >= domain.managedStandard + 0}">
+													<td style="background-color: red; color: white;">
 												</c:when>
 												<c:otherwise>
 													<td>
@@ -2961,8 +2961,8 @@
 												
 											</td>
 											<c:choose>
-												<c:when test="${domain.peEight >= domain.managedStandard}">
-													<td style="background-color: red;">
+												<c:when test="${domain.peEight + 0 >= domain.managedStandard + 0}">
+													<td style="background-color: red; color: white;">
 												</c:when>
 												<c:otherwise>
 													<td>
@@ -2973,8 +2973,8 @@
 												<input type="hidden" id="penetrationsId[${status.index}]" name="penetrationsId[${status.index}]" value="${domain.peidEight}">
 											</td>
 											<c:choose>
-												<c:when test="${domain.peNine >= domain.managedStandard}">
-													<td style="background-color: red;">
+												<c:when test="${domain.peNine + 0 >= domain.managedStandard + 0}">
+													<td style="background-color: red; color: white;">
 												</c:when>
 												<c:otherwise>
 													<td>
@@ -2986,10 +2986,10 @@
 												
 											</td>
 											<c:choose>
-												<c:when test="${domain.peTen >= domain.managedStandard}">
-													<td style="background-color: red;">
+												<c:when test="${domain.peTen + 0 >= domain.managedStandard + 0}">
+													<td style="background-color: red; color: white;">
 												</c:when>
-												<c:otherwise>
+												<c:otherwise> 
 													<td>
 												</c:otherwise>
 											</c:choose>
@@ -3000,8 +3000,8 @@
 										</c:when>
 										<c:otherwise>
 											<c:choose>
-												<c:when test="${domain.peOne >= domain.managedStandard}">
-													<td style="background-color: red;">
+												<c:when test="${domain.peOne + 0 >= domain.managedStandard + 0}">
+													<td style="background-color: red; color: white;">
 												</c:when>
 												<c:otherwise>
 													<td>
@@ -3012,8 +3012,8 @@
 												<input type="hidden" id="penetrationsId[${status.index}]" name="penetrationsId[${status.index}]" value="${domain.peidOne}">
 											</td>
 											<c:choose>
-												<c:when test="${domain.peTwo >= domain.managedStandard}">
-													<td style="background-color: red;">
+												<c:when test="${domain.peTwo + 0 >= domain.managedStandard + 0}">
+													<td style="background-color: red; color: white;">
 												</c:when>
 												<c:otherwise>
 													<td>
@@ -3024,8 +3024,8 @@
 												<input type="hidden" id="penetrationsId[${status.index}]" name="penetrationsId[${status.index}]" value="${domain.peidTwo}">
 											</td>
 											<c:choose>
-												<c:when test="${domain.peThree >= domain.managedStandard}">
-													<td style="background-color: red;">
+												<c:when test="${domain.peThree + 0 >= domain.managedStandard + 0}">
+													<td style="background-color: red; color: white;">
 												</c:when>
 												<c:otherwise>
 													<td>
@@ -3036,8 +3036,8 @@
 												<input type="hidden" id="penetrationsId[${status.index}]" name="penetrationsId[${status.index}]" value="${domain.peidThree}">
 											</td>
 											<c:choose>
-												<c:when test="${domain.peFour >= domain.managedStandard}">
-													<td style="background-color: red;">
+												<c:when test="${domain.peFour + 0 >= domain.managedStandard + 0}">
+													<td style="background-color: red; color: white;">
 												</c:when>
 												<c:otherwise>
 													<td>
@@ -3048,8 +3048,8 @@
 												<input type="hidden" id="penetrationsId[${status.index}]" name="penetrationsId[${status.index}]" value="${domain.peidFour}">
 											</td>
 											<c:choose>
-												<c:when test="${domain.peFive >= domain.managedStandard}">
-													<td style="background-color: red;">
+												<c:when test="${domain.peFive + 0 >= domain.managedStandard + 0}">
+													<td style="background-color: red; color: white;">
 												</c:when>
 												<c:otherwise>
 													<td>
