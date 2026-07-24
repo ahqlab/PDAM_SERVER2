@@ -76,7 +76,7 @@ public class ContractPdfService {
 		sb.append("table{width:100%;border-collapse:collapse;margin-bottom:4px;table-layout:fixed;}");
 		sb.append("th{border:1px solid #ccc;padding:5px 7px;background:#f5f5f5;width:15%;font-size:11.5px;line-height:1.3;text-align:center;}");
 		sb.append("td{border:1px solid #ccc;padding:5px 7px;font-size:11.5px;width:35%;line-height:1.3;}");
-		sb.append(".hdr{background:#f0f0f0;font-weight:bold;width:50%;}");
+		sb.append(".hdr{background:#f0f0f0;font-weight:bold;width:50%;font-size:13.5px;text-align:center;}");
 		sb.append(".clause{font-size:11px;margin-bottom:3px;line-height:1.4;}.chk{font-size:9px;color:#28a745;font-weight:bold;white-space:nowrap;}");
 		sb.append(".note{font-size:11px;color:#333;line-height:1.5;margin-top:12px;border-top:1px solid #ccc;padding-top:9px;}");
 		sb.append(".note p{margin:1px 0;}");
@@ -91,7 +91,7 @@ public class ContractPdfService {
 		sb.append("<tr><th>계약유형</th><td>").append(typeStr).append("</td><th>상태</th><td>서명완료</td></tr>");
 		sb.append("<tr><th>현장명</th><td>").append(esc(contract.getSiteName())).append("</td><th>회사명</th><td>").append(esc(contract.getCompanyName())).append("</td></tr>");
 		sb.append("<tr><th>모델명</th><td>").append(esc(contract.getModelName())).append("</td><th>공급기간</th><td>").append(esc(contract.getSupplyDeadline())).append("</td></tr>");
-		sb.append("<tr><th>사용료</th><td colspan='3'>").append(esc(contract.getDailyFee())).append("</td></tr>");
+		sb.append("<tr><th>").append(typeStr).append("</th><td colspan='3'>").append(esc(contract.getDailyFee())).append("</td></tr>");
 		sb.append("</table>");
 
 		boolean isMonthly = !"DAILY".equals(contract.getContractType());
@@ -112,7 +112,7 @@ public class ContractPdfService {
 			sb.append("<p>※ PDAM 시스템 SET 추가 시, 계약서 및 계약 조건은 위 내용과 동일합니다.</p>");
 		}
 		sb.append("<p style='margin-top:4px;'>※ 협조 및 유의 사항</p>");
-		sb.append("<p style='padding-left:10px;'>약정된 결제 기간(30일) 이내에 대금이 납부되지 않을 경우, 현장 기기 사용은 가능하나 서버 접속 및 데이터 연동이 제한될 수 있습니다.</p>");
+		sb.append("<p style='padding-left:10px;'>약정된 결제 기간(30일) 이내에 사용료가 납부되지 않을 경우, 현장 기기 사용은 가능하나 서버 접속 및 데이터 연동이 제한될 수 있습니다.</p>");
 		sb.append("<p style='padding-left:10px;'>원활한 서비스 이용을 위해 기한 내 납부를 부탁드립니다.</p>");
 		sb.append("</div>");
 

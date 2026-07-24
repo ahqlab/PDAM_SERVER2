@@ -123,6 +123,14 @@ public interface ConstructionMapper extends CRUDMapper<Construction, Constructio
 	@Update("UPDATE " + TABLE_NAME + " SET secretCode = #{secretCode} WHERE id = #{id}")
 	int updateSecretCodeById(@Param("id") int id, @Param("secretCode") String secretCode);
 
+	// 보유 장비(TB_DEVICE) 중 가장 늦은 endDate 기준 2개월이 지난 시행중(conduct=0) 현장을 자동 종료(conduct=1) 처리.
+	// 장비가 하나도 없는 현장은 서브쿼리가 NULL을 반환해 비교식이 거짓이 되므로 대상에서 자연히 제외된다.
+	@Update("UPDATE " + TABLE_NAME + " C SET C.conduct = 1 "
+			+ "WHERE C.conduct = 0 AND C.isDel = 0 "
+			+ "AND (SELECT MAX(D.endDate) FROM TB_DEVICE D WHERE D.constructionIdx = C.id AND D.isDel = 0) "
+			+ "< DATE_SUB(NOW(), INTERVAL 2 MONTH)")
+	int autoCloseExpiredConstructions();
+
 	int updateBasicInfo(Construction domain);
 
 }

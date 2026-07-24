@@ -2573,6 +2573,29 @@ function filterSubmit(){
 	$('#searchForm').submit();
 }
 
+// 검색폼(GET) 제출 시 값이 비어있는(또는 의미 없는 기본값인) 파라미터는 URL에서 빼서
+// currentPage 등 실제로 값이 있는 것만 남긴다.
+// (값이 있는 검색어/필터는 그대로 유지되어 페이지 이동해도 조건이 풀리지 않는다.)
+$('#searchForm').on('submit', function(e){
+	e.preventDefault();
+	var params = $(this).serializeArray();
+	var searchWordVal = '';
+	params.forEach(function(p){ if (p.name === 'searchWord') searchWordVal = p.value; });
+
+	var query = params
+		.filter(function(p){
+			if (p.value === null || p.value === '') return false;
+			// groupIdx/fcIdx == 0 은 "전체 조회"를 뜻하는 기본값이라 표시 안 함
+			if ((p.name === 'groupIdx' || p.name === 'fcIdx') && p.value === '0') return false;
+			// searchWord가 비어있으면 searchField(검색 대상 컬럼)도 의미가 없으므로 같이 뺌
+			if (p.name === 'searchField' && searchWordVal === '') return false;
+			return true;
+		})
+		.map(function(p){ return encodeURIComponent(p.name) + '=' + encodeURIComponent(p.value); })
+		.join('&');
+	location.href = '${pageContext.request.contextPath}/construction/list' + (query ? '?' + query : '');
+});
+
 function duplicateContactCheck(){
 	
 	if($('#userId').val() == ''){
