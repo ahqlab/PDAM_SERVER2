@@ -57,7 +57,16 @@
     	SELECT 
     		  MAX(B.machineNumber) AS machineNumber,
     		  A.currentDateTime,
-    		  COUNT(*) as todayConstruction
+    		  COUNT(*) as todayConstruction,
+    		  (
+            SELECT COUNT(*) 
+            FROM TB_REPORT SUB 
+            WHERE SUB.currentDateTime = A.currentDateTime 
+              AND SUB.isdel != 0
+            <if test="param.id gt 0">
+              AND SUB.deviceIdx = ${param.id}
+            </if>
+        ) AS trashCount
 		FROM TB_REPORT A, TB_DEVICE B, TB_CONSTRUCTION C
 		<include refid="condition"/>
 		group by A.currentDateTime

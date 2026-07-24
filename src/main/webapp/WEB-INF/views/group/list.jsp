@@ -151,7 +151,7 @@ function checkDuplicateGroupName(){
 		<!--//컨텐츠-->
 		
 		<!--시공사 등록 팝업-->
-		<div class="popUp">
+		<%-- <div class="popUp">
 			<div class="popTit">
 				<p>시공사 등록</p>
 				<img class="popClose" src="${pageContext.request.contextPath}/new/img/popclose.png" />
@@ -165,8 +165,47 @@ function checkDuplicateGroupName(){
 				<div class="popAdd" onclick="javascript:regGroup();">등록</div>
 				</form>
 			</div>
+		</div> --%>
+		<div class="popUp popUp01">
+			<div class="popTit">
+				<p>시공사 등록</p>
+				<img class="popClose" src="${pageContext.request.contextPath}/new/img/popclose.png" style="cursor:pointer;" />
+			</div>
+			<div class="popCont">
+				<form id="regForm" name="regForm">
+				<div class="inputArea02 mb-20">
+					<p class="inputTxt02">시공사명</p>
+					<input type="text" class="Input02" id="groupName" name="groupName" value="" placeholder="시공사명을 입력하세요.">
+				</div>
+				<div class="popAdd" onclick="javascript:regGroup();">등록</div>
+				</form>
+			</div>
 		</div>
-
+		
+		<div class="popUp popUp02">
+			<div class="popTit">
+				<p>시공사명 변경</p>
+				<img class="popClose editPopClose" src="${pageContext.request.contextPath}/new/img/popclose.png" style="cursor:pointer;" />
+			</div>
+			<div class="popCont">
+				<form id="editForm" name="editForm" onsubmit="return false;">
+				<input type="hidden" id="editGroupIdx" value="" />
+				
+				<div class="inputArea02 mb-10">
+					<p class="inputTxt02">기존 시공사명</p>
+					<input type="text" class="Input02" id="oldGroupName" value="" disabled readonly style="background-color:#f5f5f5; color:#666; border-color:#ddd; cursor:not-allowed;">
+				</div>
+				
+				<div class="inputArea02 mb-20">
+					<p class="inputTxt02">변경할 시공사명</p>
+					<input type="text" class="Input02" id="editGroupName" value="" placeholder="새롭게 변경할 시공사명을 입력하세요.">
+				</div>
+				
+				<div class="popAdd" onclick="javascript:updateGroup();">변경 저장</div>
+				</form>
+			</div>
+		</div>
+		
 		<div class="popLayer"></div>
 		<!--//시공사 등록 팝업-->
 		
@@ -267,8 +306,16 @@ function checkDuplicateGroupName(){
 		$.each(pageData, function(i, g){
 			var isNew = (g.newContent == 0);
 			var liStyle = isNew ? 'background-color:#fff9c7; padding:15px 15px;' : 'padding:15px 15px;';
+			var editBtnHtml = '';
+			
+			if ('${sessionScope.isSystemAdmin}' === 'true') {
+				editBtnHtml = '<button type="button" class="btnEditGroup" style="padding:4px 10px; background:#077b9c; color:#fff; font-weight:bold; border:none; border-radius:4px; cursor:pointer;" onclick="event.stopPropagation(); window.openEditGroup(' + g.idx + ');">시공사명 변경</button>';
+			}
 			html += '<li style="' + liStyle + '" onclick="location.href=\'' + ctx + '/construction/list?groupIdx=' + g.idx + '\'">'
-				+   '<p class="buildTxt">' + escGroup(g.groupName) + (isNew ? ' <font color="red">new</font>' : '') + '</p>'
+			+   '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">'
+			+       '<p class="buildTxt" style="margin:0;">' + escGroup(g.groupName) + (isNew ? ' <font color="red">new</font>' : '') + '</p>'
+			+       editBtnHtml
+			+   '</div>'
 				+   '<div class="CountArea01">'
 				+     countBox('buildIcon01.png', '협력사', (g.cprtCompanyAmount || 0) + ' 개')
 				+     countBox('buildIcon02.png', '본사 운영장비', (g.deviceAmount || 0) + ' 대')
@@ -357,6 +404,87 @@ function checkDuplicateGroupName(){
 			renderList();
 		});
 	};
+	
+	window.openEditGroup = function(idx){
+		var target = null;
+		$.each(allGroupData, function(i, g){
+			if(g.idx === idx){
+				target = g;
+				return false;
+			}
+		});
+		if(!target) return;
+
+		$('#editGroupIdx').val(target.idx);
+		$('#oldGroupName').val(target.groupName);
+		$('#editGroupName').val('');
+		
+		$('.popUp02').show();
+		$('.popLayer').show();
+		$('body').css('overflow', 'hidden');
+		
+		setTimeout(function(){ $('#editGroupName').focus(); }, 100);
+	};
+
+	window.updateGroup = function(){
+		var idx = $('#editGroupIdx').val();
+		var oldName = $('#oldGroupName').val();
+		var newName = $.trim($('#editGroupName').val());
+		
+		if(newName === ''){
+			alert('새로운 시공사명을 입력하세요.');
+			$('#editGroupName').focus();
+			return;
+		}
+		
+		if(oldName === newName){
+			alert('기존 시공사명과 동일한 이름입니다. 다른 이름을 입력해주세요.');
+			$('#editGroupName').focus();
+			return;
+		}
+		
+		var isDuplicate = 0;
+		$.ajax({
+			type : "POST",
+			url : ctx + "/group/duplicate/check",
+			async : false,
+			data: { groupName : newName },
+			success : function(data) { isDuplicate = data; }
+		});
+		
+		if(isDuplicate > 0){
+			alert('이미 등록된 같은 이름의 시공사가 존재합니다.');
+			return;
+		}
+
+		var myObject = new Object();
+		myObject.idx = new Number(idx);
+		myObject.groupName = newName;
+		
+		$.ajax({
+			type : "POST",
+			url : ctx + "/group/updateAjax",
+			contentType : "application/json",
+			data: JSON.stringify(myObject),
+			success : function(data) {	
+				if(data == 1 || data === "success"){
+					alert('시공사명이 변경되었습니다.');
+					$('.popUp02').hide();
+					$('.popLayer').hide();
+					$('body').css('overflow', 'auto');
+					loadGroupList();
+				} else {
+					alert('시공사명 변경에 실패했습니다.');
+				}
+			},
+			error : function(xhr, status, error) {
+				alert('서버 통신 중 오류가 발생했습니다.');
+				$('.popUp02').hide();
+				$('.popLayer').hide();
+				$('body').css('overflow', 'auto');
+			}
+		});
+	};
 })();
 </script>
 
@@ -366,13 +494,18 @@ $('.popUp').hide();
 $('.popLayer').hide();
 
 $('.popBtn').on('click', function(e){
-	$('.popUp').show();
+	$('.popUp01').show();
 	$('.popLayer').show();
 	$('body').css('overflow', 'hidden');
 });
 
 $('.popClose').on('click', function(e){
-	$('.popUp').hide();
+	$('.popUp01').hide();
+	$('.popLayer').hide();
+	$('body').css('overflow', 'auto');
+});
+$('.editPopClose').on('click', function(e){
+	$('.popUp02').hide();
 	$('.popLayer').hide();
 	$('body').css('overflow', 'auto');
 });

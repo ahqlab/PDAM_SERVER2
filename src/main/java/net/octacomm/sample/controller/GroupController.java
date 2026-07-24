@@ -64,11 +64,12 @@ public class GroupController extends AbstractGroupCRUDController<GroupMapper, Gr
 	    model.addAttribute("spareDeviceCount",  mapper.getTotalSpareDeviceCount() > 0 ? "" + "총 " + mapper.getTotalSpareDeviceCount() + "대" : "총 0 대");
 	}
 	
-	@ResponseBody
-	@RequestMapping(value = "/test", method = RequestMethod.GET)
-	public int test(HttpSession session) {
-		return mapper.updateGroupName();
-	}
+	/*
+	 * @ResponseBody
+	 * 
+	 * @RequestMapping(value = "/test", method = RequestMethod.GET) public int
+	 * test(HttpSession session) { return mapper.updateGroupName(); }
+	 */
 	
 	
 	@ResponseBody
@@ -102,4 +103,16 @@ public class GroupController extends AbstractGroupCRUDController<GroupMapper, Gr
 		return domain.getGroupName();
 	}
 	
+	@ResponseBody
+	@RequestMapping(value = "/updateAjax", method = RequestMethod.POST)
+	public int updateAjax(@RequestBody Group group, HttpSession session) {
+		Integer role = (Integer) session.getAttribute("role");
+		if (role == null || role != 0) {
+			return 0; 
+		}
+		if (group.getGroupName() == null || group.getGroupName().trim().isEmpty() || group.getIdx() <= 0) {
+			return 0;
+		}
+		return mapper.updateGroupName(group);
+	}
 }
