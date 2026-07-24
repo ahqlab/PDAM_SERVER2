@@ -13,10 +13,12 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @Configuration
 @ComponentScan(basePackages = "net.octacomm.sample.service")
 @EnableCaching
+@EnableScheduling
 @Import(MyBatisConfig.class)
 public class AppConfig {
 

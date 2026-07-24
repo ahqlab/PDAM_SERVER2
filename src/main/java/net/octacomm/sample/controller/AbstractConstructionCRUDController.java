@@ -101,7 +101,6 @@ public abstract class AbstractConstructionCRUDController<M extends CRUDMapper<D,
 	
 		if (mapper.insert(domain) == 1) {
 			sessionStatus.setComplete();
-			//return getRedirectUrl(request, session);
 			return "redirect:/construction/list?groupIdx=" + con.getGroupIdx();
 		} else {
 			return URL_REGIST;
@@ -117,11 +116,8 @@ public abstract class AbstractConstructionCRUDController<M extends CRUDMapper<D,
 
 	@RequestMapping(value = URL_UPDATE, method = RequestMethod.POST)
 	public String update(@ModelAttribute("domain") D domain, RedirectAttributes redirectAttributes, HttpServletRequest request, HttpSession session) {
-	
 		Construction con = (Construction) domain;
 		if (mapper.update(domain) == 1) {
-			//return getRedirectUrl(request, session);
-			
 			return "redirect:/construction/list?groupIdx=" + con.getGroupIdx();
 		} else {
 			return URL_UPDATE;

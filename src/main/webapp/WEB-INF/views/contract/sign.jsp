@@ -52,7 +52,7 @@
 				<th style="${TH}">공급기간</th><td style="${TD}"><c:choose><c:when test="${not empty contract.supplyDeadline}">${contract.supplyDeadline}</c:when><c:otherwise><jsp:useBean id="today" class="java.util.Date"/><fmt:formatDate value="${today}" pattern="yyyy-MM-dd"/> ~ 공사 종료시까지</c:otherwise></c:choose></td>
 			</tr>
 			<tr>
-				<th style="${TH}">사용료</th><td style="${TD}" colspan="3">${contract.dailyFee}</td>
+				<th style="${TH}"><c:choose><c:when test="${contract.contractType=='DAILY'}">일사용료</c:when><c:otherwise>월사용료</c:otherwise></c:choose></th><td style="${TD}" colspan="3">${contract.dailyFee}</td>
 			</tr>
 		</table>
 
@@ -104,7 +104,7 @@
 				</c:otherwise>
 			</c:choose>
 			<p style="margin-top:6px;">※ 협조 및 유의 사항</p>
-			<p style="padding-left:12px;">약정된 결제 기간(30일) 이내에 대금이 납부되지 않을 경우, 현장 기기 사용은 가능하나 서버 접속 및 데이터 연동이 제한될 수 있습니다.</p>
+			<p style="padding-left:12px;">약정된 결제 기간(30일) 이내에 사용료가 납부되지 않을 경우, 현장 기기 사용은 가능하나 서버 접속 및 데이터 연동이 제한될 수 있습니다.</p>
 			<p style="padding-left:12px;">원활한 서비스 이용을 위해 기한 내 납부를 부탁드립니다.</p>
 		</div>
 
@@ -319,7 +319,7 @@ function submitSig() {
 /* ── 당사자 카드 ── */
 .party-section { display: flex; gap: 16px; align-items: stretch; }
 .party-card { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-.party-card-hdr { background: #f0f0f0; font-weight: bold; font-size: 13px; padding: 6px 10px; border: 1px solid #ccc; border-bottom: none; }
+.party-card-hdr { background: #f0f0f0; font-weight: bold; font-size: 15px; text-align: center; padding: 6px 10px; border: 1px solid #ccc; border-bottom: none; }
 .party-card-tbl { width: 100%; border-collapse: collapse; flex: 1; height: 100%; }
 .party-card-tbl th { border: 1px solid #ccc; padding: 7px 10px; background: #f5f5f5; font-size: 12px; white-space: nowrap; width: 30%; vertical-align: middle; }
 .party-card-tbl td { border: 1px solid #ccc; padding: 7px 10px; font-size: 12px; word-break: break-all; vertical-align: middle; }

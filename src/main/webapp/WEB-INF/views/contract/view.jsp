@@ -46,7 +46,7 @@
 					<td>${not empty domain.supplyDeadline ? domain.supplyDeadline : '서명 시 자동 기재'}</td>
 				</tr>
 				<tr>
-					<th>사용료</th>
+					<th><c:choose><c:when test="${domain.contractType == 'DAILY'}">일사용료</c:when><c:otherwise>월사용료</c:otherwise></c:choose></th>
 					<td colspan="3">${domain.dailyFee}</td>
 				</tr>
 			</table>
