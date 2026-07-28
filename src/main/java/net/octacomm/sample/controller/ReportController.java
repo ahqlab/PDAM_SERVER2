@@ -1323,6 +1323,9 @@ public class ReportController{
 	@ResponseBody
 	@RequestMapping(value = "/insertMulti", method = RequestMethod.POST)
 	public boolean insertMulti(@RequestBody List<UpdateReport> reportList, HttpSession session) {
+	    Integer role = (Integer) session.getAttribute("role");
+	    if (role == null || role != 0) return false;
+
 	    try {
 	        for (UpdateReport newReport : reportList) {
 	            mapper.insertCopiedReport(newReport);
