@@ -429,7 +429,7 @@
 		var currentTotalPenetrationValue;
 		
 		
-		if(role == 0 || role == 3 ||hiddenManager == true){
+		if(role == 0 || role == 3 || hiddenManager == true){
 			
 			currentNo = $('#reportTable tr').eq(index).find('td:eq(1)').text().trim();
 			currentDate = $('#reportTable tr').eq(index).find('td:eq(2)').text().trim();
