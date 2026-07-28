@@ -1172,6 +1172,12 @@ function changeSpareDevice(targetId, changeId, constructionIdx){
 	
 	
 	<div class="min531">
+		<div class="backupHistoryArea">
+			<button type="button" class="backupHistoryBtn"
+				onclick="location.href='${pageContext.request.contextPath}/device/backup-history?constructionIdx=${param.constructionIdx}'">
+				백업 이력
+			</button>
+		</div>
 		<div class="tableArea">
 			<div class="viewTable viewTable01">
 				<div class="tableScroll">

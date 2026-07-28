@@ -5,7 +5,9 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpSession;
 
@@ -45,6 +47,7 @@ import net.octacomm.sample.domain.ReportOneLine;
 import net.octacomm.sample.domain.ReportParam;
 import net.octacomm.sample.domain.SessionInfo;
 import net.octacomm.sample.domain.UpdateReport;
+import net.octacomm.sample.service.DeviceBackupHistoryService;
 import net.octacomm.sample.utils.MathUtil;
 import net.octacomm.sample.utils.Pagination;
 import net.octacomm.sample.utils.ReportPagination;
@@ -83,6 +86,9 @@ public class ReportController{
 	
 	@Autowired
 	private ExtensivePileUsageMapper extensivePileUsageMapper;
+
+	@Autowired
+	private DeviceBackupHistoryService deviceBackupHistoryService;
 	
 	
 	@RequestMapping(value = "/list")
@@ -934,6 +940,7 @@ public class ReportController{
 	}
 	
 	@ResponseBody
+	@Transactional
 	@RequestMapping(value = "/update/report", method = RequestMethod.POST)
 	public boolean updateReport(@RequestBody UpdateReport report) {
 		
@@ -964,6 +971,8 @@ public class ReportController{
 		
 		
 		int constructionIdx = mapper.getConstructionIdx(report.getId());
+		deviceBackupHistoryService.createAutomaticBackup(
+				constructionIdx, report.getDeviceIdx());
 		
 		System.err.println("constructionIdx : " + constructionIdx);
 		
@@ -1024,15 +1033,26 @@ public class ReportController{
 	@ResponseBody
 	@RequestMapping(value = "/update/reportMulti", method = RequestMethod.POST)
 	public boolean updateReportMulti(@RequestBody List<UpdateReport> reports) {
-	    try {
-	        for (UpdateReport report : reports) {
-	           updateReportOne(report);
-	        }
-	        return true;
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        return false;
-	    }
+		if (reports == null || reports.isEmpty()) {
+			return false;
+		}
+
+		Set<Integer> backedUpDeviceIds = new HashSet<Integer>();
+		for (UpdateReport report : reports) {
+			if (backedUpDeviceIds.add(report.getDeviceIdx())) {
+				int constructionIdx = mapper.getConstructionIdx(report.getId());
+				deviceBackupHistoryService.createAutomaticBackup(
+						constructionIdx, report.getDeviceIdx());
+			}
+		}
+
+		for (UpdateReport report : reports) {
+			if (!updateReportOne(report)) {
+				throw new IllegalStateException(
+						"기록지 수정 중 오류가 발생했습니다.");
+			}
+		}
+		return true;
 	}
 	
 	
