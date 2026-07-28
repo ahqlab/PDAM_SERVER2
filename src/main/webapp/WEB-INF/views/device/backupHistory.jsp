@@ -78,7 +78,7 @@
 	table-layout: fixed;
 }
 .backup-history-table th {
-	height: 82px;
+	height: 58px;
 	background: #e8f7fb;
 	font-size: 16px;
 	font-weight: 700;
