@@ -94,6 +94,9 @@
        		<if test="param.conductDone == 1 and param.conductActive != 1">
        			and A.conduct = 1
        		</if>
+       		<if test="param.extensivePileUsage == 1">
+			    and exists (select 1 from TB_EXTENSIVE_PILE_USAGE where constructionIdx = A.id and isUsed = 1)
+			</if>
      		<if test="param.role == 1">
      			and A.id = #{param.constructionIdx}
      		</if>
