@@ -449,7 +449,7 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
     	  gongSacSum +=  (double) Math.abs(gongSacFixExp(((ReportOneLine)reportList.get(i)).getBalance(), ((ReportOneLine)reportList.get(i)).getGongSac(), param.getConstructionIdx()));
     	  
     	  
-    	  strings = new String[]{((ReportOneLine)reportList.get(i)).getId() + "",   
+    	  strings = new String[]{ String.valueOf(i + 1), 
     			    setDinamicDate(role, isHiddenManager, longCalYn, chanegeCurrentDate(((ReportOneLine)reportList.get(i)).getCurrentDateTime()), ((ReportOneLine)reportList.get(i)).getCreateDate()),
     			    ((ReportOneLine)reportList.get(i)).getMachineNumber(), 
     		        ((ReportOneLine)reportList.get(i)).getPileType(), 
@@ -500,7 +500,7 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
     	  //gongSacSum +=  (double) Math.abs(((ReportOneLine)reportList.get(i)).getGongSac());
     	  gongSacSum +=  (double) Math.abs(gongSacFixExp(((ReportOneLine)reportList.get(i)).getBalance(), ((ReportOneLine)reportList.get(i)).getGongSac(), param.getConstructionIdx()));
     	  
-    	  strings = new String[]{ ((ReportOneLine)reportList.get(i)).getId() + "",  
+    	  strings = new String[]{ String.valueOf(i + 1), 
 			setDinamicDate(role, isHiddenManager, longCalYn, chanegeCurrentDate(((ReportOneLine)reportList.get(i)).getCurrentDateTime()), ((ReportOneLine)reportList.get(i)).getCreateDate()),
     		((ReportOneLine)reportList.get(i)).getMachineNumber(), 
 	        ((ReportOneLine)reportList.get(i)).getPileType(), 

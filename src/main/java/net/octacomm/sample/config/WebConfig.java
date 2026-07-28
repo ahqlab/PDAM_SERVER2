@@ -188,19 +188,10 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 						.addPathPatterns(patterns)
 						.excludePathPatterns("/login")
 						.excludePathPatterns("/j_spring_security_check")
-						.excludePathPatterns("/mobile/device/login")
-						.excludePathPatterns("/mobile/device/all/list")
-						.excludePathPatterns("/mobile/ble/device/map")
+						.excludePathPatterns("/mobile/**")
 						.excludePathPatterns("/api/get/report/list")
 						.excludePathPatterns("/api/get/auth/check")
-						.excludePathPatterns("/mobile/regist/report")
-						.excludePathPatterns("/mobile/pilestandard/all/list")
-						.excludePathPatterns("/mobile/pileselectvalue/piletype/list")
-						.excludePathPatterns("/mobile/pileselectvalue/list")
-						.excludePathPatterns("/mobile/regist/report2")
-						.excludePathPatterns("/mobile/regist/report4")
-						.excludePathPatterns("/qr/**")
-						.excludePathPatterns("/mobile/regist/report5");
+						.excludePathPatterns("/qr/**");
 	}
 
 	@Override
