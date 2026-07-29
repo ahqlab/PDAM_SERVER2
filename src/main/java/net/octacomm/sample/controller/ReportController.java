@@ -202,38 +202,34 @@ public class ReportController{
 	public ReportExcelUploadAnalysis analyzeUploadedExcel(
 			@RequestParam("file") MultipartFile file,
 			@RequestParam("deviceId") int deviceId,
-			@RequestParam("constructionIdx") int constructionIdx) {
+			@RequestParam("constructionIdx") int constructionIdx,
+			@ModelAttribute("comparisonParam") ReportParam comparisonParam) {
 		return reportExcelUploadService.analyze(
-				file, deviceId, constructionIdx);
+				file, deviceId, constructionIdx, comparisonParam);
 	}
 
 	@ResponseBody
 	@RequestMapping(
-			value = "/upload/excel/backup",
+			value = "/upload/excel/apply",
 			method = RequestMethod.POST)
-	public Map<String, Object> backupBeforeUploadedExcelApply(
+	public ReportExcelUploadAnalysis applyUploadedExcel(
+			@RequestParam("file") MultipartFile file,
 			@RequestParam("deviceId") int deviceId,
-			@RequestParam("constructionIdx") int constructionIdx) {
-		Map<String, Object> result = new HashMap<String, Object>();
+			@RequestParam("constructionIdx") int constructionIdx,
+			@RequestParam("analysisToken") String analysisToken,
+			@ModelAttribute("comparisonParam") ReportParam comparisonParam) {
 		try {
-			Device device = deviceMapper.get(deviceId);
-			if (device == null
-					|| device.getConstructionIdx() != constructionIdx) {
-				throw new IllegalArgumentException(
-						"현재 현장에 속한 호기 정보를 찾을 수 없습니다.");
-			}
-
-			result.put("version",
-					deviceBackupHistoryService.createAutomaticBackup(
-							constructionIdx, deviceId).getVersion());
-			result.put("success", true);
+			return reportExcelUploadService.apply(file, deviceId,
+					constructionIdx, comparisonParam, analysisToken);
 		} catch (Exception e) {
-			result.put("success", false);
-			result.put("message", e.getMessage() == null
-					? "기록지 백업 중 오류가 발생했습니다."
+			ReportExcelUploadAnalysis result =
+					new ReportExcelUploadAnalysis();
+			result.setSuccess(false);
+			result.setMessage(e.getMessage() == null
+					? "기록지 백업 및 반영 중 오류가 발생했습니다."
 					: e.getMessage());
+			return result;
 		}
-		return result;
 	}
 
 	/**

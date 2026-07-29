@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.CacheNamespace;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -17,6 +18,7 @@ import net.octacomm.sample.domain.GReport;
 import net.octacomm.sample.domain.Penetration;
 import net.octacomm.sample.domain.Piece;
 import net.octacomm.sample.domain.Report;
+import net.octacomm.sample.domain.ReportExcelUploadRecord;
 import net.octacomm.sample.domain.ReportMaxCount;
 import net.octacomm.sample.domain.ReportOneLine;
 import net.octacomm.sample.domain.ReportParam;
@@ -60,6 +62,52 @@ public interface ReportMapper extends CRUDMapper<Report, ReportParam, Integer> {
 
 	@Override
 	int insert(Report report);
+
+	@Insert({
+		"INSERT INTO TB_REPORT (",
+		"deviceIdx, currentDateTime, createDate, location, pileNo, pileStandard,",
+		"drillingDepth, directDrillingDepth, sdDrillingDepth, stDrillingDepth,",
+		"intrusionDepth, balance, connectLength, managedStandard,",
+		"avgPenetrationValue, totalPenetrationValue, hammaT, fallMeter, pileType,",
+		"method, totalConnectWidth, gongSac, ultimateBearingCapacity,",
+		"hammaEfficiency, modulusElasticity, crossSection, bigo, sprCol1,",
+		"isDel, isUpload",
+		") VALUES (",
+		"#{deviceId}, #{constructionDate}, #{constructionDate}, #{location},",
+		"#{pileNo}, #{pileStandard}, #{drillingDepth}, #{directDrillingDepth},",
+		"#{soilDrillingDepth}, #{stoneDrillingDepth},",
+		"#{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard},",
+		"#{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT},",
+		"#{fallMeter}, #{pileType}, #{method}, #{totalConnectWidth},",
+		"#{gongSac}, #{ultimateBearingCapacity}, #{hammaEfficiency},",
+		"#{modulusElasticity}, #{crossSection}, #{bigo}, #{memo}, 0, 1",
+		")"
+	})
+	@Options(useGeneratedKeys = true, keyProperty = "id")
+	int insertExcelUploadReport(ReportExcelUploadRecord report);
+
+	@Update({
+		"UPDATE TB_REPORT SET",
+		"pileType = #{pileType}, method = #{method}, location = #{location},",
+		"pileNo = #{pileNo}, pileStandard = #{pileStandard},",
+		"drillingDepth = #{drillingDepth},",
+		"directDrillingDepth = #{directDrillingDepth},",
+		"sdDrillingDepth = #{soilDrillingDepth},",
+		"stDrillingDepth = #{stoneDrillingDepth},",
+		"intrusionDepth = #{intrusionDepth},",
+		"balance = #{balance}, connectLength = #{connectLength},",
+		"managedStandard = #{managedStandard},",
+		"avgPenetrationValue = #{avgPenetrationValue},",
+		"totalPenetrationValue = #{totalPenetrationValue},",
+		"hammaT = #{hammaT}, fallMeter = #{fallMeter},",
+		"totalConnectWidth = #{totalConnectWidth}, gongSac = #{gongSac},",
+		"ultimateBearingCapacity = #{ultimateBearingCapacity},",
+		"hammaEfficiency = #{hammaEfficiency},",
+		"modulusElasticity = #{modulusElasticity}, crossSection = #{crossSection},",
+		"bigo = #{bigo}, sprCol1 = #{memo}, isUpload = 1",
+		"WHERE id = #{id} AND deviceIdx = #{deviceId} AND isDel = 0"
+	})
+	int updateExcelUploadReport(ReportExcelUploadRecord report);
 	
 	int insertOrigin(Report report);
 	

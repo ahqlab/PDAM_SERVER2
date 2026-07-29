@@ -4962,7 +4962,8 @@
 	}
 
 	function requestBulkUploadApply(){
-		if(!bulkUploadAnalysis){
+		if(!bulkUploadAnalysis || bulkUploadFiles.length !== 1){
+			alert('분석한 업로드 파일을 찾을 수 없습니다. 중복 검사를 다시 진행해 주세요.');
 			return;
 		}
 
@@ -4970,28 +4971,52 @@
 		var constructionIdx = '${param.constructionIdx}' !== ''
 			? '${param.constructionIdx}'
 			: '${sessionInfo.constructionIdx}';
-		applyButton.prop('disabled', true).text('백업 중...');
+		var formData = new FormData();
+		formData.append('file', bulkUploadFiles[0]);
+		formData.append('deviceId', '${param.id}');
+		formData.append('constructionIdx', constructionIdx);
+		formData.append('analysisToken', bulkUploadAnalysis.analysisToken || '');
+		formData.append('type', '${param.type}');
+		formData.append('date', '${param.date}');
+		formData.append('startDate', $('#startDate').val() || '');
+		formData.append('endDate', $('#endDate').val() || '');
+		formData.append('location', $('#location').val() || '');
+		formData.append('pileNo', $('#pileNo').val() || '');
+
+		applyButton.prop('disabled', true).text('반영 중...');
 
 		$.ajax({
 			type: 'POST',
-			url: '${pageContext.request.contextPath}/report/upload/excel/backup',
+			url: '${pageContext.request.contextPath}/report/upload/excel/apply',
 			dataType: 'json',
-			data: {
-				deviceId: '${param.id}',
-				constructionIdx: constructionIdx
-			},
+			data: formData,
+			processData: false,
+			contentType: false,
 			success: function(result){
 				if(!result || !result.success){
 					alert(result && result.message
 						? result.message
-						: '기록지 백업 중 오류가 발생했습니다.');
+						: '기록지 백업 및 반영 중 오류가 발생했습니다.');
 					return;
 				}
-				alert('변경 내용 확인이 완료되었습니다. 실제 기록지 반영 기능은 다음 단계에서 연결할 수 있습니다.');
+				if(!result.applied){
+					alert(result.message || '변경된 내용이 없습니다.');
+					closeBulkAnalysisDialog();
+					return;
+				}
+
+				var versionText = result.backupVersion
+					? result.backupVersion + ' 버전으로 백업 후 '
+					: '';
+				alert(versionText + '기록지 반영이 완료되었습니다.'
+					+ '\n수정 ' + (result.modifiedCount || 0) + '건'
+					+ ' / 추가 ' + (result.addedCount || 0) + '건'
+					+ ' / 삭제 ' + (result.deletedCount || 0) + '건');
 				closeBulkAnalysisDialog();
+				window.location.reload();
 			},
 			error: function(xhr){
-				var message = '기록지 백업 중 오류가 발생했습니다.';
+				var message = '기록지 백업 및 반영 중 오류가 발생했습니다.';
 				if(xhr && xhr.responseJSON && xhr.responseJSON.message){
 					message = xhr.responseJSON.message;
 				}

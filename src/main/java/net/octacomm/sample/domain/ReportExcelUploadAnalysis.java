@@ -9,8 +9,11 @@ import lombok.Data;
 public class ReportExcelUploadAnalysis implements Domain {
 
 	private boolean success;
+	private boolean applied;
 	private String message;
 	private String fileName;
+	private String analysisToken;
+	private String backupVersion;
 	private int totalCount;
 	private int duplicateCount;
 	private int modifiedCount;
