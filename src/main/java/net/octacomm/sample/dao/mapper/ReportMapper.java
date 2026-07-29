@@ -69,9 +69,9 @@ public interface ReportMapper extends CRUDMapper<Report, ReportParam, Integer> {
 		"drillingDepth, directDrillingDepth, sdDrillingDepth, stDrillingDepth,",
 		"intrusionDepth, balance, connectLength, managedStandard,",
 		"avgPenetrationValue, totalPenetrationValue, hammaT, fallMeter, pileType,",
-		"method, totalConnectWidth, gongSac, ultimateBearingCapacity,",
+		"method, totalConnectWidth, ultimateBearingCapacity,",
 		"hammaEfficiency, modulusElasticity, crossSection, bigo, sprCol1,",
-		"isDel, isUpload",
+		"isDel",
 		") VALUES (",
 		"#{deviceId}, #{constructionDate}, #{constructionDate}, #{location},",
 		"#{pileNo}, #{pileStandard}, #{drillingDepth}, #{directDrillingDepth},",
@@ -79,8 +79,8 @@ public interface ReportMapper extends CRUDMapper<Report, ReportParam, Integer> {
 		"#{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard},",
 		"#{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT},",
 		"#{fallMeter}, #{pileType}, #{method}, #{totalConnectWidth},",
-		"#{gongSac}, #{ultimateBearingCapacity}, #{hammaEfficiency},",
-		"#{modulusElasticity}, #{crossSection}, #{bigo}, #{memo}, 0, 1",
+		"#{ultimateBearingCapacity}, #{hammaEfficiency},",
+		"#{modulusElasticity}, #{crossSection}, #{bigo}, #{memo}, 0",
 		")"
 	})
 	@Options(useGeneratedKeys = true, keyProperty = "id")
@@ -100,11 +100,11 @@ public interface ReportMapper extends CRUDMapper<Report, ReportParam, Integer> {
 		"avgPenetrationValue = #{avgPenetrationValue},",
 		"totalPenetrationValue = #{totalPenetrationValue},",
 		"hammaT = #{hammaT}, fallMeter = #{fallMeter},",
-		"totalConnectWidth = #{totalConnectWidth}, gongSac = #{gongSac},",
+		"totalConnectWidth = #{totalConnectWidth},",
 		"ultimateBearingCapacity = #{ultimateBearingCapacity},",
 		"hammaEfficiency = #{hammaEfficiency},",
 		"modulusElasticity = #{modulusElasticity}, crossSection = #{crossSection},",
-		"bigo = #{bigo}, sprCol1 = #{memo}, isUpload = 1",
+		"bigo = #{bigo}, sprCol1 = #{memo}",
 		"WHERE id = #{id} AND deviceIdx = #{deviceId} AND isDel = 0"
 	})
 	int updateExcelUploadReport(ReportExcelUploadRecord report);
