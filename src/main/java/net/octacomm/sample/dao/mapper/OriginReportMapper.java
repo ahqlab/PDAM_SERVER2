@@ -99,28 +99,18 @@ public interface OriginReportMapper extends CRUDMapper<Report, ReportParam, Inte
 	void insert2Origin(Report report);
 	
 	@Select("SELECT " + 
-			" C.name as '현장명', " + 
-			" B.machineNumber as  '기기번호', " +
-			" A.currentDateTime AS '시공일자', " +
-		    " A.location AS '위치', " +
-		    " A.pileNo AS '파일번호', " +
-		    " A.pileStandard AS '파일규격', " +
-		    " A.drillingDepth AS '천공깊이', "+
-		    " A.intrusionDepth AS '관입깊이', "+
-		    " A.balance AS '파일잔량', "+
-		    " A.connectLength AS '이음개소', "+
-		    " A.managedStandard AS '관리기준', "+
-		    " A.avgPenetrationValue AS '평균관입량', "+
-		    " A.totalPenetrationValue AS '최종관입량', "+
-		    " A.hammaT AS '헤머무게', "+
-		    " A.fallMeter AS '낙하높이', "+
-		    " A.pileType AS '파일종류', "+
-		    " A.method AS '공법', "+
-		    " A.totalConnectWidth AS '최종관입량', "+
-		    " A.ultimateBearingCapacity AS '극한지지력', "+
-		    " A.crossSection AS '단면적', "+
-		    " A.hammaEfficiency AS '헤머효율', "+
-		    " A.modulusElasticity AS '탄성계수' "+
+			" A.id, A.deviceIdx, A.currentDateTime, A.location, " +
+			" A.pileNo, A.pileStandard, A.drillingDepth, " +
+			" A.directDrillingDepth, A.stDrillingDepth, A.sdDrillingDepth, " +
+			" A.intrusionDepth, A.balance, A.connectLength, " +
+			" A.managedStandard, A.avgPenetrationValue, " +
+			" A.totalPenetrationValue, A.hammaT, A.fallMeter, " +
+			" A.createDate, A.pileType, A.method, A.totalConnectWidth, " +
+			" A.isDel, A.ultimateBearingCapacity, A.crossSection, " +
+			" A.hammaEfficiency, A.modulusElasticity, A.bigo, " +
+			" A.isDuple, A.sprCol1, " +
+			" C.name AS constructionName, " +
+			" B.machineNumber AS machineNumber " +
 			" FROM TB_REPORT_ORIGIN A , TB_DEVICE B, TB_CONSTRUCTION C " + 
 		    " WHERE A.deviceIdx = B.id AND B.constructionIdx = C.id " + 
 			" AND A.deviceIdx IN (" + 
