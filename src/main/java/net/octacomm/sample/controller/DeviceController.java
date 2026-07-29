@@ -1,11 +1,17 @@
 package net.octacomm.sample.controller;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.mail.Session;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,23 +23,41 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import net.octacomm.sample.dao.mapper.ConstructionMapper;
+import net.octacomm.sample.dao.mapper.DeviceBackupHistoryMapper;
 import net.octacomm.sample.dao.mapper.DeviceMapper;
+import net.octacomm.sample.dao.mapper.ExcelSignroomMapper;
 import net.octacomm.sample.dao.mapper.TotalWorkQuantityMapper;
 import net.octacomm.sample.domain.Construction;
 import net.octacomm.sample.domain.ConstructionParam;
+import net.octacomm.sample.domain.ConstructionSetting;
 import net.octacomm.sample.domain.Device;
+import net.octacomm.sample.domain.DeviceBackupHistory;
+import net.octacomm.sample.domain.DeviceBackupSnapshot;
 import net.octacomm.sample.domain.DeviceParam;
+import net.octacomm.sample.domain.ReportParam;
 import net.octacomm.sample.domain.SessionInfo;
+import net.octacomm.sample.service.DeviceBackupHistoryService;
 
 @RequestMapping("/device")
 @Controller
 public class DeviceController extends AbstractDeviceCRUDController<DeviceMapper, Device, DeviceParam, Integer>{
+
+	private static final Logger logger = LoggerFactory.getLogger(DeviceController.class);
 	
 	@Autowired
 	private TotalWorkQuantityMapper totalWorkQuantityMapper;
 	
 	@Autowired
 	private ConstructionMapper ConstructionMapper;
+
+	@Autowired
+	private DeviceBackupHistoryMapper deviceBackupHistoryMapper;
+
+	@Autowired
+	private DeviceBackupHistoryService deviceBackupHistoryService;
+
+	@Autowired
+	private ExcelSignroomMapper excelSignroomMapper;
 
 	@Autowired
 	public void setCRUDMapper(DeviceMapper mapper) {
@@ -64,6 +88,222 @@ public class DeviceController extends AbstractDeviceCRUDController<DeviceMapper,
 	public void regist(Model model, @RequestParam("constructionIdx") int constructionIdx){
 		model.addAttribute("constructionIdx", constructionIdx);
 		model.addAttribute("domain", new Device());
+	}
+
+	@RequestMapping(value = "/backup-history", method = RequestMethod.GET)
+	public String backupHistory(
+			Model model,
+			HttpSession session,
+			@RequestParam("constructionIdx") int constructionIdx,
+			@RequestParam(value = "deviceId", required = false) Integer deviceId) {
+		Integer role = (Integer) session.getAttribute("role");
+		if (role == null || role != 0) {
+			return "redirect:/device/list?constructionIdx=" + constructionIdx;
+		}
+
+		List<Device> deviceList = mapper.getDeviceList(constructionIdx);
+		Device selectedDevice = null;
+
+		if (deviceId != null) {
+			for (Device device : deviceList) {
+				if (device.getId() == deviceId.intValue()) {
+					selectedDevice = device;
+					break;
+				}
+			}
+		}
+
+		if (selectedDevice == null && !deviceList.isEmpty()) {
+			selectedDevice = deviceList.get(0);
+		}
+
+		List<DeviceBackupHistory> backupHistoryList = java.util.Collections.emptyList();
+		if (selectedDevice != null) {
+			try {
+				backupHistoryList = deviceBackupHistoryMapper.getListByDevice(
+						constructionIdx, selectedDevice.getId());
+			} catch (Exception e) {
+				logger.warn("Device backup history table is not ready.", e);
+			}
+		}
+
+		model.addAttribute("constructionIdx", constructionIdx);
+		model.addAttribute("deviceList", deviceList);
+		model.addAttribute("selectedDevice", selectedDevice);
+		model.addAttribute("backupHistoryList", backupHistoryList);
+		model.addAttribute("currentBackup",
+				backupHistoryList.isEmpty() ? null : backupHistoryList.get(0));
+		return "device/backupHistory";
+	}
+
+	@ResponseBody
+	@RequestMapping(
+			value = "/backup-history/restore",
+			method = RequestMethod.POST)
+	public Map<String, Object> restoreBackupHistory(
+			HttpSession session,
+			@RequestParam("constructionIdx") int constructionIdx,
+			@RequestParam("deviceId") int deviceId,
+			@RequestParam("historyId") int historyId) {
+		Map<String, Object> result = new HashMap<String, Object>();
+		Integer role = (Integer) session.getAttribute("role");
+		if (role == null || role != 0) {
+			result.put("success", false);
+			result.put("message", "권한이 없습니다.");
+			return result;
+		}
+		try {
+			DeviceBackupHistory restored =
+					deviceBackupHistoryService.restoreBackup(
+							constructionIdx, deviceId, historyId);
+			result.put("success", true);
+			result.put("version", restored.getVersion());
+		} catch (Exception e) {
+			logger.error("Device backup restore failed.", e);
+			result.put("success", false);
+			result.put("message", e.getMessage());
+		}
+		return result;
+	}
+
+	@RequestMapping(
+			value = "/backup-history/download",
+			method = RequestMethod.GET)
+	public String downloadBackupHistory(
+			Model model,
+			HttpSession session,
+			HttpServletResponse response,
+			@RequestParam("constructionIdx") int constructionIdx,
+			@RequestParam("deviceId") int deviceId,
+			@RequestParam("historyId") int historyId) throws IOException {
+		Integer roleValue = (Integer) session.getAttribute("role");
+		int role = roleValue == null ? 0 : roleValue.intValue();
+		if (role != 0) {
+			response.sendError(HttpServletResponse.SC_FORBIDDEN, "권한이 없습니다.");
+			return null;
+		}
+
+		DeviceBackupSnapshot snapshot =
+				deviceBackupHistoryService.getSnapshot(
+						historyId, constructionIdx, deviceId);
+		if (snapshot == null || snapshot.getExcelReports() == null) {
+			response.sendError(
+					HttpServletResponse.SC_NOT_FOUND,
+					"다운로드할 백업 데이터를 찾을 수 없습니다.");
+			return null;
+		}
+
+		boolean isHiddenManager = Boolean.TRUE.equals(
+				session.getAttribute("isHiddenManager"));
+		if (Boolean.TRUE.equals(session.getAttribute("settingRequired"))) {
+			isHiddenManager = true;
+		}
+
+		Construction construction = ConstructionMapper.get(constructionIdx);
+		ReportParam param = new ReportParam();
+		param.setId(deviceId);
+		param.setConstructionIdx(constructionIdx);
+
+		model.addAttribute("role", role);
+		model.addAttribute("isHiddenManager", isHiddenManager);
+		model.addAttribute("domainList", snapshot.getExcelReports());
+		model.addAttribute("constructionIdx", constructionIdx);
+		model.addAttribute("param", param);
+		model.addAttribute(
+				"signRoomList",
+				excelSignroomMapper.getFindByConstructionIdxAndOrderBy(
+						constructionIdx));
+		model.addAttribute(
+				"constructionName",
+				getConstructionName(construction, constructionIdx, role));
+		model.addAttribute(
+				"extensivePileUsage",
+				snapshot.getExtensivePileUsage());
+		addExcelPermissionModel(model, session, construction);
+
+		return getBackupExcelViewName(
+				constructionIdx,
+				snapshot.isBig(),
+				snapshot.getExtensivePileUsage());
+	}
+
+	private String getConstructionName(
+			Construction construction, int constructionIdx, int role) {
+		Construction fullNameConstruction =
+				ConstructionMapper.getFullNameByConstruction(
+						constructionIdx, role);
+		if (fullNameConstruction != null
+				&& fullNameConstruction.getName() != null) {
+			return fullNameConstruction.getName();
+		}
+		return construction == null ? "" : construction.getName();
+	}
+
+	private void addExcelPermissionModel(
+			Model model,
+			HttpSession session,
+			Construction construction) {
+		int longCalYn = construction == null ? 0 : construction.getLongCalYn();
+		int originDataYn =
+				construction == null ? 0 : construction.getOriginDataYn();
+		int ubcYn = construction == null ? 0 : construction.getUbcYn();
+		int showPdfYn = construction == null ? 0 : construction.getShowPdfYn();
+
+		ConstructionSetting setting =
+				(ConstructionSetting) session.getAttribute(
+						"constructionSetting");
+		if (Boolean.TRUE.equals(session.getAttribute("settingRequired"))
+				&& setting != null) {
+			boolean admin = Boolean.TRUE.equals(
+					session.getAttribute("isHiddenManager"));
+			longCalYn = admin
+					? (setting.isUseAdminReportTime() ? 1 : 0)
+					: (setting.isUseGuestReportTime() ? 1 : 0);
+			ubcYn = admin
+					? (setting.isUseAdminUbc() ? 1 : 0)
+					: (setting.isUseGuestUbc() ? 1 : 0);
+			originDataYn = admin
+					? (setting.isUseAdminOriginData() ? 1 : 0)
+					: (setting.isUseGuestOriginData() ? 1 : 0);
+			showPdfYn = admin
+					? (setting.isUseAdminPdf() ? 1 : 0)
+					: (setting.isUseGuestPdf() ? 1 : 0);
+		}
+
+		model.addAttribute("longCalYn", longCalYn);
+		model.addAttribute("originDataYn", originDataYn);
+		model.addAttribute("ubcYn", ubcYn);
+		model.addAttribute("showPdfYn", showPdfYn);
+	}
+
+	private String getBackupExcelViewName(
+			int constructionIdx, boolean isBig, int extensivePileUsage) {
+		if (isBig) {
+			if (constructionIdx == 645) {
+				return "reportTenAllJh";
+			}
+			if (constructionIdx == 1269) {
+				return "reportTenAllFor1269";
+			}
+			if (extensivePileUsage > 0) {
+				return "reportTenAllFor1338";
+			}
+			return "reportTenAll";
+		}
+
+		if (constructionIdx == 645) {
+			return "reportFiveAllJh";
+		}
+		if (constructionIdx == 1082) {
+			return "reportFiveAllBy";
+		}
+		if (constructionIdx == 1269) {
+			return "reportFiveAllFor1269";
+		}
+		if (extensivePileUsage > 0) {
+			return "reportFiveAllFor1338";
+		}
+		return "reportFiveAll";
 	}
 	
 	@ResponseBody
