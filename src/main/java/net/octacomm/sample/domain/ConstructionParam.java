@@ -29,6 +29,7 @@ public class ConstructionParam extends DomainParam {
 	private int blockedOnly;        // 이용제한 설정된 현장만
 	private int conductActive;      // 시행 현장 포함
 	private int conductDone;        // 종료 현장 포함
+	private int extensivePileUsage; // 확장 파일 사용 현장 필터 (1이면 해당 조건 적용)
 
 	//private boolean vimManaged;
 

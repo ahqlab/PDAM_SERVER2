@@ -559,6 +559,7 @@ function setGroupName(){
 					<span class="filterDivider"></span>
 					<label class="filterChip"><input type="checkbox" name="conductActive" value="1" onchange="filterSubmit();" ${domainParam.conductActive == 1 ? 'checked' : ''}><span class="chipText">시행</span></label>
 					<label class="filterChip"><input type="checkbox" name="conductDone" value="1" onchange="filterSubmit();" ${domainParam.conductDone == 1 ? 'checked' : ''}><span class="chipText">종료</span></label>
+					<label class="filterChip"><input type="checkbox" name="extensivePileUsage" value="1" onchange="filterSubmit();" ${domainParam.extensivePileUsage == 1 ? 'checked' : ''}><span class="chipText">중단 4개 사용</span></label>
 				</div>
 				</c:if>
 				</form:form>
