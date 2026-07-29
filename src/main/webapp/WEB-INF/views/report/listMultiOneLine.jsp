@@ -169,6 +169,439 @@
 		.popUp06 { width: 95%; max-height: 90vh; }
 		.popUp06 .row-date-input, .popUp06 .row-device-select { font-size: 13px; height: 34px; }
 	}
+
+	.view .tableCArea.bulkUploadSignRoomRow {
+		width: 350px;
+		margin-left: auto;
+		margin-right: 0;
+	}
+	.view .tableCArea.bulkUploadSignRoomRow div {
+		width: 350px;
+		margin: 0 0 5px;
+	}
+	.view .tableCArea.bulkUploadActionRow {
+		display: flex;
+		justify-content: flex-end;
+		gap: 5px;
+		width: 350px;
+		margin-left: auto;
+		margin-right: 0;
+	}
+	.view .tableCArea.bulkUploadActionRow div {
+		flex: 0 0 auto;
+		width: auto;
+		margin: 0;
+		white-space: nowrap;
+	}
+	.view .tableCArea.bulkUploadActionRow .bulkUploadExcelBtn {
+		width: 95px;
+	}
+	.view .tableCArea.bulkUploadActionRow .bulkUploadEditBtn {
+		width: 110px;
+	}
+	.view .tableCArea.bulkUploadActionRow .bulkUploadTriggerBtn {
+		width: 135px;
+		background: #245568;
+		border-color: #245568;
+	}
+	.popUp.popUp07 {
+		width: calc(100vw - 40px);
+		max-width: 1080px;
+		max-height: 90vh;
+		border-radius: 28px;
+	}
+	.popUp07 .popTit {
+		position: relative;
+		height: 85px;
+		padding: 0 36px;
+		background: #168aa4;
+		font-size: 28px;
+		line-height: 85px;
+	}
+	.popUp07 .popCont {
+		padding: 22px 30px 55px;
+	}
+	.bulkUploadFileInput {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		border: 0;
+	}
+	.bulkUploadDropZone {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		min-height: 265px;
+		border: 2px dashed #118db0;
+		border-radius: 20px;
+		background: #fbfeff;
+		cursor: pointer;
+		transition: background-color 0.2s, border-color 0.2s;
+	}
+	.bulkUploadDropZone.is-dragover {
+		border-color: #077b9c;
+		background: #eefafd;
+	}
+	.bulkUploadIcon {
+		width: 76px;
+		height: 76px;
+		margin-bottom: 22px;
+	}
+	.bulkUploadDropTitle {
+		color: #111;
+		font-size: 24px;
+		font-weight: 700;
+		text-align: center;
+	}
+	.bulkUploadFormat {
+		margin-top: 8px;
+		color: #aaa;
+		font-size: 22px;
+		font-weight: 600;
+	}
+	.bulkUploadSelection {
+		min-height: 22px;
+		margin-top: 12px;
+		color: #077b9c;
+		font-size: 14px;
+		text-align: center;
+		word-break: break-all;
+	}
+	.bulkUploadActions {
+		display: flex;
+		justify-content: flex-end;
+		gap: 20px;
+		margin-top: 92px;
+	}
+	.bulkUploadSubmitBtn,
+	.bulkUploadCloseBtn {
+		height: 40px;
+		border: 0;
+		border-radius: 5px;
+		font-weight: 600;
+		cursor: pointer;
+	}
+	.bulkUploadSubmitBtn {
+		width: 200px;
+		background: #1188a4;
+		color: #fff;
+	}
+	.bulkUploadCloseBtn {
+		width: 100px;
+		background: #edf1f3;
+		color: #333;
+	}
+	.popUp.popUp08 {
+		width: calc(100vw - 40px);
+		max-width: 1080px;
+		max-height: 90vh;
+		border-radius: 28px;
+	}
+	.popUp08 .popTit {
+		position: relative;
+		height: 85px;
+		padding: 0 36px;
+		background: #168aa4;
+		font-size: 28px;
+		line-height: 85px;
+	}
+	.popUp08 .popCont {
+		padding: 28px 30px 50px;
+		max-height: calc(90vh - 85px);
+		overflow-y: auto;
+	}
+	.bulkAnalysisFileSummary {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		min-height: 50px;
+		padding: 0 18px;
+		border: 1px solid #e5e9eb;
+		border-radius: 10px;
+		background: #fafcfd;
+		color: #666;
+		font-size: 14px;
+	}
+	.bulkAnalysisFileSummary strong {
+		margin-right: 10px;
+		color: #333;
+	}
+	.bulkAnalysisFileName {
+		display: inline-block;
+		max-width: 520px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		vertical-align: middle;
+		white-space: nowrap;
+	}
+	.bulkAnalysisCounts {
+		flex: 0 0 auto;
+		margin-left: 15px;
+	}
+	.bulkAnalysisDuplicateCount {
+		margin-left: 12px;
+		color: #f44336;
+		font-weight: 700;
+	}
+	.bulkAnalysisSection {
+		margin-top: 40px;
+	}
+	.bulkNoDuplicate {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 245px;
+		color: #111;
+		font-size: 34px;
+		font-weight: 700;
+	}
+	.bulkAnalysisTableWrap {
+		max-height: 355px;
+		overflow-y: auto;
+		border: 1px solid #e3ebee;
+		border-radius: 12px;
+	}
+	.bulkAnalysisTable {
+		width: 100%;
+		border-collapse: collapse;
+		table-layout: fixed;
+	}
+	.bulkAnalysisTable th {
+		height: 50px;
+		background: #eaf7fa;
+		color: #111;
+		font-size: 14px;
+		font-weight: 700;
+	}
+	.bulkAnalysisTable td {
+		height: 56px;
+		padding: 4px 10px;
+		border-top: 1px solid #e3ebee;
+		border-right: 1px solid #e3ebee;
+		background: #fff9ea;
+		color: #111;
+		font-size: 14px;
+		text-align: center;
+		word-break: break-all;
+	}
+	.bulkAnalysisTable .bulkDuplicateRow--upload td {
+		background: #edf8ff;
+	}
+	.bulkAnalysisTable .bulkDuplicateRow--original td {
+		background: #fff5e6;
+	}
+	.bulkDuplicateGuide {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 18px;
+		margin: 0 0 12px;
+		color: #555;
+		font-size: 13px;
+	}
+	.bulkDuplicateGuide span::before {
+		display: inline-block;
+		width: 12px;
+		height: 12px;
+		margin-right: 7px;
+		border: 1px solid #d7e2e7;
+		border-radius: 3px;
+		content: '';
+		vertical-align: -2px;
+	}
+	.bulkDuplicateGuideUpload::before {
+		background: #edf8ff;
+	}
+	.bulkDuplicateGuideOriginal::before {
+		background: #fff5e6;
+	}
+	.bulkDuplicateRow--upload td:first-child {
+		color: #087da3;
+		font-weight: 700;
+	}
+	.bulkDuplicateRow--original td:first-child {
+		color: #a86100;
+		font-weight: 700;
+	}
+	.bulkAnalysisTable th:last-child,
+	.bulkAnalysisTable td:last-child {
+		border-right: 0;
+	}
+	.bulkAnalysisDanger {
+		color: #ff3129;
+		font-weight: 700;
+	}
+	.bulkAnalysisReference {
+		color: #a86100;
+		font-weight: 700;
+	}
+	.bulkChangeSummary {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 18px;
+		margin: 14px 10px 30px;
+	}
+	.bulkChangeSummaryItem {
+		padding: 18px 10px;
+		border: 1px solid #118db0;
+		border-radius: 12px;
+		text-align: center;
+	}
+	.bulkChangeSummaryItem span {
+		display: block;
+		margin-bottom: 8px;
+		color: #777;
+		font-size: 20px;
+	}
+	.bulkChangeSummaryItem strong {
+		font-size: 22px;
+	}
+	.bulkAnalysisActions {
+		display: flex;
+		justify-content: flex-end;
+		gap: 15px;
+		margin-top: 55px;
+	}
+	.bulkAnalysisButton {
+		min-width: 200px;
+		height: 40px;
+		padding: 0 22px;
+		border: 0;
+		border-radius: 5px;
+		background: #1188a4;
+		color: #fff;
+		font-weight: 600;
+		cursor: pointer;
+	}
+	.bulkAnalysisButton--outline {
+		border: 1px solid #1188a4;
+		background: #fff;
+		color: #111;
+	}
+	.bulkAnalysisButton--close {
+		min-width: 100px;
+		background: #edf1f3;
+		color: #333;
+	}
+	.bulkAnalysisEmptyChanges {
+		padding: 75px 20px;
+		color: #777;
+		font-size: 18px;
+		text-align: center;
+	}
+	@media screen and (max-width: 767px) {
+		.view .tableCArea.bulkUploadSignRoomRow,
+		.view .tableCArea.bulkUploadActionRow {
+			width: 100%;
+		}
+		.view .tableCArea.bulkUploadSignRoomRow div {
+			width: 100%;
+		}
+		.view .tableCArea.bulkUploadActionRow {
+			gap: 3px;
+		}
+		.view .tableCArea.bulkUploadActionRow .bulkUploadExcelBtn,
+		.view .tableCArea.bulkUploadActionRow .bulkUploadEditBtn,
+		.view .tableCArea.bulkUploadActionRow .bulkUploadTriggerBtn {
+			flex: 1 1 0;
+			width: auto;
+			font-size: 11px;
+		}
+		.popUp.popUp07 {
+			width: calc(100vw - 24px);
+			border-radius: 18px;
+		}
+		.popUp07 .popTit {
+			height: 60px;
+			padding: 0 20px;
+			font-size: 20px;
+			line-height: 60px;
+		}
+		.popUp07 .popCont {
+			padding: 18px 18px 28px;
+		}
+		.bulkUploadDropZone {
+			min-height: 220px;
+			padding: 20px;
+		}
+		.bulkUploadIcon {
+			width: 58px;
+			height: 58px;
+			margin-bottom: 15px;
+		}
+		.bulkUploadDropTitle {
+			font-size: 17px;
+		}
+		.bulkUploadFormat {
+			font-size: 16px;
+		}
+		.bulkUploadActions {
+			gap: 10px;
+			margin-top: 35px;
+		}
+		.bulkUploadSubmitBtn {
+			flex: 1;
+			width: auto;
+		}
+		.popUp.popUp08 {
+			width: calc(100vw - 24px);
+			border-radius: 18px;
+		}
+		.popUp08 .popTit {
+			height: 60px;
+			padding: 0 20px;
+			font-size: 20px;
+			line-height: 60px;
+		}
+		.popUp08 .popCont {
+			padding: 18px 18px 24px;
+			max-height: calc(90vh - 60px);
+		}
+		.bulkAnalysisFileSummary {
+			display: block;
+			padding: 12px;
+		}
+		.bulkAnalysisFileName {
+			max-width: 100%;
+		}
+		.bulkAnalysisCounts {
+			display: block;
+			margin: 8px 0 0;
+		}
+		.bulkNoDuplicate {
+			min-height: 180px;
+			font-size: 24px;
+		}
+		.bulkChangeSummary {
+			gap: 7px;
+			margin: 10px 0 20px;
+		}
+		.bulkChangeSummaryItem {
+			padding: 12px 5px;
+		}
+		.bulkChangeSummaryItem span {
+			font-size: 14px;
+		}
+		.bulkChangeSummaryItem strong {
+			font-size: 17px;
+		}
+		.bulkAnalysisTable {
+			min-width: 700px;
+		}
+		.bulkAnalysisActions {
+			flex-wrap: wrap;
+			gap: 8px;
+			margin-top: 25px;
+		}
+		.bulkAnalysisButton {
+			flex: 1 1 45%;
+			min-width: 0;
+		}
+	}
 	
 </style>
 
@@ -2189,25 +2622,26 @@
 								<div class="btnType02 bg02" onclick="javascript:openDateEditPopupBtn();" style="width: 90px; background: #9C27B0; color:#fff; border: 1px solid #9C27B0; margin: 0;">시공일 수정</div>
 							</div>
 						</c:if> 
-						<div class="tableCArea">
+						<div class="tableCArea bulkUploadSignRoomRow">
 							<c:choose>												 
 								<c:when test="${sessionInfo.role == 0 || sessionInfo.hiddenManager == true || sessionInfo.role == 3}">
-									<c:if test="${useExcel}"><div class="btnType02 bg02" onclick="javascript:onClickExcelSignRoom();"   style="width: 210px; margin-bottom : 5px; background: #FFD400; color:#000000; border: 1px solid #258348;">EXCEL 결재방 설정</div></c:if>
+									<c:if test="${useExcel}"><div class="btnType02 bg02" onclick="javascript:onClickExcelSignRoom();" style="background: #FFD400; color:#000000; border: 1px solid #258348;">EXCEL 결재방 설정</div></c:if>
 								</c:when>
 								<c:otherwise>
-									<c:if test="${useExcel}"><div class="btnType02 bg02" onclick="javascript:onClickExcelSignRoom();" style="width: 210px; margin-bottom : 5px; background: #FFD400; color:#000000; border: 1px solid #258348;">EXCEL 결재방 설정</div></c:if>
+									<c:if test="${useExcel}"><div class="btnType02 bg02" onclick="javascript:onClickExcelSignRoom();" style="background: #FFD400; color:#000000; border: 1px solid #258348;">EXCEL 결재방 설정</div></c:if>
 								</c:otherwise>
 							</c:choose>
 						</div>
-						<div class="tableCArea">
+						<div class="tableCArea bulkUploadActionRow">
 							<c:choose>												 
 								<c:when test="${sessionInfo.role == 0 || sessionInfo.hiddenManager == true || sessionInfo.role == 3}">
-									<c:if test="${useExcel}"><div class="btnType02 bg02" onclick="javascript:downloadExcel();">엑셀 출력</div></c:if>
-									<div class="btnType01" onclick="javascript:onClickReportUpdate();">기록지 수정</div>
+									<c:if test="${useExcel}"><div class="btnType02 bg02 bulkUploadExcelBtn" onclick="javascript:downloadExcel();">엑셀 출력</div></c:if>
+									<div class="btnType01 bulkUploadEditBtn" onclick="javascript:onClickReportUpdate();">기록지 수정</div>
+									<div class="btnType01 bulkUploadTriggerBtn" onclick="javascript:openBulkFileUploadDialog();">수정 파일 업로드</div>
 								</c:when>
 								<c:otherwise>
-									<c:if test="${useExcel}"><div class="btnType02 bg02" onclick="javascript:downloadExcel();">엑셀 출력</div></c:if>
-									<div class="btnType01" onclick="javascript:onClickReportUpdate();" style="display: none;">기록지 수정</div>
+									<c:if test="${useExcel}"><div class="btnType02 bg02 bulkUploadExcelBtn" onclick="javascript:downloadExcel();">엑셀 출력</div></c:if>
+									<div class="btnType01 bulkUploadEditBtn" onclick="javascript:onClickReportUpdate();" style="display: none;">기록지 수정</div>
 								</c:otherwise>
 							</c:choose>
 						</div>
@@ -2253,24 +2687,25 @@
 								<div class="btnType02 bg02" onclick="javascript:openDateEditPopupBtn();" style="width: 90px; background: #9C27B0; color:#fff; border: 1px solid #9C27B0; margin: 0;">시공일 수정</div>
 							</div>
 						</c:if>
-						<div class="tableCArea" style="margin-bottom: 0px;">
+						<div class="tableCArea bulkUploadSignRoomRow" style="margin-bottom: 0px;">
 							<c:choose>												 
 								<c:when test="${sessionInfo.role == 0 || sessionInfo.hiddenManager == true || sessionInfo.role == 3}">
-									<c:if test="${useExcel}"><div class="btnType02 bg02" id="excelSignRoomSetting" style="float: right; width: 130px; margin-bottom : 5px; background: #FFD400; color:#000000; border: 1px solid #258348;">EXCEL 결재방 설정</div></c:if>
+									<c:if test="${useExcel}"><div class="btnType02 bg02" id="excelSignRoomSetting" style="background: #FFD400; color:#000000; border: 1px solid #258348;">EXCEL 결재방 설정</div></c:if>
 								</c:when>
 								<c:otherwise>
-									<c:if test="${useExcel}"><div class="btnType02 bg02" id="excelSignRoomSetting" style="float: right; width: 130px; margin-bottom : 5px; background: #FFD400; color:#000000; border: 1px solid #258348;">EXCEL 결재방 설정</div></c:if>
+									<c:if test="${useExcel}"><div class="btnType02 bg02" id="excelSignRoomSetting" style="background: #FFD400; color:#000000; border: 1px solid #258348;">EXCEL 결재방 설정</div></c:if>
 								</c:otherwise>
 							</c:choose>
 						</div>
-						<div class="tableCArea">
+						<div class="tableCArea bulkUploadActionRow">
 							<c:choose>												 
 								<c:when test="${sessionInfo.role == 0 || sessionInfo.hiddenManager == true || sessionInfo.role == 3}">
-									<c:if test="${useExcel}"><div class="btnType02 bg02" onclick="javascript:downloadExcel();">엑셀 출력</div></c:if>
-									<div class="btnType01" onclick="javascript:onClickReportUpdate();">기록지 수정</div>
+									<c:if test="${useExcel}"><div class="btnType02 bg02 bulkUploadExcelBtn" onclick="javascript:downloadExcel();">엑셀 출력</div></c:if>
+									<div class="btnType01 bulkUploadEditBtn" onclick="javascript:onClickReportUpdate();">기록지 수정</div>
+									<div class="btnType01 bulkUploadTriggerBtn" onclick="javascript:openBulkFileUploadDialog();">일괄파일업로드</div>
 								</c:when>
 								<c:otherwise>
-									<c:if test="${useExcel}"><div class="btnType02 bg02" onclick="javascript:downloadExcel();" style="float: right;">엑셀 출력</div></c:if>
+									<c:if test="${useExcel}"><div class="btnType02 bg02 bulkUploadExcelBtn" onclick="javascript:downloadExcel();">엑셀 출력</div></c:if>
 									<!-- <div class="btnType01" onclick="javascript:onClickReportUpdate();" style="display: none;">기록지 수정</div> -->
 								</c:otherwise>
 							</c:choose>
@@ -3779,6 +4214,185 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="popUp popUp07" role="dialog" aria-modal="true" aria-labelledby="bulkUploadDialogTitle">
+		<div class="popTit">
+			<p id="bulkUploadDialogTitle">수정 엑셀 올리기</p>
+		</div>
+
+		<div class="popCont">
+			<input type="file" id="bulkFileUploadInput" class="bulkUploadFileInput"
+				accept=".xls,.xlsx"
+				onchange="javascript:updateBulkFileUploadSelection(this);" />
+			<label for="bulkFileUploadInput" id="bulkUploadDropZone" class="bulkUploadDropZone"
+				ondragover="javascript:handleBulkFileDragOver(event);"
+				ondragleave="javascript:handleBulkFileDragLeave(event);"
+				ondrop="javascript:handleBulkFileDrop(event);">
+				<svg class="bulkUploadIcon" viewBox="0 0 64 64" aria-hidden="true">
+					<path d="M32 7v35M19 20 32 7l13 13M12 42v9c0 4 3 7 7 7h26c4 0 7-3 7-7v-9"
+						fill="none" stroke="currentColor" stroke-width="7"
+						stroke-linecap="round" stroke-linejoin="round" />
+				</svg>
+				<span class="bulkUploadDropTitle">수정된 파일 1개를 선택하거나, 여기에 놓아주세요.</span>
+				<span class="bulkUploadFormat">업로드 양식 : XLS, XLSX</span>
+				<div id="bulkFileUploadSelection" class="bulkUploadSelection" aria-live="polite">
+				</div>
+			</label>
+			<div class="bulkUploadActions">
+				<button type="button" class="bulkUploadSubmitBtn"
+					onclick="javascript:runBulkFileUploadDuplicateCheck();">
+					업로드 및 중복 검사
+				</button>
+				<button type="button" class="bulkUploadCloseBtn"
+					onclick="javascript:closeBulkFileUploadDialog();">
+					닫기
+				</button>
+			</div>
+		</div>
+	</div>
+
+	<div class="popUp popUp08" role="dialog" aria-modal="true"
+		aria-labelledby="bulkAnalysisDialogTitle">
+		<div class="popTit">
+			<p id="bulkAnalysisDialogTitle">수정 엑셀 중복 검사 결과</p>
+		</div>
+		<div class="popCont">
+			<div id="bulkAnalysisFileSummary" class="bulkAnalysisFileSummary">
+				<div>
+					<strong>업로드 파일</strong>
+					<span id="bulkAnalysisFileName" class="bulkAnalysisFileName"></span>
+				</div>
+				<div class="bulkAnalysisCounts">
+					업로드 데이터 <b id="bulkAnalysisTotalCount">0건</b>
+					<span class="bulkAnalysisDuplicateCount">
+						중복 개수 <b id="bulkAnalysisDuplicateCount">0건</b>
+					</span>
+				</div>
+			</div>
+
+			<div id="bulkNoDuplicateView" class="bulkAnalysisSection bulkNoDuplicate">
+				중복 데이터가 없습니다.
+			</div>
+
+			<div id="bulkDuplicateSummaryView" class="bulkAnalysisSection">
+				<div class="bulkAnalysisTableWrap">
+					<table class="bulkAnalysisTable">
+						<colgroup>
+							<col style="width: 65%;">
+							<col style="width: 35%;">
+						</colgroup>
+						<thead>
+							<tr>
+								<th>중복조합 (시공일 | 시공장비 | 시공위치 | 파일번호)</th>
+								<th>원본개수</th>
+							</tr>
+						</thead>
+						<tbody id="bulkDuplicateSummaryBody"></tbody>
+					</table>
+				</div>
+			</div>
+
+			<div id="bulkDuplicateDetailView" class="bulkAnalysisSection">
+				<div class="bulkDuplicateGuide">
+					<span class="bulkDuplicateGuideUpload">
+						파란색 : 업로드 파일 내 중복된 데이터
+					</span>
+					<span class="bulkDuplicateGuideOriginal">
+						노란색 : 업로드 파일과 비교하는 원본
+					</span>
+				</div>
+				<div class="bulkAnalysisTableWrap">
+					<table class="bulkAnalysisTable">
+						<colgroup>
+							<col style="width: 19%;">
+							<col style="width: 17%;">
+							<col style="width: 14%;">
+							<col style="width: 16%;">
+							<col style="width: 17%;">
+							<col style="width: 17%;">
+						</colgroup>
+						<thead>
+							<tr>
+								<th>중복 구분</th>
+								<th>시공일</th>
+								<th>시공장비</th>
+								<th>시공위치</th>
+								<th>파일번호</th>
+								<th>판정</th>
+							</tr>
+						</thead>
+						<tbody id="bulkDuplicateDetailBody"></tbody>
+					</table>
+				</div>
+			</div>
+
+			<div id="bulkChangeView" class="bulkAnalysisSection">
+				<div class="bulkChangeSummary">
+					<div class="bulkChangeSummaryItem">
+						<span>수정</span>
+						<strong id="bulkModifiedCount">0건</strong>
+					</div>
+					<div class="bulkChangeSummaryItem">
+						<span>추가</span>
+						<strong id="bulkAddedCount">0건</strong>
+					</div>
+					<div class="bulkChangeSummaryItem">
+						<span>삭제</span>
+						<strong id="bulkDeletedCount">0건</strong>
+					</div>
+				</div>
+				<div id="bulkChangeTableWrap" class="bulkAnalysisTableWrap">
+					<table class="bulkAnalysisTable">
+						<colgroup>
+							<col style="width: 36%;">
+							<col style="width: 21%;">
+							<col style="width: 22%;">
+							<col style="width: 21%;">
+						</colgroup>
+						<thead>
+							<tr>
+								<th>대상</th>
+								<th>변경 항목</th>
+								<th>변경 전</th>
+								<th>변경 후</th>
+							</tr>
+						</thead>
+						<tbody id="bulkChangeBody"></tbody>
+					</table>
+				</div>
+				<div id="bulkChangeEmpty" class="bulkAnalysisEmptyChanges">
+					변경된 내용이 없습니다.
+				</div>
+			</div>
+
+			<div class="bulkAnalysisActions">
+				<button type="button" id="bulkChangePreviewButton"
+					class="bulkAnalysisButton"
+					onclick="javascript:showBulkChangeView();">
+					변경 내용 확인
+				</button>
+				<button type="button" id="bulkDuplicateDetailButton"
+					class="bulkAnalysisButton bulkAnalysisButton--outline"
+					onclick="javascript:showBulkDuplicateDetailView();">
+					중복 목록 상세보기
+				</button>
+				<button type="button" id="bulkDuplicatePdfButton"
+					class="bulkAnalysisButton"
+					onclick="javascript:printBulkDuplicateResult();">
+					중복 결과 PDF 다운로드
+				</button>
+				<button type="button" id="bulkApplyButton"
+					class="bulkAnalysisButton"
+					onclick="javascript:requestBulkUploadApply();">
+					기록 백업 후 반영
+				</button>
+				<button type="button" class="bulkAnalysisButton bulkAnalysisButton--close"
+					onclick="javascript:closeBulkAnalysisDialog();">
+					<span id="bulkAnalysisCloseLabel">닫기</span>
+				</button>
+			</div>
+		</div>
+	</div>
 	
 	<div class="popUp popUp04">
 	    <div class="popTit">
@@ -4028,6 +4642,366 @@
 		$('.popUp03').show();
 		$('.popLayer').show();
 		$('body').css('overflow', 'hidden');
+	}
+
+	var bulkUploadFiles = [];
+	var bulkUploadAnalysis = null;
+
+	function openBulkFileUploadDialog(){
+		bulkUploadFiles = [];
+		$('#bulkFileUploadInput').val('');
+		$('#bulkFileUploadSelection').text('');
+		$('#bulkUploadDropZone').removeClass('is-dragover');
+		$('.popUp07').show();
+		$('.popLayer').show();
+		$('body').css('overflow', 'hidden');
+	}
+
+	function closeBulkFileUploadDialog(){
+		$('.popUp07').hide();
+		$('.popLayer').hide();
+		$('body').css('overflow', 'auto');
+	}
+
+	function updateBulkFileUploadSelection(input){
+		setBulkUploadFiles(input.files);
+	}
+
+	function handleBulkFileDragOver(event){
+		event.preventDefault();
+		event.stopPropagation();
+		$('#bulkUploadDropZone').addClass('is-dragover');
+	}
+
+	function handleBulkFileDragLeave(event){
+		event.preventDefault();
+		event.stopPropagation();
+		$('#bulkUploadDropZone').removeClass('is-dragover');
+	}
+
+	function handleBulkFileDrop(event){
+		event.preventDefault();
+		event.stopPropagation();
+		$('#bulkUploadDropZone').removeClass('is-dragover');
+		setBulkUploadFiles(event.dataTransfer.files);
+	}
+
+	function setBulkUploadFiles(files){
+		if(!files || files.length === 0){
+			bulkUploadFiles = [];
+			$('#bulkFileUploadSelection').text('');
+			return;
+		}
+
+		if(files.length > 1){
+			bulkUploadFiles = [];
+			$('#bulkFileUploadInput').val('');
+			$('#bulkFileUploadSelection').text('');
+			alert('수정 파일은 한 번에 1개만 업로드할 수 있습니다.');
+			return;
+		}
+
+		var selectedFile = files[0];
+		if(!/\.(xls|xlsx)$/i.test(selectedFile.name)){
+			bulkUploadFiles = [];
+			$('#bulkFileUploadInput').val('');
+			$('#bulkFileUploadSelection').text('');
+			alert('XLS 또는 XLSX 파일만 선택할 수 있습니다.');
+			return;
+		}
+
+		bulkUploadFiles = [selectedFile];
+		$('#bulkFileUploadSelection').text('선택된 파일 · ' + selectedFile.name);
+	}
+
+	function runBulkFileUploadDuplicateCheck(){
+		if(bulkUploadFiles.length === 0){
+			alert('업로드할 XLS 또는 XLSX 파일을 선택해 주세요.');
+			return;
+		}
+		if(bulkUploadFiles.length > 1){
+			alert('수정 파일은 한 번에 1개만 업로드할 수 있습니다.');
+			return;
+		}
+
+		var submitButton = $('.bulkUploadSubmitBtn');
+		var formData = new FormData();
+		var constructionIdx = '${param.constructionIdx}' !== ''
+			? '${param.constructionIdx}'
+			: '${sessionInfo.constructionIdx}';
+		formData.append('file', bulkUploadFiles[0]);
+		formData.append('deviceId', '${param.id}');
+		formData.append('constructionIdx', constructionIdx);
+		formData.append('type', '${param.type}');
+		formData.append('date', '${param.date}');
+		formData.append('startDate', $('#startDate').val() || '');
+		formData.append('endDate', $('#endDate').val() || '');
+		formData.append('location', $('#location').val() || '');
+		formData.append('pileNo', $('#pileNo').val() || '');
+
+		submitButton.prop('disabled', true).text('중복 검사 중...');
+		$.ajax({
+			type: 'POST',
+			url: '${pageContext.request.contextPath}/report/upload/excel/analyze',
+			data: formData,
+			processData: false,
+			contentType: false,
+			dataType: 'json',
+			success: function(result){
+				if(!result || !result.success){
+					alert(result && result.message
+						? result.message
+						: '엑셀 분석에 실패했습니다.');
+					return;
+				}
+				bulkUploadAnalysis = result;
+				renderBulkAnalysisResult();
+			},
+			error: function(xhr){
+				var message = '엑셀 분석 중 오류가 발생했습니다.';
+				if(xhr && xhr.responseJSON && xhr.responseJSON.message){
+					message = xhr.responseJSON.message;
+				}
+				alert(message);
+			},
+			complete: function(){
+				submitButton.prop('disabled', false).text('업로드 및 중복 검사');
+			}
+		});
+	}
+
+	function renderBulkAnalysisResult(){
+		var result = bulkUploadAnalysis;
+		$('#bulkAnalysisFileName').text(result.fileName || '');
+		$('#bulkAnalysisTotalCount').text((result.totalCount || 0) + '건');
+		$('#bulkAnalysisDuplicateCount').text((result.duplicateCount || 0) + '건');
+		$('#bulkModifiedCount').text((result.modifiedCount || 0) + '건');
+		$('#bulkAddedCount').text((result.addedCount || 0) + '건');
+		$('#bulkDeletedCount').text((result.deletedCount || 0) + '건');
+		renderBulkDuplicateSummary(result.duplicateGroups || []);
+		renderBulkDuplicateDetails(result.duplicateDetails || []);
+		renderBulkChanges(result.changes || []);
+
+		$('.popUp07').hide();
+		$('.popUp08').show();
+		if((result.duplicateCount || 0) > 0){
+			showBulkDuplicateSummaryView();
+		}else{
+			showBulkNoDuplicateView();
+		}
+	}
+
+	function hideBulkAnalysisViews(){
+		$('#bulkNoDuplicateView, #bulkDuplicateSummaryView, '
+			+ '#bulkDuplicateDetailView, #bulkChangeView').hide();
+		$('#bulkChangePreviewButton, #bulkDuplicateDetailButton, '
+			+ '#bulkDuplicatePdfButton, #bulkApplyButton').hide();
+	}
+
+	function showBulkNoDuplicateView(){
+		hideBulkAnalysisViews();
+		$('#bulkAnalysisDialogTitle').text('수정 엑셀 올리기');
+		$('#bulkAnalysisFileSummary').show();
+		$('#bulkNoDuplicateView, #bulkChangePreviewButton').show();
+		$('#bulkAnalysisCloseLabel').text('닫기');
+	}
+
+	function showBulkDuplicateSummaryView(){
+		hideBulkAnalysisViews();
+		$('#bulkAnalysisDialogTitle').text('수정 엑셀 중복 검사 결과');
+		$('#bulkAnalysisFileSummary').show();
+		$('#bulkDuplicateSummaryView, #bulkDuplicateDetailButton, '
+			+ '#bulkDuplicatePdfButton').show();
+		$('#bulkAnalysisCloseLabel').text('닫기');
+	}
+
+	function showBulkDuplicateDetailView(){
+		hideBulkAnalysisViews();
+		$('#bulkAnalysisDialogTitle').text('수정 엑셀 중복 검사 결과');
+		$('#bulkAnalysisFileSummary').show();
+		$('#bulkDuplicateDetailView, #bulkDuplicatePdfButton').show();
+		$('#bulkAnalysisCloseLabel').text('닫기');
+	}
+
+	function showBulkChangeView(){
+		hideBulkAnalysisViews();
+		$('#bulkAnalysisDialogTitle').text('수정 엑셀 변경 내용 확인');
+		$('#bulkAnalysisFileSummary').hide();
+		$('#bulkChangeView, #bulkApplyButton').show();
+		$('#bulkAnalysisCloseLabel').text('취소');
+	}
+
+	function renderBulkDuplicateSummary(groups){
+		var html = '';
+		$.each(groups, function(index, group){
+			var combination = [
+				group.constructionDate,
+				group.machineNumber,
+				group.location,
+				group.pileNo
+			].join(' | ');
+			html += '<tr><td>' + escapeBulkHtml(combination) + '</td>'
+				+ '<td><span class="bulkAnalysisDanger">'
+				+ escapeBulkHtml(group.originalCount + '개')
+				+ '</span></td></tr>';
+		});
+		$('#bulkDuplicateSummaryBody').html(html);
+	}
+
+	function renderBulkDuplicateDetails(details){
+		var html = '';
+		var detailGroups = [];
+		var detailGroupByKey = {};
+		$.each(details, function(index, detail){
+			var detailKey = detail.key || [
+				detail.constructionDate,
+				detail.machineNumber,
+				detail.location,
+				detail.pileNo
+			].join('|');
+			if(!detailGroupByKey[detailKey]){
+				detailGroupByKey[detailKey] = {
+					originals: [],
+					uploads: []
+				};
+				detailGroups.push(detailGroupByKey[detailKey]);
+			}
+			if(detail.type === '사용자 업로드'){
+				detailGroupByKey[detailKey].uploads.push(detail);
+			}else{
+				detailGroupByKey[detailKey].originals.push(detail);
+			}
+		});
+
+		$.each(detailGroups, function(groupIndex, group){
+			var orderedDetails = group.originals.concat(group.uploads);
+			var uploadSequence = 0;
+			$.each(orderedDetails, function(index, detail){
+				var isUpload = detail.type === '사용자 업로드';
+				var rowClass = isUpload
+					? 'bulkDuplicateRow--upload'
+					: 'bulkDuplicateRow--original';
+				var judgmentClass = isUpload
+					? 'bulkAnalysisDanger'
+					: 'bulkAnalysisReference';
+				var typeLabel = '기존 원본 (비교 기준)';
+				var judgmentLabel = '비교 기준';
+				if(isUpload){
+					uploadSequence++;
+					typeLabel = '업로드 중복 #' + uploadSequence;
+					judgmentLabel = '업로드 파일 내 중복';
+				}
+				html += '<tr class="' + rowClass + '">'
+					+ '<td>' + escapeBulkHtml(typeLabel) + '</td>'
+					+ '<td>' + escapeBulkHtml(detail.constructionDate) + '</td>'
+					+ '<td>' + escapeBulkHtml(detail.machineNumber) + '</td>'
+					+ '<td>' + escapeBulkHtml(detail.location) + '</td>'
+					+ '<td>' + escapeBulkHtml(detail.pileNo) + '</td>'
+					+ '<td><span class="' + judgmentClass + '">'
+					+ escapeBulkHtml(judgmentLabel) + '</span></td>'
+					+ '</tr>';
+			});
+		});
+		$('#bulkDuplicateDetailBody').html(html);
+	}
+
+	function renderBulkChanges(changes){
+		var html = '';
+		$.each(changes, function(index, change){
+			html += '<tr>'
+				+ '<td>' + escapeBulkHtml(change.target) + '</td>'
+				+ '<td>' + escapeBulkHtml(change.field) + '</td>'
+				+ '<td>' + escapeBulkHtml(change.beforeValue) + '</td>'
+				+ '<td>' + escapeBulkHtml(change.afterValue) + '</td>'
+				+ '</tr>';
+		});
+		$('#bulkChangeBody').html(html);
+		$('#bulkChangeTableWrap').toggle(changes.length > 0);
+		$('#bulkChangeEmpty').toggle(changes.length === 0);
+	}
+
+	function escapeBulkHtml(value){
+		return $('<div>').text(value == null ? '' : String(value)).html();
+	}
+
+	function closeBulkAnalysisDialog(){
+		$('.popUp08').hide();
+		$('.popLayer').hide();
+		$('body').css('overflow', 'auto');
+		$('#bulkAnalysisFileSummary').show();
+		bulkUploadAnalysis = null;
+	}
+
+	function printBulkDuplicateResult(){
+		if(!bulkUploadAnalysis){
+			return;
+		}
+		var printWindow = window.open('', '_blank', 'width=1000,height=760');
+		if(!printWindow){
+			alert('PDF 출력을 위해 팝업을 허용해 주세요.');
+			return;
+		}
+		var tableHtml = $('#bulkDuplicateDetailView').is(':visible')
+			? $('#bulkDuplicateDetailView').html()
+			: $('#bulkDuplicateSummaryView').html();
+		printWindow.document.write(
+			'<!doctype html><html><head><meta charset="UTF-8">'
+			+ '<title>수정 엑셀 중복 검사 결과</title>'
+			+ '<style>body{font-family:Arial,sans-serif;padding:30px}'
+			+ 'h1{font-size:24px}table{width:100%;border-collapse:collapse}'
+			+ 'th,td{border:1px solid #bbb;padding:10px;text-align:center}'
+			+ 'th{background:#eaf7fa}.bulkAnalysisDanger{color:#f44336}'
+			+ '</style></head><body><h1>수정 엑셀 중복 검사 결과</h1>'
+			+ '<p>업로드 파일: ' + escapeBulkHtml(bulkUploadAnalysis.fileName)
+			+ '</p>' + tableHtml + '</body></html>');
+		printWindow.document.close();
+		printWindow.focus();
+		setTimeout(function(){
+			printWindow.print();
+		}, 300);
+	}
+
+	function requestBulkUploadApply(){
+		if(!bulkUploadAnalysis){
+			return;
+		}
+
+		var applyButton = $('#bulkApplyButton');
+		var constructionIdx = '${param.constructionIdx}' !== ''
+			? '${param.constructionIdx}'
+			: '${sessionInfo.constructionIdx}';
+		applyButton.prop('disabled', true).text('백업 중...');
+
+		$.ajax({
+			type: 'POST',
+			url: '${pageContext.request.contextPath}/report/upload/excel/backup',
+			dataType: 'json',
+			data: {
+				deviceId: '${param.id}',
+				constructionIdx: constructionIdx
+			},
+			success: function(result){
+				if(!result || !result.success){
+					alert(result && result.message
+						? result.message
+						: '기록지 백업 중 오류가 발생했습니다.');
+					return;
+				}
+				alert('변경 내용 확인이 완료되었습니다. 실제 기록지 반영 기능은 다음 단계에서 연결할 수 있습니다.');
+				closeBulkAnalysisDialog();
+			},
+			error: function(xhr){
+				var message = '기록지 백업 중 오류가 발생했습니다.';
+				if(xhr && xhr.responseJSON && xhr.responseJSON.message){
+					message = xhr.responseJSON.message;
+				}
+				alert(message);
+			},
+			complete: function(){
+				applyButton.prop('disabled', false)
+					.text('기록 백업 후 반영');
+			}
+		});
 	}
 
 </script>
