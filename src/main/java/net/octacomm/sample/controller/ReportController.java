@@ -110,6 +110,13 @@ public class ReportController{
 		
 		isBig = mapper.isBigAllReports(param, (int) param.getConstructionIdx());
 		
+		ExtensivePileUsage usage = extensivePileUsageMapper.findByConstructionIdx((int) param.getConstructionIdx());
+		if(usage != null) {
+			extensivePileUsage = usage.getIsUsed();
+		}else {
+			extensivePileUsage = 0;
+		}
+		
 		param.setRole((int) session.getAttribute("role"));
 		
 		param.setConstructionIdx((int) session.getAttribute("constructionIdx"));
@@ -117,13 +124,6 @@ public class ReportController{
 		Construction targetCon = constructionMapper.get((int) param.getConstructionIdx());
 		
 		Construction con = constructionMapper.get((int) session.getAttribute("constructionIdx"));
-		
-		ExtensivePileUsage usage = extensivePileUsageMapper.findByConstructionIdx((int) param.getConstructionIdx());
-		if(usage != null) {
-			extensivePileUsage = usage.getIsUsed();
-		}else {
-			extensivePileUsage = 0;
-		}
 		
 		int totalCount = mapper.getCountByParam(param);
 		
@@ -1382,5 +1382,38 @@ public class ReportController{
 			successCount += mapper.updateChangeDevice(report);
 		}
 		return successCount == reportList.size();
+	}
+	
+	@Transactional
+	@ResponseBody
+	@RequestMapping(value = "/insertMulti", method = RequestMethod.POST)
+	public boolean insertMulti(@RequestBody List<UpdateReport> reportList, HttpSession session) {
+	    Integer role = (Integer) session.getAttribute("role");
+	    if (role == null || role != 0) return false;
+
+	    try {
+	        for (UpdateReport newReport : reportList) {
+	            mapper.insertCopiedReport(newReport);
+	            int newReportId = newReport.getId(); 
+
+	            if (newReport.getPiece() != null) {
+	                for (Piece piece : newReport.getPiece()) {
+	                    piece.setReportIdx(newReportId);
+	                    mapper.insertPiece(piece);
+	                }
+	            }
+
+	            if (newReport.getPenetrations() != null) {
+	                for (Penetration pntr : newReport.getPenetrations()) {
+	                    pntr.setReportIdx(newReportId);  
+	                    mapper.insertPenetration(pntr);
+	                }
+	            }
+	        }
+	        return true; 
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return false;
+	    }
 	}
 }

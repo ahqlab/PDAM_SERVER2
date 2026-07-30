@@ -93,8 +93,14 @@ public class DeviceController extends AbstractDeviceCRUDController<DeviceMapper,
 	@RequestMapping(value = "/backup-history", method = RequestMethod.GET)
 	public String backupHistory(
 			Model model,
+			HttpSession session,
 			@RequestParam("constructionIdx") int constructionIdx,
 			@RequestParam(value = "deviceId", required = false) Integer deviceId) {
+		Integer role = (Integer) session.getAttribute("role");
+		if (role == null || role != 0) {
+			return "redirect:/device/list?constructionIdx=" + constructionIdx;
+		}
+
 		List<Device> deviceList = mapper.getDeviceList(constructionIdx);
 		Device selectedDevice = null;
 
@@ -138,10 +144,17 @@ public class DeviceController extends AbstractDeviceCRUDController<DeviceMapper,
 			value = "/backup-history/restore",
 			method = RequestMethod.POST)
 	public Map<String, Object> restoreBackupHistory(
+			HttpSession session,
 			@RequestParam("constructionIdx") int constructionIdx,
 			@RequestParam("deviceId") int deviceId,
 			@RequestParam("historyId") int historyId) {
 		Map<String, Object> result = new HashMap<String, Object>();
+		Integer role = (Integer) session.getAttribute("role");
+		if (role == null || role != 0) {
+			result.put("success", false);
+			result.put("message", "권한이 없습니다.");
+			return result;
+		}
 		try {
 			DeviceBackupHistory restored =
 					deviceBackupHistoryService.restoreBackup(
@@ -167,6 +180,13 @@ public class DeviceController extends AbstractDeviceCRUDController<DeviceMapper,
 			@RequestParam("constructionIdx") int constructionIdx,
 			@RequestParam("deviceId") int deviceId,
 			@RequestParam("historyId") int historyId) throws IOException {
+		Integer roleValue = (Integer) session.getAttribute("role");
+		int role = roleValue == null ? 0 : roleValue.intValue();
+		if (role != 0) {
+			response.sendError(HttpServletResponse.SC_FORBIDDEN, "권한이 없습니다.");
+			return null;
+		}
+
 		DeviceBackupHistory history = deviceBackupHistoryService.getHistory(
 				historyId, constructionIdx, deviceId);
 		DeviceBackupSnapshot snapshot =
@@ -180,8 +200,6 @@ public class DeviceController extends AbstractDeviceCRUDController<DeviceMapper,
 			return null;
 		}
 
-		Integer roleValue = (Integer) session.getAttribute("role");
-		int role = roleValue == null ? 0 : roleValue.intValue();
 		boolean isHiddenManager = Boolean.TRUE.equals(
 				session.getAttribute("isHiddenManager"));
 		if (Boolean.TRUE.equals(session.getAttribute("settingRequired"))) {

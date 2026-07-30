@@ -675,7 +675,56 @@
 		}
 	}
 	
+	.popUp07 {
+		display: none;
+		position: fixed !important;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		width: 98%;
+		max-width: 1350px;
+		max-height: 90vh;
+		z-index: 9999;
+		background: #fff;
+		flex-direction: column;
+		box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+		border-radius: 8px;
+		padding: 60px 20px 30px 20px;
+		box-sizing: border-box;
+	}
+	.popUp07 .table-scroll-area {
+		max-height: 60vh;
+		overflow: auto;
+		margin-top: 10px;
+		border: 1px solid #ccc;
+	}
+	.popUp07 .signTable th, .popUp07 .signTable td {
+		text-align: center !important;
+		vertical-align: middle !important;
+		border: 1px solid #ccc;
+		padding: 4px;
+	}
+	.popUp07 input[type="text"] {
+		width: 100%;
+		min-width: 50px;
+		box-sizing: border-box;
+		padding: 4px;
+		border: 1px solid #e2e8f0;
+		text-align: center;
+		font-size: 13px;
+	}
+	.popUp07 input[type="text"]:focus {
+		border-color: #00adef;
+		outline: none;
+		background: #f0f9ff;
+	}
+	@media screen and (max-width: 767px) {
+		.popUp07 { width: 98%; max-height: 90vh; padding: 40px 10px 20px 10px; }
+	}
+	
 </style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <script>
 
@@ -909,7 +958,8 @@
 		var constructionIdx = ${sessionInfo.constructionIdx};
 		var conIdx = ${param.constructionIdx};
 		var isBig = ${isBig};
-		var extensivePileUsage = ${extensivePileUsage}
+		var extensivePileUsage = ${extensivePileUsage};
+		var isSystemadmin = ${sessionScope.isSystemAdmin};
 		
 		var currentNo;
 		var currentDate;
@@ -934,7 +984,7 @@
 		var currentTotalPenetrationValue;
 		
 		
-		if(role == 0 || role == 3 ||hiddenManager == true){
+		if(role == 0 || role == 3 || hiddenManager == true){
 			
 			currentNo = $('#reportTable tr').eq(index).find('td:eq(1)').text().trim();
 			currentDate = $('#reportTable tr').eq(index).find('td:eq(2)').text().trim();
@@ -2614,6 +2664,409 @@
 		});
 	}
 	
+	var isBigStr = String('${isBig}' || '').trim().toLowerCase();
+	var isBigVal = (isBigStr === 'true' || isBigStr === '1' || isBigStr === 'y' || isBigStr === 'on' || Number(isBigStr) > 0) ? 1 : 0;
+
+	var extStr = String('${extensivePileUsage}' || '').trim().toLowerCase();
+	var extensiveVal = (extStr === 'true' || extStr === '1' || extStr === 'y' || extStr === 'on' || Number(extStr) > 0) ? 1 : 0;
+
+	var currentIsExt = false;
+	var currentIsBig = false;
+
+	function triggerExcelUpload() {
+		$('#excelFileInput').val('');
+		$('#excelFileInput').click();
+	}
+
+	function formatExcelDate(val) {
+		if (val === undefined || val === null || val === '') return '';
+		var str = String(val).trim();
+		str = str.replace(/\.\d+$/, '');
+		if (/^\d{4}[-/.]\d{1,2}[-/.]\d{1,2}/.test(str)) {
+			if (str.length >= 19) return str.substring(0, 19);
+			return str;
+		}
+		if (!isNaN(val) && Number(val) > 30000 && Number(val) < 70000) {
+			var date = new Date((Number(val) - (25569)) * 86400 * 1000);
+			var yyyy = date.getFullYear();
+			var mm = ('0' + (date.getMonth() + 1)).slice(-2);
+			var dd = ('0' + date.getDate()).slice(-2);
+			return yyyy + '-' + mm + '-' + dd;
+		}
+		return str;
+	}
+
+	function readExcelFile(e) {
+		var file = e.target.files[0];
+		if (!file) return;
+
+		var reader = new FileReader();
+		reader.onload = function(e) {
+			var data = new Uint8Array(e.target.result);
+			var workbook = XLSX.read(data, { type: 'array' });
+			var firstSheetName = workbook.SheetNames[0];
+			var worksheet = workbook.Sheets[firstSheetName];
+			
+			var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false, dateNF: 'yyyy-mm-dd hh:mm:ss' });
+			if (jsonData.length <= 1) {
+				alert("엑셀에 데이터가 없거나 헤더만 존재합니다.");
+				return;
+			}
+
+			renderExcelTable(jsonData);
+			
+			if (currentIsExt) {
+				$('.mid-group').css('display', '');
+				$('#ex_th_pileGroup').attr('colspan', '8');
+			} else {
+				$('.mid-group').css('display', 'none');
+				$('#ex_th_pileGroup').attr('colspan', '6');
+			}
+			
+			if (currentIsBig) {
+				$('.meas-big-group').css('display', '');
+				$('#ex_th_measGroup').attr('colspan', '10');
+			} else {
+				$('.meas-big-group').css('display', 'none');
+				$('#ex_th_measGroup').attr('colspan', '5');
+			}
+
+			$('.popUp07').css('display', 'flex');
+			$('.popLayer').show();
+			$('body').css('overflow', 'hidden');
+		};
+		reader.readAsArrayBuffer(file);
+	}
+
+	function renderExcelTable(rows) {
+		var html = '';
+		var rowNum = 1;
+
+		currentIsExt = (extensiveVal > 0);
+		currentIsBig = (isBigVal > 0);
+
+		var hasDeviceCol = false;
+		var headerFound = false;
+		
+		var has1To5 = false;
+		var has6To10 = false;
+		
+		for (var h = 0; h < Math.min(rows.length, 15); h++) {
+			var hRow = rows[h];
+			if (!hRow) continue;
+			
+			var midCount = 0;
+			var isHeaderRow = false;
+
+			for (var c = 0; c < hRow.length; c++) {
+				var cellStr = String(hRow[c] || '').replace(/\s+/g, '');
+				
+				if (cellStr.indexOf('시공장비') !== -1 || cellStr.indexOf('장비명') !== -1 || cellStr.indexOf('기기번호') !== -1 || cellStr === '장비') {
+					hasDeviceCol = true;
+				}
+				if (cellStr.indexOf('단본') !== -1 || cellStr.indexOf('하단') !== -1 || cellStr.indexOf('상단') !== -1) {
+					isHeaderRow = true;
+				}
+				if (/^(1회|2회|3회|4회|5회|1차|2차|3차|4차|5차|1회측정|5회측정)$/.test(cellStr) || cellStr.indexOf('1회') !== -1 || cellStr.indexOf('5회') !== -1 || cellStr.indexOf('1차') !== -1) {
+					has1To5 = true;
+				}
+				if (/^(6회|7회|8회|9회|10회|6차|7차|8차|9차|10차|6회측정|7회측정|8회측정|9회측정|10회측정)$/.test(cellStr) ||
+					cellStr.indexOf('6회') !== -1 || cellStr.indexOf('7회') !== -1 || cellStr.indexOf('8회') !== -1 || cellStr.indexOf('9회') !== -1 || cellStr.indexOf('10회') !== -1 ||
+					cellStr.indexOf('6차') !== -1 || cellStr.indexOf('7차') !== -1 || cellStr.indexOf('8차') !== -1 || cellStr.indexOf('9차') !== -1 || cellStr.indexOf('10차') !== -1) {
+					has6To10 = true;
+				}
+			}
+
+			if (isHeaderRow && !headerFound) {
+				headerFound = true;
+				for (var c = 0; c < hRow.length; c++) {
+					var cellStr = String(hRow[c] || '').replace(/\s+/g, '');
+					if (cellStr.indexOf('중단') !== -1) {
+						midCount++;
+					}
+				}
+				if (midCount >= 3) {
+					currentIsExt = true;
+				} else {
+					currentIsExt = false;
+				}
+			}
+		}
+
+		if (has1To5) {
+			if (has6To10) {
+				currentIsBig = true;
+			} else {
+				currentIsBig = false;
+			}
+		}
+
+		var dateRegex = /^\d{4}[-/.]\d{1,2}[-/.]\d{1,2}/;
+
+		for (var i = 0; i < rows.length; i++) {
+			var row = rows[i];
+			if (!row || row.length === 0 || row.join('').trim() === '') continue;
+
+			var colIdx = -1;
+			var firstColStr = formatExcelDate(row[0]);
+			var secondColStr = formatExcelDate(row[1]);
+
+			if (dateRegex.test(firstColStr)) {
+				colIdx = 0;
+			} else if (dateRegex.test(secondColStr)) {
+				colIdx = 1;
+			}
+
+			if (colIdx === -1) continue;
+
+			var createDateVal = formatExcelDate(row[colIdx++]);
+
+			var nextCellStr = String(row[colIdx] || '').trim();
+			if (hasDeviceCol || nextCellStr.indexOf('호기') !== -1 || nextCellStr.indexOf('장비') !== -1 || /^\d+호기/.test(nextCellStr)) {
+				colIdx++;
+			}
+
+			var dataObj = {
+				createDate: createDateVal,
+				pileType: row[colIdx++] || 'PHC',
+				method: row[colIdx++] || 'SDA',
+				location: row[colIdx++] || '',
+				pileNo: row[colIdx++] || '',
+				pileStandard: row[colIdx++] || '500',
+				piOne: row[colIdx++] || '0',
+				piTwo: row[colIdx++] || '0',
+				piThree: row[colIdx++] || '0',
+				piFour: row[colIdx++] || '0'
+			};
+
+			if (currentIsExt) {
+				dataObj.piFive = row[colIdx++] || '0';
+				dataObj.piSix = row[colIdx++] || '0';
+				dataObj.piSeven = row[colIdx++] || '0';
+			} else {
+				dataObj.piFive = '0';
+				dataObj.piSix = '0';
+				dataObj.piSeven = row[colIdx++] || '0';
+			}
+
+			var sumVal = row[colIdx++] || '0'; 
+
+			dataObj.connectLength = row[colIdx++] || '0';
+			dataObj.drillingDepth = row[colIdx++] || '0';
+			dataObj.intrusionDepth = row[colIdx++] || '0';
+			dataObj.balance = row[colIdx++] || '0';
+			dataObj.gongSac = row[colIdx++] || '0';
+			dataObj.hammaT = row[colIdx++] || '0';
+			dataObj.fallMeter = row[colIdx++] || '0';
+			dataObj.managedStandard = row[colIdx++] || '0';
+			dataObj.meas = [];
+			var maxMeas = (currentIsBig) ? 10 : 5;
+			for (var m = 0; m < maxMeas; m++) {
+				dataObj.meas.push(row[colIdx++] || '');
+			}
+
+			dataObj.avgPenetrationValue = row[colIdx++] || '0';
+			dataObj.totalPenetrationValue = row[colIdx++] || '0'; 
+			
+			colIdx += 4; 
+			
+			dataObj.bigo = row[colIdx++] || ''
+
+			html += createExcelRowHtml(dataObj, rowNum++);
+		}
+		$('#popExcel_tbody').html(html);
+	}
+
+	function createExcelRowHtml(data, idx) {
+		var midStyle = (currentIsExt) ? '' : 'display:none;';
+		var measStyle = (currentIsBig) ? '' : 'display:none;';
+
+		var totalM = (Number(data.piOne||0) + Number(data.piTwo||0) + Number(data.piThree||0) + Number(data.piFour||0) + Number(data.piFive||0) + Number(data.piSix||0) + Number(data.piSeven||0)).toFixed(2);
+		if (totalM.endsWith('.00')) totalM = totalM.slice(0, -3);
+
+		var html = '<tr class="excel-tr" style="border-bottom: 1px solid #ddd;">' +
+			'<td style="border:1px solid #ccc; padding:2px;"><input type="checkbox" class="excel-row-chk" checked /></td>' +
+			'<td style="border:1px solid #ccc; padding:2px; background:#f9f9f9; font-weight:bold;">' + (idx || '') + '</td>' +
+			'<td style="border:1px solid #ccc; padding:2px;"><input type="text" name="ex_createDate" value="' + (data.createDate || '') + '" placeholder="YYYY-MM-DD HH:mm:ss" style="width:140px; text-align:center;" /></td>' +
+			'<td style="border:1px solid #ccc; padding:2px;"><input type="text" name="ex_pileType" value="' + (data.pileType || '') + '" style="width:60px; text-align:center;" /></td>' +
+			'<td style="border:1px solid #ccc; padding:2px;"><input type="text" name="ex_method" value="' + (data.method || '') + '" style="width:60px; text-align:center;" /></td>' +
+			'<td style="border:1px solid #ccc; padding:2px;"><input type="text" name="ex_location" value="' + (data.location || '') + '" style="width:70px; text-align:center;" /></td>' +
+			'<td style="border:1px solid #ccc; padding:2px;"><input type="text" name="ex_pileNo" value="' + (data.pileNo || '') + '" style="width:60px; text-align:center;" /></td>' +
+			'<td style="border:1px solid #ccc; padding:2px;"><input type="text" name="ex_pileStandard" value="' + (data.pileStandard || '') + '" style="width:60px; text-align:center;" /></td>' +
+			
+			'<td style="border:1px solid #ccc; padding:2px;"><input type="text" name="ex_piOne" value="' + (data.piOne || '0') + '" style="width:50px; text-align:center;" /></td>' +
+			'<td style="border:1px solid #ccc; padding:2px;"><input type="text" name="ex_piTwo" value="' + (data.piTwo || '0') + '" style="width:50px; text-align:center;" /></td>' +
+			'<td style="border:1px solid #ccc; padding:2px;"><input type="text" name="ex_piThree" value="' + (data.piThree || '0') + '" style="width:50px; text-align:center;" /></td>' +
+			'<td style="border:1px solid #ccc; padding:2px;"><input type="text" name="ex_piFour" value="' + (data.piFour || '0') + '" style="width:50px; text-align:center;" /></td>' +
+			'<td class="mid-group" style="border:1px solid #ccc; padding:2px; ' + midStyle + '"><input type="text" name="ex_piFive" value="' + (data.piFive || '0') + '" style="width:50px; text-align:center;" /></td>' +
+			'<td class="mid-group" style="border:1px solid #ccc; padding:2px; ' + midStyle + '"><input type="text" name="ex_piSix" value="' + (data.piSix || '0') + '" style="width:50px; text-align:center;" /></td>' +
+			'<td style="border:1px solid #ccc; padding:2px;"><input type="text" name="ex_piSeven" value="' + (data.piSeven || '0') + '" style="width:50px; text-align:center;" /></td>' +
+			'<td style="border:1px solid #ccc; padding:2px; background:#f0f4f8; font-weight:bold;"><input type="text" name="ex_totalConnectWidth" value="' + totalM + '" style="width:50px; text-align:center; background:transparent; border:none; font-weight:bold;" readonly /></td>' +
+			
+			'<td style="border:1px solid #ccc; padding:2px;"><input type="text" name="ex_connectLength" value="' + (data.connectLength || '0') + '" style="width:40px; text-align:center;" /></td>' +
+			'<td style="border:1px solid #ccc; padding:2px;"><input type="text" name="ex_drillingDepth" value="' + (data.drillingDepth || '0') + '" style="width:50px; text-align:center;" /></td>' +
+			'<td style="border:1px solid #ccc; padding:2px;"><input type="text" name="ex_intrusionDepth" value="' + (data.intrusionDepth || '0') + '" style="width:50px; text-align:center;" /></td>' +
+			'<td style="border:1px solid #ccc; padding:2px;"><input type="text" name="ex_balance" value="' + (data.balance || '0') + '" style="width:50px; text-align:center;" /></td>' +
+			'<td style="border:1px solid #ccc; padding:2px;"><input type="text" name="ex_gongSac" value="' + (data.gongSac || '0') + '" style="width:50px; text-align:center;" /></td>' +
+			'<td style="border:1px solid #ccc; padding:2px;"><input type="text" name="ex_hammaT" value="' + (data.hammaT || '0') + '" style="width:50px; text-align:center;" /></td>' +
+			'<td style="border:1px solid #ccc; padding:2px;"><input type="text" name="ex_fallMeter" value="' + (data.fallMeter || '0') + '" style="width:50px; text-align:center;" /></td>' +
+			'<td style="border:1px solid #ccc; padding:2px;"><input type="text" name="ex_managedStandard" value="' + (data.managedStandard || '0') + '" style="width:50px; text-align:center;" /></td>';
+
+		for (var m = 0; m < 5; m++) {
+			var measVal1 = (data.meas && data.meas[m] !== undefined) ? data.meas[m] : '';
+			html += '<td style="border:1px solid #ccc; padding:2px;"><input type="text" name="ex_meas' + (m + 1) + '" value="' + measVal1 + '" style="width:45px; text-align:center;" /></td>';
+		}
+		for (var m = 5; m < 10; m++) {
+			var measVal2 = (data.meas && data.meas[m] !== undefined) ? data.meas[m] : '';
+			html += '<td class="meas-big-group" style="border:1px solid #ccc; padding:2px; ' + measStyle + '"><input type="text" name="ex_meas' + (m + 1) + '" value="' + measVal2 + '" style="width:45px; text-align:center;" /></td>';
+		}
+
+		html += '<td style="border:1px solid #ccc; padding:2px;"><input type="text" name="ex_avgPenetrationValue" value="' + (data.avgPenetrationValue || '0') + '" style="width:50px; text-align:center;" /></td>' +
+				'<td style="border:1px solid #ccc; padding:2px;"><input type="text" name="ex_totalPenetrationValue" value="' + (data.totalPenetrationValue || '0') + '" style="width:50px; text-align:center;" /></td>' +
+				'<td style="border:1px solid #ccc; padding:2px;"><input type="text" name="ex_bigo" value="' + (data.bigo || '') + '" style="width:110px; text-align:center;" /></td>' +
+			'</tr>';
+		
+		$('#excelChkAll').prop('checked', true);
+		
+		return html;
+	}
+
+	function toggleExcelChkAll(el) {
+		$('#popExcel_tbody .excel-row-chk').prop('checked', $(el).is(':checked'));
+	}
+
+	function closeExcelUploadPopup() {
+		$('.popUp07').hide();
+		$('.popLayer').hide();
+		$('body').css('overflow', 'auto');
+	}
+
+	function submitExcelData() {
+		var reports = [];
+		var dateRegex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]) (0\d|1\d|2[0-3]):([0-5]\d):([0-5]\d)$/;
+		var hasError = false;
+		
+		var deviceIdxVal = $('input[name="deviceIdx"]').first().val();
+		var deviceIdx = deviceIdxVal ? Number(deviceIdxVal) : 0;
+
+		if (deviceIdx === 0) {
+			alert('현재 선택된 호기(장비) 정보를 찾을 수 없습니다.');
+			return;
+		}
+
+		var $checkedRows = $('#popExcel_tbody .excel-row-chk:checked');
+		
+		if ($checkedRows.length === 0) {
+			alert('저장할 항목을 체크박스로 선택해주세요.');
+			return;
+		}
+
+		$checkedRows.each(function(index) {
+			var $tr = $(this).closest('tr');
+			
+			var createDateVal = $tr.find('input[name="ex_createDate"]').val().trim();
+			if (!dateRegex.test(createDateVal)) {
+				alert('선택된 항목 중 ' + (index + 1) + '번째 행의 시공일 형식이 올바르지 않습니다.\n(예: 2026-07-15 14:30:00)');
+				$tr.find('input[name="ex_createDate"]').focus();
+				hasError = true;
+				return false;
+			}
+
+			var pieces = [];
+			if (currentIsExt) {
+				pieces = [
+					{ name: '단본', value: $tr.find('input[name="ex_piOne"]').val() || '0', id: 0, reportIdx: 0 },
+					{ name: '하단', value: $tr.find('input[name="ex_piTwo"]').val() || '0', id: 0, reportIdx: 0 },
+					{ name: '중단', value: $tr.find('input[name="ex_piThree"]').val() || '0', id: 0, reportIdx: 0 },
+					{ name: '중단', value: $tr.find('input[name="ex_piFour"]').val() || '0', id: 0, reportIdx: 0 },
+					{ name: '중단', value: $tr.find('input[name="ex_piFive"]').val() || '0', id: 0, reportIdx: 0 },
+					{ name: '중단', value: $tr.find('input[name="ex_piSix"]').val() || '0', id: 0, reportIdx: 0 },
+					{ name: '상단', value: $tr.find('input[name="ex_piSeven"]').val() || '0', id: 0, reportIdx: 0 }
+				];
+			} else {
+				pieces = [
+					{ name: '단본', value: $tr.find('input[name="ex_piOne"]').val() || '0', id: 0, reportIdx: 0 },
+					{ name: '하단', value: $tr.find('input[name="ex_piTwo"]').val() || '0', id: 0, reportIdx: 0 },
+					{ name: '중단', value: $tr.find('input[name="ex_piThree"]').val() || '0', id: 0, reportIdx: 0 },
+					{ name: '중단', value: $tr.find('input[name="ex_piFour"]').val() || '0', id: 0, reportIdx: 0 },
+					{ name: '상단', value: $tr.find('input[name="ex_piSeven"]').val() || '0', id: 0, reportIdx: 0 }
+				];
+			}
+
+			var penetrations = [];
+			var maxMeasLimit = (currentIsBig) ? 10 : 5;
+			for (var m = 1; m <= maxMeasLimit; m++) {
+				var val = $tr.find('input[name="ex_meas' + m + '"]').val();
+				if (val !== undefined && val !== '') {
+					penetrations.push({
+						name: m + "회",
+						value: val,
+						id: 0,
+						reportIdx: 0
+					});
+				}
+			}
+
+			reports.push({
+				deviceIdx: deviceIdx,
+				createDate: createDateVal,
+				currentDateTime: createDateVal.substring(0, 10),
+				pileType: $tr.find('input[name="ex_pileType"]').val() || 'null',
+				method: $tr.find('input[name="ex_method"]').val() || 'null',
+				location: $tr.find('input[name="ex_location"]').val() || 'null',
+				pileNo: $tr.find('input[name="ex_pileNo"]').val() || 'null',
+				pileStandard: $tr.find('input[name="ex_pileStandard"]').val() || 'null',
+				piece: pieces,
+				penetrations: penetrations,
+				drillingDepth: $tr.find('input[name="ex_drillingDepth"]').val() || '0',
+				intrusionDepth: $tr.find('input[name="ex_intrusionDepth"]').val() || '0',
+				balance: $tr.find('input[name="ex_balance"]').val() || '0',
+				gongSac: $tr.find('input[name="ex_gongSac"]').val() || '0',
+				hammaT: $tr.find('input[name="ex_hammaT"]').val() || '0',
+				fallMeter: $tr.find('input[name="ex_fallMeter"]').val() || '0',
+				managedStandard: $tr.find('input[name="ex_managedStandard"]').val() || '0',
+				avgPenetrationValue: $tr.find('input[name="ex_avgPenetrationValue"]').val() || '0',
+				totalPenetrationValue: $tr.find('input[name="ex_totalPenetrationValue"]').val() || '0',
+				bigo: $tr.find('input[name="ex_bigo"]').val() || 'null'
+			});
+		});
+
+		if (hasError) return;
+		if (reports.length === 0) {
+			alert('저장할 데이터가 없습니다.');
+			return;
+		}
+
+		if (!confirm("선택된 총 " + reports.length + "건의 엑셀 데이터를 저장하시겠습니까?")) {
+			return;
+		}
+
+		var $btn = $('#saveExcelBtn');
+		$btn.prop('disabled', true).css({'pointer-events': 'none', 'opacity': '0.5'});
+
+		$.ajax({
+			type: "POST",
+			url: "${pageContext.request.contextPath}/report/insertMulti",
+			data: JSON.stringify(reports),
+			dataType: "JSON",
+			contentType: "application/json",
+			success: function(res) {
+				if (res === true || res.success) {
+					alert('선택된 엑셀 데이터가 성공적으로 저장되었습니다.');
+					closeExcelUploadPopup();
+					location.reload();
+				} else {
+					alert('데이터 저장 중 오류가 발생했습니다.');
+					$btn.prop('disabled', false).css({'pointer-events': '', 'opacity': ''});
+				}
+			},
+			error: function(xhr, status, error) {
+				alert('서버 통신 중 문제가 발생했습니다.');
+				console.error(error);
+				$btn.prop('disabled', false).css({'pointer-events': '', 'opacity': ''});
+			}
+		});
+	}
 
 </script>
 <!--컨텐츠-->
@@ -2692,6 +3145,7 @@
 								<div class="btnType02 bg02" onclick="javascript:openCopyReportPopup();" style="width: 90px; background: #4CAF50; color:#fff; border: 1px solid #4CAF50; margin: 0;">기록지 복사</div>
 								<div class="btnType02 bg02" onclick="javascript:openNewReportPopup();" style="width: 90px; background: #2196F3; color:#fff; border: 1px solid #2196F3; margin: 0;">기록지 추가</div>
 								<div class="btnType02 bg02" onclick="javascript:openDateEditPopupBtn();" style="width: 90px; background: #9C27B0; color:#fff; border: 1px solid #9C27B0; margin: 0;">시공일 수정</div>
+								<div class="btnType02 bg02" onclick="javascript:triggerExcelUpload();" style="width: 100px; background: #FF9800; color:#fff; border: 1px solid #FF9800; margin: 0; cursor:pointer;">Excel 업로드</div>
 							</div>
 						</c:if> 
 						<div class="tableCArea bulkUploadSignRoomRow">
@@ -2757,6 +3211,7 @@
 								<div class="btnType02 bg02" onclick="javascript:openCopyReportPopup();" style="width: 90px; background: #4CAF50; color:#fff; border: 1px solid #4CAF50; margin: 0;">기록지 복사</div>
 								<div class="btnType02 bg02" onclick="javascript:openNewReportPopup();" style="width: 90px; background: #2196F3; color:#fff; border: 1px solid #2196F3; margin: 0;">기록지 추가</div>
 								<div class="btnType02 bg02" onclick="javascript:openDateEditPopupBtn();" style="width: 90px; background: #9C27B0; color:#fff; border: 1px solid #9C27B0; margin: 0;">시공일 수정</div>
+								<div class="btnType02 bg02" onclick="javascript:triggerExcelUpload();" style="width: 100px; background: #FF9800; color:#fff; border: 1px solid #FF9800; margin: 0; cursor:pointer;">Excel 업로드</div>
 							</div>
 						</c:if>
 						<div class="tableCArea bulkUploadSignRoomRow" style="margin-bottom: 0px;">
@@ -4661,6 +5116,73 @@
 				</table>
 			</div>
 			<div onclick="javascript:submitDeviceChange();" style="margin-top: 20px; background:#077b9c; color:#fff; text-align: center; padding: 14px; cursor: pointer; font-weight: bold; font-size: 16px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">개별 이전 및 수정 저장</div>
+		</div>
+	</div>
+	
+	<input type="file" id="excelFileInput" accept=".xlsx, .xls" style="display:none;" onchange="readExcelFile(event);" />
+
+	<div class="popUp popUp07">
+		<div class="popTit">
+			<p style="font-size:18px; font-weight:bold; margin:0;">Excel 데이터 업로드</p>
+			<img class="popClose" src="${pageContext.request.contextPath}/new/img/popclose.png" onclick="closeExcelUploadPopup();" style="cursor:pointer;" />
+		</div>
+		<div class="table-scroll-area">
+			<table class="signTable" style="margin: 0; width: 100% !important; border-collapse: collapse; white-space: nowrap;">
+				<thead>
+					<tr style="background: #eee; font-size: 13px;">
+						<th rowspan="2" style="width: 30px;"><input type="checkbox" id="excelChkAll" onclick="toggleExcelChkAll(this);" /></th>
+						<th rowspan="2" style="width: 40px;">순번</th>
+						<th rowspan="2">시공일<br>(YYYY-MM-DD HH:mm:ss)</th>
+						<th rowspan="2">파일종류</th>
+						<th rowspan="2">시공공법</th>
+						<th rowspan="2">시공위치</th>
+						<th rowspan="2">파일번호</th>
+						<th rowspan="2">파일규격</th>
+						<!-- id="ex_th_pileGroup" 추가 -->
+						<th id="ex_th_pileGroup" colspan="8">파일구분</th>
+						<th rowspan="2">이음<br>(개소)</th>
+						<th rowspan="2">천공깊이<br>(M)</th>
+						<th rowspan="2">관입깊이<br>(M)</th>
+						<th rowspan="2">파일잔량<br>(M)</th>
+						<th rowspan="2">공삭공<br>(M)</th>
+						<th rowspan="2">해머무게<br>(Ton)</th>
+						<th rowspan="2">낙하높이<br>(m)</th>
+						<th rowspan="2">관리기준<br>(mm)</th>
+						<!-- id="ex_th_measGroup" 추가 -->
+						<th id="ex_th_measGroup" colspan="10">관입량 측정(mm)</th>
+						<th rowspan="2">평균관입<br>(mm)</th>
+						<th rowspan="2">최종관입<br>(mm)</th>
+						<th rowspan="2">비고</th>
+					</tr>
+					<tr style="background: #eee; font-size: 13px;">
+						<th>단본(M)</th>
+						<th>하단(M)</th>
+						<th>중단1(M)</th>
+						<th>중단2(M)</th>
+						<th class="mid-group" style="display:none;">중단3(M)</th>
+						<th class="mid-group" style="display:none;">중단4(M)</th>
+						<th>상단(M)</th>
+						<th>합계(M)</th>
+						<th>1회</th>
+						<th>2회</th>
+						<th>3회</th>
+						<th>4회</th>
+						<th>5회</th>
+						<th class="meas-big-group" style="display:none;">6회</th>
+						<th class="meas-big-group" style="display:none;">7회</th>
+						<th class="meas-big-group" style="display:none;">8회</th>
+						<th class="meas-big-group" style="display:none;">9회</th>
+						<th class="meas-big-group" style="display:none;">10회</th>
+					</tr>
+				</thead>
+				<tbody id="popExcel_tbody">
+				</tbody>
+			</table>
+		</div>
+
+		<div style="display: flex; justify-content: center; gap: 10px; margin-top: 15px;">
+			<div onclick="closeExcelUploadPopup();" style="background:#718096; color:#fff; padding:12px 30px; border-radius:4px; cursor:pointer; font-weight:bold;">취소</div>
+			<div id="saveExcelBtn" onclick="submitExcelData();" style="background:#077b9c; color:#fff; padding:12px 30px; border-radius:4px; cursor:pointer; font-weight:bold;">데이터 저장</div>
 		</div>
 	</div>
 	

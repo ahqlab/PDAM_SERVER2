@@ -1172,12 +1172,14 @@ function changeSpareDevice(targetId, changeId, constructionIdx){
 	
 	
 	<div class="min531">
+		<c:if test="${sessionInfo.role == 0}">
 		<div class="backupHistoryArea">
 			<button type="button" class="backupHistoryBtn"
 				onclick="location.href='${pageContext.request.contextPath}/device/backup-history?constructionIdx=${param.constructionIdx}'">
 				백업 이력
 			</button>
 		</div>
+		</c:if>
 		<div class="tableArea">
 			<div class="viewTable viewTable01">
 				<div class="tableScroll">
@@ -2359,5 +2361,6 @@ $(document).on('click', "input[type='checkbox'][name='changeDeivceCk']", functio
 		<div class="pdfLoading-spinner"></div>
 		<div class="pdfLoading-title">기록지 PDF를 생성하고 있습니다</div>
 		<div class="pdfLoading-desc">건수가 많으면 다소 시간이 걸릴 수 있습니다.<br/>창을 닫지 말고 잠시만 기다려 주세요.</div>
+		<div class="pdfLoading-desc" style="margin-top:12px;padding-top:12px;border-top:1px solid #eee;">"페이지가 응답하지 않습니다" 창이 뜨면 [페이지 종료]가 아닌<br/><span style="display:inline-block;margin-top:4px;padding:3px 10px;background:#337ab7;color:#fff;border-radius:4px;font-weight:bold;">대기</span>를 눌러주세요.</div>
 	</div>
 </div>

@@ -528,6 +528,7 @@ function setGroupName(){
 		                    <form:option value="address">현장주소</form:option>
 		                    <form:option value="groupName">시공사</form:option>
 		                    <form:option value="bluetoothNo">블루투스 No</form:option>
+		                    <form:option value="serialNo">시리얼넘버</form:option>
 						</form:select>
 						<form:input path="searchWord" class="searchin"  placeholder="검색어를 입력하세요."/>
 						<form:hidden path="currentPage"/>
@@ -558,6 +559,7 @@ function setGroupName(){
 					<span class="filterDivider"></span>
 					<label class="filterChip"><input type="checkbox" name="conductActive" value="1" onchange="filterSubmit();" ${domainParam.conductActive == 1 ? 'checked' : ''}><span class="chipText">시행</span></label>
 					<label class="filterChip"><input type="checkbox" name="conductDone" value="1" onchange="filterSubmit();" ${domainParam.conductDone == 1 ? 'checked' : ''}><span class="chipText">종료</span></label>
+					<label class="filterChip"><input type="checkbox" name="extensivePileUsage" value="1" onchange="filterSubmit();" ${domainParam.extensivePileUsage == 1 ? 'checked' : ''}><span class="chipText">중단 4개 사용</span></label>
 				</div>
 				</c:if>
 				</form:form>
@@ -1051,16 +1053,8 @@ function setGroupName(){
 				<div class="popCont">
 					<div class="inputArea02 mb-20">
 						<p class="inputTxt02">협력사</p>
-						<c:choose>
-							<c:when test="${sessionInfo.role gt 0}">
-								<input type="text" autocomplete="off" disabled="disabled" class="Input02" id="constructionName" name="constructionName" >
-								<input type="hidden" id="constructionIdx" name="constructionIdx">
-							</c:when>
-							<c:otherwise>
-								<select id="constructionIdx" name="constructionIdx" class="Input02"  disabled="disabled" >
-								</select>
-							</c:otherwise>
-						</c:choose>
+						<input type="text" autocomplete="off" disabled="disabled" class="Input02" id="constructionName" name="constructionName" readonly="readonly">
+						<input type="hidden" id="constructionIdx" name="constructionIdx">
 					</div>
 					<div class="inputArea02 mb-20">
 						<p class="inputTxt02">PDAM 태블릿 번호</p>
@@ -2030,40 +2024,19 @@ function registDeviceInfo(constructionIdx){
 			// 통신이 성공적으로 이루어졌을 때 이 함수를 타게 된다.
 			// TODO
 			if(data.length > 0){
-				var role = ${sessionInfo.role};
-				if(role > 0){
-					$.each(data, function(index, item) {
+				$.each(data, function(index, item) {
+					if(item.id == constructionIdx){
 						$("#deviceRegistForm input[name='constructionName']").val(item.name);
 						$("#deviceRegistForm input[name='constructionIdx']").val(item.id);
-					});
-				}else{
-					$("#deviceRegistForm select[name='constructionIdx']").append("<option value=\"0\">선택</option>");
-					//$('#constructionIdx').append("<option value=\"0\">선택</option>");
-					$.each(data, function(index, item) {
-						/* $('#constructionIdx').append("<option value='" + item.id + "'>"+ item.name + "</option>"); */
-						var idx = constructionIdx;
-						if(item.id == idx){
-							$("#deviceRegistForm select[name='constructionIdx']").append("<option selected=\"selected\" value='" + item.id + "'>"+ item.name + "</option>");
-						}else{
-							$("#deviceRegistForm select[name='constructionIdx']").append("<option value='" + item.id + "'>"+ item.name + "</option>");
-						}
-					});
-				}
-				
+						return false; 
+					}
+				});
 			}
-			
-		},
-		complete : function(data) {
-			// 통신이 실패했어도 완료가 되었을 때 이 함수를 타게 된다.
-			//$('#ctmIdx').append("<option value=\"0\">선택</option>");
-			//alert("서버와 통신에 실패했습니다. 계속 실패할 경우 관리자에게 문의하세요.");
 		},
 		error : function(xhr, status, error) {
-			$("#deviceRegistForm select[name='constructionIdx']").append("<option value=\"0\">선택</option>");
 			alert("에러발생");
 		}
 	});
-	
 	
 	
 	jQuery.ajax({
