@@ -340,7 +340,13 @@ public class DeviceController extends AbstractDeviceCRUDController<DeviceMapper,
 		
 	@ResponseBody
 	@RequestMapping(value = "/doDelete", method = RequestMethod.POST)
-	public boolean doDelete(@RequestParam("id") int id) {
+	public boolean doDelete(@RequestParam("id") int id, HttpSession session,
+			HttpServletResponse response) {
+		Object role = session.getAttribute("role");
+		if (!(role instanceof Integer) || ((Integer) role).intValue() != 0) {
+			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			return false;
+		}
 		return mapper.doDelete(id) > 0;
 	}
 	

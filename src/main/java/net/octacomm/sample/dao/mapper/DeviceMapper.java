@@ -3,7 +3,6 @@ package net.octacomm.sample.dao.mapper;
 import java.util.List;
 
 import org.apache.ibatis.annotations.CacheNamespace;
-import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -39,7 +38,7 @@ public interface DeviceMapper extends CRUDMapper<Device, DeviceParam, Integer>{
 	int update(Device domain);
 	
 	
-	@Delete("DELETE FROM " + TABLE_NAME + " WHERE id =  #{id}")
+	@Update("UPDATE" + TABLE_NAME + "SET isDel = 1 WHERE id = #{id} AND isDel = 0")
 	@Override
 	int delete(Integer id);
 	
@@ -55,7 +54,7 @@ public interface DeviceMapper extends CRUDMapper<Device, DeviceParam, Integer>{
 	Device getFindByTabletNoAndPassword(Device device);
 	
 	
-	@Update("UPDATE " + TABLE_NAME + " SET isDel = 1 where id = #{id}")
+	@Update("UPDATE " + TABLE_NAME + " SET isDel = 1 WHERE id = #{id} AND isDel = 0")
 	int doDelete(int id);
 	
 	

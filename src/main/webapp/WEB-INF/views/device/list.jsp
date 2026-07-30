@@ -118,6 +118,10 @@
 	   헤더/셀 줄바꿈을 막아 내용 너비를 유지하고, 컨테이너가 좁을 때만 스크롤 발생. */
 	.viewTable01 .tableScroll { overflow-x: auto; }
 	#userListTable th, #userListTable td { white-space: nowrap; }
+	#userListTable .deviceDelete {
+		background: #dc3545;
+		border-color: #dc3545;
+	}
 </style>
 <script type="text/javascript">
 $( document ).ready( function() 
@@ -232,7 +236,7 @@ function calcSum(){
 }
 
 function doDelete(idx){
-	var result = confirm("삭제하시겠습니까?");
+	var result = confirm("선택한 호기를 삭제하시겠습니까?");
 	if(result){
 		jQuery.ajax({
 			type : "POST",
@@ -244,12 +248,19 @@ function doDelete(idx){
 			success : function(data) {
 				if(data == true){
 					alert('삭제되었습니다.');
-					history.go(0);
+					location.reload();
+				}else{
+					alert('삭제할 호기를 찾을 수 없습니다.');
 				}
 			},
 			complete : function(data) {
 			},
 			error : function(xhr, status, error) {
+				if(xhr.status == 403){
+					alert('슈퍼관리자 계정만 호기를 삭제할 수 있습니다.');
+				}else{
+					alert('호기 삭제 중 오류가 발생했습니다.');
+				}
 			}
 		}); 
 		return;
@@ -1210,6 +1221,7 @@ function changeSpareDevice(targetId, changeId, constructionIdx){
 								<c:when test="${sessionInfo.role == 0}">
 									<th style="width: 5%; font-size: 15px;">정보변경</th>
 									<th style="width: 5%; font-size: 15px;">상태</th>
+									<th style="width: 5%; font-size: 15px;">삭제</th>
 								</c:when>
 							</c:choose>
 						</tr>
@@ -1263,7 +1275,7 @@ function changeSpareDevice(targetId, changeId, constructionIdx){
 												<option value="1" ${domain.conduct == 1 ? 'selected="selected"' : '' }>종료</option>
 											</select>
 										</td>
-										<%-- <td><a href="javascript:doDelete('${domain.id}')">[삭제]</a></td> --%>
+										<td><div class="tableDelate deviceDelete" onclick="doDelete('${domain.id}');">삭제</div></td>
 									</tr>
 								</c:when>
 								<c:when test="${sessionInfo.role == 2 or sessionInfo.role == 3 or sessionInfo.role == 4}">
@@ -1357,7 +1369,7 @@ function changeSpareDevice(targetId, changeId, constructionIdx){
 							<tr>
 								<c:choose>
 									<c:when test="${sessionInfo.role == 0}">
-										<td colspan="13">등록된 데이터가 없습니다.</td>
+										<td colspan="${param.constructionIdx == 588 or param.constructionIdx == 613 or param.constructionIdx == 627 ? 16 : 15}">등록된 데이터가 없습니다.</td>
 									</c:when>
 									<c:otherwise>
 										<td colspan="11">등록된 데이터가 없습니다.</td>
@@ -1379,6 +1391,7 @@ function changeSpareDevice(targetId, changeId, constructionIdx){
 											<td id="totalSum"></td>
 											<td id="todaySum"></td>
 											<td id="yesterdaySum"></td>
+											<td></td>
 											<td></td>
 											<td></td>
 											<td></td>
