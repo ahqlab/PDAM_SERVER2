@@ -48,7 +48,9 @@ public class ReportTenAllJh extends AbstractExcelView{
     throws Exception
   {
     String userAgent = req.getHeader("User-Agent");
-    String fileName = "PDAM_REPORT_" + DateUtil.getCurrentDatetime() + ".xls";
+    String fileName = model.get("backupDownloadFileName") == null
+        ? "PDAM_REPORT_" + DateUtil.getCurrentDatetime() + ".xls"
+        : (String) model.get("backupDownloadFileName");
 
     if (userAgent.indexOf("MSIE") > -1)
       fileName = URLEncoder.encode(fileName, "utf-8");

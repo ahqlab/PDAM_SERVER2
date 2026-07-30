@@ -13,6 +13,13 @@ public interface DeviceBackupHistoryMapper {
 			@Param("constructionIdx") int constructionIdx,
 			@Param("deviceId") int deviceId);
 
+	List<DeviceBackupHistory> getListByConstruction(
+			@Param("constructionIdx") int constructionIdx);
+
+	DeviceBackupHistory getLatestByDevice(
+			@Param("constructionIdx") int constructionIdx,
+			@Param("deviceId") int deviceId);
+
 	DeviceBackupHistory getById(
 			@Param("id") int id,
 			@Param("constructionIdx") int constructionIdx,
