@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.mail.Session;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import net.octacomm.logger.Log;
@@ -178,8 +179,12 @@ public abstract class AbstractDeviceCRUDController<M extends CRUDMapper<D, P, PK
 	}
 
 	@RequestMapping(value = URL_DELETE, method = RequestMethod.GET)
-	public String delete(@RequestParam PK id, RedirectAttributes redirectAttributes, HttpServletRequest request, HttpSession session) {
-	
+	public String delete(@RequestParam PK id, RedirectAttributes redirecAttributes, HttpServletRequest request, HttpSession session, HttpServletResponse response) {
+		Object role = session.getAttribute("role");
+		if (!(role instanceof Integer) || ((Integer) role).intValue() != 0) {
+			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			return null;
+		}
 		if (mapper.delete(id) == 1) {
 			return getRedirectUrl(request, session);
 		} else {
