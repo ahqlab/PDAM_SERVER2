@@ -205,21 +205,21 @@
 		border-color: #245568;
 	}
 	.popUp.popUp07 {
-		width: calc(100vw - 40px);
-		max-width: 1080px;
-		max-height: 90vh;
-		border-radius: 28px;
+		width: calc(100vw - 32px);
+		max-width: 900px;
+		max-height: calc(100vh - 32px);
+		border-radius: 18px;
 	}
 	.popUp07 .popTit {
 		position: relative;
-		height: 85px;
-		padding: 0 36px;
+		height: 60px;
+		padding: 0 64px 0 24px;
 		background: #168aa4;
-		font-size: 28px;
-		line-height: 85px;
+		font-size: 22px;
+		line-height: 60px;
 	}
 	.popUp07 .popCont {
-		padding: 22px 30px 55px;
+		padding: 18px 24px 24px;
 	}
 	.bulkUploadFileInput {
 		position: absolute;
@@ -236,9 +236,9 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		min-height: 265px;
+		min-height: 190px;
 		border: 2px dashed #118db0;
-		border-radius: 20px;
+		border-radius: 14px;
 		background: #fbfeff;
 		cursor: pointer;
 		transition: background-color 0.2s, border-color 0.2s;
@@ -248,25 +248,25 @@
 		background: #eefafd;
 	}
 	.bulkUploadIcon {
-		width: 76px;
-		height: 76px;
-		margin-bottom: 22px;
+		width: 54px;
+		height: 54px;
+		margin-bottom: 14px;
 	}
 	.bulkUploadDropTitle {
 		color: #111;
-		font-size: 24px;
+		font-size: 18px;
 		font-weight: 700;
 		text-align: center;
 	}
 	.bulkUploadFormat {
-		margin-top: 8px;
+		margin-top: 6px;
 		color: #aaa;
-		font-size: 22px;
+		font-size: 15px;
 		font-weight: 600;
 	}
 	.bulkUploadSelection {
-		min-height: 22px;
-		margin-top: 12px;
+		min-height: 18px;
+		margin-top: 8px;
 		color: #077b9c;
 		font-size: 14px;
 		text-align: center;
@@ -275,52 +275,52 @@
 	.bulkUploadActions {
 		display: flex;
 		justify-content: flex-end;
-		gap: 20px;
-		margin-top: 92px;
+		gap: 10px;
+		margin-top: 24px;
 	}
 	.bulkUploadSubmitBtn,
 	.bulkUploadCloseBtn {
-		height: 40px;
+		height: 36px;
 		border: 0;
 		border-radius: 5px;
 		font-weight: 600;
 		cursor: pointer;
 	}
 	.bulkUploadSubmitBtn {
-		width: 200px;
+		width: 180px;
 		background: #1188a4;
 		color: #fff;
 	}
 	.bulkUploadCloseBtn {
-		width: 100px;
+		width: 88px;
 		background: #edf1f3;
 		color: #333;
 	}
 	.popUp.popUp08 {
-		width: calc(100vw - 40px);
-		max-width: 1080px;
-		max-height: 90vh;
-		border-radius: 28px;
+		width: calc(100vw - 32px);
+		max-width: 900px;
+		max-height: calc(100vh - 32px);
+		border-radius: 18px;
 	}
 	.popUp08 .popTit {
 		position: relative;
-		height: 85px;
-		padding: 0 36px;
+		height: 60px;
+		padding: 0 64px 0 24px;
 		background: #168aa4;
-		font-size: 28px;
-		line-height: 85px;
+		font-size: 22px;
+		line-height: 60px;
 	}
 	.popUp08 .popCont {
-		padding: 28px 30px 50px;
-		max-height: calc(90vh - 85px);
+		padding: 18px 24px 24px;
+		max-height: calc(100vh - 92px);
 		overflow-y: auto;
 	}
 	.bulkAnalysisFileSummary {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		min-height: 50px;
-		padding: 0 18px;
+		min-height: 44px;
+		padding: 0 14px;
 		border: 1px solid #e5e9eb;
 		border-radius: 10px;
 		background: #fafcfd;
@@ -349,20 +349,23 @@
 		font-weight: 700;
 	}
 	.bulkAnalysisSection {
-		margin-top: 40px;
+		margin-top: 20px;
+	}
+	#bulkChangeView {
+		margin-top: 0;
 	}
 	.bulkNoDuplicate {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		min-height: 245px;
+		min-height: 150px;
 		color: #111;
-		font-size: 34px;
+		font-size: 24px;
 		font-weight: 700;
 	}
 	.bulkAnalysisTableWrap {
-		max-height: 355px;
-		overflow-y: auto;
+		max-height: 300px;
+		overflow: auto;
 		border: 1px solid #e3ebee;
 		border-radius: 12px;
 	}
@@ -372,14 +375,14 @@
 		table-layout: fixed;
 	}
 	.bulkAnalysisTable th {
-		height: 50px;
+		height: 42px;
 		background: #eaf7fa;
 		color: #111;
 		font-size: 14px;
 		font-weight: 700;
 	}
 	.bulkAnalysisTable td {
-		height: 56px;
+		height: 46px;
 		padding: 4px 10px;
 		border-top: 1px solid #e3ebee;
 		border-right: 1px solid #e3ebee;
@@ -442,34 +445,34 @@
 	.bulkChangeSummary {
 		display: grid;
 		grid-template-columns: repeat(3, 1fr);
-		gap: 18px;
-		margin: 14px 10px 30px;
+		gap: 12px;
+		margin: 0 0 16px;
 	}
 	.bulkChangeSummaryItem {
-		padding: 18px 10px;
+		padding: 12px 8px;
 		border: 1px solid #118db0;
 		border-radius: 12px;
 		text-align: center;
 	}
 	.bulkChangeSummaryItem span {
 		display: block;
-		margin-bottom: 8px;
+		margin-bottom: 4px;
 		color: #777;
-		font-size: 20px;
+		font-size: 16px;
 	}
 	.bulkChangeSummaryItem strong {
-		font-size: 22px;
+		font-size: 18px;
 	}
 	.bulkAnalysisActions {
 		display: flex;
 		justify-content: flex-end;
-		gap: 15px;
-		margin-top: 55px;
+		gap: 10px;
+		margin-top: 20px;
 	}
 	.bulkAnalysisButton {
-		min-width: 200px;
-		height: 40px;
-		padding: 0 22px;
+		min-width: 180px;
+		height: 36px;
+		padding: 0 18px;
 		border: 0;
 		border-radius: 5px;
 		background: #1188a4;
@@ -483,15 +486,39 @@
 		color: #111;
 	}
 	.bulkAnalysisButton--close {
-		min-width: 100px;
+		min-width: 88px;
 		background: #edf1f3;
 		color: #333;
 	}
 	.bulkAnalysisEmptyChanges {
-		padding: 75px 20px;
+		padding: 34px 16px;
 		color: #777;
-		font-size: 18px;
+		font-size: 16px;
 		text-align: center;
+	}
+	.bulkDialogCloseButton {
+		position: absolute;
+		top: 50%;
+		right: 20px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 34px;
+		height: 34px;
+		padding: 0;
+		border: 0;
+		border-radius: 50%;
+		background: transparent;
+		color: #fff;
+		font-size: 27px;
+		line-height: 1;
+		cursor: pointer;
+		transform: translateY(-50%);
+	}
+	.bulkDialogCloseButton:hover,
+	.bulkDialogCloseButton:focus {
+		background: rgba(255, 255, 255, 0.18);
+		outline: 0;
 	}
 	@media screen and (max-width: 767px) {
 		.view .tableCArea.bulkUploadSignRoomRow,
@@ -512,58 +539,73 @@
 			font-size: 11px;
 		}
 		.popUp.popUp07 {
-			width: calc(100vw - 24px);
-			border-radius: 18px;
+			width: calc(100vw - 16px);
+			max-height: calc(100vh - 16px);
+			max-height: calc(100dvh - 16px);
+			border-radius: 14px;
 		}
 		.popUp07 .popTit {
-			height: 60px;
-			padding: 0 20px;
-			font-size: 20px;
-			line-height: 60px;
+			height: 52px;
+			padding: 0 50px 0 16px;
+			font-size: 18px;
+			line-height: 52px;
 		}
 		.popUp07 .popCont {
-			padding: 18px 18px 28px;
+			padding: 14px 14px 16px;
+			max-height: calc(100vh - 68px);
+			max-height: calc(100dvh - 68px);
+			overflow-y: auto;
 		}
 		.bulkUploadDropZone {
-			min-height: 220px;
-			padding: 20px;
+			min-height: 165px;
+			padding: 16px;
+			border-radius: 12px;
 		}
 		.bulkUploadIcon {
-			width: 58px;
-			height: 58px;
-			margin-bottom: 15px;
+			width: 44px;
+			height: 44px;
+			margin-bottom: 10px;
 		}
 		.bulkUploadDropTitle {
-			font-size: 17px;
+			font-size: 15px;
+			line-height: 1.4;
 		}
 		.bulkUploadFormat {
-			font-size: 16px;
+			font-size: 13px;
 		}
 		.bulkUploadActions {
-			gap: 10px;
-			margin-top: 35px;
+			gap: 8px;
+			margin-top: 16px;
 		}
 		.bulkUploadSubmitBtn {
 			flex: 1;
 			width: auto;
 		}
+		.bulkUploadCloseBtn {
+			width: 76px;
+		}
 		.popUp.popUp08 {
-			width: calc(100vw - 24px);
-			border-radius: 18px;
+			width: calc(100vw - 16px);
+			max-height: calc(100vh - 16px);
+			max-height: calc(100dvh - 16px);
+			border-radius: 14px;
 		}
 		.popUp08 .popTit {
-			height: 60px;
-			padding: 0 20px;
-			font-size: 20px;
-			line-height: 60px;
+			height: 52px;
+			padding: 0 50px 0 16px;
+			font-size: 18px;
+			line-height: 52px;
 		}
 		.popUp08 .popCont {
-			padding: 18px 18px 24px;
-			max-height: calc(90vh - 60px);
+			padding: 14px 14px 16px;
+			max-height: calc(100vh - 68px);
+			max-height: calc(100dvh - 68px);
 		}
 		.bulkAnalysisFileSummary {
 			display: block;
-			padding: 12px;
+			min-height: 0;
+			padding: 10px;
+			font-size: 13px;
 		}
 		.bulkAnalysisFileName {
 			max-width: 100%;
@@ -573,33 +615,63 @@
 			margin: 8px 0 0;
 		}
 		.bulkNoDuplicate {
-			min-height: 180px;
-			font-size: 24px;
+			min-height: 110px;
+			font-size: 19px;
 		}
 		.bulkChangeSummary {
-			gap: 7px;
-			margin: 10px 0 20px;
+			gap: 6px;
+			margin: 0 0 12px;
 		}
 		.bulkChangeSummaryItem {
-			padding: 12px 5px;
+			padding: 9px 4px;
+			border-radius: 9px;
 		}
 		.bulkChangeSummaryItem span {
-			font-size: 14px;
+			margin-bottom: 3px;
+			font-size: 13px;
 		}
 		.bulkChangeSummaryItem strong {
-			font-size: 17px;
+			font-size: 15px;
 		}
 		.bulkAnalysisTable {
-			min-width: 700px;
+			min-width: 620px;
+		}
+		#bulkDuplicateSummaryView .bulkAnalysisTable {
+			min-width: 500px;
+		}
+		.bulkAnalysisTable th {
+			height: 38px;
+			font-size: 12px;
+		}
+		.bulkAnalysisTable td {
+			height: 42px;
+			padding: 4px 7px;
+			font-size: 12px;
+		}
+		.bulkAnalysisSection {
+			margin-top: 14px;
+		}
+		.bulkAnalysisEmptyChanges {
+			padding: 24px 10px;
+			font-size: 14px;
 		}
 		.bulkAnalysisActions {
 			flex-wrap: wrap;
 			gap: 8px;
-			margin-top: 25px;
+			margin-top: 14px;
 		}
 		.bulkAnalysisButton {
 			flex: 1 1 45%;
 			min-width: 0;
+			height: 38px;
+			padding: 0 10px;
+			font-size: 12px;
+		}
+		.bulkDialogCloseButton {
+			right: 10px;
+			width: 32px;
+			height: 32px;
+			font-size: 24px;
 		}
 	}
 	
@@ -4218,6 +4290,11 @@
 	<div class="popUp popUp07" role="dialog" aria-modal="true" aria-labelledby="bulkUploadDialogTitle">
 		<div class="popTit">
 			<p id="bulkUploadDialogTitle">수정 엑셀 올리기</p>
+			<button type="button" class="bulkDialogCloseButton"
+				aria-label="수정 엑셀 올리기 닫기"
+				onclick="javascript:closeBulkFileUploadDialog();">
+				<span aria-hidden="true">&times;</span>
+			</button>
 		</div>
 
 		<div class="popCont">
@@ -4255,6 +4332,11 @@
 		aria-labelledby="bulkAnalysisDialogTitle">
 		<div class="popTit">
 			<p id="bulkAnalysisDialogTitle">수정 엑셀 중복 검사 결과</p>
+			<button type="button" class="bulkDialogCloseButton"
+				aria-label="수정 엑셀 결과 닫기"
+				onclick="javascript:closeBulkAnalysisDialog();">
+				<span aria-hidden="true">&times;</span>
+			</button>
 		</div>
 		<div class="popCont">
 			<div id="bulkAnalysisFileSummary" class="bulkAnalysisFileSummary">
