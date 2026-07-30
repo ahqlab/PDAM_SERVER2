@@ -178,33 +178,6 @@ public interface ReportMapper extends CRUDMapper<Report, ReportParam, Integer> {
 	
 	int insertG2Origin(GReport report);
 	
-	@Select("SELECT " + 
-			" A.id, A.deviceIdx, A.currentDateTime, A.location, " +
-			" A.pileNo, A.pileStandard, A.drillingDepth, " +
-			" A.directDrillingDepth, A.stDrillingDepth, A.sdDrillingDepth, " +
-			" A.intrusionDepth, A.balance, A.connectLength, " +
-			" A.managedStandard, A.avgPenetrationValue, " +
-			" A.totalPenetrationValue, A.hammaT, A.fallMeter, " +
-			" A.createDate, A.pileType, A.method, A.totalConnectWidth, " +
-			" A.isDel, A.ultimateBearingCapacity, A.crossSection, " +
-			" A.hammaEfficiency, A.modulusElasticity, A.bigo, " +
-			" A.isDuple, A.sprCol1, " +
-			" C.name AS constructionName, " +
-			" B.machineNumber AS machineNumber " +
-			" FROM TB_REPORT A , TB_DEVICE B, TB_CONSTRUCTION C " + 
-		    " WHERE A.deviceIdx = B.id AND B.constructionIdx = C.id " + 
-			" AND A.deviceIdx IN (" + 
-			"  SELECT D.id " +
-			"           FROM (SELECT * " +
-			"                 FROM TB_CONSTRUCTION " +
-			"                 WHERE groupIdx = (SELECT idx " +
-			"                                   FROM TB_GROUP " +
-			"                                   WHERE TB_GROUP.userId = 'hd0001')) C, " +
-			"                TB_DEVICE D " +
-			"           WHERE C.id = D.constructionIdx) " +
-			" ORDER BY A.deviceIdx ASC, A.createDate DESC ")
-	List<Report> getApiReport();
-
 	@Select("SELECT COUNT(*) FROM (SELECT deviceIdx, pileNo, location FROM " + TABLE_NAME + "  WHERE deviceIdx =  #{id} and isDel = 0 GROUP BY deviceIdx, pileNo, location) A")
 	int getCount(ReportParam param);
 	
