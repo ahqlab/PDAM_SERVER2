@@ -5005,10 +5005,13 @@
 					return;
 				}
 
-				var versionText = result.backupVersion
-					? result.backupVersion + ' 버전으로 백업 후 '
+				var beforeBackupText = result.backupVersion
+					? '현재 기록지는 ' + result.backupVersion + ' 버전, '
 					: '';
-				alert(versionText + '기록지 반영이 완료되었습니다.'
+				var appliedBackupText = result.appliedBackupVersion
+					? '반영 결과는 ' + result.appliedBackupVersion + ' 버전으로'
+					: '';
+				alert(beforeBackupText + appliedBackupText + '기록지 반영이 완료되었습니다.'
 					+ '\n수정 ' + (result.modifiedCount || 0) + '건'
 					+ ' / 추가 ' + (result.addedCount || 0) + '건'
 					+ ' / 삭제 ' + (result.deletedCount || 0) + '건');

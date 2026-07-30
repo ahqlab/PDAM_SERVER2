@@ -14,6 +14,7 @@ public class ReportExcelUploadAnalysis implements Domain {
 	private String fileName;
 	private String analysisToken;
 	private String backupVersion;
+	private String appliedBackupVersion;
 	private int totalCount;
 	private int duplicateCount;
 	private int modifiedCount;

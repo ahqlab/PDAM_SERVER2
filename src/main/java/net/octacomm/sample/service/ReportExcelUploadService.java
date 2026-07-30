@@ -73,8 +73,7 @@ public class ReportExcelUploadService {
 	public ReportExcelUploadAnalysis analyze(MultipartFile file, int deviceId, int constructionIdx,
 			ReportParam comparisonParam) {
 		try {
-			AnalysisContext context = createAnalysisContext(
-					file, deviceId, constructionIdx, comparisonParam);
+			AnalysisContext context = createAnalysisContext(file, deviceId, constructionIdx, comparisonParam);
 			ReportExcelUploadAnalysis result = context.result;
 			result.setSuccess(true);
 			result.setAnalysisToken(createAnalysisToken(context));
@@ -88,31 +87,21 @@ public class ReportExcelUploadService {
 		}
 	}
 
-	/**
-	 * 화면에서 확인한 파일을 서버에서 다시 분석한 뒤, 현재 상태 백업과 실제
-	 * 기록지 반영을 하나의 트랜잭션으로 처리한다.
-	 */
 	@Transactional(rollbackFor = Exception.class)
-	public ReportExcelUploadAnalysis apply(MultipartFile file, int deviceId,
-			int constructionIdx, ReportParam comparisonParam,
-			String expectedAnalysisToken) throws Exception {
-		AnalysisContext context = createAnalysisContext(
-				file, deviceId, constructionIdx, comparisonParam);
+	public ReportExcelUploadAnalysis apply(MultipartFile file, int deviceId, int constructionIdx,
+			ReportParam comparisonParam, String expectedAnalysisToken) throws Exception {
+		AnalysisContext context = createAnalysisContext(file, deviceId, constructionIdx, comparisonParam);
 		ReportExcelUploadAnalysis result = context.result;
 		String currentToken = createAnalysisToken(context);
 
-		if (normalize(expectedAnalysisToken).isEmpty()
-				|| !currentToken.equals(expectedAnalysisToken)) {
-			throw new IllegalStateException(
-					"분석 이후 원본 기록지 또는 업로드 파일이 변경되었습니다. 중복 검사를 다시 진행해 주세요.");
+		if (normalize(expectedAnalysisToken).isEmpty() || !currentToken.equals(expectedAnalysisToken)) {
+			throw new IllegalStateException("분석 이후 원본 기록지 또는 업로드 파일이 변경되었습니다. 중복 검사를 다시 진행해 주세요.");
 		}
 		if (result.getDuplicateCount() > 0) {
-			throw new IllegalStateException(
-					"중복 데이터가 있는 파일은 반영할 수 없습니다. 중복 항목을 먼저 정리해 주세요.");
+			throw new IllegalStateException("중복 데이터가 있는 파일은 반영할 수 없습니다. 중복 항목을 먼저 정리해 주세요.");
 		}
 
-		int changeCount = result.getModifiedCount()
-				+ result.getAddedCount() + result.getDeletedCount();
+		int changeCount = result.getModifiedCount() + result.getAddedCount() + result.getDeletedCount();
 		if (changeCount == 0) {
 			result.setSuccess(true);
 			result.setApplied(false);
@@ -121,36 +110,31 @@ public class ReportExcelUploadService {
 			return result;
 		}
 
-		DeviceBackupHistory backup =
-				deviceBackupHistoryService.createAutomaticBackup(
-						constructionIdx, deviceId);
+		DeviceBackupHistory backup = deviceBackupHistoryService.createCurrentBackupIfChanged(constructionIdx, deviceId);
 		applyChanges(context, deviceId);
+		DeviceBackupHistory appliedBackup = deviceBackupHistoryService.createAppliedBackup(constructionIdx, deviceId);
 
 		result.setSuccess(true);
 		result.setApplied(true);
 		result.setAnalysisToken(currentToken);
-		result.setBackupVersion(backup.getVersion());
+		result.setBackupVersion(backup == null ? null : backup.getVersion());
+		result.setAppliedBackupVersion(appliedBackup == null ? null : appliedBackup.getVersion());
 		result.setMessage("기록지 백업 및 반영이 완료되었습니다.");
 		return result;
 	}
 
-	private AnalysisContext createAnalysisContext(MultipartFile file,
-			int deviceId, int constructionIdx, ReportParam comparisonParam)
-			throws Exception {
+	private AnalysisContext createAnalysisContext(MultipartFile file, int deviceId, int constructionIdx,
+			ReportParam comparisonParam) throws Exception {
 		validateFile(file);
 		Device device = validateDevice(deviceId, constructionIdx);
 		List<UploadedReportRow> uploadedRows = readRows(file);
 		if (uploadedRows.isEmpty()) {
-			throw new IllegalArgumentException(
-					"분석할 기록지 데이터가 없습니다. 파일이 정확한지 확인해주세요.");
+			throw new IllegalArgumentException("분석할 기록지 데이터가 없습니다. 파일이 정확한지 확인해주세요.");
 		}
 
-		ReportParam effectiveComparisonParam =
-				prepareComparisonParam(comparisonParam, uploadedRows);
-		List<ReportOneLine> originalRows =
-				getOriginalRows(deviceId, constructionIdx, effectiveComparisonParam);
-		originalRows = filterOriginalRowsByComparisonScope(
-				originalRows, effectiveComparisonParam, uploadedRows);
+		ReportParam effectiveComparisonParam = prepareComparisonParam(comparisonParam, uploadedRows);
+		List<ReportOneLine> originalRows = getOriginalRows(deviceId, constructionIdx, effectiveComparisonParam);
+		originalRows = filterOriginalRowsByComparisonScope(originalRows, effectiveComparisonParam, uploadedRows);
 
 		ReportExcelUploadAnalysis result = new ReportExcelUploadAnalysis();
 		result.setFileName(file.getOriginalFilename());
@@ -337,19 +321,14 @@ public class ReportExcelUploadService {
 		layout.drillingDepth = findHeaderColumn(sheet, "천공깊이", 8, 28, formatter, evaluator);
 		layout.intrusionDepth = findHeaderColumn(sheet, "관입깊이", 8, 30, formatter, evaluator);
 		if (layout.intrusionDepth < 0) {
-			layout.intrusionDepth = findHeaderColumn(
-					sheet, "경타깊이", 8, 32, formatter, evaluator);
+			layout.intrusionDepth = findHeaderColumn(sheet, "경타깊이", 8, 32, formatter, evaluator);
 		}
 		if (layout.intrusionDepth < 0) {
-			layout.intrusionDepth = findHeaderColumn(
-					sheet, "경타길이", 8, 32, formatter, evaluator);
+			layout.intrusionDepth = findHeaderColumn(sheet, "경타길이", 8, 32, formatter, evaluator);
 		}
-		layout.directDrillingDepth = findHeaderColumn(
-				sheet, "직타깊이", 8, 32, formatter, evaluator);
-		layout.soilDrillingDepth = findHeaderColumn(
-				sheet, "토사천공", 8, 32, formatter, evaluator);
-		layout.stoneDrillingDepth = findHeaderColumn(
-				sheet, "전석층천공", 8, 32, formatter, evaluator);
+		layout.directDrillingDepth = findHeaderColumn(sheet, "직타깊이", 8, 32, formatter, evaluator);
+		layout.soilDrillingDepth = findHeaderColumn(sheet, "토사천공", 8, 32, formatter, evaluator);
+		layout.stoneDrillingDepth = findHeaderColumn(sheet, "전석층천공", 8, 32, formatter, evaluator);
 		layout.balance = findHeaderColumn(sheet, "파일잔량", 8, 32, formatter, evaluator);
 		layout.gongSac = findHeaderColumn(sheet, "공삭공", 8, 34, formatter, evaluator);
 		layout.hammaT = findHeaderColumn(sheet, "해머무게", 8, 36, formatter, evaluator);
@@ -357,14 +336,10 @@ public class ReportExcelUploadService {
 		layout.managedStandard = findHeaderColumn(sheet, "관리기준", 8, 40, formatter, evaluator);
 		layout.avgPenetrationValue = findHeaderColumn(sheet, "평균관입", 20, 48, formatter, evaluator);
 		layout.totalPenetrationValue = findHeaderColumn(sheet, "총관입량", 20, 50, formatter, evaluator);
-		layout.ultimateBearingCapacity =
-				findHeaderColumn(sheet, "극한지지력", 20, 55, formatter, evaluator);
-		layout.hammaEfficiency =
-				findHeaderColumn(sheet, "해머효율", 20, 55, formatter, evaluator);
-		layout.modulusElasticity =
-				findHeaderColumn(sheet, "탄성계수", 20, 55, formatter, evaluator);
-		layout.crossSection =
-				findHeaderColumn(sheet, "파일단면적", 20, 55, formatter, evaluator);
+		layout.ultimateBearingCapacity = findHeaderColumn(sheet, "극한지지력", 20, 55, formatter, evaluator);
+		layout.hammaEfficiency = findHeaderColumn(sheet, "해머효율", 20, 55, formatter, evaluator);
+		layout.modulusElasticity = findHeaderColumn(sheet, "탄성계수", 20, 55, formatter, evaluator);
+		layout.crossSection = findHeaderColumn(sheet, "파일단면적", 20, 55, formatter, evaluator);
 		layout.bigo = findHeaderColumn(sheet, "비고", 20, 55, formatter, evaluator);
 		layout.memo = findHeaderColumn(sheet, "메모", 20, 56, formatter, evaluator);
 
@@ -385,8 +360,7 @@ public class ReportExcelUploadService {
 
 		Row bottomHeader = sheet.getRow(3);
 		for (int index = 8; index < layout.totalConnectWidth; index++) {
-			String label = bottomHeader == null ? ""
-					: cellValue(bottomHeader, index, formatter, evaluator);
+			String label = bottomHeader == null ? "" : cellValue(bottomHeader, index, formatter, evaluator);
 			String pieceName = pieceName(label);
 			if (!pieceName.isEmpty()) {
 				PieceColumn column = new PieceColumn();
@@ -397,10 +371,8 @@ public class ReportExcelUploadService {
 			}
 		}
 
-		for (int index = layout.managedStandard + 1;
-				index < layout.avgPenetrationValue; index++) {
-			String label = bottomHeader == null ? ""
-					: cellValue(bottomHeader, index, formatter, evaluator);
+		for (int index = layout.managedStandard + 1; index < layout.avgPenetrationValue; index++) {
+			String label = bottomHeader == null ? "" : cellValue(bottomHeader, index, formatter, evaluator);
 			String penetrationName = penetrationName(label);
 			if (!penetrationName.isEmpty()) {
 				PenetrationColumn column = new PenetrationColumn();
@@ -411,10 +383,8 @@ public class ReportExcelUploadService {
 			}
 		}
 
-		if (layout.pieceColumns.isEmpty()
-				|| layout.penetrationColumns.isEmpty()) {
-			throw new IllegalArgumentException(
-					"파일 구분 또는 관입량 열을 찾을 수 없습니다. 시스템에서 출력한 엑셀 양식인지 확인해 주세요.");
+		if (layout.pieceColumns.isEmpty() || layout.penetrationColumns.isEmpty()) {
+			throw new IllegalArgumentException("파일 구분 또는 관입량 열을 찾을 수 없습니다. 시스템에서 출력한 엑셀 양식인지 확인해 주세요.");
 		}
 		return layout;
 	}
@@ -437,11 +407,14 @@ public class ReportExcelUploadService {
 		uploaded.soilDrillingDepthPresent = layout.soilDrillingDepth >= 0;
 		uploaded.stoneDrillingDepthPresent = layout.stoneDrillingDepth >= 0;
 		uploaded.directDrillingDepth = uploaded.directDrillingDepthPresent
-				? cellValue(row, layout.directDrillingDepth, formatter, evaluator) : "";
+				? cellValue(row, layout.directDrillingDepth, formatter, evaluator)
+				: "";
 		uploaded.soilDrillingDepth = uploaded.soilDrillingDepthPresent
-				? cellValue(row, layout.soilDrillingDepth, formatter, evaluator) : "";
+				? cellValue(row, layout.soilDrillingDepth, formatter, evaluator)
+				: "";
 		uploaded.stoneDrillingDepth = uploaded.stoneDrillingDepthPresent
-				? cellValue(row, layout.stoneDrillingDepth, formatter, evaluator) : "";
+				? cellValue(row, layout.stoneDrillingDepth, formatter, evaluator)
+				: "";
 		uploaded.intrusionDepth = cellValue(row, layout.intrusionDepth, formatter, evaluator);
 		uploaded.balance = cellValue(row, layout.balance, formatter, evaluator);
 		uploaded.gongSac = cellValue(row, layout.gongSac, formatter, evaluator);
@@ -455,13 +428,16 @@ public class ReportExcelUploadService {
 		uploaded.modulusElasticityPresent = layout.modulusElasticity >= 0;
 		uploaded.crossSectionPresent = layout.crossSection >= 0;
 		uploaded.ultimateBearingCapacity = uploaded.ultimateBearingCapacityPresent
-				? cellValue(row, layout.ultimateBearingCapacity, formatter, evaluator) : "";
+				? cellValue(row, layout.ultimateBearingCapacity, formatter, evaluator)
+				: "";
 		uploaded.hammaEfficiency = uploaded.hammaEfficiencyPresent
-				? cellValue(row, layout.hammaEfficiency, formatter, evaluator) : "";
+				? cellValue(row, layout.hammaEfficiency, formatter, evaluator)
+				: "";
 		uploaded.modulusElasticity = uploaded.modulusElasticityPresent
-				? cellValue(row, layout.modulusElasticity, formatter, evaluator) : "";
-		uploaded.crossSection = uploaded.crossSectionPresent
-				? cellValue(row, layout.crossSection, formatter, evaluator) : "";
+				? cellValue(row, layout.modulusElasticity, formatter, evaluator)
+				: "";
+		uploaded.crossSection = uploaded.crossSectionPresent ? cellValue(row, layout.crossSection, formatter, evaluator)
+				: "";
 		uploaded.bigo = cellValue(row, layout.bigo, formatter, evaluator);
 		uploaded.memo = cellValue(row, layout.memo, formatter, evaluator);
 
@@ -473,12 +449,10 @@ public class ReportExcelUploadService {
 			uploaded.pieceValues.add(piece);
 		}
 		for (PenetrationColumn column : layout.penetrationColumns) {
-			UploadedPenetrationValue penetration =
-					new UploadedPenetrationValue();
+			UploadedPenetrationValue penetration = new UploadedPenetrationValue();
 			penetration.originalIndex = column.originalIndex;
 			penetration.label = column.label;
-			penetration.value =
-					cellValue(row, column.columnIndex, formatter, evaluator);
+			penetration.value = cellValue(row, column.columnIndex, formatter, evaluator);
 			uploaded.penetrationValues.add(penetration);
 		}
 		return uploaded;
@@ -557,57 +531,58 @@ public class ReportExcelUploadService {
 
 	private void buildAnalysis(ReportExcelUploadAnalysis result, List<UploadedReportRow> uploadedRows,
 			List<ReportOneLine> originalRows, Device device) {
-		Map<String, List<UploadedReportRow>> uploadedByKey = new LinkedHashMap<String, List<UploadedReportRow>>();
-		Map<String, List<ReportOneLine>> originalByKey = new LinkedHashMap<String, List<ReportOneLine>>();
+		Map<String, List<UploadedReportRow>> uploadedByKey = new LinkedHashMap<>();
+		Map<String, List<ReportOneLine>> originalByKey = new LinkedHashMap<>();
 		int modifiedCount = 0;
 
 		for (UploadedReportRow row : uploadedRows) {
-			if (normalizeDate(row.constructionDate).isEmpty()
-					|| normalizeIdentifier(row.machineNumber).isEmpty()
-					|| normalizeIdentifier(row.location).isEmpty()
-					|| normalizeIdentifier(row.pileNo).isEmpty()) {
-				throw new IllegalArgumentException(
-						row.rowNumber + "행의 시공일, 시공장비, 시공위치 또는 파일번호가 비어 있습니다.");
+			if (normalizeDate(row.constructionDate).isEmpty() || normalizeIdentifier(row.machineNumber).isEmpty()
+					|| normalizeIdentifier(row.location).isEmpty() || normalizeIdentifier(row.pileNo).isEmpty()) {
+				throw new IllegalArgumentException(row.rowNumber + "행의 시공일, 시공장비, 시공위치 또는 파일번호가 비어 있습니다.");
 			}
 			if (!normalize(row.machineNumber).equals(normalize(device.getMachineNumber()))) {
 				throw new IllegalArgumentException("업로드 파일에 현재 호기와 다른 시공장비가 포함되어 있습니다.");
 			}
 			addUploaded(uploadedByKey, row.key(), row);
 		}
+
 		for (ReportOneLine row : originalRows) {
 			addOriginal(originalByKey, originalKey(row), row);
 		}
 
 		for (Map.Entry<String, List<UploadedReportRow>> entry : uploadedByKey.entrySet()) {
+			String key = entry.getKey();
 			List<UploadedReportRow> uploadedGroup = entry.getValue();
-			List<ReportOneLine> originals = originalByKey.get(entry.getKey());
+			List<ReportOneLine> originals = originalByKey.get(key);
 			if (originals == null) {
 				originals = new ArrayList<ReportOneLine>();
 			}
 
 			if (uploadedGroup.size() > 1 || originals.size() > 1) {
-				addDuplicateResult(result, entry.getKey(), uploadedGroup, originals);
+				addDuplicateResult(result, key, uploadedGroup, originals);
 				continue;
 			}
 
 			UploadedReportRow uploaded = uploadedGroup.get(0);
+
 			if (originals.isEmpty()) {
 				result.setAddedCount(result.getAddedCount() + 1);
 				addRecordChange(result, uploaded.target(), "기록 추가", "-", "추가");
 			} else {
-				if (addChanges(result, uploaded, originals.get(0))) {
+				ReportOneLine original = originals.get(0);
+				if (addChanges(result, uploaded, original)) {
 					modifiedCount++;
 				}
 			}
 		}
 
 		for (Map.Entry<String, List<ReportOneLine>> entry : originalByKey.entrySet()) {
-			if (uploadedByKey.containsKey(entry.getKey())) {
-				continue;
-			}
-			for (ReportOneLine original : entry.getValue()) {
-				result.setDeletedCount(result.getDeletedCount() + 1);
-				addRecordChange(result, originalTarget(original), "기록 삭제", "원본 기록", "-");
+			String key = entry.getKey();
+			if (!uploadedByKey.containsKey(key)) {
+				for (ReportOneLine original : entry.getValue()) {
+					result.setDeletedCount(result.getDeletedCount() + 1);
+					addRecordChange(result, originalTarget(original), "기록 삭제", "원본 기록", "-");
+				}
 			}
 		}
 
@@ -668,19 +643,13 @@ public class ReportExcelUploadService {
 		compare(result, target, "이음개소", original.getConnectLength(), uploaded.connectLength);
 		compare(result, target, "천공깊이", original.getDrillingDepth(), uploaded.drillingDepth);
 		if (uploaded.directDrillingDepthPresent) {
-			compare(result, target, "직타깊이",
-					original.getDirectDrillingDepth(),
-					uploaded.directDrillingDepth);
+			compare(result, target, "직타깊이", original.getDirectDrillingDepth(), uploaded.directDrillingDepth);
 		}
 		if (uploaded.soilDrillingDepthPresent) {
-			compare(result, target, "토사천공",
-					original.getSdDrillingDepth(),
-					uploaded.soilDrillingDepth);
+			compare(result, target, "토사천공", original.getSdDrillingDepth(), uploaded.soilDrillingDepth);
 		}
 		if (uploaded.stoneDrillingDepthPresent) {
-			compare(result, target, "전석층천공",
-					original.getStDrillingDepth(),
-					uploaded.stoneDrillingDepth);
+			compare(result, target, "전석층천공", original.getStDrillingDepth(), uploaded.stoneDrillingDepth);
 		}
 		compare(result, target, "관입깊이", original.getIntrusionDepth(), uploaded.intrusionDepth);
 		compare(result, target, "파일잔량", String.valueOf(original.getBalance()), uploaded.balance);
@@ -690,26 +659,21 @@ public class ReportExcelUploadService {
 		compare(result, target, "관리기준", original.getManagedStandard(), uploaded.managedStandard);
 		for (UploadedPenetrationValue penetrationValue : uploaded.penetrationValues) {
 			compare(result, target, penetrationValue.label,
-					originalPenetrationValue(original, penetrationValue.originalIndex),
-					penetrationValue.value);
+					originalPenetrationValue(original, penetrationValue.originalIndex), penetrationValue.value);
 		}
 		compare(result, target, "평균관입", original.getAvgPenetrationValue(), uploaded.avgPenetrationValue);
 		compare(result, target, "총관입량", original.getTotalPenetrationValue(), uploaded.totalPenetrationValue);
 		if (uploaded.ultimateBearingCapacityPresent) {
-			compare(result, target, "극한지지력", original.getUltimateBearingCapacity(),
-					uploaded.ultimateBearingCapacity);
+			compare(result, target, "극한지지력", original.getUltimateBearingCapacity(), uploaded.ultimateBearingCapacity);
 		}
 		if (uploaded.hammaEfficiencyPresent) {
-			compare(result, target, "해머효율", original.getHammaEfficiency(),
-					uploaded.hammaEfficiency);
+			compare(result, target, "해머효율", original.getHammaEfficiency(), uploaded.hammaEfficiency);
 		}
 		if (uploaded.modulusElasticityPresent) {
-			compare(result, target, "탄성계수", original.getModulusElasticity(),
-					uploaded.modulusElasticity);
+			compare(result, target, "탄성계수", original.getModulusElasticity(), uploaded.modulusElasticity);
 		}
 		if (uploaded.crossSectionPresent) {
-			compare(result, target, "파일단면적", original.getCrossSection(),
-					uploaded.crossSection);
+			compare(result, target, "파일단면적", original.getCrossSection(), uploaded.crossSection);
 		}
 		compare(result, target, "비고", original.getBigo(), uploaded.bigo);
 		compare(result, target, "메모", original.getSprCol1(), uploaded.memo);
@@ -737,8 +701,7 @@ public class ReportExcelUploadService {
 		}
 	}
 
-	private String originalPenetrationValue(ReportOneLine original,
-			int penetrationIndex) {
+	private String originalPenetrationValue(ReportOneLine original, int penetrationIndex) {
 		switch (penetrationIndex) {
 		case 1:
 			return original.getPeOne();
@@ -766,10 +729,8 @@ public class ReportExcelUploadService {
 	}
 
 	private void applyChanges(AnalysisContext context, int deviceId) {
-		Map<String, List<UploadedReportRow>> uploadedByKey =
-				new LinkedHashMap<String, List<UploadedReportRow>>();
-		Map<String, List<ReportOneLine>> originalByKey =
-				new LinkedHashMap<String, List<ReportOneLine>>();
+		Map<String, List<UploadedReportRow>> uploadedByKey = new LinkedHashMap<String, List<UploadedReportRow>>();
+		Map<String, List<ReportOneLine>> originalByKey = new LinkedHashMap<String, List<ReportOneLine>>();
 
 		for (UploadedReportRow uploaded : context.uploadedRows) {
 			addUploaded(uploadedByKey, uploaded.key(), uploaded);
@@ -778,14 +739,12 @@ public class ReportExcelUploadService {
 			addOriginal(originalByKey, originalKey(original), original);
 		}
 
-		for (Map.Entry<String, List<UploadedReportRow>> entry
-				: uploadedByKey.entrySet()) {
+		for (Map.Entry<String, List<UploadedReportRow>> entry : uploadedByKey.entrySet()) {
 			List<UploadedReportRow> uploadedGroup = entry.getValue();
 			List<ReportOneLine> originalGroup = originalByKey.get(entry.getKey());
 			int originalCount = originalGroup == null ? 0 : originalGroup.size();
 			if (uploadedGroup.size() != 1 || originalCount > 1) {
-				throw new IllegalStateException(
-						"반영 직전에 중복 데이터가 확인되었습니다. 중복 검사를 다시 진행해 주세요.");
+				throw new IllegalStateException("반영 직전에 중복 데이터가 확인되었습니다. 중복 검사를 다시 진행해 주세요.");
 			}
 
 			UploadedReportRow uploaded = uploadedGroup.get(0);
@@ -800,53 +759,41 @@ public class ReportExcelUploadService {
 			}
 		}
 
-		for (Map.Entry<String, List<ReportOneLine>> entry
-				: originalByKey.entrySet()) {
+		for (Map.Entry<String, List<ReportOneLine>> entry : originalByKey.entrySet()) {
 			if (uploadedByKey.containsKey(entry.getKey())) {
 				continue;
 			}
 			for (ReportOneLine original : entry.getValue()) {
 				if (reportMapper.doDelete(original.getId()) != 1) {
-					throw new IllegalStateException(
-							"기록지 삭제 처리에 실패했습니다. 반영 작업이 취소되었습니다.");
+					throw new IllegalStateException("기록지 삭제 처리에 실패했습니다. 반영 작업이 취소되었습니다.");
 				}
 			}
 		}
 	}
 
-	private boolean isChanged(UploadedReportRow uploaded,
-			ReportOneLine original) {
+	private boolean isChanged(UploadedReportRow uploaded, ReportOneLine original) {
 		ReportExcelUploadAnalysis changes = new ReportExcelUploadAnalysis();
 		return addChanges(changes, uploaded, original);
 	}
 
-	private void insertUploadedReport(UploadedReportRow uploaded,
-			int deviceId) {
-		ReportExcelUploadRecord record =
-				toUploadRecord(uploaded, null, deviceId);
-		if (reportMapper.insertExcelUploadReport(record) != 1
-				|| record.getId() <= 0) {
-			throw new IllegalStateException(
-					"새 기록지 저장에 실패했습니다. 반영 작업이 취소되었습니다.");
+	private void insertUploadedReport(UploadedReportRow uploaded, int deviceId) {
+		ReportExcelUploadRecord record = toUploadRecord(uploaded, null, deviceId);
+		if (reportMapper.insertExcelUploadReport(record) != 1 || record.getId() <= 0) {
+			throw new IllegalStateException("새 기록지 저장에 실패했습니다. 반영 작업이 취소되었습니다.");
 		}
 		replaceReportDetails(record.getId(), uploaded);
 	}
 
-	private void updateUploadedReport(UploadedReportRow uploaded,
-			ReportOneLine original, int deviceId) {
-		ReportExcelUploadRecord record =
-				toUploadRecord(uploaded, original, deviceId);
+	private void updateUploadedReport(UploadedReportRow uploaded, ReportOneLine original, int deviceId) {
+		ReportExcelUploadRecord record = toUploadRecord(uploaded, original, deviceId);
 		record.setId(original.getId());
 		if (reportMapper.updateExcelUploadReport(record) != 1) {
-			throw new IllegalStateException(
-					"기록지 수정에 실패했습니다. 반영 작업이 취소되었습니다.");
+			throw new IllegalStateException("기록지 수정에 실패했습니다. 반영 작업이 취소되었습니다.");
 		}
 		replaceReportDetails(original.getId(), uploaded);
 	}
 
-	private ReportExcelUploadRecord toUploadRecord(
-			UploadedReportRow uploaded, ReportOneLine original,
-			int deviceId) {
+	private ReportExcelUploadRecord toUploadRecord(UploadedReportRow uploaded, ReportOneLine original, int deviceId) {
 		ReportExcelUploadRecord record = new ReportExcelUploadRecord();
 		record.setDeviceId(deviceId);
 		record.setConstructionDate(uploaded.constructionDate);
@@ -856,21 +803,14 @@ public class ReportExcelUploadService {
 		record.setPileNo(uploaded.pileNo);
 		record.setPileStandard(uploaded.pileStandard);
 		record.setDrillingDepth(uploaded.drillingDepth);
-		record.setDirectDrillingDepth(optionalValue(
-				uploaded.directDrillingDepthPresent,
-				uploaded.directDrillingDepth,
+		record.setDirectDrillingDepth(optionalValue(uploaded.directDrillingDepthPresent, uploaded.directDrillingDepth,
 				original == null ? "" : original.getDirectDrillingDepth()));
-		record.setSoilDrillingDepth(optionalValue(
-				uploaded.soilDrillingDepthPresent,
-				uploaded.soilDrillingDepth,
+		record.setSoilDrillingDepth(optionalValue(uploaded.soilDrillingDepthPresent, uploaded.soilDrillingDepth,
 				original == null ? "" : original.getSdDrillingDepth()));
-		record.setStoneDrillingDepth(optionalValue(
-				uploaded.stoneDrillingDepthPresent,
-				uploaded.stoneDrillingDepth,
+		record.setStoneDrillingDepth(optionalValue(uploaded.stoneDrillingDepthPresent, uploaded.stoneDrillingDepth,
 				original == null ? "" : original.getStDrillingDepth()));
 		record.setIntrusionDepth(uploaded.intrusionDepth);
-		record.setBalance(decimalValue(uploaded.balance, uploaded.rowNumber,
-				"파일잔량"));
+		record.setBalance(decimalValue(uploaded.balance, uploaded.rowNumber, "파일잔량"));
 		record.setConnectLength(uploaded.connectLength);
 		record.setManagedStandard(uploaded.managedStandard);
 		record.setAvgPenetrationValue(uploaded.avgPenetrationValue);
@@ -878,33 +818,25 @@ public class ReportExcelUploadService {
 		record.setHammaT(uploaded.hammaT);
 		record.setFallMeter(uploaded.fallMeter);
 		record.setTotalConnectWidth(uploaded.totalConnectWidth);
-		record.setGongSac(decimalValue(uploaded.gongSac,
-				uploaded.rowNumber, "공삭공"));
-		record.setUltimateBearingCapacity(optionalValue(
-				uploaded.ultimateBearingCapacityPresent,
-				uploaded.ultimateBearingCapacity,
-				original == null ? "" : original.getUltimateBearingCapacity()));
-		record.setHammaEfficiency(optionalValue(
-				uploaded.hammaEfficiencyPresent, uploaded.hammaEfficiency,
+		record.setGongSac(decimalValue(uploaded.gongSac, uploaded.rowNumber, "공삭공"));
+		record.setUltimateBearingCapacity(optionalValue(uploaded.ultimateBearingCapacityPresent,
+				uploaded.ultimateBearingCapacity, original == null ? "" : original.getUltimateBearingCapacity()));
+		record.setHammaEfficiency(optionalValue(uploaded.hammaEfficiencyPresent, uploaded.hammaEfficiency,
 				original == null ? "" : original.getHammaEfficiency()));
-		record.setModulusElasticity(optionalValue(
-				uploaded.modulusElasticityPresent, uploaded.modulusElasticity,
+		record.setModulusElasticity(optionalValue(uploaded.modulusElasticityPresent, uploaded.modulusElasticity,
 				original == null ? "" : original.getModulusElasticity()));
-		record.setCrossSection(optionalValue(uploaded.crossSectionPresent,
-				uploaded.crossSection,
+		record.setCrossSection(optionalValue(uploaded.crossSectionPresent, uploaded.crossSection,
 				original == null ? "" : original.getCrossSection()));
 		record.setBigo(uploaded.bigo);
 		record.setMemo(uploaded.memo);
 		return record;
 	}
 
-	private String optionalValue(boolean present, String uploadedValue,
-			String originalValue) {
+	private String optionalValue(boolean present, String uploadedValue, String originalValue) {
 		return present ? uploadedValue : originalValue;
 	}
 
-	private BigDecimal decimalValue(String value, int rowNumber,
-			String fieldName) {
+	private BigDecimal decimalValue(String value, int rowNumber, String fieldName) {
 		String normalized = normalize(value).replace(",", "");
 		if (normalized.isEmpty()) {
 			return BigDecimal.ZERO;
@@ -912,14 +844,11 @@ public class ReportExcelUploadService {
 		try {
 			return new BigDecimal(normalized);
 		} catch (NumberFormatException e) {
-			throw new IllegalArgumentException(
-					rowNumber + "행의 " + fieldName
-					+ " 값이 숫자가 아닙니다: " + value);
+			throw new IllegalArgumentException(rowNumber + "행의 " + fieldName + " 값이 숫자가 아닙니다: " + value);
 		}
 	}
 
-	private void replaceReportDetails(int reportId,
-			UploadedReportRow uploaded) {
+	private void replaceReportDetails(int reportId, UploadedReportRow uploaded) {
 		pieceMapper.deleteByReportIdx(reportId);
 		for (UploadedPieceValue value : uploaded.pieceValues) {
 			if (normalize(value.value).isEmpty()) {
@@ -930,8 +859,7 @@ public class ReportExcelUploadService {
 			piece.setName(value.label);
 			piece.setValue(value.value);
 			if (pieceMapper.insert(piece) != 1) {
-				throw new IllegalStateException(
-						"파일 구성 저장에 실패했습니다. 반영 작업이 취소되었습니다.");
+				throw new IllegalStateException("파일 구성 저장에 실패했습니다. 반영 작업이 취소되었습니다.");
 			}
 		}
 
@@ -945,62 +873,44 @@ public class ReportExcelUploadService {
 			penetration.setName(value.label);
 			penetration.setValue(value.value);
 			if (penetrationMapper.insert(penetration) != 1) {
-				throw new IllegalStateException(
-						"관입량 저장에 실패했습니다. 반영 작업이 취소되었습니다.");
+				throw new IllegalStateException("관입량 저장에 실패했습니다. 반영 작업이 취소되었습니다.");
 			}
 		}
 	}
 
-	private String createAnalysisToken(AnalysisContext context)
-			throws Exception {
+	private String createAnalysisToken(AnalysisContext context) throws Exception {
 		List<String> sourceRows = new ArrayList<String>();
 		for (UploadedReportRow row : context.uploadedRows) {
 			StringBuilder value = new StringBuilder("U|");
-			appendToken(value, row.constructionDate, row.machineNumber,
-					row.pileType, row.method, row.location, row.pileNo,
-					row.pileStandard, row.totalConnectWidth,
-					row.connectLength, row.drillingDepth,
-					row.directDrillingDepth, row.soilDrillingDepth,
-					row.stoneDrillingDepth,
-					row.intrusionDepth, row.balance, row.gongSac,
-					row.hammaT, row.fallMeter, row.managedStandard,
-					row.avgPenetrationValue, row.totalPenetrationValue,
-					row.ultimateBearingCapacity, row.hammaEfficiency,
-					row.modulusElasticity, row.crossSection, row.bigo,
-					row.memo);
+			appendToken(value, row.constructionDate, row.machineNumber, row.pileType, row.method, row.location,
+					row.pileNo, row.pileStandard, row.totalConnectWidth, row.connectLength, row.drillingDepth,
+					row.directDrillingDepth, row.soilDrillingDepth, row.stoneDrillingDepth, row.intrusionDepth,
+					row.balance, row.gongSac, row.hammaT, row.fallMeter, row.managedStandard, row.avgPenetrationValue,
+					row.totalPenetrationValue, row.ultimateBearingCapacity, row.hammaEfficiency, row.modulusElasticity,
+					row.crossSection, row.bigo, row.memo);
 			for (UploadedPieceValue piece : row.pieceValues) {
 				appendToken(value, piece.label, piece.value);
 			}
-			for (UploadedPenetrationValue penetration
-					: row.penetrationValues) {
+			for (UploadedPenetrationValue penetration : row.penetrationValues) {
 				appendToken(value, penetration.label, penetration.value);
 			}
 			sourceRows.add(value.toString());
 		}
 		for (ReportOneLine row : context.originalRows) {
 			StringBuilder value = new StringBuilder("O|");
-			appendToken(value, String.valueOf(row.getId()),
-					originalDate(row), row.getMachineNumber(),
-					row.getPileType(), row.getMethod(), row.getLocation(),
-					row.getPileNo(), row.getPileStandard(),
-					row.getTotalConnectWidth(), row.getConnectLength(),
-					row.getDrillingDepth(), row.getDirectDrillingDepth(),
-					row.getSdDrillingDepth(), row.getStDrillingDepth(),
-					row.getIntrusionDepth(),
-					String.valueOf(row.getBalance()),
-					String.valueOf(row.getGongSac()), row.getHammaT(),
-					row.getFallMeter(), row.getManagedStandard(),
-					row.getAvgPenetrationValue(),
-					row.getTotalPenetrationValue(),
-					row.getUltimateBearingCapacity(),
-					row.getHammaEfficiency(), row.getModulusElasticity(),
-					row.getCrossSection(), row.getBigo(), row.getSprCol1());
+			appendToken(value, String.valueOf(row.getId()), originalDate(row), row.getMachineNumber(),
+					row.getPileType(), row.getMethod(), row.getLocation(), row.getPileNo(), row.getPileStandard(),
+					row.getTotalConnectWidth(), row.getConnectLength(), row.getDrillingDepth(),
+					row.getDirectDrillingDepth(), row.getSdDrillingDepth(), row.getStDrillingDepth(),
+					row.getIntrusionDepth(), String.valueOf(row.getBalance()), String.valueOf(row.getGongSac()),
+					row.getHammaT(), row.getFallMeter(), row.getManagedStandard(), row.getAvgPenetrationValue(),
+					row.getTotalPenetrationValue(), row.getUltimateBearingCapacity(), row.getHammaEfficiency(),
+					row.getModulusElasticity(), row.getCrossSection(), row.getBigo(), row.getSprCol1());
 			for (int index = 1; index <= 7; index++) {
 				appendToken(value, originalPieceValue(row, index));
 			}
 			for (int index = 1; index <= 10; index++) {
-				appendToken(value,
-						originalPenetrationValue(row, index));
+				appendToken(value, originalPenetrationValue(row, index));
 			}
 			sourceRows.add(value.toString());
 		}
@@ -1021,8 +931,7 @@ public class ReportExcelUploadService {
 	private void appendToken(StringBuilder builder, String... values) {
 		for (String value : values) {
 			String normalized = value == null ? "" : value.trim();
-			builder.append(normalized.length()).append(':')
-					.append(normalized).append('|');
+			builder.append(normalized.length()).append(':').append(normalized).append('|');
 		}
 	}
 
@@ -1156,8 +1065,7 @@ public class ReportExcelUploadService {
 		private String hammaT;
 		private String fallMeter;
 		private String managedStandard;
-		private List<UploadedPenetrationValue> penetrationValues =
-				new ArrayList<UploadedPenetrationValue>();
+		private List<UploadedPenetrationValue> penetrationValues = new ArrayList<UploadedPenetrationValue>();
 		private String avgPenetrationValue;
 		private String totalPenetrationValue;
 		private boolean ultimateBearingCapacityPresent;
@@ -1225,8 +1133,7 @@ public class ReportExcelUploadService {
 		}
 
 		private List<PieceColumn> pieceColumns = new ArrayList<PieceColumn>();
-		private List<PenetrationColumn> penetrationColumns =
-				new ArrayList<PenetrationColumn>();
+		private List<PenetrationColumn> penetrationColumns = new ArrayList<PenetrationColumn>();
 		private int totalConnectWidth;
 		private int connectLength;
 		private int drillingDepth;
