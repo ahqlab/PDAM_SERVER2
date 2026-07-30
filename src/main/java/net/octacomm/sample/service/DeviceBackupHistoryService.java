@@ -26,8 +26,10 @@ import net.octacomm.sample.domain.ReportParam;
 @Service
 public class DeviceBackupHistoryService {
 
+	private static final String WORK_TYPE_INITIAL_SNAPSHOT = "초기 기록 보관";
+	private static final String WORK_TYPE_CURRENT_SNAPSHOT = "현재 상태 보관";
+	private static final String WORK_TYPE_APPLY_COMPLETED = "엑셀 수정 반영";
 	private static final String WORK_TYPE_AUTO_BACKUP = "수정 전 자동 백업";
-	private static final String WORK_TYPE_RESTORE = "복구";
 
 	@Autowired
 	private DeviceBackupHistoryMapper deviceBackupHistoryMapper;
@@ -57,6 +59,45 @@ public class DeviceBackupHistoryService {
 	}
 
 	@Transactional
+	public DeviceBackupHistory createCurrentBackupIfChanged(
+			int constructionIdx, int deviceId) {
+		String snapshotData = createSnapshotData(constructionIdx, deviceId);
+		DeviceBackupHistory latestHistory =
+				deviceBackupHistoryMapper.getLatestByDevice(
+						constructionIdx, deviceId);
+		if (latestHistory != null && hasSameReportData(
+				snapshotData, latestHistory.getSnapshotData())) {
+			return null;
+		}
+
+		return insertBackup(
+				constructionIdx,
+				deviceId,
+				latestHistory == null
+						? WORK_TYPE_INITIAL_SNAPSHOT : WORK_TYPE_CURRENT_SNAPSHOT,
+				snapshotData);
+	}
+
+	@Transactional
+	public DeviceBackupHistory createAppliedBackup(
+			int constructionIdx, int deviceId) {
+		String snapshotData = createSnapshotData(constructionIdx, deviceId);
+		DeviceBackupHistory latestHistory =
+				deviceBackupHistoryMapper.getLatestByDevice(
+						constructionIdx, deviceId);
+		if (latestHistory != null && hasSameReportData(
+				snapshotData, latestHistory.getSnapshotData())) {
+			return null;
+		}
+
+		return insertBackup(
+				constructionIdx,
+				deviceId,
+				WORK_TYPE_APPLY_COMPLETED,
+				snapshotData);
+	}
+
+	@Transactional
 	public DeviceBackupHistory restoreBackup(
 			int constructionIdx, int deviceId, int historyId) {
 		DeviceBackupHistory selectedHistory =
@@ -68,7 +109,12 @@ public class DeviceBackupHistoryService {
 			throw new IllegalArgumentException("복구할 백업 데이터를 찾을 수 없습니다.");
 		}
 
-		createAutomaticBackup(constructionIdx, deviceId);
+		if (hasSameReportData(createSnapshotData(constructionIdx, deviceId),
+				selectedHistory.getSnapshotData())) {
+			return selectedHistory;
+		}
+
+		createCurrentBackupIfChanged(constructionIdx, deviceId);
 
 		DeviceBackupSnapshot selectedSnapshot =
 				readSnapshot(selectedHistory.getSnapshotData());
@@ -77,7 +123,7 @@ public class DeviceBackupHistoryService {
 		return insertBackup(
 				constructionIdx,
 				deviceId,
-				WORK_TYPE_RESTORE,
+				selectedHistory.getVersion() + "기준 복구",
 				selectedHistory.getSnapshotData());
 	}
 
@@ -166,6 +212,42 @@ public class DeviceBackupHistoryService {
 					snapshotData, DeviceBackupSnapshot.class);
 		} catch (IOException e) {
 			throw new IllegalStateException("백업 데이터를 읽지 못했습니다.", e);
+		}
+	}
+
+	private boolean hasSameReportData(
+			String leftSnapshotData, String rightSnapshotData) {
+		if (leftSnapshotData == null || rightSnapshotData == null) {
+			return false;
+		}
+		try {
+			return createReportFingerprint(readSnapshot(leftSnapshotData))
+					.equals(createReportFingerprint(readSnapshot(rightSnapshotData)));
+		} catch (IllegalStateException e) {
+			return false;
+		}
+	}
+
+	private String createReportFingerprint(DeviceBackupSnapshot snapshot) {
+		List<Report> reports = snapshot.getReports() == null
+				? new ArrayList<Report>() : snapshot.getReports();
+		for (Report report : reports) {
+			report.setId(0);
+			for (Piece piece : report.getPiece() == null
+					? new ArrayList<Piece>() : report.getPiece()) {
+				piece.setId(0);
+				piece.setReportIdx(0);
+			}
+			for (Penetration penetration : report.getPenetrations() == null
+					? new ArrayList<Penetration>() : report.getPenetrations()) {
+				penetration.setId(0);
+				penetration.setReportIdx(0);
+			}
+		}
+		try {
+			return objectMapper.writeValueAsString(reports);
+		} catch (IOException e) {
+			throw new IllegalStateException("기록지 백업 데이터를 비교하지 못했습니다.", e);
 		}
 	}
 

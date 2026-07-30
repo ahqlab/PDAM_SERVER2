@@ -113,15 +113,18 @@ public class DeviceController extends AbstractDeviceCRUDController<DeviceMapper,
 			}
 		}
 
-		if (selectedDevice == null && !deviceList.isEmpty()) {
-			selectedDevice = deviceList.get(0);
-		}
-
 		List<DeviceBackupHistory> backupHistoryList = java.util.Collections.emptyList();
 		if (selectedDevice != null) {
 			try {
 				backupHistoryList = deviceBackupHistoryMapper.getListByDevice(
 						constructionIdx, selectedDevice.getId());
+			} catch (Exception e) {
+				logger.warn("Device backup history table is not ready.", e);
+			}
+		} else {
+			try {
+				backupHistoryList = deviceBackupHistoryMapper.getListByConstruction(
+						constructionIdx);
 			} catch (Exception e) {
 				logger.warn("Device backup history table is not ready.", e);
 			}
@@ -158,6 +161,7 @@ public class DeviceController extends AbstractDeviceCRUDController<DeviceMapper,
 							constructionIdx, deviceId, historyId);
 			result.put("success", true);
 			result.put("version", restored.getVersion());
+			result.put("created", restored.getId() != historyId);
 		} catch (Exception e) {
 			logger.error("Device backup restore failed.", e);
 			result.put("success", false);
@@ -183,10 +187,13 @@ public class DeviceController extends AbstractDeviceCRUDController<DeviceMapper,
 			return null;
 		}
 
+		DeviceBackupHistory history = deviceBackupHistoryService.getHistory(
+				historyId, constructionIdx, deviceId);
 		DeviceBackupSnapshot snapshot =
 				deviceBackupHistoryService.getSnapshot(
 						historyId, constructionIdx, deviceId);
-		if (snapshot == null || snapshot.getExcelReports() == null) {
+		if (history == null || snapshot == null
+				|| snapshot.getExcelReports() == null) {
 			response.sendError(
 					HttpServletResponse.SC_NOT_FOUND,
 					"다운로드할 백업 데이터를 찾을 수 없습니다.");
@@ -209,6 +216,8 @@ public class DeviceController extends AbstractDeviceCRUDController<DeviceMapper,
 		model.addAttribute("domainList", snapshot.getExcelReports());
 		model.addAttribute("constructionIdx", constructionIdx);
 		model.addAttribute("param", param);
+		model.addAttribute("backupDownloadFileName",
+				createBackupDownloadFileName(history));
 		model.addAttribute(
 				"signRoomList",
 				excelSignroomMapper.getFindByConstructionIdxAndOrderBy(
@@ -225,6 +234,23 @@ public class DeviceController extends AbstractDeviceCRUDController<DeviceMapper,
 				constructionIdx,
 				snapshot.isBig(),
 				snapshot.getExtensivePileUsage());
+	}
+
+	private String createBackupDownloadFileName(DeviceBackupHistory history) {
+		String createdAt = history.getCreatedAt() == null ? ""
+				: history.getCreatedAt().replaceAll("[^0-9]", "");
+		return "PDAM_REPORT_"
+				+ sanitizeFileNamePart(history.getVersion())
+				+ "_" + sanitizeFileNamePart(history.getWorkType())
+				+ (createdAt.isEmpty() ? "" : "_" + createdAt)
+				+ ".xls";
+	}
+
+	private String sanitizeFileNamePart(String value) {
+		if (value == null || value.trim().isEmpty()) {
+			return "기록지";
+		}
+		return value.trim().replaceAll("[\\\\/:*?\"<>|\\s]+", "_");
 	}
 
 	private String getConstructionName(

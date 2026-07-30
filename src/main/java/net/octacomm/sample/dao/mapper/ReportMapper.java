@@ -5,18 +5,19 @@ import java.util.List;
 import org.apache.ibatis.annotations.CacheNamespace;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import net.octacomm.sample.dao.CRUDMapper;
-import net.octacomm.sample.domain.ApiReport;
 import net.octacomm.sample.domain.Construction;
 import net.octacomm.sample.domain.ConstructionParam;
 import net.octacomm.sample.domain.GReport;
 import net.octacomm.sample.domain.Penetration;
 import net.octacomm.sample.domain.Piece;
 import net.octacomm.sample.domain.Report;
+import net.octacomm.sample.domain.ReportExcelUploadRecord;
 import net.octacomm.sample.domain.ReportMaxCount;
 import net.octacomm.sample.domain.ReportOneLine;
 import net.octacomm.sample.domain.ReportParam;
@@ -60,6 +61,52 @@ public interface ReportMapper extends CRUDMapper<Report, ReportParam, Integer> {
 
 	@Override
 	int insert(Report report);
+
+	@Insert({
+		"INSERT INTO TB_REPORT (",
+		"deviceIdx, currentDateTime, createDate, location, pileNo, pileStandard,",
+		"drillingDepth, directDrillingDepth, sdDrillingDepth, stDrillingDepth,",
+		"intrusionDepth, balance, connectLength, managedStandard,",
+		"avgPenetrationValue, totalPenetrationValue, hammaT, fallMeter, pileType,",
+		"method, totalConnectWidth, ultimateBearingCapacity,",
+		"hammaEfficiency, modulusElasticity, crossSection, bigo, sprCol1,",
+		"isDel",
+		") VALUES (",
+		"#{deviceId}, #{constructionDate}, #{constructionDate}, #{location},",
+		"#{pileNo}, #{pileStandard}, #{drillingDepth}, #{directDrillingDepth},",
+		"#{soilDrillingDepth}, #{stoneDrillingDepth},",
+		"#{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard},",
+		"#{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT},",
+		"#{fallMeter}, #{pileType}, #{method}, #{totalConnectWidth},",
+		"#{ultimateBearingCapacity}, #{hammaEfficiency},",
+		"#{modulusElasticity}, #{crossSection}, #{bigo}, #{memo}, 0",
+		")"
+	})
+	@Options(useGeneratedKeys = true, keyProperty = "id")
+	int insertExcelUploadReport(ReportExcelUploadRecord report);
+
+	@Update({
+		"UPDATE TB_REPORT SET",
+		"pileType = #{pileType}, method = #{method}, location = #{location},",
+		"pileNo = #{pileNo}, pileStandard = #{pileStandard},",
+		"drillingDepth = #{drillingDepth},",
+		"directDrillingDepth = #{directDrillingDepth},",
+		"sdDrillingDepth = #{soilDrillingDepth},",
+		"stDrillingDepth = #{stoneDrillingDepth},",
+		"intrusionDepth = #{intrusionDepth},",
+		"balance = #{balance}, connectLength = #{connectLength},",
+		"managedStandard = #{managedStandard},",
+		"avgPenetrationValue = #{avgPenetrationValue},",
+		"totalPenetrationValue = #{totalPenetrationValue},",
+		"hammaT = #{hammaT}, fallMeter = #{fallMeter},",
+		"totalConnectWidth = #{totalConnectWidth},",
+		"ultimateBearingCapacity = #{ultimateBearingCapacity},",
+		"hammaEfficiency = #{hammaEfficiency},",
+		"modulusElasticity = #{modulusElasticity}, crossSection = #{crossSection},",
+		"bigo = #{bigo}, sprCol1 = #{memo}",
+		"WHERE id = #{id} AND deviceIdx = #{deviceId} AND isDel = 0"
+	})
+	int updateExcelUploadReport(ReportExcelUploadRecord report);
 	
 	int insertOrigin(Report report);
 	
@@ -130,45 +177,6 @@ public interface ReportMapper extends CRUDMapper<Report, ReportParam, Integer> {
 	int insertG2(GReport report);
 	
 	int insertG2Origin(GReport report);
-	
-	@Select("SELECT " + 
-			" C.name as '현장명', " + 
-			" B.machineNumber as  '기기번호', " +
-			" A.currentDateTime AS '시공일자', " +
-		    " A.location AS '위치', " +
-		    " A.pileNo AS '파일번호', " +
-		    " A.pileStandard AS '파일규격', " +
-		    " A.drillingDepth AS '천공깊이', "+
-		    " A.directDrillingDepth AS '직타깊이', "+
-		    " A.intrusionDepth AS '관입깊이', "+
-		    " A.balance AS '파일잔량', "+
-		    " A.connectLength AS '이음개소', "+
-		    " A.managedStandard AS '관리기준', "+
-		    " A.avgPenetrationValue AS '평균관입량', "+
-		    " A.totalPenetrationValue AS '최종관입량', "+
-		    " A.hammaT AS '헤머무게', "+
-		    " A.fallMeter AS '낙하높이', "+
-		    " A.pileType AS '파일종류', "+
-		    " A.method AS '공법', "+
-		    " A.totalConnectWidth AS '최종관입량', "+
-		    " A.ultimateBearingCapacity AS '극한지지력', "+
-		    " A.crossSection AS '단면적', "+
-		    " A.hammaEfficiency AS '헤머효율', "+
-		    " A.modulusElasticity AS '탄성계수' "+
-			" FROM TB_REPORT A , TB_DEVICE B, TB_CONSTRUCTION C " + 
-		    " WHERE A.deviceIdx = B.id AND B.constructionIdx = C.id " + 
-			" AND A.deviceIdx IN (" + 
-			"  SELECT D.id " +
-			"           FROM (SELECT * " +
-			"                 FROM TB_CONSTRUCTION " +
-			"                 WHERE groupIdx = (SELECT idx " +
-			"                                   FROM TB_GROUP " +
-			"                                   WHERE TB_GROUP.userId = 'hd0001')) C, " +
-			"                TB_DEVICE D " +
-			"           WHERE C.id = D.constructionIdx) " +
-			" ORDER BY A.deviceIdx ASC, A.createDate DESC ")
-	List<ApiReport> getApiReport();
-	
 	
 	@Select("SELECT COUNT(*) FROM (SELECT deviceIdx, pileNo, location FROM " + TABLE_NAME + "  WHERE deviceIdx =  #{id} and isDel = 0 GROUP BY deviceIdx, pileNo, location) A")
 	int getCount(ReportParam param);

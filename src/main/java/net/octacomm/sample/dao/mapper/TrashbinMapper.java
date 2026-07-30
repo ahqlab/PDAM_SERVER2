@@ -10,7 +10,6 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import net.octacomm.sample.dao.CRUDMapper;
-import net.octacomm.sample.domain.ApiReport;
 import net.octacomm.sample.domain.Construction;
 import net.octacomm.sample.domain.ConstructionParam;
 import net.octacomm.sample.domain.GReport;
@@ -115,44 +114,6 @@ public interface TrashbinMapper extends CRUDMapper<Report, ReportParam, Integer>
 	int insertG2(GReport report);
 	
 	int insertG2Origin(GReport report);
-	
-	@Select("SELECT " + 
-			" C.name as '현장명', " + 
-			" B.machineNumber as  '기기번호', " +
-			" A.currentDateTime AS '시공일자', " +
-		    " A.location AS '위치', " +
-		    " A.pileNo AS '파일번호', " +
-		    " A.pileStandard AS '파일규격', " +
-		    " A.drillingDepth AS '천공깊이', "+
-		    " A.intrusionDepth AS '관입깊이', "+
-		    " A.balance AS '파일잔량', "+
-		    " A.connectLength AS '이음개소', "+
-		    " A.managedStandard AS '관리기준', "+
-		    " A.avgPenetrationValue AS '평균관입량', "+
-		    " A.totalPenetrationValue AS '최종관입량', "+
-		    " A.hammaT AS '헤머무게', "+
-		    " A.fallMeter AS '낙하높이', "+
-		    " A.pileType AS '파일종류', "+
-		    " A.method AS '공법', "+
-		    " A.totalConnectWidth AS '최종관입량', "+
-		    " A.ultimateBearingCapacity AS '극한지지력', "+
-		    " A.crossSection AS '단면적', "+
-		    " A.hammaEfficiency AS '헤머효율', "+
-		    " A.modulusElasticity AS '탄성계수' "+
-			" FROM TB_REPORT A , TB_DEVICE B, TB_CONSTRUCTION C " + 
-		    " WHERE A.deviceIdx = B.id AND B.constructionIdx = C.id " + 
-			" AND A.deviceIdx IN (" + 
-			"  SELECT D.id " +
-			"           FROM (SELECT * " +
-			"                 FROM TB_CONSTRUCTION " +
-			"                 WHERE groupIdx = (SELECT idx " +
-			"                                   FROM TB_GROUP " +
-			"                                   WHERE TB_GROUP.userId = 'hd0001')) C, " +
-			"                TB_DEVICE D " +
-			"           WHERE C.id = D.constructionIdx) " +
-			" ORDER BY A.deviceIdx ASC, A.createDate DESC ")
-	List<ApiReport> getApiReport();
-	
 	
 	@Select("SELECT COUNT(*) FROM (SELECT deviceIdx, pileNo, location FROM " + TABLE_NAME + "  WHERE deviceIdx =  #{id} and isDel = 0 GROUP BY deviceIdx, pileNo, location) A")
 	int getCount(ReportParam param);

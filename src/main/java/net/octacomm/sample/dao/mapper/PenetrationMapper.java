@@ -58,5 +58,7 @@ public interface PenetrationMapper extends CRUDMapper<Penetration, DefaultParam,
 	@Select("SELECT id, reportIdx, name , value FROM " + TABLE_NAME + " where reportIdx = #{reportIdx}")
 	List<Penetration> getListByReportIdxOfCopy(@Param("reportIdx") int reportIdx);
 
+	@Delete("DELETE FROM " + TABLE_NAME + " WHERE reportIdx = #{reportIdx}")
+	int deleteByReportIdx(@Param("reportIdx") int reportIdx);
 
 }
