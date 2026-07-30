@@ -10,7 +10,6 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import net.octacomm.sample.dao.CRUDMapper;
-import net.octacomm.sample.domain.ApiReport;
 import net.octacomm.sample.domain.Construction;
 import net.octacomm.sample.domain.ConstructionParam;
 import net.octacomm.sample.domain.GReport;
@@ -144,9 +143,8 @@ public interface ReportAllMapper extends CRUDMapper<Report, ReportParam, Integer
 			"                TB_DEVICE D " +
 			"           WHERE C.id = D.constructionIdx) " +
 			" ORDER BY A.deviceIdx ASC, A.createDate DESC ")
-	List<ApiReport> getApiReport();
-	
-	
+	List<Report> getApiReport();
+
 	@Select("SELECT COUNT(*) FROM (SELECT deviceIdx, pileNo, location FROM " + TABLE_NAME + "  WHERE deviceIdx =  #{id} and isDel = 0 GROUP BY deviceIdx, pileNo, location) A")
 	int getCount(ReportParam param);
 	
