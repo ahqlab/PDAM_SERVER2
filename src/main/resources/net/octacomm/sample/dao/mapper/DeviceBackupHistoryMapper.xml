@@ -7,32 +7,17 @@
 	<select id="getListByDevice"
 			resultType="net.octacomm.sample.domain.DeviceBackupHistory">
 		SELECT
-			h.id,
-			h.constructionIdx,
-			h.deviceId,
-			h.versionNo,
-			CONCAT('V', LPAD(h.versionNo, 3, '0')) AS version,
-			DATE_FORMAT(h.createdAt, '%Y-%m-%d %H:%i') AS createdAt,
-			h.workType
-		FROM TB_DEVICE_BACKUP_HISTORY h
-		WHERE h.constructionIdx = #{constructionIdx}
-		  AND h.deviceId = #{deviceId}
-		ORDER BY h.versionNo DESC, h.id DESC
-	</select>
-
-	<select id="getListByConstruction"
-			resultType="net.octacomm.sample.domain.DeviceBackupHistory">
-		SELECT
-			h.id,
-			h.constructionIdx,
-			h.deviceId,
-			h.versionNo,
-			CONCAT('V', LPAD(h.versionNo, 3, '0')) AS version,
-			DATE_FORMAT(h.createdAt, '%Y-%m-%d %H:%i') AS createdAt,
-			h.workType
-		FROM TB_DEVICE_BACKUP_HISTORY h
-		WHERE h.constructionIdx = #{constructionIdx}
-		ORDER BY h.deviceId ASC, h.versionNo DESC, h.id DESC
+			id,
+			constructionIdx,
+			deviceId,
+			versionNo,
+			CONCAT('V', LPAD(versionNo, 3, '0')) AS version,
+			DATE_FORMAT(createdAt, '%Y-%m-%d %H:%i') AS createdAt,
+			workType
+		FROM TB_DEVICE_BACKUP_HISTORY
+		WHERE constructionIdx = #{constructionIdx}
+		  AND deviceId = #{deviceId}
+		ORDER BY versionNo DESC, id DESC
 	</select>
 
 	<select id="getById"
@@ -50,24 +35,6 @@
 		WHERE id = #{id}
 		  AND constructionIdx = #{constructionIdx}
 		  AND deviceId = #{deviceId}
-	</select>
-
-	<select id="getLatestByDevice"
-			resultType="net.octacomm.sample.domain.DeviceBackupHistory">
-		SELECT
-			id,
-			constructionIdx,
-			deviceId,
-			versionNo,
-			CONCAT('V', LPAD(versionNo, 3, '0')) AS version,
-			DATE_FORMAT(createdAt, '%Y-%m-%d %H:%i') AS createdAt,
-			workType,
-			snapshotData
-		FROM TB_DEVICE_BACKUP_HISTORY
-		WHERE constructionIdx = #{constructionIdx}
-		  AND deviceId = #{deviceId}
-		ORDER BY versionNo DESC, id DESC
-		LIMIT 1
 	</select>
 
 	<insert id="insertBackup"

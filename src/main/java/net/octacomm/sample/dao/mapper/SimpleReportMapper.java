@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import net.octacomm.sample.dao.CRUDMapper;
+import net.octacomm.sample.domain.ApiReport;
 import net.octacomm.sample.domain.Report;
 import net.octacomm.sample.domain.ReportParam;
 import net.octacomm.sample.domain.SimpleReport;
