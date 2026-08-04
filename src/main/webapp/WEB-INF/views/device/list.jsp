@@ -1183,6 +1183,7 @@ function changeSpareDevice(targetId, changeId, constructionIdx){
 	
 	
 	<div class="min531">
+		<%-- 현재 미사용: 백업 이력 버튼 (필요 시 주석 해제)
 		<c:if test="${sessionInfo.role == 0}">
 		<div class="backupHistoryArea">
 			<button type="button" class="backupHistoryBtn"
@@ -1191,6 +1192,7 @@ function changeSpareDevice(targetId, changeId, constructionIdx){
 			</button>
 		</div>
 		</c:if>
+		--%>
 		<div class="tableArea">
 			<div class="viewTable viewTable01">
 				<div class="tableScroll">
@@ -1221,7 +1223,8 @@ function changeSpareDevice(targetId, changeId, constructionIdx){
 								<c:when test="${sessionInfo.role == 0}">
 									<th style="width: 5%; font-size: 15px;">정보변경</th>
 									<th style="width: 5%; font-size: 15px;">상태</th>
-									<th style="width: 5%; font-size: 15px;">삭제</th>
+									<%-- 삭제는 슈퍼관리자(role==0) 중에서도 진짜 시스템관리자(TB_SYSTEM_ADMIN)만 --%>
+									<c:if test="${sessionScope.isSystemAdmin}"><th style="width: 5%; font-size: 15px;">삭제</th></c:if>
 								</c:when>
 							</c:choose>
 						</tr>
@@ -1275,7 +1278,9 @@ function changeSpareDevice(targetId, changeId, constructionIdx){
 												<option value="1" ${domain.conduct == 1 ? 'selected="selected"' : '' }>종료</option>
 											</select>
 										</td>
+										<c:if test="${sessionScope.isSystemAdmin}">
 										<td><div class="tableDelate deviceDelete" onclick="doDelete('${domain.id}');">삭제</div></td>
+									</c:if>
 									</tr>
 								</c:when>
 								<c:when test="${sessionInfo.role == 2 or sessionInfo.role == 3 or sessionInfo.role == 4}">
@@ -1369,7 +1374,9 @@ function changeSpareDevice(targetId, changeId, constructionIdx){
 							<tr>
 								<c:choose>
 									<c:when test="${sessionInfo.role == 0}">
-										<td colspan="${param.constructionIdx == 588 or param.constructionIdx == 613 or param.constructionIdx == 627 ? 16 : 15}">등록된 데이터가 없습니다.</td>
+										<c:set var="noDataColspan" value="${param.constructionIdx == 588 or param.constructionIdx == 613 or param.constructionIdx == 627 ? 16 : 15}" />
+										<c:if test="${not sessionScope.isSystemAdmin}"><c:set var="noDataColspan" value="${noDataColspan - 1}" /></c:if>
+										<td colspan="${noDataColspan}">등록된 데이터가 없습니다.</td>
 									</c:when>
 									<c:otherwise>
 										<td colspan="11">등록된 데이터가 없습니다.</td>

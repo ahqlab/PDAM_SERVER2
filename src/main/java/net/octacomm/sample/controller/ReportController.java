@@ -5,10 +5,8 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpSession;
@@ -25,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.support.SessionStatus;
-import org.springframework.web.multipart.MultipartFile;
 
 import net.octacomm.sample.dao.mapper.ConstructionMapper;
 import net.octacomm.sample.dao.mapper.DeviceMapper;
@@ -45,14 +42,12 @@ import net.octacomm.sample.domain.ExtensivePileUsage;
 import net.octacomm.sample.domain.Penetration;
 import net.octacomm.sample.domain.Piece;
 import net.octacomm.sample.domain.Report;
-import net.octacomm.sample.domain.ReportExcelUploadAnalysis;
 import net.octacomm.sample.domain.ReportMaxCount;
 import net.octacomm.sample.domain.ReportOneLine;
 import net.octacomm.sample.domain.ReportParam;
 import net.octacomm.sample.domain.SessionInfo;
 import net.octacomm.sample.domain.UpdateReport;
 import net.octacomm.sample.service.DeviceBackupHistoryService;
-import net.octacomm.sample.service.ReportExcelUploadService;
 import net.octacomm.sample.utils.MathUtil;
 import net.octacomm.sample.utils.Pagination;
 import net.octacomm.sample.utils.ReportPagination;
@@ -91,12 +86,6 @@ public class ReportController{
 	
 	@Autowired
 	private ExtensivePileUsageMapper extensivePileUsageMapper;
-
-	@Autowired
-	private DeviceBackupHistoryService deviceBackupHistoryService;
-
-	@Autowired
-	private ReportExcelUploadService reportExcelUploadService;
 	
 	
 	@RequestMapping(value = "/list")
@@ -193,43 +182,6 @@ public class ReportController{
 		model.addAttribute("extensivePileUsage", extensivePileUsage);
 		
 		return "report/listMultiOneLine";
-	}
-
-	@ResponseBody
-	@RequestMapping(
-			value = "/upload/excel/analyze",
-			method = RequestMethod.POST)
-	public ReportExcelUploadAnalysis analyzeUploadedExcel(
-			@RequestParam("file") MultipartFile file,
-			@RequestParam("deviceId") int deviceId,
-			@RequestParam("constructionIdx") int constructionIdx,
-			@ModelAttribute("comparisonParam") ReportParam comparisonParam) {
-		return reportExcelUploadService.analyze(
-				file, deviceId, constructionIdx, comparisonParam);
-	}
-
-	@ResponseBody
-	@RequestMapping(
-			value = "/upload/excel/apply",
-			method = RequestMethod.POST)
-	public ReportExcelUploadAnalysis applyUploadedExcel(
-			@RequestParam("file") MultipartFile file,
-			@RequestParam("deviceId") int deviceId,
-			@RequestParam("constructionIdx") int constructionIdx,
-			@RequestParam("analysisToken") String analysisToken,
-			@ModelAttribute("comparisonParam") ReportParam comparisonParam) {
-		try {
-			return reportExcelUploadService.apply(file, deviceId,
-					constructionIdx, comparisonParam, analysisToken);
-		} catch (Exception e) {
-			ReportExcelUploadAnalysis result =
-					new ReportExcelUploadAnalysis();
-			result.setSuccess(false);
-			result.setMessage(e.getMessage() == null
-					? "기록지 백업 및 반영 중 오류가 발생했습니다."
-					: e.getMessage());
-			return result;
-		}
 	}
 
 	/**
@@ -1016,8 +968,7 @@ public class ReportController{
 		
 		
 		int constructionIdx = mapper.getConstructionIdx(report.getId());
-		deviceBackupHistoryService.createAutomaticBackup(
-				constructionIdx, report.getDeviceIdx());
+		//deviceBackupHistoryService.createAutomaticBackup(constructionIdx, report.getDeviceIdx());
 		
 		System.err.println("constructionIdx : " + constructionIdx);
 		
@@ -1082,19 +1033,17 @@ public class ReportController{
 			return false;
 		}
 
-		Set<Integer> backedUpDeviceIds = new HashSet<Integer>();
-		for (UpdateReport report : reports) {
-			if (backedUpDeviceIds.add(report.getDeviceIdx())) {
-				int constructionIdx = mapper.getConstructionIdx(report.getId());
-				deviceBackupHistoryService.createAutomaticBackup(
-						constructionIdx, report.getDeviceIdx());
-			}
-		}
+		// Set<Integer> backedUpDeviceIds = new HashSet<Integer>();
+		// for (UpdateReport report : reports) {
+		// 	if (backedUpDeviceIds.add(report.getDeviceIdx())) {
+		// 		int constructionIdx = mapper.getConstructionIdx(report.getId());
+		// 		//deviceBackupHistoryService.createAutomaticBackup(constructionIdx, report.getDeviceIdx());
+		// 	}
+		// }
 
 		for (UpdateReport report : reports) {
 			if (!updateReportOne(report)) {
-				throw new IllegalStateException(
-						"기록지 수정 중 오류가 발생했습니다.");
+				throw new IllegalStateException("기록지 수정 중 오류가 발생했습니다.");
 			}
 		}
 		return true;

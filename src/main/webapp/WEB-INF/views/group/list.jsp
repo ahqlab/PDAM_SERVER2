@@ -260,7 +260,7 @@ function checkDuplicateGroupName(){
 <script>
 (function(){
 	var ctx = '${pageContext.request.contextPath}';
-	var PAGE_SIZE = 10;
+	var PAGE_SIZE = 20;
 	var BLOCK_SIZE = 10;
 	var allGroupData = [];
 	var currentPage = 1;

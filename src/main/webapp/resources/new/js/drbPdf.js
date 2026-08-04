@@ -123,7 +123,8 @@ function drawCompactChart(
 	    doc,
 	    currentAvgPenetrationValue,
 	    currentTotalPenetrationValue,
-	    constructionIdx
+	    constructionIdx,
+	    signRoomData
 	) {
 
 	    // =========================
@@ -240,123 +241,110 @@ function drawCompactChart(
 	        doc.text((i + 1) + '회 측정', x, graphBottomY + 6, { align: 'center' });
 	    }
 	    
-	    if(constructionIdx != 738){
-			jQuery.ajax({
-				type : "POST",
-				url : root + "/signroom/get/order/list",
-				data: { 
-					constructionIdx : constructionIdx			
-				}, 
-				dataType : "JSON", // 옵션이므로 JSON으로 받을게 아니면 안써도 됨
-				async : false,
-				success : function(data) {
-					
-					var signRoomStartX = 75;
-					var signRoomTopY = 12;
-					var signRoomBottomY = 22;
-					
-					if(data.length > 0){
-						
-						var roomOneWidth = 44;
-						
-						var endXSum = 0;
-						$.each(data, function(index, item) {
-							
-							if(constructionIdx == 969){
-								roomOneWidth = 60;
-							}else{
-								roomOneWidth = 44;
-							}
-							
-							
-							var end = (pageWidth - 15) - (roomOneWidth * (index + 1));
-							endXSum = end;
-						});
-						
-						//세로
-						doc.line(endXSum, 
-								pageHeight - signRoomTopY, 
-								endXSum, 
-								pageHeight - signRoomBottomY);
-						
-						$.each(data, function(index, item) {
-							
-							if(constructionIdx == 969){
-								roomOneWidth = 60;
-							}else{
-								roomOneWidth = 44;
-							}
-							
-							var x = (pageWidth - 15) - (roomOneWidth * index);
-							var end = (pageWidth - 15) - (roomOneWidth * (index + 1));
-							
-							//가로위
-							doc.line(x, 
-									pageHeight - signRoomTopY, 
-									end,
-									pageHeight - signRoomTopY);
-							//가로아래
-							doc.line(x, 
-									pageHeight - signRoomBottomY, 
-									end,
-									pageHeight - signRoomBottomY);
-							//세로
-							doc.line(x, 
-									pageHeight - signRoomTopY, 
-									x, 
-									pageHeight - signRoomBottomY);
-							
-							//세로 칸의 중간
-							doc.line(x - (roomOneWidth / 2), 
-									pageHeight - signRoomTopY, 
-									x -  (roomOneWidth / 2), 
-									pageHeight - signRoomBottomY);
-							
-							
-							//doc.text(item.approver , x - ( (roomOneWidth / 2) + (roomOneWidth/4)), pageHeight - 16, {align: 'center'});
-							drawAutoFitText(
-								    doc,
-								    item.approver,
-								    x - ( (roomOneWidth / 2) + (roomOneWidth / 4) ),
-								    pageHeight - 16,
-								    roomOneWidth,
-								    { align: 'center' }
-								);
-							
-						});
-						
-						
+	    if(constructionIdx != 738 && signRoomData){
+			// PDF 페이지마다 서버에 재요청하지 않고, 호출부에서 한 번만 조회해 전달받은 결재방 데이터를 사용
+			var data = signRoomData;
+
+			var signRoomStartX = 75;
+			var signRoomTopY = 12;
+			var signRoomBottomY = 22;
+
+			if(data.length > 0){
+
+				var roomOneWidth = 44;
+
+				var endXSum = 0;
+				$.each(data, function(index, item) {
+
+					if(constructionIdx == 969){
+						roomOneWidth = 60;
 					}else{
-						//결재방시작
-						/**
-						var signRoomStartX = 75;
-						var signRoomTopY = 12;
-						var signRoomBottomY = 22;
-						//가로
-						doc.line( signRoomStartX , pageHeight - signRoomTopY , pageWidth - 15, pageHeight - signRoomTopY);
-						doc.line( signRoomStartX , pageHeight - signRoomBottomY , pageWidth - 15, pageHeight - signRoomBottomY);
-						
-						//세로
-						doc.line( signRoomStartX, pageHeight - signRoomTopY , signRoomStartX, pageHeight - signRoomBottomY);
-						for(var i = 1; i <= 4; i++){
-							doc.line( signRoomStartX  + (i*30) , pageHeight - signRoomTopY , signRoomStartX   + (i*30), pageHeight - signRoomBottomY);
-						}
-						
-						//doc.line( signRoomStartX  + 60 , pageHeight - signRoomTopY , signRoomStartX   + 60, pageHeight - signRoomBottomY);
-						//doc.line( signRoomStartX  + 90 , pageHeight - signRoomTopY , signRoomStartX   + 90, pageHeight - signRoomBottomY);
-						//doc.line( signRoomStartX  + 120 , pageHeight - signRoomTopY , signRoomStartX   + 120, pageHeight - signRoomBottomY);
-						doc.setFontSize(10);
-						doc.text('시공사', signRoomStartX  + 15, pageHeight - 16, {align: 'center'});
-						doc.text('감리단', signRoomStartX  + 60 + 15, pageHeight - 16, {align: 'center'});
-						**/
-		
+						roomOneWidth = 44;
 					}
-				},
-				complete : function(data) {
-				},
-				error : function(xhr, status, error) {
+
+
+					var end = (pageWidth - 15) - (roomOneWidth * (index + 1));
+					endXSum = end;
+				});
+
+				//세로
+				doc.line(endXSum,
+						pageHeight - signRoomTopY,
+						endXSum,
+						pageHeight - signRoomBottomY);
+
+				$.each(data, function(index, item) {
+
+					if(constructionIdx == 969){
+						roomOneWidth = 60;
+					}else{
+						roomOneWidth = 44;
+					}
+
+					var x = (pageWidth - 15) - (roomOneWidth * index);
+					var end = (pageWidth - 15) - (roomOneWidth * (index + 1));
+
+					//가로위
+					doc.line(x,
+							pageHeight - signRoomTopY,
+							end,
+							pageHeight - signRoomTopY);
+					//가로아래
+					doc.line(x,
+							pageHeight - signRoomBottomY,
+							end,
+							pageHeight - signRoomBottomY);
+					//세로
+					doc.line(x,
+							pageHeight - signRoomTopY,
+							x,
+							pageHeight - signRoomBottomY);
+
+					//세로 칸의 중간
+					doc.line(x - (roomOneWidth / 2),
+							pageHeight - signRoomTopY,
+							x -  (roomOneWidth / 2),
+							pageHeight - signRoomBottomY);
+
+
+					//doc.text(item.approver , x - ( (roomOneWidth / 2) + (roomOneWidth/4)), pageHeight - 16, {align: 'center'});
+					drawAutoFitText(
+						    doc,
+						    item.approver,
+						    x - ( (roomOneWidth / 2) + (roomOneWidth / 4) ),
+						    pageHeight - 16,
+						    roomOneWidth,
+						    { align: 'center' }
+						);
+
+				});
+
+
+			}else{
+				//결재방시작
+				/**
+				var signRoomStartX = 75;
+				var signRoomTopY = 12;
+				var signRoomBottomY = 22;
+				//가로
+				doc.line( signRoomStartX , pageHeight - signRoomTopY , pageWidth - 15, pageHeight - signRoomTopY);
+				doc.line( signRoomStartX , pageHeight - signRoomBottomY , pageWidth - 15, pageHeight - signRoomBottomY);
+
+				//세로
+				doc.line( signRoomStartX, pageHeight - signRoomTopY , signRoomStartX, pageHeight - signRoomBottomY);
+				for(var i = 1; i <= 4; i++){
+					doc.line( signRoomStartX  + (i*30) , pageHeight - signRoomTopY , signRoomStartX   + (i*30), pageHeight - signRoomBottomY);
 				}
-			});
+
+				//doc.line( signRoomStartX  + 60 , pageHeight - signRoomTopY , signRoomStartX   + 60, pageHeight - signRoomBottomY);
+				//doc.line( signRoomStartX  + 90 , pageHeight - signRoomTopY , signRoomStartX   + 90, pageHeight - signRoomBottomY);
+				//doc.line( signRoomStartX  + 120 , pageHeight - signRoomTopY , signRoomStartX   + 120, pageHeight - signRoomBottomY);
+				doc.setFontSize(10);
+				doc.text('시공사', signRoomStartX  + 15, pageHeight - 16, {align: 'center'});
+				doc.text('감리단', signRoomStartX  + 60 + 15, pageHeight - 16, {align: 'center'});
+				**/
+
+			}
 		}
 
 	    // =========================
@@ -407,7 +395,7 @@ function drawCompactChart(
 
 
 //그래프를 그린다.
-function drawChart(root, index, item, pageWidth, pageHeight, doc, currentAvgPenetrationValue , currentTotalPenetrationValue, constructionIdx){
+function drawChart(root, index, item, pageWidth, pageHeight, doc, currentAvgPenetrationValue , currentTotalPenetrationValue, constructionIdx, signRoomData){
 	
 	//var mode = 'center';
 	var mode = 'bottom';
@@ -558,128 +546,112 @@ function drawChart(root, index, item, pageWidth, pageHeight, doc, currentAvgPene
 	
 	
 	
-	if(constructionIdx != 738){
-		jQuery.ajax({
-			type : "POST",
-			url : root + "/signroom/get/order/list",
-			data: { 
-				constructionIdx : constructionIdx			
-			}, 
-			dataType : "JSON", // 옵션이므로 JSON으로 받을게 아니면 안써도 됨
-			async : false,
-			success : function(data) {
-				
-				var signRoomStartX = 75;
-				var signRoomTopY = 12;
-				var signRoomBottomY = 22;
-				
-				if(data.length > 0){
-					
-					var roomOneWidth = 44;
-					
-					var endXSum = 0;
-					$.each(data, function(index, item) {
-						
-						if(constructionIdx == 969){
-							roomOneWidth = 60;
-						}else{
-							roomOneWidth = 44;
-						}
-						
-						
-						var end = (pageWidth - 15) - (roomOneWidth * (index + 1));
-						endXSum = end;
-					});
-					
-					//세로
-					doc.line(endXSum, 
-							pageHeight - signRoomTopY, 
-							endXSum, 
-							pageHeight - signRoomBottomY);
-					
-					$.each(data, function(index, item) {
-						
-						if(constructionIdx == 969){
-							roomOneWidth = 60;
-						}else{
-							roomOneWidth = 44;
-						}
-						
-						var x = (pageWidth - 15) - (roomOneWidth * index);
-						var end = (pageWidth - 15) - (roomOneWidth * (index + 1));
-						
-						//가로위
-						doc.line(x, 
-								pageHeight - signRoomTopY, 
-								end,
-								pageHeight - signRoomTopY);
-						//가로아래
-						doc.line(x, 
-								pageHeight - signRoomBottomY, 
-								end,
-								pageHeight - signRoomBottomY);
-						//세로
-						doc.line(x, 
-								pageHeight - signRoomTopY, 
-								x, 
-								pageHeight - signRoomBottomY);
-						
-						//세로 칸의 중간
-						doc.line(x - (roomOneWidth / 2), 
-								pageHeight - signRoomTopY, 
-								x -  (roomOneWidth / 2), 
-								pageHeight - signRoomBottomY);
-						
-						
-						//doc.text(item.approver , x - ( (roomOneWidth / 2) + (roomOneWidth/4)), pageHeight - 16, {align: 'center'});
-						drawAutoFitText(
-							    doc,
-							    item.approver,
-							    x - ( (roomOneWidth / 2) + (roomOneWidth / 4) ),
-							    pageHeight - 16,
-							    roomOneWidth,
-							    { align: 'center' }
-							);
-						
-					});
-					
-					
+	if(constructionIdx != 738 && signRoomData){
+		// PDF 페이지마다 서버에 재요청하지 않고, 호출부에서 한 번만 조회해 전달받은 결재방 데이터를 사용
+		var data = signRoomData;
+
+		var signRoomStartX = 75;
+		var signRoomTopY = 12;
+		var signRoomBottomY = 22;
+
+		if(data.length > 0){
+
+			var roomOneWidth = 44;
+
+			var endXSum = 0;
+			$.each(data, function(index, item) {
+
+				if(constructionIdx == 969){
+					roomOneWidth = 60;
 				}else{
-					//결재방시작
-					/**
-					var signRoomStartX = 75;
-					var signRoomTopY = 12;
-					var signRoomBottomY = 22;
-					//가로
-					doc.line( signRoomStartX , pageHeight - signRoomTopY , pageWidth - 15, pageHeight - signRoomTopY);
-					doc.line( signRoomStartX , pageHeight - signRoomBottomY , pageWidth - 15, pageHeight - signRoomBottomY);
-					
-					//세로
-					doc.line( signRoomStartX, pageHeight - signRoomTopY , signRoomStartX, pageHeight - signRoomBottomY);
-					for(var i = 1; i <= 4; i++){
-						doc.line( signRoomStartX  + (i*30) , pageHeight - signRoomTopY , signRoomStartX   + (i*30), pageHeight - signRoomBottomY);
-					}
-					
-					//doc.line( signRoomStartX  + 60 , pageHeight - signRoomTopY , signRoomStartX   + 60, pageHeight - signRoomBottomY);
-					//doc.line( signRoomStartX  + 90 , pageHeight - signRoomTopY , signRoomStartX   + 90, pageHeight - signRoomBottomY);
-					//doc.line( signRoomStartX  + 120 , pageHeight - signRoomTopY , signRoomStartX   + 120, pageHeight - signRoomBottomY);
-					doc.setFontSize(10);
-					doc.text('시공사', signRoomStartX  + 15, pageHeight - 16, {align: 'center'});
-					doc.text('감리단', signRoomStartX  + 60 + 15, pageHeight - 16, {align: 'center'});
-					**/
-	
+					roomOneWidth = 44;
 				}
-			},
-			complete : function(data) {
-			},
-			error : function(xhr, status, error) {
+
+
+				var end = (pageWidth - 15) - (roomOneWidth * (index + 1));
+				endXSum = end;
+			});
+
+			//세로
+			doc.line(endXSum,
+					pageHeight - signRoomTopY,
+					endXSum,
+					pageHeight - signRoomBottomY);
+
+			$.each(data, function(index, item) {
+
+				if(constructionIdx == 969){
+					roomOneWidth = 60;
+				}else{
+					roomOneWidth = 44;
+				}
+
+				var x = (pageWidth - 15) - (roomOneWidth * index);
+				var end = (pageWidth - 15) - (roomOneWidth * (index + 1));
+
+				//가로위
+				doc.line(x,
+						pageHeight - signRoomTopY,
+						end,
+						pageHeight - signRoomTopY);
+				//가로아래
+				doc.line(x,
+						pageHeight - signRoomBottomY,
+						end,
+						pageHeight - signRoomBottomY);
+				//세로
+				doc.line(x,
+						pageHeight - signRoomTopY,
+						x,
+						pageHeight - signRoomBottomY);
+
+				//세로 칸의 중간
+				doc.line(x - (roomOneWidth / 2),
+						pageHeight - signRoomTopY,
+						x -  (roomOneWidth / 2),
+						pageHeight - signRoomBottomY);
+
+
+				//doc.text(item.approver , x - ( (roomOneWidth / 2) + (roomOneWidth/4)), pageHeight - 16, {align: 'center'});
+				drawAutoFitText(
+					    doc,
+					    item.approver,
+					    x - ( (roomOneWidth / 2) + (roomOneWidth / 4) ),
+					    pageHeight - 16,
+					    roomOneWidth,
+					    { align: 'center' }
+					);
+
+			});
+
+
+		}else{
+			//결재방시작
+			/**
+			var signRoomStartX = 75;
+			var signRoomTopY = 12;
+			var signRoomBottomY = 22;
+			//가로
+			doc.line( signRoomStartX , pageHeight - signRoomTopY , pageWidth - 15, pageHeight - signRoomTopY);
+			doc.line( signRoomStartX , pageHeight - signRoomBottomY , pageWidth - 15, pageHeight - signRoomBottomY);
+
+			//세로
+			doc.line( signRoomStartX, pageHeight - signRoomTopY , signRoomStartX, pageHeight - signRoomBottomY);
+			for(var i = 1; i <= 4; i++){
+				doc.line( signRoomStartX  + (i*30) , pageHeight - signRoomTopY , signRoomStartX   + (i*30), pageHeight - signRoomBottomY);
 			}
-		});
-		
-		
-	
+
+			//doc.line( signRoomStartX  + 60 , pageHeight - signRoomTopY , signRoomStartX   + 60, pageHeight - signRoomBottomY);
+			//doc.line( signRoomStartX  + 90 , pageHeight - signRoomTopY , signRoomStartX   + 90, pageHeight - signRoomBottomY);
+			//doc.line( signRoomStartX  + 120 , pageHeight - signRoomTopY , signRoomStartX   + 120, pageHeight - signRoomBottomY);
+			doc.setFontSize(10);
+			doc.text('시공사', signRoomStartX  + 15, pageHeight - 16, {align: 'center'});
+			doc.text('감리단', signRoomStartX  + 60 + 15, pageHeight - 16, {align: 'center'});
+			**/
+
+		}
 	}
-	
+
 	//실제 그래프를 그린다.
 	doc.setLineWidth(1); 
 	for(var i=0; i<pointArr.length; i++){
@@ -879,6 +851,19 @@ function downloadDrivingRecoredBook(root, constructionIdx, machineNumber, curren
 					// 한글 폰트는 문서당 1회만 등록 (대량 출력 메모리 개선)
 					doc.addFileToVFS('malgun.ttf', _fonts);
 					doc.addFont('malgun.ttf','malgun', 'normal');
+
+					// 결재방(승인자) 목록도 문서당 1회만 조회 (페이지마다 재요청 방지)
+					var signRoomData = [];
+					if(constructionIdx != 738){
+						jQuery.ajax({
+							type : "POST",
+							url : root + "/signroom/get/order/list",
+							data: { constructionIdx : constructionIdx },
+							dataType : "JSON",
+							async : false,
+							success : function(sdata) { signRoomData = sdata; }
+						});
+					}
 				   
 					$.each(data, function(index, item) {
 						var constructionName = item.name;
@@ -1033,9 +1018,9 @@ function downloadDrivingRecoredBook(root, constructionIdx, machineNumber, curren
 						if(option == 'Y'){
 							drawHitCountLegend(doc, 105);
 							//금도건설 조풍건설 구형 흑연사업 토건공사
-							drawCompactChart(root, index, item, pageWidth, pageHeight, doc, currentAvgPenetrationValue , currentTotalPenetrationValue, constructionIdx);
+							drawCompactChart(root, index, item, pageWidth, pageHeight, doc, currentAvgPenetrationValue , currentTotalPenetrationValue, constructionIdx, signRoomData);
 						}else{
-							drawChart(root, index, item, pageWidth, pageHeight, doc, currentAvgPenetrationValue , currentTotalPenetrationValue, constructionIdx);
+							drawChart(root, index, item, pageWidth, pageHeight, doc, currentAvgPenetrationValue , currentTotalPenetrationValue, constructionIdx, signRoomData);
 						}
 						
 						if(constructionIdx == 1508){
@@ -1114,6 +1099,19 @@ function downloadDrivingAllRecoredBook(root, constructionIdx, machineNumber){
 					// 한글 폰트는 문서당 1회만 등록 (대량 출력 메모리 개선)
 					doc.addFileToVFS('malgun.ttf', _fonts);
 					doc.addFont('malgun.ttf','malgun', 'normal');
+
+					// 결재방(승인자) 목록도 문서당 1회만 조회 (페이지마다 재요청 방지)
+					var signRoomData = [];
+					if(constructionIdx != 738){
+						jQuery.ajax({
+							type : "POST",
+							url : root + "/signroom/get/order/list",
+							data: { constructionIdx : constructionIdx },
+							dataType : "JSON",
+							async : false,
+							success : function(sdata) { signRoomData = sdata; }
+						});
+					}
 				   
 					$.each(data, function(index, item) {
 						 var constructionName = item.name;
@@ -1223,7 +1221,7 @@ function downloadDrivingAllRecoredBook(root, constructionIdx, machineNumber){
 							title: 'PDF타이틀',        
 						});
 						drawLegend(doc);
-						drawChart(root, index, item, pageWidth, pageHeight, doc, currentAvgPenetrationValue , currentTotalPenetrationValue, constructionIdx);
+						drawChart(root, index, item, pageWidth, pageHeight, doc, currentAvgPenetrationValue , currentTotalPenetrationValue, constructionIdx, signRoomData);
 						drawPageNumber(doc, index);
 						if(index < data.length - 1){
 							doc.addPage();

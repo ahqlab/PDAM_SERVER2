@@ -51,9 +51,7 @@ public class ReportFiveAllBy extends AbstractExcelView
   protected void buildExcelDocument(Map<String, Object> model, HSSFWorkbook workbook, HttpServletRequest req, HttpServletResponse res) throws Exception
   {
     String userAgent = req.getHeader("User-Agent");
-    String fileName = model.get("backupDownloadFileName") == null
-        ? "PDAM_REPORT_" + DateUtil.getCurrentDatetime() + ".xls"
-        : (String) model.get("backupDownloadFileName");
+    String fileName = "PDAM_REPORT_" + DateUtil.getCurrentDatetime() + ".xls";
 
     if (userAgent.indexOf("MSIE") > -1)
       fileName = URLEncoder.encode(fileName, "utf-8");

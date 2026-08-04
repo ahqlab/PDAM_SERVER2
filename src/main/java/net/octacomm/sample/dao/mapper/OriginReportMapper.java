@@ -97,6 +97,7 @@ public interface OriginReportMapper extends CRUDMapper<Report, ReportParam, Inte
 	
 	void insert2Origin(Report report);
 	
+	
 	@Select("SELECT COUNT(*) FROM (SELECT deviceIdx, pileNo, location FROM " + TABLE_NAME + "  WHERE deviceIdx =  #{id} and isDel = 0 GROUP BY deviceIdx, pileNo, location) A")
 	//@Select("SELECT count(*) FROM " + TABLE_NAME + " WHERE deviceIdx =  #{id} and isDel = 0")
 	int getCount(ReportParam param);

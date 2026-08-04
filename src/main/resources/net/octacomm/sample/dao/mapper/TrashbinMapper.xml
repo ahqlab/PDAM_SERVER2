@@ -2182,7 +2182,7 @@
 	    		</when>
 	    	</choose>
 	    	
-			, createDate )
+	    	, createDate , gongSac  )
 	     VALUES 
 	     ( #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo} , #{pileStandard},  #{drillingDepth} , #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter},  #{pileType}, #{method}, #{totalConnectWidth},  #{ultimateBearingCapacity} , #{crossSection} , #{hammaEfficiency} , #{modulusElasticity} 
 	     	
@@ -2192,7 +2192,7 @@
 	    		</when>
 	    	</choose>
 	     	
-			, now() )
+	     	, now(), #{gongSac} )
 	    <selectKey resultType="int" keyProperty="id" order="AFTER">
         SELECT LAST_INSERT_ID()
     	</selectKey>
@@ -2208,7 +2208,7 @@
 	    		</when>
 	    	</choose>
 	    	
-			, createDate )
+	    	, createDate , gongSac  )
 	     VALUES 
 	     ( #{id}, #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo} , #{pileStandard},  #{drillingDepth} , #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter},  #{pileType}, #{method}, #{totalConnectWidth},  #{ultimateBearingCapacity} , #{crossSection} , #{hammaEfficiency} , #{modulusElasticity} 
 	     	
@@ -2218,7 +2218,7 @@
 	    		</when>
 	    	</choose>
 	     	
-			, now() )
+	     	, now(), #{gongSac} )
     </insert>
     
     <insert id="insertG2" parameterType="GReport">
@@ -2229,7 +2229,7 @@
 	    		, bigo 
 	    		</when>
 	    	</choose>
-			, createDate )
+	    	, createDate , gongSac  )
 	     VALUES 
 	     ( #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo} , #{pileStandard},  #{drillingDepth} , #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter},  #{pileType}, #{method}, #{totalConnectWidth},   #{ultimateBearingCapacity}, #{crossSection} , #{hammaEfficiency} , #{modulusElasticity} 
 	     	<choose>
@@ -2237,7 +2237,7 @@
 	    		,  #{bigo} 
 	    		</when>
 	    	</choose>
-			, #{createDate} )
+	     	, #{createDate}, #{gongSac} )
 	    <selectKey resultType="int" keyProperty="id" order="AFTER">
         	SELECT LAST_INSERT_ID()
     	</selectKey>
@@ -2252,7 +2252,7 @@
 	    		, bigo 
 	    		</when>
 	    	</choose>
-			, createDate )
+	    	, createDate , gongSac  )
 	     VALUES 
 	     ( #{id}, #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo} , #{pileStandard},  #{drillingDepth} , #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter},  #{pileType}, #{method}, #{totalConnectWidth},   #{ultimateBearingCapacity}, #{crossSection} , #{hammaEfficiency} , #{modulusElasticity} 
 	     	<choose>
@@ -2260,7 +2260,7 @@
 	    		,  #{bigo} 
 	    		</when>
 	    	</choose>
-			, #{createDate} )
+	     	, #{createDate}, #{gongSac} )
     </insert> 
        
        

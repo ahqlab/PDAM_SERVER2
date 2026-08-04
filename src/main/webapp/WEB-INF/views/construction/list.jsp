@@ -1924,14 +1924,10 @@ function deviceRegistFormCheck(){
 		alert('PDAM테블릿 번호 중복확인을 체크하시기 바랍니다.');
 		return;
 	}
-	$("#deviceRegistForm select[name='constructionIdx'] option").not(":selected").attr("disabled", "");
-	$("#deviceRegistForm select[name='constructionIdx']").attr("disabled", "false"); //1.
-	$("#deviceRegistForm select[name='constructionIdx']").removeAttr("disabled");  //2.
-	
-	var myObject = new Object(); 
+	var myObject = new Object();
 	myObject.id = new Number(0);
-	
-	myObject.constructionIdx = new Number($("#deviceRegistForm select[name='constructionIdx'] option:selected").val());//시공사
+
+	myObject.constructionIdx = new Number($("#deviceRegistForm input[name='constructionIdx']").val());//시공사
 	myObject.lavelNo = $("#deviceRegistForm input[name='lavelNo']").val();//자동측정기번호    
 	myObject.bluetoothNo = $("#deviceRegistForm input[name='bluetoothNo']").val();//블루투스번호
 	myObject.tabletNo = $("#deviceRegistForm input[name='tabletNo']").val();//PDAM 테블릿 번호

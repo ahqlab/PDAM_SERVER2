@@ -104,9 +104,18 @@
 		<div class="tableArea">
 
 			<%-- 컬럼 표시 여부: 원본데이터/휴지통은 권한(settingRequired 현장) 기반, PDF는 기존 로직 유지 --%>
-			<c:set var="showOriginData" value="${originDataYn > 0}" />
-			<c:set var="showTrash" value="${not sessionScope.settingRequired or (sessionScope.isHiddenManager ? sessionScope.constructionSetting.useAdminTrash : sessionScope.constructionSetting.useGuestTrash)}" />
-			<c:set var="showPdf" value="${sessionInfo.role == 0 or sessionInfo.showPdfYn or showPdfYn > 0 or sessionInfo.userId == 'ji2177' or sessionInfo.constructionIdx == 738}" />
+			<%-- 레거시(비대상) 현장은 예전 role별 규칙 유지: role==0은 무조건, role==1은 hiddenManager 로그인일 때만, role==3은 originDataYn만, role==2/4는 항상 미노출 --%>
+			<c:set var="showOriginData" value="${sessionInfo.role == 0
+				or (sessionScope.settingRequired and originDataYn > 0)
+				or (not sessionScope.settingRequired and sessionInfo.role == 3 and originDataYn > 0)
+				or (not sessionScope.settingRequired and sessionInfo.role == 1 and sessionInfo.hiddenManager == true and originDataYn > 0)}" />
+			<c:set var="showTrash" value="${sessionScope.settingRequired and (sessionScope.isHiddenManager ? sessionScope.constructionSetting.useAdminTrash : sessionScope.constructionSetting.useGuestTrash)}" />
+			<%-- 레거시 현장은 예전 role별 규칙 유지: role==1은 본인 세션(sessionInfo.showPdfYn), role==2는 ji2177 특례, role==3은 보고 있는 대상 현장의 원본값(showPdfYn) --%>
+			<c:set var="showPdf" value="${sessionInfo.role == 0
+				or (sessionScope.settingRequired and sessionInfo.showPdfYn)
+				or (not sessionScope.settingRequired and sessionInfo.role == 1 and (sessionInfo.showPdfYn or sessionInfo.constructionIdx == 738))
+				or (not sessionScope.settingRequired and sessionInfo.role == 2 and sessionInfo.userId == 'ji2177')
+				or (not sessionScope.settingRequired and sessionInfo.role == 3 and showPdfYn > 0)}" />
 			<c:set var="conIdx" value="${sessionInfo.role == 1 ? sessionInfo.constructionIdx : param.constructionIdx}" />
 			<c:set var="colCount" value="2" />
 			<c:if test="${showOriginData}"><c:set var="colCount" value="${colCount + 1}" /></c:if>

@@ -115,6 +115,8 @@ public interface TrashbinMapper extends CRUDMapper<Report, ReportParam, Integer>
 	
 	int insertG2Origin(GReport report);
 	
+	
+	
 	@Select("SELECT COUNT(*) FROM (SELECT deviceIdx, pileNo, location FROM " + TABLE_NAME + "  WHERE deviceIdx =  #{id} and isDel = 0 GROUP BY deviceIdx, pileNo, location) A")
 	int getCount(ReportParam param);
 	
