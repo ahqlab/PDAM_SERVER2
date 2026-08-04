@@ -36,15 +36,15 @@ public class ExcelSignroomController {
 	@ResponseBody
 	@RequestMapping(value = "/update/all", method = RequestMethod.POST)
 	private boolean updateMulti(@RequestBody List<ExcelSignroom> signrooms){
-		int result = 0;
+		int successCount = 0;
 		for (int i = 0; i < signrooms.size(); i++) {
 			if(signrooms.get(i).getId() <= 0) {
-				result = excelSignroomMapper.insert(signrooms.get(i));
+				successCount += excelSignroomMapper.insert(signrooms.get(i));
 			}else {
-				result = excelSignroomMapper.update(signrooms.get(i));
+				successCount += excelSignroomMapper.update(signrooms.get(i));
 			}
 		}
-		return signrooms.size() != result;
+		return successCount == signrooms.size();
 	}
 	
 	@ResponseBody

@@ -86,9 +86,6 @@ public class ReportController{
 	
 	@Autowired
 	private ExtensivePileUsageMapper extensivePileUsageMapper;
-
-	@Autowired
-	private DeviceBackupHistoryService deviceBackupHistoryService;
 	
 	
 	@RequestMapping(value = "/list")
@@ -971,8 +968,7 @@ public class ReportController{
 		
 		
 		int constructionIdx = mapper.getConstructionIdx(report.getId());
-		deviceBackupHistoryService.createAutomaticBackup(
-				constructionIdx, report.getDeviceIdx());
+		//deviceBackupHistoryService.createAutomaticBackup(constructionIdx, report.getDeviceIdx());
 		
 		System.err.println("constructionIdx : " + constructionIdx);
 		
@@ -1037,19 +1033,17 @@ public class ReportController{
 			return false;
 		}
 
-		Set<Integer> backedUpDeviceIds = new HashSet<Integer>();
-		for (UpdateReport report : reports) {
-			if (backedUpDeviceIds.add(report.getDeviceIdx())) {
-				int constructionIdx = mapper.getConstructionIdx(report.getId());
-				deviceBackupHistoryService.createAutomaticBackup(
-						constructionIdx, report.getDeviceIdx());
-			}
-		}
+		// Set<Integer> backedUpDeviceIds = new HashSet<Integer>();
+		// for (UpdateReport report : reports) {
+		// 	if (backedUpDeviceIds.add(report.getDeviceIdx())) {
+		// 		int constructionIdx = mapper.getConstructionIdx(report.getId());
+		// 		//deviceBackupHistoryService.createAutomaticBackup(constructionIdx, report.getDeviceIdx());
+		// 	}
+		// }
 
 		for (UpdateReport report : reports) {
 			if (!updateReportOne(report)) {
-				throw new IllegalStateException(
-						"기록지 수정 중 오류가 발생했습니다.");
+				throw new IllegalStateException("기록지 수정 중 오류가 발생했습니다.");
 			}
 		}
 		return true;

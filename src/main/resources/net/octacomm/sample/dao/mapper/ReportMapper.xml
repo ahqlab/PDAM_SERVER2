@@ -3716,52 +3716,34 @@
     </select>
     
     <select id="getMachineListByPdf" resultType="ReportOneLine">
-    	SELECT 
-    		id 
-		    , deviceIdx 
-		    , constructionIdx 
-		    , machineNumber 
-		    , currentDateTime 
-			,(	select count(*) 
-				from TB_REPORT 
-		        WHERE TB_REPORT.deviceIdx = TB.deviceIdx 
-		        and TB_REPORT.pileNo = TB.pileNo 
-		        and TB_REPORT.location = TB.location 
-		        and TB_REPORT.isDel = 0) as duplicated 
-			,(	SELECT count(*) 
-				FROM TB_REPORT 
-		        WHERE TB_REPORT.pileNo = TB.pileNo 
-		        AND TB_REPORT.location = TB.location 
-		        AND TB_REPORT.isDel = 0 
-		        AND TB_REPORT.deviceIdx in ( SELECT TBD.id FROM TB_DEVICE TBD WHERE TBD.constructionIdx = TB.constructionIdx AND TBD.isDel = 0 AND TBD.conduct = 0 )) as totalDuplicated
-			,(
-				SELECT IF(role = 0, CONCAT(CONCAT(IFNULL((SELECT groupName from TB_GROUP WHERE TB_GROUP.idx = TB_CONSTRUCTION.groupIdx), '')
-					, CONCAT(' ',NAME)) 
-		            , CONCAT(' ',LOCATION)), LOCATION) AS NAME
-				FROM TB_CONSTRUCTION WHERE id = TB.constructionIdx
-		    )  as name 
-		    , lavelNo 
-		    , location 
-		    , pileNo 
-		    , pileStandard 
-		    , drillingDepth 
+    	SELECT
+    		id
+		    , deviceIdx
+		    , constructionIdx
+		    , machineNumber
+		    , currentDateTime
+		    , lavelNo
+		    , location
+		    , pileNo
+		    , pileStandard
+		    , drillingDepth
 		    , directDrillingDepth
-		    , intrusionDepth 
-		    , balance 
-		    , connectLength 
-		    , managedStandard 
-		    , avgPenetrationValue 
-		    , totalPenetrationValue 
-		    , hammaT 
-		    , fallMeter 
-		    , pileType 
-		    , method 
-		    , totalConnectWidth 
-		    , ultimateBearingCapacity 
-		    , crossSection 
-		    , hammaEfficiency 
-		    , modulusElasticity 
-		    , createDate 
+		    , intrusionDepth
+		    , balance
+		    , connectLength
+		    , managedStandard
+		    , avgPenetrationValue
+		    , totalPenetrationValue
+		    , hammaT
+		    , fallMeter
+		    , pileType
+		    , method
+		    , totalConnectWidth
+		    , ultimateBearingCapacity
+		    , crossSection
+		    , hammaEfficiency
+		    , modulusElasticity
+		    , createDate
 		    , role
 		    , isDel
 		    , bigo
@@ -3781,7 +3763,13 @@
 		    , piThree
 		    , piFour
 		    , piFive
-		FROM ( SELECT C.name as name 
+		FROM ( SELECT
+				(
+					SELECT IF(role = 0, CONCAT(CONCAT(IFNULL((SELECT groupName from TB_GROUP WHERE TB_GROUP.idx = TB_CONSTRUCTION.groupIdx), '')
+						, CONCAT(' ',NAME))
+			            , CONCAT(' ',LOCATION)), LOCATION) AS NAME
+					FROM TB_CONSTRUCTION WHERE id = #{constructionIdx}
+			    ) as name
 				, B.lavelNo as lavelNo
                 , B.machineNumber as machineNumber 
                 , A.id 
@@ -3820,8 +3808,8 @@
 	            , (SELECT VALUE  FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 9,1) as peTen
                 , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "단본" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piOne
                 , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "하단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piTwo
-                , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 0,1),'') as piThree
-                , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 1,1),'') as piFour
+                , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piThree
+                , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" ORDER BY TB_PIECE.id ASC LIMIT 1, 1 ),'') as piFour
                 , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "상단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piFive
                 , A.createDate
                 , C.role 
