@@ -1365,39 +1365,6 @@ color: #000;
     overflow-x: auto;
 }
 
-.backupHistoryArea {
-	display: flex;
-	justify-content: flex-end;
-	margin-bottom: 8px;
-}
-
-.backupHistoryBtn,
-.backupHistoryBackBtn {
-	height: 30px;
-	padding: 0 18px;
-	border: 0;
-	border-radius: 7px;
-	background: #077b9c;
-	color: #fff;
-	font-size: 13px;
-	font-weight: 600;
-	cursor: pointer;
-}
-
-.backupHistoryPage {
-	min-height: 260px;
-	padding: 20px;
-	border-radius: 7px;
-	background: #fff;
-	box-shadow: 0px 0px 6.79px 0.21px rgb(0 0 0 / 7%);
-}
-
-.backupHistoryEmpty {
-	padding: 40px 10px;
-	text-align: center;
-	color: #666;
-}
-
 .tableArea.type02 {
 	box-shadow: none;
 	border-radius: 0;

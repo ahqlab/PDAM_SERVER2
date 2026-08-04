@@ -5,9 +5,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpSession;
 
@@ -47,7 +45,6 @@ import net.octacomm.sample.domain.ReportOneLine;
 import net.octacomm.sample.domain.ReportParam;
 import net.octacomm.sample.domain.SessionInfo;
 import net.octacomm.sample.domain.UpdateReport;
-import net.octacomm.sample.service.DeviceBackupHistoryService;
 import net.octacomm.sample.utils.MathUtil;
 import net.octacomm.sample.utils.Pagination;
 import net.octacomm.sample.utils.ReportPagination;
@@ -968,8 +965,6 @@ public class ReportController{
 		
 		
 		int constructionIdx = mapper.getConstructionIdx(report.getId());
-		//deviceBackupHistoryService.createAutomaticBackup(constructionIdx, report.getDeviceIdx());
-		
 		System.err.println("constructionIdx : " + constructionIdx);
 		
 		//ConstructionSetting setting = holder.get();
@@ -1032,14 +1027,6 @@ public class ReportController{
 		if (reports == null || reports.isEmpty()) {
 			return false;
 		}
-
-		// Set<Integer> backedUpDeviceIds = new HashSet<Integer>();
-		// for (UpdateReport report : reports) {
-		// 	if (backedUpDeviceIds.add(report.getDeviceIdx())) {
-		// 		int constructionIdx = mapper.getConstructionIdx(report.getId());
-		// 		//deviceBackupHistoryService.createAutomaticBackup(constructionIdx, report.getDeviceIdx());
-		// 	}
-		// }
 
 		for (UpdateReport report : reports) {
 			if (!updateReportOne(report)) {
@@ -1331,38 +1318,5 @@ public class ReportController{
 			successCount += mapper.updateChangeDevice(report);
 		}
 		return successCount == reportList.size();
-	}
-	
-	@Transactional
-	@ResponseBody
-	@RequestMapping(value = "/insertMulti", method = RequestMethod.POST)
-	public boolean insertMulti(@RequestBody List<UpdateReport> reportList, HttpSession session) {
-	    Integer role = (Integer) session.getAttribute("role");
-	    if (role == null || role != 0) return false;
-
-	    try {
-	        for (UpdateReport newReport : reportList) {
-	            mapper.insertCopiedReport(newReport);
-	            int newReportId = newReport.getId(); 
-
-	            if (newReport.getPiece() != null) {
-	                for (Piece piece : newReport.getPiece()) {
-	                    piece.setReportIdx(newReportId);
-	                    mapper.insertPiece(piece);
-	                }
-	            }
-
-	            if (newReport.getPenetrations() != null) {
-	                for (Penetration pntr : newReport.getPenetrations()) {
-	                    pntr.setReportIdx(newReportId);  
-	                    mapper.insertPenetration(pntr);
-	                }
-	            }
-	        }
-	        return true; 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        return false;
-	    }
 	}
 }
