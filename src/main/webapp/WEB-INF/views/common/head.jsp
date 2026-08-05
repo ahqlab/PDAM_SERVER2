@@ -2,9 +2,18 @@
 <% 
 	response.setHeader("Cache-Control","no-store"); 
 	response.setHeader("Pragma","no-cache"); 
-	response.setDateHeader("Expires",0); 
-	if (request.getProtocol().equals("HTTP/1.1")) 
-		response.setHeader("Cache-Control", "no-cache"); 
+	response.setDateHeader("Expires",0);
+	if (request.getProtocol().equals("HTTP/1.1"))
+		response.setHeader("Cache-Control", "no-cache");
+
+	// 정적 리소스 캐시버스팅용 빌드(서버 기동) 시각: 서버 켜진 후 최초 요청 시 1회만 계산해 재사용
+	if (application.getAttribute("buildTime") == null) {
+		synchronized (application) {
+			if (application.getAttribute("buildTime") == null) {
+				application.setAttribute("buildTime", System.currentTimeMillis());
+			}
+		}
+	}
 %>
 	<meta charset="utf-8">
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -95,4 +104,4 @@
 	<script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.min.js"></script>
 	
-	<script src="${pageContext.request.contextPath}/new/js/drbPdf.js?20260630"></script>
+	<script src="${pageContext.request.contextPath}/new/js/drbPdf.js?${applicationScope.buildTime}"></script>

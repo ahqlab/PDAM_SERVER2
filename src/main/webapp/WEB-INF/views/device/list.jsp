@@ -624,7 +624,8 @@ function exportAllPdf(){
 		try {
 			downloadDrivingAllRecoredBook('${pageContext.request.contextPath}', conId, '');
 		} catch(e) {
-			alert('PDF 생성 중 오류가 발생했습니다.');
+			console.error('PDF 생성 오류 상세:', e); // TODO: 원인 파악 후 제거
+			alert('PDF 생성 중 오류가 발생했습니다.\n' + (e && e.message ? e.message : e));
 		} finally {
 			hidePdfLoading();
 		}
