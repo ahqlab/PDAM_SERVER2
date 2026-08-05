@@ -341,7 +341,7 @@ function checkDuplicateGroupName(){
 		var html = '';
 		if(currentBlock > 1){
 			html += '<a href="javascript:void(0)" class="prevBtn" onclick="groupGoPage(' + (startPage - 1) + ')">'
-				+ '&#51060;&#51204;</a>';
+				+ '이전</a>';
 		}
 		for(var p = startPage; p <= endPage; p++){
 			if(p === currentPage){
@@ -352,7 +352,7 @@ function checkDuplicateGroupName(){
 		}
 		if(currentBlock < totalBlocks){
 			html += '<a href="javascript:void(0)" class="nextBtn" onclick="groupGoPage(' + (endPage + 1) + ')">'
-				+ '&#45796;&#51020;</a>';
+				+ '다음</a>';
 		}
 		$wrap.html(html);
 	}

@@ -275,13 +275,13 @@ function renderPagination(totalItems) {
 
 	var html = '';
 	if (currentBlock > 1) {
-		html += '<button class="pageBtn" onclick="goPage(' + (startPage - 1) + ')">&#51060;&#51204;</button>';
+		html += '<button class="pageBtn" onclick="goPage(' + (startPage - 1) + ')">이전</button>';
 	}
 	for (var p = startPage; p <= endPage; p++) {
 		html += '<button class="pageBtn' + (p === currentPage ? ' active' : '') + '" onclick="goPage(' + p + ')">' + p + '</button>';
 	}
 	if (currentBlock < totalBlocks) {
-		html += '<button class="pageBtn" onclick="goPage(' + (endPage + 1) + ')">&#45796;&#51020;</button>';
+		html += '<button class="pageBtn" onclick="goPage(' + (endPage + 1) + ')">다음</button>';
 	}
 
 	wrap.html(html);

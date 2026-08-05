@@ -4,7 +4,7 @@
     <!-- <ul> -->
 	<c:if test="${page.priorPageGroup > 0}">
 		<a href="javascript:movePage(1)" class="prevBtn">
-			&#51060;&#51204;
+			이전
 		</a>
 		
 	</c:if>
@@ -22,7 +22,7 @@
 
 	<c:if test="${page.nextPageGroup > 0}">
 		<a href="javascript:movePage(${page.nextPageGroup})" class="nextBtn">
-			&#45796;&#51020;
+			다음
 		</a>
 	</c:if>
  	<!-- </ul> -->
