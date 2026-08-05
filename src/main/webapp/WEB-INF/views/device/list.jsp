@@ -1183,16 +1183,6 @@ function changeSpareDevice(targetId, changeId, constructionIdx){
 	
 	
 	<div class="min531">
-		<%-- 현재 미사용: 백업 이력 버튼 (필요 시 주석 해제)
-		<c:if test="${sessionInfo.role == 0}">
-		<div class="backupHistoryArea">
-			<button type="button" class="backupHistoryBtn"
-				onclick="location.href='${pageContext.request.contextPath}/device/backup-history?constructionIdx=${param.constructionIdx}'">
-				백업 이력
-			</button>
-		</div>
-		</c:if>
-		--%>
 		<div class="tableArea">
 			<div class="viewTable viewTable01">
 				<div class="tableScroll">
