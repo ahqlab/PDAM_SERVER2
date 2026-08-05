@@ -26,7 +26,7 @@ public interface CustomerMapper {
 	public String SELECT_FIELDS = " id, constructionIdx , deviceIdx, operDate, erpDiv, dmiCol, preDay, today, dSum, bigo ";
 	
 	@Select(" SELECT * FROM TB_CUSTOMER_VIEW ORDER BY ID DESC")
-	List<Customer> getLsit();
+	List<Customer> getList();
 	
 	@Insert("INSERT INTO " + TABLE_NAME + " " + INSERT_FIELDS + " VALUES " + INSERT_VALUES)
 	int insert(Customer customer);
