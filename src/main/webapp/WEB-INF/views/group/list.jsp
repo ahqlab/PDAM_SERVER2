@@ -341,7 +341,7 @@ function checkDuplicateGroupName(){
 		var html = '';
 		if(currentBlock > 1){
 			html += '<a href="javascript:void(0)" class="prevBtn" onclick="groupGoPage(' + (startPage - 1) + ')">'
-				+ '<img class="prev" src="' + ctx + '/new/img/arrow-prev.png" />prev</a>';
+				+ '&#51060;&#51204;</a>';
 		}
 		for(var p = startPage; p <= endPage; p++){
 			if(p === currentPage){
@@ -352,7 +352,7 @@ function checkDuplicateGroupName(){
 		}
 		if(currentBlock < totalBlocks){
 			html += '<a href="javascript:void(0)" class="nextBtn" onclick="groupGoPage(' + (endPage + 1) + ')">'
-				+ 'next<img class="next" src="' + ctx + '/new/img/arrow-next.png" /></a>';
+				+ '&#45796;&#51020;</a>';
 		}
 		$wrap.html(html);
 	}

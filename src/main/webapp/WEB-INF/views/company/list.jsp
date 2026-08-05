@@ -47,7 +47,7 @@
 		<div id="companyCards" style="display:none;"></div>
 
 		<!-- 페이지네이션 -->
-		<div id="companyPagination" style="display:flex;justify-content:center;gap:5px;margin-top:20px;"></div>
+		<div id="companyPagination" style="display:flex;justify-content:center;gap:4px;margin-top:20px;"></div>
 	</div>
 
 <style>
@@ -78,8 +78,8 @@
 	box-sizing: border-box;
 }
 .pageBtn {
-	min-width:32px;
-	height:32px;
+	min-width:30px;
+	height:30px;
 	padding:0 8px;
 	border:1px solid #ddd;
 	background:#fff;
@@ -87,11 +87,20 @@
 	border-radius:3px;
 	cursor:pointer;
 	font-size:13px;
+	font-weight:400;
+	line-height:1;
+}
+.pageBtn:hover {
+	border-color:#adadad;
+	background:#e6e6e6;
 }
 .pageBtn.active {
 	background:#337ab7;
 	color:#fff;
 	border-color:#337ab7;
+}
+.pageBtn.active:hover {
+	background:#337ab7;
 }
 .pageBtn:disabled {
 	cursor:default;
@@ -266,13 +275,13 @@ function renderPagination(totalItems) {
 
 	var html = '';
 	if (currentBlock > 1) {
-		html += '<button class="pageBtn" onclick="goPage(' + (startPage - 1) + ')">prev</button>';
+		html += '<button class="pageBtn" onclick="goPage(' + (startPage - 1) + ')">&#51060;&#51204;</button>';
 	}
 	for (var p = startPage; p <= endPage; p++) {
 		html += '<button class="pageBtn' + (p === currentPage ? ' active' : '') + '" onclick="goPage(' + p + ')">' + p + '</button>';
 	}
 	if (currentBlock < totalBlocks) {
-		html += '<button class="pageBtn" onclick="goPage(' + (endPage + 1) + ')">next</button>';
+		html += '<button class="pageBtn" onclick="goPage(' + (endPage + 1) + ')">&#45796;&#51020;</button>';
 	}
 
 	wrap.html(html);
