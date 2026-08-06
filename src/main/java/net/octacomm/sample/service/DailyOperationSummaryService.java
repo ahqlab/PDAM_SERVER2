@@ -12,6 +12,6 @@ public class DailyOperationSummaryService {
 
 	@Transactional
 	public int collectAndSave() {
-		return dailyOperationSummaryMapper.upsertDailySnapshot();
+		return dailyOperationSummaryMapper.insertSnapshot();
 	}
 }

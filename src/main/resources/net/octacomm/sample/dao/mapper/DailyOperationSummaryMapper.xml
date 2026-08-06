@@ -3,19 +3,15 @@
 
 <mapper namespace="net.octacomm.sample.dao.mapper.DailyOperationSummaryMapper">
 
-	<insert id="upsertDailySnapshot">
+	<insert id="insertSnapshot">
 		INSERT INTO TB_DAILY_OPERATION_SUMMARY (
-			snapshotDate,
-			snapshotAt,
+			snapshotDateTime,
 			constructionCount,
 			headquartersDeviceCount,
 			franchiseDeviceCount,
-			spareDeviceCount,
-			createDate,
-			lastModifiedDate
+			spareDeviceCount
 		)
 		SELECT
-			CURDATE(),
 			NOW(),
 			(
 				SELECT COUNT(*)
@@ -54,16 +50,7 @@
 				  AND CON.conduct = 0
 				  AND CON.isDel = 0
 				  AND GP.isDel = 0
-			),
-			NOW(),
-			NOW()
-		ON DUPLICATE KEY UPDATE
-			snapshotAt = VALUES(snapshotAt),
-			constructionCount = VALUES(constructionCount),
-			headquartersDeviceCount = VALUES(headquartersDeviceCount),
-			franchiseDeviceCount = VALUES(franchiseDeviceCount),
-			spareDeviceCount = VALUES(spareDeviceCount),
-			lastModifiedDate = NOW()
+			)
 	</insert>
 
 </mapper>
