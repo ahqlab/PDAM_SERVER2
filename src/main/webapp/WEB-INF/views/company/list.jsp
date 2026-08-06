@@ -5,7 +5,7 @@
 	<div class="TopContArea">
 		<div class="titArea">
 			<p class="h1Tit">사업자정보 관리</p>
-			<div class="popBtn" onclick="openForm(0)" style="cursor:pointer;">+ 사업자 등록</div>
+			<a class="popBtn popBtnRegist" style="cursor:pointer;">+ 사업자 등록</a>
 		</div>
 	</div>
 
@@ -109,39 +109,72 @@
 </style>
 </div>
 
-<!-- 등록/수정 모달 -->
-<div id="companyModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.45);z-index:9999;align-items:center;justify-content:center;">
-	<div style="background:#fff;border-radius:6px;padding:30px 30px 24px;width:500px;max-width:95%;box-shadow:0 4px 20px rgba(0,0,0,0.2);">
-		<h3 id="modalTitle" style="font-size:16px;margin:0 0 20px;color:#333;">사업자 등록</h3>
-		<input type="hidden" id="m_id" value="0" />
-
-		<div class="inputArea02 mb-20">
-			<p class="inputTxt02">상호명</p>
-			<input type="text" id="m_name" class="Input02" placeholder="상호명" />
+<div class="popUp popUpRegist">
+	<form id="regForm" name="regForm" method="POST" onsubmit="return false;">
+		<div class="popTit">
+			<p>사업자 등록</p>
+			<img class="popClose" src="${pageContext.request.contextPath}/new/img/popclose.png" style="cursor:pointer;" />
 		</div>
-		<div class="inputArea02 mb-20">
-			<p class="inputTxt02">사업자번호</p>
-			<input type="text" id="m_businessNo" class="Input02" placeholder="000-00-00000" />
+		<div class="popCont">
+			<div class="inputArea02 mb-20">
+				<p class="inputTxt02">상호명</p>
+				<input type="text" autocomplete="off" class="Input02" name="name" id="r_name" placeholder="상호명" />
+			</div>
+			<div class="inputArea02 mb-20">
+				<p class="inputTxt02">사업자번호</p>
+				<input type="text" autocomplete="off" class="Input02" name="businessNo" id="r_businessNo" placeholder="000-00-00000" />
+			</div>
+			<div class="inputArea02 mb-20">
+				<p class="inputTxt02">대표자</p>
+				<input type="text" autocomplete="off" class="Input02" name="representative" id="r_representative" placeholder="대표자 성명" />
+			</div>
+			<div class="inputArea02 mb-20">
+				<p class="inputTxt02">전화번호</p>
+				<input type="text" autocomplete="off" class="Input02" name="tel" id="r_tel" placeholder="전화번호" />
+			</div>
+			<div class="inputArea02 mb-20">
+				<p class="inputTxt02">주소</p>
+				<input type="text" autocomplete="off" class="Input02" name="address" id="r_address" placeholder="주소" />
+			</div>
+			<div class="popAdd" onclick="saveCompany()" style="cursor:pointer;">등록</div>
 		</div>
-		<div class="inputArea02 mb-20">
-			<p class="inputTxt02">대표자</p>
-			<input type="text" id="m_representative" class="Input02" placeholder="대표자 성명" />
-		</div>
-		<div class="inputArea02 mb-20">
-			<p class="inputTxt02">전화번호</p>
-			<input type="text" id="m_tel" class="Input02" placeholder="전화번호" />
-		</div>
-		<div class="inputArea02 mb-20">
-			<p class="inputTxt02">주소</p>
-			<input type="text" id="m_address" class="Input02" placeholder="주소" />
-		</div>
-
-		<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:24px;">
-			<div class="popAdd" onclick="saveCompany()" style="cursor:pointer;">저장</div>
-			<div class="popAdd" onclick="closeModal()" style="cursor:pointer;background:#999;">취소</div>
-		</div>
-	</div>
+	</form>
 </div>
+
+<div class="popUp popUpUpdate">
+	<form id="updateForm" name="updateForm" method="POST" onsubmit="return false;">
+		<div class="popTit">
+			<p>사업자 수정</p>
+			<img class="popClose" src="${pageContext.request.contextPath}/new/img/popclose.png" style="cursor:pointer;" />
+		</div>
+		<div class="popCont">
+			<input type="hidden" name="id" id="m_id" value="0" />
+			<div class="inputArea02 mb-20">
+				<p class="inputTxt02">상호명</p>
+				<input type="text" autocomplete="off" class="Input02" name="name" id="m_name" placeholder="상호명" />
+			</div>
+			<div class="inputArea02 mb-20">
+				<p class="inputTxt02">사업자번호</p>
+				<input type="text" autocomplete="off" class="Input02" name="businessNo" id="m_businessNo" placeholder="000-00-00000" />
+			</div>
+			<div class="inputArea02 mb-20">
+				<p class="inputTxt02">대표자</p>
+				<input type="text" autocomplete="off" class="Input02" name="representative" id="m_representative" placeholder="대표자 성명" />
+			</div>
+			<div class="inputArea02 mb-20">
+				<p class="inputTxt02">전화번호</p>
+				<input type="text" autocomplete="off" class="Input02" name="tel" id="m_tel" placeholder="전화번호" />
+			</div>
+			<div class="inputArea02 mb-20">
+				<p class="inputTxt02">주소</p>
+				<input type="text" autocomplete="off" class="Input02" name="address" id="m_address" placeholder="주소" />
+			</div>
+			<div class="popAdd" onclick="updateCompany()" style="cursor:pointer;">수정</div>
+		</div>
+	</form>
+</div>
+
+<div class="popLayer"></div>
 
 <script>
 var ctx = '${pageContext.request.contextPath}';
@@ -205,7 +238,7 @@ function renderList() {
 
 	var rows = '', cardHtml = '';
 	$.each(pageData, function(i, c) {
-		var editBtn = '<button onclick="openForm(' + c.id + ')" style="' + BTN_EDIT + '">수정</button>';
+		var editBtn = '<button onclick="openUpdateForm(' + c.id + ')" style="' + BTN_EDIT + '">수정</button>';
 		var delBtn  = '<button onclick="deleteCompany(' + c.id + ')" style="' + BTN_DEL + '">삭제</button>';
 
 		/* 테이블 행 */
@@ -238,20 +271,6 @@ function renderList() {
 	renderPagination(filtered.length);
 }
 
-/* function renderPagination(totalItems) {
-	var totalPages = Math.ceil(totalItems / PAGE_SIZE);
-	var wrap = $('#companyPagination');
-	if (totalPages <= 1) { wrap.html(''); return; }
-
-	var html = '';
-	html += '<button class="pageBtn" onclick="goPage(' + (currentPage - 1) + ')"' + (currentPage <= 1 ? ' disabled' : '') + '>이전</button>';
-	for (var p = 1; p <= totalPages; p++) {
-		html += '<button class="pageBtn' + (p === currentPage ? ' active' : '') + '" onclick="goPage(' + p + ')">' + p + '</button>';
-	}
-	html += '<button class="pageBtn" onclick="goPage(' + (currentPage + 1) + ')"' + (currentPage >= totalPages ? ' disabled' : '') + '>다음</button>';
-	wrap.html(html);
-} */
-
 function renderPagination(totalItems) {
 	var totalPages = Math.ceil(totalItems / PAGE_SIZE);
 	var wrap = $('#companyPagination');
@@ -266,64 +285,87 @@ function renderPagination(totalItems) {
 
 	var html = '';
 	if (currentBlock > 1) {
-		html += '<button class="pageBtn" onclick="goPage(' + (startPage - 1) + ')">prev</button>';
+		html += '<button class="pageBtn" onclick="goPage(' + (startPage - 1) + ')">이전</button>';
 	}
 	for (var p = startPage; p <= endPage; p++) {
 		html += '<button class="pageBtn' + (p === currentPage ? ' active' : '') + '" onclick="goPage(' + p + ')">' + p + '</button>';
 	}
 	if (currentBlock < totalBlocks) {
-		html += '<button class="pageBtn" onclick="goPage(' + (endPage + 1) + ')">next</button>';
+		html += '<button class="pageBtn" onclick="goPage(' + (endPage + 1) + ')">다음</button>';
 	}
 
 	wrap.html(html);
 }
 
 function goPage(p) {
-	/* var totalPages = Math.ceil(getFilteredData().length / PAGE_SIZE) || 1;
-	if (p < 1 || p > totalPages || p === currentPage) return; */
 	if (p < 1 || p === currentPage) return;
 	currentPage = p;
 	renderList();
 }
 
-function openForm(id) {
-	$('#m_id').val(id);
-	$('#m_name,#m_businessNo,#m_representative,#m_tel,#m_address').val('');
-	$('#modalTitle').text(id === 0 ? '사업자 등록' : '사업자 수정');
-	if (id !== 0) {
-		$.getJSON(ctx + '/company/ajax/detail', {id: id}, function(c) {
-			$('#m_name').val(c.name);
-			$('#m_businessNo').val(c.businessNo);
-			$('#m_representative').val(c.representative);
-			$('#m_tel').val(c.tel);
-			$('#m_address').val(c.address);
-		});
-	}
-	$('#companyModal').css('display', 'flex');
-}
-
-function closeModal() {
-	$('#companyModal').css('display', 'none');
-}
-
 function saveCompany() {
-	var id  = parseInt($('#m_id').val());
-	var url = id === 0 ? ctx + '/company/ajax/regist' : ctx + '/company/ajax/update';
 	var data = {
-		id:             id,
-		name:           $.trim($('#m_name').val()),
-		businessNo:     $.trim($('#m_businessNo').val()),
-		representative: $.trim($('#m_representative').val()),
-		tel:            $.trim($('#m_tel').val()),
-		address:        $.trim($('#m_address').val())
+		id: 0,
+		name: $.trim($('#r_name').val()),
+		businessNo: $.trim($('#r_businessNo').val()),
+		representative: $.trim($('#r_representative').val()),
+		tel: $.trim($('#r_tel').val()),
+		address: $.trim($('#r_address').val())
 	};
 	if (!data.name || !data.businessNo) {
 		alert('상호명과 사업자번호는 필수입니다.');
 		return;
 	}
-	$.post(url, data, function(res) {
-		if (res.success) { closeModal(); loadList(); }
-		else alert('저장 실패: ' + (res.message || '사업자번호가 중복되었을 수 있습니다.'));
+	$.post(ctx + '/company/ajax/regist', data, function(res) {
+		if (res.success) {
+			$('.popUp').hide();
+			$('.popLayer').hide();
+			$('body').css('overflow', 'auto');
+			loadList();
+			$('#regForm')[0].reset();
+		} else {
+			alert('저장 실패: ' + (res.message || '사업자번호가 중복되었을 수 있습니다.'));
+		}
+	});
+}
+
+function openUpdateForm(id) {
+	$.getJSON(ctx + '/company/ajax/detail', {id: id}, function(c) {
+		$('#m_id').val(c.id);
+		$('#updateForm #m_name').val(c.name);
+		$('#updateForm #m_businessNo').val(c.businessNo);
+		$('#updateForm #m_representative').val(c.representative);
+		$('#updateForm #m_tel').val(c.tel);
+		$('#updateForm #m_address').val(c.address);
+
+		$('.popUpUpdate').show();
+		$('.popLayer').show();
+		$('body').css('overflow', 'hidden');
+	});
+}
+
+function updateCompany() {
+	var data = {
+		id: parseInt($('#m_id').val()),
+		name: $.trim($('#updateForm #m_name').val()),
+		businessNo: $.trim($('#updateForm #m_businessNo').val()),
+		representative: $.trim($('#updateForm #m_representative').val()),
+		tel: $.trim($('#updateForm #m_tel').val()),
+		address: $.trim($('#updateForm #m_address').val())
+	};
+	if (!data.name || !data.businessNo) {
+		alert('상호명과 사업자번호는 필수입니다.');
+		return;
+	}
+	$.post(ctx + '/company/ajax/update', data, function(res) {
+		if (res.success) {
+			$('.popUp').hide();
+			$('.popLayer').hide();
+			$('body').css('overflow', 'auto');
+			loadList();
+		} else {
+			alert('수정 실패: ' + (res.message || '사업자번호가 중복되었을 수 있습니다.'));
+		}
 	});
 }
 
@@ -339,10 +381,52 @@ function escHtml(s) {
 	return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-$(function() {
+$(document).ready(function() {
+	$('.popUp').hide();
+	$('.popLayer').hide();
+
 	loadList();
+
 	$('#searchKeyword').on('keypress', function(e) {
 		if (e.which === 13) searchCompany();
+	});
+
+	$('.popBtnRegist').on('click', function(e) {
+		$('#regForm')[0].reset();
+		$('.popUpRegist').show();
+		$('.popLayer').show();
+		$('body').css('overflow', 'hidden');
+	});
+
+	$('.popClose').on('click', function(e) {
+		$('.popUp').hide();
+		$('.popLayer').hide();
+		$('body').css('overflow', 'auto');
+	});
+	
+	$(".navBtn").click(function() {
+		$(".left-menu").animate({ "left": "0%" }, 500);
+	});
+	$(".m-closeBtn").click(function() {
+		$(".left-menu").animate({ "left": "-150%" }, 500);
+	});
+
+	$('.mlist a').on('click', function(e){
+		var tg = $(this).next('.sub-menu');
+		if(tg.length > 0){
+			if($(this).hasClass('isOpen')){
+				tg.slideUp('fast');
+				$(this).removeClass('isOpen');
+			} else {
+				if($('.mlist a.isOpen').length > 0){
+					$('.mlist a.isOpen').next().slideUp('fast');
+					$('.mlist a.isOpen').removeClass('isOpen');
+				}
+				tg.slideDown('fast');
+				$(this).addClass('isOpen');
+			}
+			e.preventDefault();
+		}
 	});
 });
 </script>
