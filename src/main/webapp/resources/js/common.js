@@ -165,3 +165,36 @@ $( document ).ready( function() {
 	};
 	
 });*/
+
+document.addEventListener('keydown', function(event) {
+	if (event.defaultPrevented || event.isComposing || event.key !== 'Enter') return;
+	
+	var target = event.target;
+	if (!target || target.tagName !== 'INPUT') return;
+	
+	var ignoreTypes = new Set(['button', 'submit', 'image', 'checkbox', 'radio', 'file']);
+	var inputType = (target.getAttribute('type') || 'text').toLowerCase();
+	if (ignoreTypes.has(inputType)) return;
+	
+	var form = target.closest('form');
+	if (!form) return;
+	
+	var formIdentifier = ((form.id || '') + ' ' + (form.getAttribute('name') || '')).toLowerCase();
+	if (!formIdentifier.includes('search')) return;
+
+	event.preventDefault();
+
+	var sectionSelector = '.searchArea01, .searchArea02, .search_form01, .search_form02';
+	var buttonSelector = '.searchBtn button, .searchBtn input, .searchBtn img, #submitBtn, button[type="submit"], input[type="submit"], input[type="image"]';
+
+	var searchSection = target.closest(sectionSelector);
+	var searchButton = searchSection ? searchSection.querySelector(buttonSelector) : form.querySelector(buttonSelector);
+
+	if (searchButton) {
+		searchButton.click();
+	} else if (typeof form.requestSubmit === 'function') {
+		form.requestSubmit();
+	} else {
+		form.submit();
+	}
+});

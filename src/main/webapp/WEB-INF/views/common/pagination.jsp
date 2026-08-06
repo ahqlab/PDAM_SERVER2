@@ -3,9 +3,8 @@
 <div class="pagingArea">
     <!-- <ul> -->
 	<c:if test="${page.priorPageGroup > 0}">
-		<!-- <li class="prevBtn"><a href="javascript:movePage(1)">처음</a></li> -->
 		<a href="javascript:movePage(1)" class="prevBtn">
-			<img class="prev" src="${pageContext.request.contextPath}/new/img/arrow-prev.png" />prev
+			이전
 		</a>
 		
 	</c:if>
@@ -22,9 +21,8 @@
 	</c:forEach>
 
 	<c:if test="${page.nextPageGroup > 0}">
-	<%-- 	<li><a href="javascript:movePage(${page.nextPageGroup})">맨끝</a></li> --%>
 		<a href="javascript:movePage(${page.nextPageGroup})" class="nextBtn">
-			next<img class="next" src="${pageContext.request.contextPath}/new/img/arrow-next.png" />
+			다음
 		</a>
 	</c:if>
  	<!-- </ul> -->

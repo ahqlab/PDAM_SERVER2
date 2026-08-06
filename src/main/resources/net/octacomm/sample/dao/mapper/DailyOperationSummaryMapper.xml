@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.octacomm.sample.dao.mapper.DailyOperationSummaryMapper">
+
+	<insert id="insertSnapshot">
+		INSERT INTO TB_DAILY_OPERATION_SUMMARY (
+			snapshotDateTime,
+			constructionCount,
+			headquartersDeviceCount,
+			franchiseDeviceCount,
+			spareDeviceCount
+		)
+		SELECT
+			NOW(),
+			(
+				SELECT COUNT(*)
+				FROM TB_CONSTRUCTION CON
+				INNER JOIN TB_GROUP GP ON GP.idx = CON.groupIdx
+				WHERE CON.conduct = 0
+				  AND CON.isDel = 0
+			),
+			(
+				SELECT COUNT(*)
+				FROM TB_DEVICE DEV
+				INNER JOIN TB_CONSTRUCTION CON ON CON.id = DEV.constructionIdx
+				INNER JOIN TB_GROUP GP ON GP.idx = CON.groupIdx
+				WHERE DEV.conduct = 0
+				  AND DEV.isDel = 0
+				  AND CON.conduct = 0
+				  AND CON.isDel = 0
+			),
+			(
+				SELECT COUNT(*)
+				FROM TB_DEVICE DEV
+				INNER JOIN TB_CONSTRUCTION CON ON CON.id = DEV.constructionIdx
+				INNER JOIN TB_GROUP GP ON GP.idx = CON.groupIdx
+				WHERE DEV.conduct = 2
+				  AND DEV.isDel = 0
+				  AND CON.conduct = 0
+				  AND CON.isDel = 0
+			),
+			(
+				SELECT COUNT(*)
+				FROM TB_SPARE_DEVICE SD
+				INNER JOIN TB_CONSTRUCTION CON ON CON.id = SD.constructionIdx
+				INNER JOIN TB_GROUP GP ON GP.idx = CON.groupIdx
+				WHERE SD.type = 0
+				  AND SD.status = 0
+				  AND CON.conduct = 0
+				  AND CON.isDel = 0
+				  AND GP.isDel = 0
+			)
+	</insert>
+
+</mapper>

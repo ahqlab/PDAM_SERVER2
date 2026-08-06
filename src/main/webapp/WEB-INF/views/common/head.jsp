@@ -31,8 +31,8 @@
 	<meta property="og:type" content="website">
 
 	<link href="${pageContext.request.contextPath}/new/css/reset.css" rel="stylesheet" />
-	<link href="${pageContext.request.contextPath}/new/css/style.css?v=20260728" rel="stylesheet" media="screen and (min-width:1024px)">
-	<link href="${pageContext.request.contextPath}/new/css/responsive.css?v=20260728" rel="stylesheet" media="screen and (max-width:1023px)">
+	<link href="${pageContext.request.contextPath}/new/css/style.css?v=20260805" rel="stylesheet" media="screen and (min-width:1024px)">
+	<link href="${pageContext.request.contextPath}/new/css/responsive.css?v=20260805" rel="stylesheet" media="screen and (max-width:1023px)">
 	<link href="${pageContext.request.contextPath}/new/css/custom.css" rel="stylesheet"  rel="stylesheet" media="screen and (min-width:1024px)"/>
 	<link href="${pageContext.request.contextPath}/new/css/responsiveCustom.css" rel="stylesheet"  rel="stylesheet" media="screen and (max-width:1023px)"/>
 	<link href="${pageContext.request.contextPath}/new/css/popup.css" rel="stylesheet" />
@@ -59,7 +59,7 @@
 	<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
 	
-	<script src="${pageContext.request.contextPath}/js/common.js"></script> 
+	<script src="${pageContext.request.contextPath}/js/common.js?${applicationScope.buildTime}"></script>
 	<script src="${pageContext.request.contextPath}/js/echarts.js"></script> 
 	
 	<!-- for dataTable -->
