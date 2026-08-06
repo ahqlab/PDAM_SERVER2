@@ -7,15 +7,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class DailyOperationSummaryService {
-		private final DailyOperationSummaryMapper dailyOperationSummaryMapper;
-		
-		@Autowired
-		public DailyOperationSummaryService(DailyOperationSummaryMapper dailyOperationSummaryMapper) {
-			this.dailyOperationSummaryMapper = dailyOperationSummaryMapper;
-		}
-		
-		@Transactional
-		public int collectAndSave() {
-			return dailyOperationSummaryMapper.upsertDailySnapshot();
-		}
+	@Autowired
+	private DailyOperationSummaryMapper dailyOperationSummaryMapper;
+
+	@Transactional
+	public int collectAndSave() {
+		return dailyOperationSummaryMapper.upsertDailySnapshot();
+	}
 }
