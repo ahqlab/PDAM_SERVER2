@@ -20,7 +20,11 @@ public class DailyOperationSummaryScheduler {
 		public void collectDailyOperationSummary() {
 			try {
 				int affectedRows = dailyOperationSummaryService.collectAndSave();
-				logger.info("일일 운영 현황 스냅샷 저장 완료. 반영 행 수 : {}", affectedRows);;
+				if (affectedRows == 0) {
+					logger.info("일일 운영 현황 스냅샷이 이미 저장되어 실행을 건너뜁니다.");
+				} else {
+					logger.info("일일 운영 현황 스냅샷 저장 완료. 반영 행 수: {}", affectedRows);
+				}
 			} catch(Exception e) {
 				logger.error("일일 운영 현황 스냅샷 저장 실패", e);
 			}
