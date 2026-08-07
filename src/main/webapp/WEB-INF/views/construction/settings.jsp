@@ -2,26 +2,38 @@
 <%@ include file="/WEB-INF/views/common/tagLib.jsp" %>
 <style>
 .settings-wrap {
-    padding: 20px;
+    width: 100%;
+    min-width: 0;
+    padding: clamp(10px, 2vw, 20px);
 }
 .settings-header {
     background: linear-gradient(135deg, #e8f4f8 0%, #cce8f4 100%);
     border-radius: 12px;
-    padding: 20px 28px;
-    margin-bottom: 24px;
-    font-size: 22px;
+    padding: clamp(16px, 2vw, 20px) clamp(18px, 2vw, 28px);
+    margin-bottom: clamp(16px, 2vw, 24px);
+    font-size: clamp(20px, 1.5vw, 22px);
     font-weight: 700;
     color: #1a6a8a;
 }
 .settings-tabs {
     display: flex;
     border-bottom: 2px solid #dee2e6;
-    margin-bottom: 24px;
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: clamp(16px, 2vw, 24px);
     gap: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+.settings-tabs::-webkit-scrollbar {
+    display: none;
 }
 .settings-tab {
-    padding: 12px 28px;
-    font-size: 17px;
+    flex: 0 0 auto;
+    padding: 12px clamp(16px, 1.5vw, 28px);
+    font-size: clamp(16px, 1.2vw, 17px);
     font-weight: 600;
     color: #555;
     cursor: pointer;
@@ -39,10 +51,12 @@
 }
 .settings-panel {
     display: none;
+    width: 100%;
+    min-width: 0;
     background: #fff;
     border: 1px solid #e5e5e5;
     border-radius: 10px;
-    padding: 30px 28px;
+    padding: clamp(22px, 2vw, 30px) clamp(16px, 2vw, 28px);
 }
 .settings-panel.active {
     display: block;
@@ -50,24 +64,30 @@
 .settings-panel h3 {
     font-size: 16px;
     font-weight: 700;
-    margin-bottom: 24px;
+    margin-bottom: clamp(20px, 2vw, 24px);
     color: #333;
 }
 .form-row {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    margin-bottom: 18px;
+    width: 100%;
+    min-width: 0;
+    margin-bottom: clamp(16px, 1.5vw, 18px);
     gap: 12px;
 }
 .form-label {
     width: 160px;
+    flex: 0 1 160px;
     font-size: 16px;
     font-weight: 600;
     color: #555;
     flex-shrink: 0;
 }
 .form-input {
-    flex: 1;
+    flex: 1 1 320px;
+    width: 100%;
+    min-width: 0;
     height: 40px;
     border: 1px solid #ccc;
     border-radius: 6px;
@@ -81,7 +101,9 @@
     color: #888;
 }
 .form-select {
-    flex: 1;
+    flex: 1 1 320px;
+    width: 100%;
+    min-width: 0;
     height: 40px;
     border: 1px solid #ccc;
     border-radius: 6px;
@@ -92,10 +114,14 @@
     display: flex;
     gap: 8px;
     align-items: center;
-    flex: 1;
+    flex: 1 1 320px;
+    width: 100%;
+    min-width: 0;
 }
 .form-group-btn .form-input {
     flex: 1;
+    width: auto;
+    min-width: 0;
 }
 .popup-open-btn {
     height: 40px;
@@ -119,7 +145,7 @@
     font-size: 18px;
     font-weight: 700;
     cursor: pointer;
-    margin-top: 28px;
+    margin-top: clamp(22px, 2vw, 28px);
 }
 .save-btn:hover {
     background: #286090;
@@ -128,8 +154,14 @@
 /* 권한관리 테이블 */
 .perm-table {
     width: 100%;
+    min-width: 560px;
     border-collapse: collapse;
     font-size: 16px;
+}
+.perm-table-scroll {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 .perm-table th {
     background: #f5f5f5;
@@ -184,6 +216,18 @@ input:checked + .toggle-slider {
 }
 input:checked + .toggle-slider:before {
     transform: translateX(24px);
+}
+.navBtn,
+.m-closeBtn {
+    cursor: pointer;
+    touch-action: manipulation;
+}
+.navBtn {
+    position: relative;
+    z-index: 2;
+}
+.left-menu {
+    transition: left 0.25s ease;
 }
 </style>
 
@@ -270,6 +314,7 @@ input:checked + .toggle-slider:before {
         <div id="tab-permission" class="settings-panel">
             <h3>&#9881; 권한관리</h3>
             <input type="hidden" id="permConstructionIdx" value="${construction.id}">
+            <div class="perm-table-scroll" role="region" aria-label="권한관리 표" tabindex="0">
             <table class="perm-table">
                 <thead>
                     <tr>
@@ -316,6 +361,7 @@ input:checked + .toggle-slider:before {
                     </tr>
                 </tbody>
             </table>
+            </div>
             <button class="save-btn" onclick="savePermission()">저장</button>
         </div>
         </c:if>
@@ -376,6 +422,31 @@ input:checked + .toggle-slider:before {
 </div>
 
 <script>
+function initMobileNavigation() {
+    var openButton = document.querySelector('.navBtn');
+    var closeButton = document.querySelector('.m-closeBtn');
+    var menu = document.querySelector('.left-menu');
+
+    function openMenu() {
+        menu.style.left = '0';
+        openButton.setAttribute('aria-expanded', 'true');
+    }
+    function closeMenu() {
+        menu.style.left = '-150%';
+        openButton.setAttribute('aria-expanded', 'false');
+    }
+    
+    openButton.addEventListener('click', openMenu);
+    closeButton.addEventListener('click', closeMenu);
+
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMobileNavigation);
+} else {
+    initMobileNavigation();
+}
+
 function showTab(tabName, el) {
     document.querySelectorAll('.settings-panel').forEach(function(p) { p.classList.remove('active'); });
     document.querySelectorAll('.settings-tab').forEach(function(t) { t.classList.remove('active'); });

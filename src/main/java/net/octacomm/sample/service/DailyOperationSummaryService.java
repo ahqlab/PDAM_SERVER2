@@ -12,6 +12,15 @@ public class DailyOperationSummaryService {
 
 	@Transactional
 	public int collectAndSave() {
-		return dailyOperationSummaryMapper.insertSnapshot();
+		int acquired = dailyOperationSummaryMapper.acquireDailySnapshotLock();
+		if (acquired != 1) {
+			return 0;
+		}
+
+		try {
+			return dailyOperationSummaryMapper.insertSnapshotIfAbsent();
+		} finally {
+			dailyOperationSummaryMapper.releaseDailySnapshotLock();
+		}
 	}
 }
