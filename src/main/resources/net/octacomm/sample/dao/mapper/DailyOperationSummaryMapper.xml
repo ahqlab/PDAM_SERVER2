@@ -3,11 +3,7 @@
 
 <mapper namespace="net.octacomm.sample.dao.mapper.DailyOperationSummaryMapper">
 
-	<select id="acquireDailySnapshotLock" resultType="int">
-		SELECT GET_LOCK('wooritech.dailyOperationSummary', 10)
-	</select>
-
-	<insert id="insertSnapshotIfAbsent">
+	<insert id="insertSnapshot">
 		INSERT INTO TB_DAILY_OPERATION_SUMMARY (
 			snapshotDateTime,
 			constructionCount,
@@ -55,16 +51,6 @@
 				  AND CON.isDel = 0
 				  AND GP.isDel = 0
 			)
-		WHERE NOT EXISTS (
-			SELECT 1
-			FROM TB_DAILY_OPERATION_SUMMARY DOS
-			WHERE DOS.snapshotDateTime <![CDATA[>=]]> CURDATE()
-			  AND DOS.snapshotDateTime <![CDATA[<]]> DATE_ADD(CURDATE(), INTERVAL 1 DAY)
-		)
 	</insert>
-
-	<select id="releaseDailySnapshotLock" resultType="int">
-		SELECT RELEASE_LOCK('wooritech.dailyOperationSummary')
-	</select>
 
 </mapper>
