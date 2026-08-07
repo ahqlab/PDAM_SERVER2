@@ -131,6 +131,11 @@
     border-collapse: collapse;
     font-size: 16px;
 }
+.perm-table-scroll {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
 .perm-table th {
     background: #f5f5f5;
     padding: 12px 16px;
@@ -184,6 +189,75 @@ input:checked + .toggle-slider {
 }
 input:checked + .toggle-slider:before {
     transform: translateX(24px);
+}
+
+@media screen and (max-width: 1023px) {
+	.settings-wrap {
+		width: 100%;
+		min-width: 0;
+		padding: 10px 0;
+	}
+	.settings-header {
+		padding: 16px 18px;
+		margin-bototm: 16px;
+		font-size: 20px;
+	}
+	.settings-tabs {
+		width: 100%;
+		max-width: 100%;
+		margin-bottom: 16px;
+		overflow-x: auto;
+		overflow-y: hidden;
+		-webkit-overflow
+	}
+}
+    .form-row {
+        width: 100%;
+        min-width: 0;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        margin-bottom: 16px;
+    }
+    .form-label {
+        width: auto;
+        font-size: 15px;
+    }
+    .form-input,
+    .form-select,
+    .form-group-btn {
+        width: 100%;
+        min-width: 0;
+    }
+    .form-group-btn .form-input {
+        width: auto;
+        min-width: 0;
+    }
+    .popup-open-btn {
+        flex: 0 0 auto;
+    }
+    .save-btn {
+        margin-top: 22px;
+    }
+    .perm-table {
+        min-width: 560px;
+    }
+    .perm-table th,
+    .perm-table td {
+        padding: 11px 12px;
+    }
+    .navBtn,
+    .m-closeBtn {
+        cursor: pointer;
+        touch-action: manipulation;
+    }
+    .navBtn {
+        position: relative;
+        z-index: 2;
+    }
+    .left-menu {
+        transition: left 0.25s ease;
+    }
 }
 </style>
 
@@ -270,6 +344,7 @@ input:checked + .toggle-slider:before {
         <div id="tab-permission" class="settings-panel">
             <h3>&#9881; 권한관리</h3>
             <input type="hidden" id="permConstructionIdx" value="${construction.id}">
+            <div class="perm-table-scroll" role="region" aria-label="권한관리 표" tabindex="0">
             <table class="perm-table">
                 <thead>
                     <tr>
@@ -316,6 +391,7 @@ input:checked + .toggle-slider:before {
                     </tr>
                 </tbody>
             </table>
+            </div>
             <button class="save-btn" onclick="savePermission()">저장</button>
         </div>
         </c:if>
@@ -376,6 +452,31 @@ input:checked + .toggle-slider:before {
 </div>
 
 <script>
+function initMobileNavigation() {
+    var openButton = document.querySelector('.navBtn');
+    var closeButton = document.querySelector('.m-closeBtn');
+    var menu = document.querySelector('.left-menu');
+
+    function openMenu() {
+        menu.style.left = '0';
+        openButton.setAttribute('aria-expanded', 'true');
+    }
+    function closeMenu() {
+        menu.style.left = '-150%';
+        openButton.setAttribute('aria-expanded', 'false');
+    }
+    
+    openButton.addEventListener('click', openMenu);
+    closeButton.addEventListener('click', closeMenu);
+
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMobileNavigation);
+} else {
+    initMobileNavigation();
+}
+
 function showTab(tabName, el) {
     document.querySelectorAll('.settings-panel').forEach(function(p) { p.classList.remove('active'); });
     document.querySelectorAll('.settings-tab').forEach(function(t) { t.classList.remove('active'); });
