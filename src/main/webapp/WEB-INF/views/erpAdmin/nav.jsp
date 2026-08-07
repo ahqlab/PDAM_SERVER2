@@ -1,5 +1,19 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/views/common/tagLib.jsp" %>
+<style>
+.left-menu .mlist img {
+    width: 20px;
+    height: 20px;  
+    object-fit: contain;
+    margin-right: 10px;
+}
+
+.left-menu .mlist svg {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+</style>
 <div class="left_menu">
 	<div class="menu_logo">
 		<c:choose>
@@ -18,16 +32,16 @@
 			<c:when test="${sessionInfo.role == 0}">
 			<li class='sub-menu'>
 				<a href="${pageContext.request.contextPath}/group/list">
-					<img src="${pageContext.request.contextPath}/images/menu_icon01.png" class="menu_icon">시공사
+					<img src="${pageContext.request.contextPath}/images/menu_icon04.png" class="menu_icon">시공사
 				</a>
 				<a href="${pageContext.request.contextPath}/construction/list">
-					<img src="${pageContext.request.contextPath}/images/menu_icon01.png" class="menu_icon">전체 협력사
+					<img src="${pageContext.request.contextPath}/images/menu_icon07.png" class="menu_icon">전체 협력사
 				</a>
 				<a href="${pageContext.request.contextPath}/device/list?constructionIdx=${param.constructionIdx}">
-					<img src="${pageContext.request.contextPath}/images/menu_icon02.png" class="menu_icon">기기관리
+					<img src="${pageContext.request.contextPath}/images/menu_icon10.png" class="menu_icon">기기관리
 				</a>	
 				<a href="${pageContext.request.contextPath}/fileinventory/list?constructionIdx=${param.constructionIdx}" >
-					<img src="${pageContext.request.contextPath}/images/menu_icon01.png" class="menu_icon">파일반입 및 수정
+					<img src="${pageContext.request.contextPath}/images/menu_icon08.png" class="menu_icon">파일반입 및 수정
 				</a>
 				<%-- <a href="${pageContext.request.contextPath}/erpAdmin/list?constructionIdx=${param.constructionIdx}" class="on">
 					<img src="${pageContext.request.contextPath}/images/menu_icon01.png" class="menu_icon" >관리자현황
@@ -43,11 +57,11 @@
 			<c:when test="${sessionInfo.role == 1}">
 				<li class='sub-menu'>
 					<a href="${pageContext.request.contextPath}/device/list?constructionIdx=${sessionInfo.constructionIdx}" >
-						<img src="${pageContext.request.contextPath}/images/menu_icon02.png" class="menu_icon">기기관리
+						<img src="${pageContext.request.contextPath}/images/menu_icon10.png" class="menu_icon">기기관리
 					</a>
 					<c:if test="${not sessionScope.settingRequired or (sessionScope.isHiddenManager ? sessionScope.constructionSetting.useAdminFileMenu : sessionScope.constructionSetting.useGuestFileMenu)}">
 					<a href="${pageContext.request.contextPath}/fileinventory/list?constructionIdx=${sessionInfo.constructionIdx}">
-						<img src="${pageContext.request.contextPath}/images/menu_icon01.png" class="menu_icon">파일반입 및 수정
+						<img src="${pageContext.request.contextPath}/images/menu_icon08.png" class="menu_icon">파일반입 및 수정
 					</a>
 					</c:if>
 					<c:if test="${sessionScope.isHiddenManager and sessionScope.settingRequired}">
@@ -69,13 +83,13 @@
 			<c:when test="${sessionInfo.role == 2}">
 				<li class='sub-menu'>
 					<a href="${pageContext.request.contextPath}/construction/list?groupIdx=${sessionInfo.groupIdx}">
-						<img src="${pageContext.request.contextPath}/images/menu_icon02.png" class="menu_icon">협력사
+						<img src="${pageContext.request.contextPath}/images/menu_icon04.png" class="menu_icon">협력사
 					</a>
 					<a href="${pageContext.request.contextPath}/device/list?constructionIdx=${param.constructionIdx}">
-						<img src="${pageContext.request.contextPath}/images/menu_icon02.png" class="menu_icon">기기관리
+						<img src="${pageContext.request.contextPath}/images/menu_icon10.png" class="menu_icon">기기관리
 					</a>
 				 	<a href="${pageContext.request.contextPath}/fileinventory/list?constructionIdx=${param.constructionIdx}" >
-				 		<img src="${pageContext.request.contextPath}/images/menu_icon01.png" class="menu_icon">파일반입 및 수정
+				 		<img src="${pageContext.request.contextPath}/images/menu_icon08.png" class="menu_icon">파일반입 및 수정
 				 	</a>
 				 	<%-- <a href="${pageContext.request.contextPath}/erpAdmin/list?constructionIdx=${param.constructionIdx}" class="on">
 						<img src="${pageContext.request.contextPath}/images/menu_icon01.png" class="menu_icon" >관리자현황
