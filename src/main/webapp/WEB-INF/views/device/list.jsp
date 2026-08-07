@@ -594,29 +594,21 @@ function getQuantityResult(){
 
 
 
-// 기록지 전체 출력: Excel / PDF 선택 모달
-var _exportConId = 0;
-function downloadAllReport(conId){
+// 기록지 전체 출력: Excel / PDF 각각 버튼으로 직접 실행
+// Excel: 기존 서버 다운로드 로직
+function exportAllExcel(conId){
 	if(conId <= 0){
 		alert('에러가 발생했습니다.');
 		return;
 	}
-	_exportConId = conId;
-	$('#exportChoiceOverlay').css('display', 'flex');
-}
-function closeExportChoice(){
-	$('#exportChoiceOverlay').css('display', 'none');
-}
-// Excel: 기존 서버 다운로드 로직
-function exportAllExcel(){
-	var conId = _exportConId;
-	closeExportChoice();
 	location.href = '${pageContext.request.contextPath}/report/download/all/excel?constructionIdx=' + conId;
 }
 // PDF: 전체 출력 로직(머신 무관) 연결
-function exportAllPdf(){
-	var conId = _exportConId;
-	closeExportChoice();
+function exportAllPdf(conId){
+	if(conId <= 0){
+		alert('에러가 발생했습니다.');
+		return;
+	}
 	if(!confirm("전체 기록지를 PDF로 출력하시겠습니까?\n건수가 많으면 시간이 걸릴 수 있습니다.")) return;
 	showPdfLoading();
 	// 동기(블로킹) 생성이라 setTimeout으로 한 박자 양보 → 로딩 화면을 먼저 그린 뒤 작업 시작
@@ -830,6 +822,22 @@ function changeSpareDevice(targetId, changeId, constructionIdx){
 </script>
 
 		<!--컨텐츠-->
+<style>
+/* 상단 출력 버튼 4개(시험성적표/파일현황/엑셀/PDF) 크기 통일 */
+.titBtnArea {
+	display: grid !important;
+	grid-template-columns: 1fr 1fr;
+	gap: 8px;
+	width: 420px;
+	max-width: 100%;
+}
+.titBtnArea select, .titBtnArea .printBtn {
+	width: 100% !important;
+	margin: 0 !important;
+	box-sizing: border-box;
+	text-align: center;
+}
+</style>
 <div class="section-right">
 	<%@ include file="/WEB-INF/views/common/welcomeMsg.jsp" %>
 	<div class="TopContArea">
@@ -960,16 +968,25 @@ function changeSpareDevice(targetId, changeId, constructionIdx){
 				</c:choose>
 				<c:choose>
 					<c:when test="${sessionInfo.role == 0}">
-						<c:if test="${useExcel}"><div class="printBtn" onclick="javascript:downloadAllReport(${param.constructionIdx});">기록지 전체 출력</div></c:if>
+						<c:if test="${useExcel}">
+								<div class="printBtn" onclick="javascript:exportAllExcel(${param.constructionIdx});" style="background:#258348;height:35px;line-height:35px;margin-left:0;white-space:nowrap;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="vertical-align:-3px;margin-right:6px;"><rect x="3" y="3" width="18" height="18" rx="2" stroke="#fff" stroke-width="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18" stroke="#fff" stroke-width="1.3"/></svg>엑셀 전체출력</div>
+								<div class="printBtn" onclick="javascript:exportAllPdf(${param.constructionIdx});" style="background:#c8102e;height:35px;line-height:35px;margin-left:8px;white-space:nowrap;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="vertical-align:-3px;margin-right:6px;"><path d="M6 2h9l5 5v15H6V2z" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><path d="M15 2v5h5" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg>PDF 전체출력</div>
+						</c:if>
 					</c:when>
 					<c:when test="${sessionInfo.role == 2 or sessionInfo.role == 3 or sessionInfo.role == 4}">
-						<c:if test="${useExcel}"><div class="printBtn" onclick="javascript:downloadAllReport(${param.constructionIdx});">기록지 전체 출력</div></c:if>
+						<c:if test="${useExcel}">
+								<div class="printBtn" onclick="javascript:exportAllExcel(${param.constructionIdx});" style="background:#258348;height:35px;line-height:35px;margin-left:0;white-space:nowrap;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="vertical-align:-3px;margin-right:6px;"><rect x="3" y="3" width="18" height="18" rx="2" stroke="#fff" stroke-width="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18" stroke="#fff" stroke-width="1.3"/></svg>엑셀 전체출력</div>
+								<div class="printBtn" onclick="javascript:exportAllPdf(${param.constructionIdx});" style="background:#c8102e;height:35px;line-height:35px;margin-left:8px;white-space:nowrap;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="vertical-align:-3px;margin-right:6px;"><path d="M6 2h9l5 5v15H6V2z" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><path d="M15 2v5h5" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg>PDF 전체출력</div>
+						</c:if>
 					</c:when>
 					<c:otherwise>
-						<c:if test="${useExcel}"><div class="printBtn" onclick="javascript:downloadAllReport(${sessionInfo.constructionIdx});">기록지 전체 출력</div></c:if>
+						<c:if test="${useExcel}">
+								<div class="printBtn" onclick="javascript:exportAllExcel(${sessionInfo.constructionIdx});" style="background:#258348;height:35px;line-height:35px;margin-left:0;white-space:nowrap;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="vertical-align:-3px;margin-right:6px;"><rect x="3" y="3" width="18" height="18" rx="2" stroke="#fff" stroke-width="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18" stroke="#fff" stroke-width="1.3"/></svg>엑셀 전체출력</div>
+								<div class="printBtn" onclick="javascript:exportAllPdf(${sessionInfo.constructionIdx});" style="background:#c8102e;height:35px;line-height:35px;margin-left:8px;white-space:nowrap;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="vertical-align:-3px;margin-right:6px;"><path d="M6 2h9l5 5v15H6V2z" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><path d="M15 2v5h5" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg>PDF 전체출력</div>
+						</c:if>
 						<%-- <c:if test="${sessionInfo.role == 1}"> --%>
 						<c:if test="${sessionScope.isHiddenManager}">
-							<div id="contractDownloadBtn" class="printBtn" onclick="openContractDownload()" style="background-color:#28a745;margin-left:10px;display:none;">계약서 다운로드</div>
+							<div id="contractDownloadBtn" class="printBtn" onclick="openContractDownload()" style="background-color:#d39e00;margin-left:10px;display:none;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="vertical-align:-3px;margin-right:6px;"><path d="M6 2h9l5 5v15H6V2z" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><path d="M15 2v5h5" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><path d="M8.5 16.5c1-1 2-1 3 0s2 1 3 0" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/></svg>계약서 다운로드</div>
 						</c:if>
 					</c:otherwise>
 				</c:choose>
@@ -2334,30 +2351,6 @@ $(document).on('click', "input[type='checkbox'][name='changeDeivceCk']", functio
   	
 
 </script>
-<!-- 기록지 전체 출력: Excel / PDF 선택 모달 -->
-<style>
-.exportChoice-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 99999; align-items: center; justify-content: center; }
-.exportChoice-box { background: #fff; border-radius: 10px; padding: 24px 20px; width: 90%; max-width: 360px; box-shadow: 0 8px 24px rgba(0,0,0,0.25); box-sizing: border-box; text-align: center; }
-.exportChoice-title { font-size: 16px; font-weight: bold; margin-bottom: 6px; color: #222; }
-.exportChoice-desc { font-size: 13px; color: #666; margin-bottom: 18px; }
-.exportChoice-btns { display: flex; gap: 10px; }
-.exportChoice-btns button { flex: 1; height: 48px; border: none; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; color: #fff; }
-.exportChoice-excel { background: #258348; }
-.exportChoice-pdf { background: #004058; }
-.exportChoice-cancel { margin-top: 12px; background: none; border: none; color: #888; font-size: 13px; cursor: pointer; }
-</style>
-<div id="exportChoiceOverlay" class="exportChoice-overlay" style="display:none;">
-	<div class="exportChoice-box">
-		<div class="exportChoice-title">기록지 전체 출력</div>
-		<div class="exportChoice-desc">출력 형식을 선택하세요.</div>
-		<div class="exportChoice-btns">
-			<button type="button" class="exportChoice-excel" onclick="exportAllExcel();">Excel</button>
-			<button type="button" class="exportChoice-pdf" onclick="exportAllPdf();">PDF</button>
-		</div>
-		<button type="button" class="exportChoice-cancel" onclick="closeExportChoice();">취소</button>
-	</div>
-</div>
-
 <!-- 기록지 PDF 생성 중 로딩 표시 -->
 <style>
 .pdfLoading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.55); z-index: 100000; align-items: center; justify-content: center; }
