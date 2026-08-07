@@ -452,6 +452,8 @@ function showTab(tabName, el) {
     document.querySelectorAll('.settings-tab').forEach(function(t) { t.classList.remove('active'); });
     document.getElementById('tab-' + tabName).classList.add('active');
     el.classList.add('active');
+    // 좁은 화면에서 탭 바가 가로 스크롤될 때, 선택한 탭이 잘려 보이지 않도록 뷰 안으로 스크롤
+    el.scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
 }
 
 /* ---- 기본정보 저장 ---- */

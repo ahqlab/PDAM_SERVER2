@@ -29,7 +29,7 @@ public class CustomerController {
 	@ResponseBody
 	@RequestMapping(value = "/get/list", method = RequestMethod.GET)
 	public List<Customer> getList() {
-		return customerMapper.getLsit();
+		return customerMapper.getList();
 	}
 	
 	@RequestMapping(value = "/list")
