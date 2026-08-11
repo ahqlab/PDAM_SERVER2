@@ -1,6 +1,7 @@
 package net.octacomm.sample.controller;
 
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import net.octacomm.sample.dao.mapper.GroupMapper;
+import net.octacomm.sample.dao.mapper.DailyOperationSummaryMapper;
 import net.octacomm.sample.domain.Construction;
 import net.octacomm.sample.domain.Group;
 import net.octacomm.sample.domain.GroupParam;
@@ -25,6 +27,8 @@ import net.octacomm.sample.domain.SessionInfo;
 @RequestMapping("/group")
 @Controller
 public class GroupController extends AbstractGroupCRUDController<GroupMapper, Group, GroupParam, Integer>{
+	@Autowired
+	private DailyOperationSummaryMapper dailyOperationSummaryMapper;
 	
 	@Autowired
 	public void setCRUDMapper(GroupMapper mapper) {
@@ -58,10 +62,42 @@ public class GroupController extends AbstractGroupCRUDController<GroupMapper, Gr
 	
 	@ModelAttribute
 	public void setTotalUseCount(Model model, HttpSession session) {
-	    model.addAttribute("deviceCount", mapper.getTotalUseDeviceCount() > 0 ? "총 " + mapper.getTotalUseDeviceCount() + "대" : "총 0 대");
-	    model.addAttribute("devicePrenchCount", mapper.getPrenchTotalUseDeviceCount() > 0 ? "총 " + mapper.getPrenchTotalUseDeviceCount() + "대" : "총 0 대");
-	    model.addAttribute("constructionCount",  mapper.getTotalUseConstructionCount() > 0 ? "" + "총 " + mapper.getTotalUseConstructionCount() + "개" : "총 0 개");
-	    model.addAttribute("spareDeviceCount",  mapper.getTotalSpareDeviceCount() > 0 ? "" + "총 " + mapper.getTotalSpareDeviceCount() + "대" : "총 0 대");
+		int headquartersDeviceCount = mapper.getTotalUseDeviceCount();
+		int franchiseDeviceCount = mapper.getPrenchTotalUseDeviceCount();
+		int constructionCount = mapper.getTotalUseConstructionCount();
+		int spareDeviceCount = mapper.getTotalSpareDeviceCount();
+		int currentOperationDeviceCount =  headquartersDeviceCount + franchiseDeviceCount;
+		Integer maximumOperationDeviceCount = dailyOperationSummaryMapper.getMaximumOperationDeviceCount();
+		Integer minimumOperationDeviceCount = dailyOperationSummaryMapper.getMinimumOperationDeviceCount();
+		Integer yesterdayOperationDeviceCount = dailyOperationSummaryMapper.getYesterdayOperationDeviceCount();
+
+		model.addAttribute("deviceCount", headquartersDeviceCount > 0 ? "총 " + headquartersDeviceCount + "대" : "총 0 대");
+		model.addAttribute("devicePrenchCount", franchiseDeviceCount > 0 ? "총 " + franchiseDeviceCount + "대" : "총 0 대");
+		model.addAttribute("constructionCount", constructionCount > 0 ? "총 " + constructionCount + "개" : "총 0 개");
+		model.addAttribute("spareDeviceCount", spareDeviceCount > 0 ? "총 " + spareDeviceCount + "대" : "총 0 대");
+		model.addAttribute("currentOperationDeviceCount", currentOperationDeviceCount + "대");
+		model.addAttribute("maximumOperationDeviceCount", maximumOperationDeviceCount == null ? "-" : maximumOperationDeviceCount + "대");
+		model.addAttribute("minimumOperationDeviceCount", minimumOperationDeviceCount == null ? "-" : minimumOperationDeviceCount + "대");
+
+		if (yesterdayOperationDeviceCount == null) {
+			model.addAttribute("operationDeviceChange", "-");
+			model.addAttribute("operationDeviceChangeRate", "-");
+			model.addAttribute("operationDeviceChangeClass", "neutral");
+			return;
+		}
+
+		int operationDeviceChange = currentOperationDeviceCount - yesterdayOperationDeviceCount;
+		String changeSign = operationDeviceChange > 0 ? "+" : operationDeviceChange < 0 ? "-" : "";
+		String changeClass = operationDeviceChange > 0 ? "positive" : operationDeviceChange < 0 ? "negative" : "neutral";
+		model.addAttribute("operationDeviceChange", changeSign + Math.abs(operationDeviceChange) + "대");
+		model.addAttribute("operationDeviceChangeClass", changeClass);
+
+		if (yesterdayOperationDeviceCount == 0) {
+			model.addAttribute("operationDeviceChangeRate", "-");
+		} else {
+			double changeRate = (operationDeviceChange * 100.0) / yesterdayOperationDeviceCount;
+			model.addAttribute("operationDeviceChangeRate", changeSign + String.format(Locale.KOREA, "%.2f", Math.abs(changeRate)) + "%");
+		}
 	}
 	
 	/*

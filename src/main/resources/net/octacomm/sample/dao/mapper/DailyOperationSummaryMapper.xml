@@ -3,19 +3,17 @@
 
 <mapper namespace="net.octacomm.sample.dao.mapper.DailyOperationSummaryMapper">
 
-	<select id="acquireDailySnapshotLock" resultType="int">
-		SELECT GET_LOCK('wooritech.dailyOperationSummary', 10)
-	</select>
-
-	<insert id="insertSnapshotIfAbsent">
+	<insert id="upsertDailySnapshot">
 		INSERT INTO TB_DAILY_OPERATION_SUMMARY (
-			snapshotDateTime,
+			snapshotDate,
+			snapshotAt,
 			constructionCount,
 			headquartersDeviceCount,
 			franchiseDeviceCount,
 			spareDeviceCount
 		)
 		SELECT
+			CURDATE(),
 			NOW(),
 			(
 				SELECT COUNT(*)
@@ -55,16 +53,28 @@
 				  AND CON.isDel = 0
 				  AND GP.isDel = 0
 			)
-		WHERE NOT EXISTS (
-			SELECT 1
-			FROM TB_DAILY_OPERATION_SUMMARY DOS
-			WHERE DOS.snapshotDateTime <![CDATA[>=]]> CURDATE()
-			  AND DOS.snapshotDateTime <![CDATA[<]]> DATE_ADD(CURDATE(), INTERVAL 1 DAY)
-		)
+		ON DUPLICATE KEY UPDATE
+			snapshotAt = VALUES(snapshotAt),
+			constructionCount = VALUES(constructionCount),
+			headquartersDeviceCount = VALUES(headquartersDeviceCount),
+			franchiseDeviceCount = VALUES(franchiseDeviceCount),
+			spareDeviceCount = VALUES(spareDeviceCount)
 	</insert>
 
-	<select id="releaseDailySnapshotLock" resultType="int">
-		SELECT RELEASE_LOCK('wooritech.dailyOperationSummary')
+	<select id="getMaximumOperationDeviceCount" resultType="java.lang.Integer">
+		SELECT MAX(headquartersDeviceCount + franchiseDeviceCount)
+		FROM TB_DAILY_OPERATION_SUMMARY
+	</select>
+
+	<select id="getMinimumOperationDeviceCount" resultType="java.lang.Integer">
+		SELECT MIN(headquartersDeviceCount + franchiseDeviceCount)
+		FROM TB_DAILY_OPERATION_SUMMARY
+	</select>
+
+	<select id="getYesterdayOperationDeviceCount" resultType="java.lang.Integer">
+		SELECT headquartersDeviceCount + franchiseDeviceCount
+		FROM TB_DAILY_OPERATION_SUMMARY
+		WHERE snapshotDate = DATE_SUB(CURDATE(), INTERVAL 1 DAY)
 	</select>
 
 </mapper>
