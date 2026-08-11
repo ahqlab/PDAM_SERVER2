@@ -5,25 +5,29 @@
 	<div class="TopContArea">
 		<div class="titArea">
 			<p class="h1Tit">사업자정보 관리</p>
-			<a class="popBtn popBtnRegist" style="cursor:pointer;">+ 사업자 등록</a>
+			<a class="popBtn popBtnRegist" style="cursor:pointer;">사업자 등록</a>
 		</div>
-	</div>
 
+		<form id="searchForm" method="POST" onsubmit="return false;">
+			<div class="searchArea">
+				<div class="searchArea01">
+					<select id="searchType" class="select01">
+						<option value="name">상호명</option>
+						<option value="businessNo">사업자번호</option>
+						<option value="representative">대표자</option>
+						<option value="tel">전화번호</option>
+						<option value="address">주소</option>
+					</select>
+					<input type="text" id="searchKeyword" class="searchin" placeholder="검색어를 입력하세요."/>
+					<div class="searchBtn">
+						<img id="submitBtn" src="${pageContext.request.contextPath}/new/img/search.png" style="cursor:pointer;" onclick="searchCompany();">
+					</div>
+				</div>
+			</div>
+		</form>
+ 	</div>
+ 	
 	<div class="listArea" style="padding:20px;">
-		<!-- 검색영역 -->
-		<div class="company-searchArea" style="margin-bottom:15px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-			<select id="searchType" class="company-search-input" style="width:130px;">
-				<option value="name">상호명</option>
-				<option value="businessNo">사업자번호</option>
-				<option value="representative">대표자</option>
-				<option value="tel">전화번호</option>
-				<option value="address">주소</option>
-			</select>
-			<input type="text" id="searchKeyword" class="company-search-input" style="width:220px;" placeholder="검색어를 입력하세요" />
-			<div class="company-search-btn" onclick="searchCompany()">검색</div>
-			<div class="company-search-btn" onclick="resetSearch()" style="background:#999;">초기화</div>
-		</div>
-
 		<!-- 데스크탑 테이블 -->
 		<div class="pc-table-wrap" style="overflow-x:auto;">
 			<table style="width:100%;min-width:700px;border-collapse:collapse;">
@@ -45,41 +49,18 @@
 		</div>
 		<!-- 모바일 카드 -->
 		<div id="companyCards" style="display:none;"></div>
-
-		<!-- 페이지네이션 -->
-		<div id="companyPagination" style="display:flex;justify-content:center;gap:4px;margin-top:20px;"></div>
 	</div>
+	<!-- 페이지네이션 -->
+	<div id="companyPagination" style="display:flex;justify-content:center;gap:4px;margin-top:20px;"></div>
 
 <style>
 @media (max-width: 600px) {
 	.pc-table-wrap { display: none !important; }
 	#companyCards  { display: block !important; }
 }
-.company-search-input {
-	border: 1px solid #d1d1d1;
-	border-radius: 7px;
-	height: 40px;
-	line-height: 40px;
-	padding: 0 12px;
-	font-size: 14px;
-	box-sizing: border-box;
-}
-.company-search-btn {
-	display: inline-block;
-	background: #077b9c;
-	border-radius: 7px;
-	height: 40px;
-	line-height: 40px;
-	padding: 0 20px;
-	text-align: center;
-	font-size: 14px;
-	color: #fff;
-	cursor: pointer;
-	box-sizing: border-box;
-}
 .pageBtn {
-	min-width:30px;
-	height:30px;
+	min-width:32px;
+	height:32px;
 	padding:0 8px;
 	border:1px solid #ddd;
 	background:#fff;
@@ -87,8 +68,6 @@
 	border-radius:3px;
 	cursor:pointer;
 	font-size:13px;
-	font-weight:400;
-	line-height:1;
 }
 .pageBtn:hover {
 	border-color:#adadad;
@@ -99,8 +78,9 @@
 	color:#fff;
 	border-color:#337ab7;
 }
-.pageBtn.active:hover {
-	background:#337ab7;
+.pageBtn:hover {
+	border-color:#adadad;
+	background:#e6e6e6;
 }
 .pageBtn:disabled {
 	cursor:default;
@@ -118,7 +98,7 @@
 </style>
 </div>
 
-<div class="popUp popUpRegist">
+<div class="popUp popUp01">
 	<form id="regForm" name="regForm" method="POST" onsubmit="return false;">
 		<div class="popTit">
 			<p>사업자 등록</p>
@@ -150,7 +130,7 @@
 	</form>
 </div>
 
-<div class="popUp popUpUpdate">
+<div class="popUp popUp02">
 	<form id="updateForm" name="updateForm" method="POST" onsubmit="return false;">
 		<div class="popTit">
 			<p>사업자 수정</p>
@@ -347,7 +327,7 @@ function openUpdateForm(id) {
 		$('#updateForm #m_tel').val(c.tel);
 		$('#updateForm #m_address').val(c.address);
 
-		$('.popUpUpdate').show();
+		$('.popUp02').show();
 		$('.popLayer').show();
 		$('body').css('overflow', 'hidden');
 	});
@@ -402,7 +382,7 @@ $(document).ready(function() {
 
 	$('.popBtnRegist').on('click', function(e) {
 		$('#regForm')[0].reset();
-		$('.popUpRegist').show();
+		$('.popUp01').show();
 		$('.popLayer').show();
 		$('body').css('overflow', 'hidden');
 	});
