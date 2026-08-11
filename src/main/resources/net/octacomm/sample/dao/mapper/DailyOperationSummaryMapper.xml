@@ -61,4 +61,20 @@
 			spareDeviceCount = VALUES(spareDeviceCount)
 	</insert>
 
+	<select id="getMaximumOperationDeviceCount" resultType="java.lang.Integer">
+		SELECT MAX(headquartersDeviceCount + franchiseDeviceCount)
+		FROM TB_DAILY_OPERATION_SUMMARY
+	</select>
+
+	<select id="getMinimumOperationDeviceCount" resultType="java.lang.Integer">
+		SELECT MIN(headquartersDeviceCount + franchiseDeviceCount)
+		FROM TB_DAILY_OPERATION_SUMMARY
+	</select>
+
+	<select id="getYesterdayOperationDeviceCount" resultType="java.lang.Integer">
+		SELECT headquartersDeviceCount + franchiseDeviceCount
+		FROM TB_DAILY_OPERATION_SUMMARY
+		WHERE snapshotDate = DATE_SUB(CURDATE(), INTERVAL 1 DAY)
+	</select>
+
 </mapper>

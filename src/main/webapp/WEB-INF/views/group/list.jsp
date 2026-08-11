@@ -139,6 +139,31 @@ function checkDuplicateGroupName(){
 					<p class="listCount">협력사  <span>${constructionCount}</span> / 본사 운영장비 <span>${deviceCount}</span> / 가맹 운영장비 <span>${devicePrenchCount}</span> / 예비용 장비 <span>${spareDeviceCount}</span></p>
 					<!-- <div class="buildDown">시행 협력사 정보</div> -->
 				</div>
+
+				<div class="operationSummaryTableWrap">
+					<table class="operationSummaryTable">
+						<thead>
+							<tr>
+								<th>항목</th>
+								<th>현재 개수</th>
+								<th>최고 개수</th>
+								<th>최저 개수</th>
+								<th>변동</th>
+								<th>변동 %</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td class="operationName">현재 운영 장비</td>
+								<td>${currentOperationDeviceCount}</td>
+								<td>${maximumOperationDeviceCount}</td>
+								<td>${minimumOperationDeviceCount}</td>
+								<td class="operationChange ${operationDeviceChangeClass}">${operationDeviceChange}</td>
+								<td class="operationChange ${operationDeviceChangeClass}">${operationDeviceChangeRate}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
 				
 				<ul id="groupList" class="listUl cross"></ul>
 			</div>
@@ -214,6 +239,44 @@ function checkDuplicateGroupName(){
 		
 <!-- 시공사 목록: 클라이언트 사이드 페이징 (POST 재제출 방지) -->
 <style>
+.operationSummaryTableWrap{
+	width:100%;
+	margin-bottom:15px;
+	overflow-x:auto;
+	background:#fff;
+	border-radius:10px;
+	box-shadow:0px 0px 6.79px 0.21px rgb(0 0 0 / 7%);
+}
+.operationSummaryTable{
+	width:100%;
+	min-width:760px;
+	border-collapse:collapse;
+	table-layout:fixed;
+}
+.operationSummaryTable th,
+.operationSummaryTable td{
+	padding:10px 14px;
+	border-bottom:1px solid #e5e8eb;
+	font-size:15px;
+	text-align:center;
+	vertical-align:middle;
+}
+.operationSummaryTable th{
+	color:#333;
+	font-weight:700;
+}
+.operationSummaryTable th:first-child,
+.operationSummaryTable td:first-child{
+	width:28%;
+	text-align:center;
+}
+.operationSummaryTable .operationName{
+	font-weight:400;
+	white-space:nowrap;
+}
+.operationSummaryTable .operationChange.positive{ color:#e53935; }
+.operationSummaryTable .operationChange.negative{ color:#0e60ff; }
+.operationSummaryTable .operationChange.neutral{ color:#333; }
 .groupSpinner{
 	display:inline-block;width:18px;height:18px;vertical-align:middle;margin-right:6px;
 	border:3px solid #e0e0e0;border-top-color:#077b9c;border-radius:50%;
