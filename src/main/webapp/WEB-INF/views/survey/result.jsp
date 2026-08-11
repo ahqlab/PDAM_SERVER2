@@ -33,6 +33,12 @@
 <script>
 $( document ).ready( function() {
 	
+	$(".navBtn").click(function() {
+		$(".left-menu").animate({ "left": "0%" }, 500);
+	});
+	$(".m-closeBtn").click(function() {
+		$(".left-menu").animate({ "left": "-150%" }, 500);
+	});
 	
 	jQuery.ajax({
 		type : "POST",
@@ -99,4 +105,21 @@ $( document ).ready( function() {
 	});
 	
 });
+$('.mlist a').on('click', function(e){
+	var tg = $(this).next('.sub-menu');
+	if(tg.length > 0){
+		if($(this).hasClass('isOpen')){
+			tg.slideUp('fast');
+			$(this).removeClass('isOpen');
+		} else {
+			if($('.mlist a.isOpen').length > 0){
+				$('.mlist a.isOpen').next().slideUp('fast');$('.mlist a.isOpen').removeClass('isOpen');
+			}
+			tg.slideDown('fast');
+			$(this).addClass('isOpen');
+		}
+		e.preventDefault();
+	}
+});
+
 </script>

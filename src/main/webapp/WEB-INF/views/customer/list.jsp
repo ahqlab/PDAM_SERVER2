@@ -6,24 +6,29 @@
 	<div class="TopContArea">
 		<div class="titArea">
 			<p class="h1Tit">고객관리</p>
-			<a class="popBtn popBtn01" style="cursor:pointer;">+ 고객 등록</a>
+			<a class="popBtn popBtnRegist" style="cursor:pointer;">고객 등록</a>
 		</div>
+
+		<form id="searchForm" method="POST" onsubmit="return false;">
+			<div class="searchArea">
+				<div class="searchArea01">
+					<select id="searchType" class="select01">
+						<option value="groupName">시공사</option>
+						<option value="conName">협력사</option>
+						<option value="conLocation">현장주소</option>
+						<option value="conManager">관리자</option>
+						<option value="conContact">연락처</option>
+					</select>
+					<input type="text" id="searchKeyword" class="searchin" placeholder="검색어를 입력하세요." />
+					<div class="searchBtn">
+						<img id="submitBtn" src="${pageContext.request.contextPath}/new/img/search.png" style="cursor:pointer;" onclick="searchCustomer();">
+					</div>
+				</div>
+			</div>
+		</form>
 	</div>
 
-	<div class="listArea" style="padding:20px; background:#fff; border-radius:8px; box-shadow:0 2px 10px rgba(0,0,0,0.05);">
-		<div class="company-searchArea" style="margin-bottom:15px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-			<select id="searchType" class="company-search-input" style="width:130px;">
-				<option value="groupName">시공사</option>
-				<option value="conName">협력사</option>
-				<option value="conLocation">현장주소</option>
-				<option value="conManager">관리자</option>
-				<option value="conContact">연락처</option>
-			</select>
-			<input type="text" id="searchKeyword" class="company-search-input" style="width:220px;" placeholder="검색어를 입력하세요" />
-			<div class="company-search-btn" onclick="searchCustomer()">검색</div>
-			<div class="company-search-btn" onclick="resetSearch()" style="background:#999;">초기화</div>
-		</div>
-
+	<div class="listArea" style="padding:20px;">
 		<div class="pc-table-wrap" style="overflow-x:auto;">
 			<table style="width:100%;min-width:700px;border-collapse:collapse;">
 				<thead>
@@ -43,36 +48,14 @@
 			</table>
 		</div>
 		<div id="customerCards" style="display:none;"></div>
-
-		<div id="customerPagination" style="display:flex;justify-content:center;gap:5px;margin-top:20px;"></div>
 	</div>
+	
+	<div id="customerPagination" style="display:flex;justify-content:center;gap:5px;margin-top:20px;"></div>
 
 <style>
 @media (max-width: 600px) {
 	.pc-table-wrap { display: none !important; }
 	#customerCards { display: block !important; }
-}
-.company-search-input {
-	border: 1px solid #d1d1d1;
-	border-radius: 7px;
-	height: 40px;
-	line-height: 40px;
-	padding: 0 12px;
-	font-size: 14px;
-	box-sizing: border-box;
-}
-.company-search-btn {
-	display: inline-block;
-	background: #077b9c;
-	border-radius: 7px;
-	height: 40px;
-	line-height: 40px;
-	padding: 0 20px;
-	text-align: center;
-	font-size: 14px;
-	color: #fff;
-	cursor: pointer;
-	box-sizing: border-box;
 }
 .pageBtn {
 	min-width:32px;
@@ -93,6 +76,16 @@
 .pageBtn:disabled {
 	cursor:default;
 	color:#ccc;
+}
+.pageBtn:hover {
+	border-color:#adadad;
+	background:#e6e6e6;
+}
+.listArea {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    padding: 20px;
 }
 #customerTbody tr:hover {
 	background-color: #f9f9f9;
@@ -455,7 +448,7 @@ $(document).ready(function() {
 		if (e.which === 13) searchCustomer();
 	});
 
-	$('.popBtn01').on('click', function(e) {
+	$('.popBtnRegist').on('click', function(e) {
 		$('.popUp01').show();
 		$('.popLayer').show();
 		$('body').css('overflow', 'hidden');

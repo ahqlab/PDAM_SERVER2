@@ -21,24 +21,25 @@ function onClickDeleteBtn(idx){
 		<div class="section-right">
 			<%@ include file="/WEB-INF/views/common/welcomeMsg.jsp" %>
 			<div class="TopContArea">
-				<div class="titArea mb-40">
+				<div class="titArea">
 					<p class="h1Tit">시험성적표관리</p>
 					<%-- <div class="popBtn" onclick="location.href='${pageContext.request.contextPath}/fileinventory/regist2?constructionIdx=${param.constructionIdx}&pileType=PHC'">파일 등록</div> --%>
+					<a class="popBtn popBtnRegist" href="${pageContext.request.contextPath}/treport/regist">시험성적표 등록</a>
 				</div>
 				
 				<!--검색-->
 				<form:form id="searchForm" commandName="domainParam" method="POST">
 					<form:hidden path="currentPage"/>
 						<div class="searchArea">
-							<div class="searchArea01" style="width: 100%;">
+							<div class="searchArea01">
 								<form:select class="select01" path="searchMfr" onchange="javascript:onSMfrChange();">
 				                	<form:option value="SOKKIA">SOKKIA</form:option>
 				                	<form:option value="TOPCON">TOPCON</form:option>
 								</form:select>
-								<form:select id="searchForm"  path="searchField">
+								<form:select path="searchField">
 				                    <form:option value="sn">측정기S/N</form:option>
 								</form:select>
-								<form:input path="searchWord" class="searchin"  style="width:30%;" placeholder="검색어를 입력하세요."/>
+								<form:input path="searchWord" class="searchin" placeholder="검색어를 입력하세요."/>
 								<div class="searchBtn">
 									<img id="submitBtn" src="${pageContext.request.contextPath}/new/img/search.png" style="cursor:pointer;">
 								</div>
@@ -48,65 +49,77 @@ function onClickDeleteBtn(idx){
 			</div>
 
 			<!--공지리스트-->
-			<div class="min640">
-				<table class="table_board_for type_a">
-					<colgroup>
-						<col width="10%">
-						<col width="10%;">
-						<col width="10%;">
-						<col width="10%;">
-						<col width="20%;">
-						<col width="*%;">
-						<col width="10%;">
-						<col width="10%;">
-					</colgroup>
-					<tr>
-						<th scope="col">NO</th>
-						<th scope="col">제조사</th>
-						<th scope="col">측정기종류</th>
-						<th scope="col">측정기S/N</th>
-						<th scope="col">파일명</th>
-						<th scope="col">비고</th>
-						<th scope="col">정보변경</th>
-						<th scope="col">삭제</th>
-					</tr>
-					<!--리스트 한페이지에 최대10개-->
-					<c:forEach var="domain" items="${domainList}" varStatus="status">
-					<tr class="">
-						<%-- <td class="text_left">
-							<a href="./notice-view.html">[테스트글] 테스트페이지 현재 코딩작업 중</a>
-						</td>
-						<td>
-							<img src="${pageContext.request.contextPath}/new/img/file-download.png" class="file-img" alt="파일첨부"><!--파일첨부시-->
-						</td>
-						<td>관리자</td>
-						<td>2023.02.06</td> --%>
-						<td>${domain.no}</td>
-						<td>${domain.mfr}</td>
-						<td>${domain.type}</td>
-						<td>${domain.sn}</td>
-						<td><a href="javascript:TestReportFileDownload('${pageContext.request.contextPath}','${pageContext.request.contextPath}/treport/download/test/report?sn=${domain.sn}', '${domain.sn}');">${domain.fileName}</a></td>
-						<td>${domain.bigo}</td>	
-						<td><a href="${pageContext.request.contextPath}/treport/update?id=${domain.idx}">[정보변경]</a></td>	
-						<td><a href="javascript:onClickDeleteBtn(${domain.idx});"  style="cursor:pointer;">[삭제]</a></td>		
-					</tr>
-					</c:forEach>
-					<c:choose>
-						<c:when test="${fn:length(domainList) == 0}">
-							<tr>
-								<td colspan="8">등록된 데이터가 없습니다.</td>
+			<div class="listArea" style="padding:20px;">
+				<!-- PC 테이블 뷰 -->
+				<div class="pc-table-wrap" style="overflow-x:auto;">
+					<table style="width:100%; min-width:700px; border-collapse:collapse;">
+						<thead>
+							<tr style="background:#f5f5f5; border-bottom:2px solid #ddd;">
+								<th style="padding:10px; text-align:center; width:60px; white-space:nowrap;">NO</th>
+								<th style="padding:10px; text-align:center; min-width:100px; white-space:nowrap;">제조사</th>
+								<th style="padding:10px; text-align:center; min-width:110px; white-space:nowrap;">측정기종류</th>
+								<th style="padding:10px; text-align:center; min-width:130px; white-space:nowrap;">측정기S/N</th>
+								<th style="padding:10px; text-align:center;">파일명</th>
+								<th style="padding:10px; text-align:center; min-width:120px;">비고</th>
+								<th style="padding:10px; text-align:center; width:80px; white-space:nowrap;">정보변경</th>
+								<th style="padding:10px; text-align:center; width:70px; white-space:nowrap;">삭제</th>
 							</tr>
-						</c:when>
-					</c:choose>
-					
+						</thead>
+						<tbody id="reportTbody">
+							<!--리스트 한페이지에 최대10개-->
+							<c:forEach var="domain" items="${domainList}" varStatus="status">
+							<tr style="border-bottom:1px solid #eee;">
+								<td style="padding:10px; text-align:center; border:1px solid #eee; white-space:nowrap;">${domain.no}</td>
+								<td style="padding:10px; text-align:center; border:1px solid #eee; white-space:nowrap;">${domain.mfr}</td>
+								<td style="padding:10px; text-align:center; border:1px solid #eee; white-space:nowrap;">${domain.type}</td>
+								<td style="padding:10px; text-align:center; border:1px solid #eee; white-space:nowrap;">${domain.sn}</td>
+								<td style="padding:10px; border:1px solid #eee;">
+									<a href="javascript:TestReportFileDownload('${pageContext.request.contextPath}','${pageContext.request.contextPath}/treport/download/test/report?sn=${domain.sn}', '${domain.sn}');" style="color:#077b9c; text-decoration:underline;">${domain.fileName}</a>
+								</td>
+								<td style="padding:10px; border:1px solid #eee;">${domain.bigo}</td>	
+								<td style="padding:10px; text-align:center; border:1px solid #eee; white-space:nowrap;">
+									<a href="${pageContext.request.contextPath}/treport/update?id=${domain.idx}" style="padding:4px 10px; background:#337ab7; color:#fff; border-radius:3px; font-size:12px; text-decoration:none; display:inline-block;">변경</a>
+								</td>	
+								<td style="padding:10px; text-align:center; border:1px solid #eee; white-space:nowrap;">
+									<a href="javascript:onClickDeleteBtn(${domain.idx});" style="padding:4px 10px; background:#d9534f; color:#fff; border-radius:3px; font-size:12px; text-decoration:none; display:inline-block; cursor:pointer;">삭제</a>
+								</td>		
+							</tr>
+							</c:forEach>
+							<c:choose>
+								<c:when test="${fn:length(domainList) == 0}">
+									<tr>
+										<td colspan="8" style="text-align:center; padding:24px; color:#999;">등록된 데이터가 없습니다.</td>
+									</tr>
+								</c:when>
+							</c:choose>
+						</tbody>
 					</table>
-					
-					
-				<!--//공지리스트-->
+				</div>
 
-			<a class="goWrite" href="${pageContext.request.contextPath}/treport/regist">등록</a>
-			
+				<!-- 모바일 카드형 뷰 (반응형 대응) -->
+				<div id="reportCards" style="display:none; margin-top:10px;">
+					<c:forEach var="domain" items="${domainList}" varStatus="status">
+						<div style="background:#fff; border:1px solid #ddd; border-radius:6px; padding:14px 16px; margin-bottom:10px;">
+							<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+								<span style="font-weight:bold; font-size:15px; color:#333;">[${domain.mfr}] ${domain.sn}</span>
+								<div>
+									<a href="${pageContext.request.contextPath}/treport/update?id=${domain.idx}" style="padding:3px 8px; background:#337ab7; color:#fff; border-radius:3px; font-size:11px; text-decoration:none; margin-right:4px;">변경</a>
+									<a href="javascript:onClickDeleteBtn(${domain.idx});" style="padding:3px 8px; background:#d9534f; color:#fff; border-radius:3px; font-size:11px; text-decoration:none;">삭제</a>
+								</div>
+							</div>
+							<table style="width:100%; font-size:13px; border-collapse:collapse;">
+								<tr><td style="color:#888; padding:3px 8px 3px 0; width:80px;">측정기종류</td><td style="padding:3px 0;">${domain.type}</td></tr>
+								<tr><td style="color:#888; padding:3px 8px 3px 0;">파일명</td><td style="padding:3px 0;"><a href="javascript:TestReportFileDownload('${pageContext.request.contextPath}','${pageContext.request.contextPath}/treport/download/test/report?sn=${domain.sn}', '${domain.sn}');" style="color:#077b9c; text-decoration:underline;">${domain.fileName}</a></td></tr>
+								<tr><td style="color:#888; padding:3px 8px 3px 0;">비고</td><td style="padding:3px 0;">${domain.bigo}</td></tr>
+							</table>
+						</div>
+					</c:forEach>
+					<c:if test="${fn:length(domainList) == 0}">
+						<p style="text-align:center; padding:24px; color:#999;">등록된 데이터가 없습니다.</p>
+					</c:if>
+				</div>
 			</div>
+			<!--//공지리스트-->
 			
 
 			<!--페이징-->
@@ -117,7 +130,22 @@ function onClickDeleteBtn(idx){
 		</div>
 		<!--//컨텐츠-->
 
-		
+<style>
+@media (max-width: 600px) {
+	.pc-table-wrap { display: none !important; }
+	#reportCards { display: block !important; }
+}
+#reportTbody tr:hover {
+	background-color: #f9f9f9;
+}
+.listArea {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    padding: 20px;
+}
+</style>
+
 <!-- 팝업 -->
 <script>
 $('.popUp').hide();

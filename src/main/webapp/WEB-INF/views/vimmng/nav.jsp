@@ -22,7 +22,20 @@
 		<p class="com_name">Pile Driving Automatic Measurement system</p>
 		</div>
 </div>
+<style>
+.left-menu .mlist img {
+    width: 20px;
+    height: 20px;  
+    object-fit: contain;
+    margin-right: 10px;
+}
 
+.left-menu .mlist svg {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+</style>
 <div class="left-menu">
 
 	<img class="m-closeBtn pc_hide" src="${pageContext.request.contextPath}/new/img/close.png" />
@@ -32,64 +45,52 @@
 			<div class="pc-menu">
 				<div class="mlist">
 					<a href="${pageContext.request.contextPath}/group/list" >
-						<img src="${pageContext.request.contextPath}/new/img/menuIcon01.png">시공사
+						<img src="${pageContext.request.contextPath}/images/menu_icon04.png">시공사
 					</a>
 				</div>
 				<div class="mlist">
 					<a href="${pageContext.request.contextPath}/franchise/list">
-						<img src="${pageContext.request.contextPath}/new/img/menuIcon02.png">가맹점
+						<img src="${pageContext.request.contextPath}/images/menu_icon05.png">가맹점
 					</a>
 				</div>
 				<div class="mlist">
 					<a href="${pageContext.request.contextPath}/construction/list">
-						<img src="${pageContext.request.contextPath}/new/img/menuIcon03.png">전체 협력사
+						<img src="${pageContext.request.contextPath}/images/menu_icon07.png">전체 협력사
 					</a>
 				</div>
 				<div class="mlist">
 					<a href="${pageContext.request.contextPath}/treport/list">
-						<img src="${pageContext.request.contextPath}/new/img/menuIcon02.png"/>시험성적표관리
+						<img src="${pageContext.request.contextPath}/images/menu_icon06.png"/>시험성적표관리
 					</a>
 				</div>
 				<div class="mlist">
 					<a href="${pageContext.request.contextPath}/vimmng/list" class="menuActive">
-						<img src="${pageContext.request.contextPath}/new/img/menuIcon02.png"/>빔파트너스 협력사 
+						<img src="${pageContext.request.contextPath}/images/menu_icon05.png"/>빔파트너스 협력사 
 					</a>
 				</div>
 				<!-- 만족도조사 결과보기 -->
 				<div class="mlist">
 					<a href="${pageContext.request.contextPath}/survey/result">
-						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bar-chart" viewBox="0 0 16 16" style="margin-right: 10px;">
-						  <path d="M4 11H2v3h2zm5-4H7v7h2zm5-5v12h-2V2zm-2-1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM6 7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm-5 4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1z"/>
-						</svg>만족도조사 결과보기
+						<img src="${pageContext.request.contextPath}/images/menu_icon11.png" />만족도조사 결과보기
 					</a>
 				</div>
-				
 				<!-- 고객관리 -->
 				<div class="mlist">
 					<a href="${pageContext.request.contextPath}/customer/list">
-						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-person-fill" viewBox="0 0 16 16" style="margin-right: 10px;">
-						  <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0m2 5.755V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-.245S4 12 8 12s5 1.755 5 1.755"/>
-						</svg>고객관리
+						<img src="${pageContext.request.contextPath}/images/menu_icon12.png" />고객관리
 					</a>
 				</div>
 				<div class="mlist">
 					<a href="${pageContext.request.contextPath}/qr/list">
-						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-							class="bi bi-qr-code-scan" viewBox="0 0 16 16" style="margin-right: 10px;">
-							<path d="M0 0v6h6V0H0zm5 5H1V1h4v4zM10 0v6h6V0h-6zm5 5h-4V1h4v4zM0 10v6h6v-6H0zm5 5H1v-4h4v4zM11 10h1v1h-1v-1zm-1 1h-1v1h1v-1zm1 1h1v1h-1v-1zm2-1h1v1h-1v-1zm-2 2h1v1h-1v-1zm2 0h1v1h-1v-1zm1-2h1v1h-1v-1zm-3-1h1v1h-1v-1z"/>
-							<path d="M8 8h1v1H8V8zm2 0h1v1h-1V8zm1 1h1v1h-1V9zm1 1h1v1h-1v-1zm-4 1h1v1H8v-1zm1 1h1v1H9v-1zm1 1h1v1h-1v-1zm1 1h1v1h-1v-1z"/>
-						</svg>QR코드관리
+						<img src="${pageContext.request.contextPath}/images/menu_icon13.png" />QR코드관리
 					</a>
 				</div>
-
-			<div class="mlist">
-				<a href="${pageContext.request.contextPath}/company/list">
-					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-building" viewBox="0 0 16 16" style="margin-right: 10px;">
-						<path d="M4 2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm3.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zM4 5.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zM7.5 5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm2.5.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zM4.5 8a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm2.5.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm3.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5z"/>
-						<path d="M2 1a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1zm11 0H3v14h3v-2.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5V15h3z"/>
-					</svg>사업자정보 관리
-				</a>
-			</div>
+		
+				<div class="mlist">
+					<a href="${pageContext.request.contextPath}/company/list">
+						<img src="${pageContext.request.contextPath}/images/menu_icon14.png" />사업자정보 관리
+					</a>
+				</div>
 <%--				<!-- 계약서 관리 -->
 				<div class="mlist" style="padding:0;display:block;">
 					<a href="javascript:void(0);" onclick="toggleContractNav(this)" style="display:flex;justify-content:space-between;align-items:center;">
