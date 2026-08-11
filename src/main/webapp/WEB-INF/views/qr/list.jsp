@@ -232,7 +232,6 @@ function generateQR() {
     .qr-page {
         display: flex;
         gap: 20px;
-        padding: 20px;
         font-family: Arial, sans-serif;
     }
 
