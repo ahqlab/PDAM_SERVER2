@@ -341,28 +341,32 @@
 		        <include refid="condition"/>
 			ORDER BY A.createDate DESC ) as TB) AA LEFT OUTER JOIN
 				 (SELECT COUNT(*) as cnt,
-						 deviceIdx,  
+						 deviceIdx,
                          pileNo,
-                         location 
+                         location,
+                         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey
                     FROM TB_REPORT
 				   WHERE deviceIdx = ${param.id}
 					 AND isDel = 0
-				GROUP BY deviceIdx, pileNo, location) BB 
+				GROUP BY deviceIdx, pileNo, location, IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) BB
 		              ON AA.deviceIdx  = BB.deviceIdx
 					 AND AA.pileNo  = BB.pileNo
 					 AND AA.location  = BB.location
+					 AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = BB.pileStdKey
 				LEFT OUTER JOIN
 				 (SELECT COUNT(*) as cnt,
 						 pileNo,
-                         location 
+                         location,
+                         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey
                     FROM TB_REPORT
 				   WHERE deviceIdx IN (SELECT TD.ID FROM TB_DEVICE TD WHERE TD.constructionIdx = (
 							SELECT constructionIdx FROM TB_DEVICE WHERE ID IN (SELECT deviceIdx FROM TB_REPORT WHERE deviceIdx = ${param.id}) GROUP BY constructionIdx)
                         )
 					 AND isDel = 0
-				GROUP BY pileNo, location) CC 
+				GROUP BY pileNo, location, IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) CC
 		              ON AA.pileNo  = CC.pileNo
-					 AND AA.location  = CC.location	
+					 AND AA.location  = CC.location
+					 AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = CC.pileStdKey
 		   WHERE 1=1
 		    ORDER BY AA.createDate DESC
            LIMIT #{pageSize} OFFSET #{startRow}
@@ -602,28 +606,32 @@
 		        <include refid="condition"/>
 			ORDER BY A.createDate DESC ) as TB) AA LEFT OUTER JOIN
 				 (SELECT COUNT(*) as cnt,
-						 deviceIdx,  
+						 deviceIdx,
                          pileNo,
-                         location 
+                         location,
+                         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey
                     FROM TB_REPORT
 				   WHERE deviceIdx = ${param.id}
 					 AND isDel = 0
-				GROUP BY deviceIdx, pileNo, location) BB 
+				GROUP BY deviceIdx, pileNo, location, IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) BB
 		              ON AA.deviceIdx  = BB.deviceIdx
 					 AND AA.pileNo  = BB.pileNo
 					 AND AA.location  = BB.location
+					 AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = BB.pileStdKey
 				LEFT OUTER JOIN
 				 (SELECT COUNT(*) as cnt,
 						 pileNo,
-                         location 
+                         location,
+                         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey
                     FROM TB_REPORT
 				   WHERE deviceIdx IN (SELECT TD.ID FROM TB_DEVICE TD WHERE TD.constructionIdx = (
 							SELECT constructionIdx FROM TB_DEVICE WHERE ID IN (SELECT deviceIdx FROM TB_REPORT WHERE deviceIdx = ${param.id}) GROUP BY constructionIdx)
                         )
 					 AND isDel = 0
-				GROUP BY pileNo, location) CC 
+				GROUP BY pileNo, location, IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) CC
 		              ON AA.pileNo  = CC.pileNo
-					 AND AA.location  = CC.location	
+					 AND AA.location  = CC.location
+					 AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = CC.pileStdKey
 		   WHERE 1=1
 		    ORDER BY AA.createDate DESC
            LIMIT #{pageSize} OFFSET #{startRow}
@@ -875,28 +883,32 @@
 		        <include refid="condition"/>
 			ORDER BY A.createDate DESC ) as TB) AA LEFT OUTER JOIN
 				 (SELECT COUNT(*) as cnt,
-						 deviceIdx,  
+						 deviceIdx,
                          pileNo,
-                         location 
+                         location,
+                         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey
                     FROM TB_REPORT
 				   WHERE deviceIdx = ${param.id}
 					 AND isDel = 0
-				GROUP BY deviceIdx, pileNo, location) BB 
+				GROUP BY deviceIdx, pileNo, location, IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) BB
 		              ON AA.deviceIdx  = BB.deviceIdx
 					 AND AA.pileNo  = BB.pileNo
 					 AND AA.location  = BB.location
+					 AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = BB.pileStdKey
 				LEFT OUTER JOIN
 				 (SELECT COUNT(*) as cnt,
 						 pileNo,
-                         location 
+                         location,
+                         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey
                     FROM TB_REPORT
 				   WHERE deviceIdx IN (SELECT TD.ID FROM TB_DEVICE TD WHERE TD.constructionIdx = (
 							SELECT constructionIdx FROM TB_DEVICE WHERE ID IN (SELECT deviceIdx FROM TB_REPORT WHERE deviceIdx = ${param.id}) GROUP BY constructionIdx)
                         )
 					 AND isDel = 0
-				GROUP BY pileNo, location) CC 
+				GROUP BY pileNo, location, IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) CC
 		              ON AA.pileNo  = CC.pileNo
-					 AND AA.location  = CC.location	
+					 AND AA.location  = CC.location
+					 AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = CC.pileStdKey
 		   WHERE 1=1
 		    ORDER BY AA.createDate DESC
            LIMIT #{pageSize} OFFSET #{startRow}
@@ -1652,20 +1664,26 @@
 		         and C.id = #{param.constructionIdx} 
 		         and A.isdel = 0 
 			ORDER BY A.createDate asc ) as TB) AA LEFT OUTER JOIN
-				 (select count(*) as cnt, deviceIdx,  pileNo, location from TB_REPORT
+				 (select count(*) as cnt, deviceIdx, pileNo, location,
+				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey
+				  from TB_REPORT
 					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} )
 					   and isDel = 0
-				     group by deviceIdx, pileNo, location) BB 
+				     group by deviceIdx, pileNo, location, IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) BB
 		             ON AA.deviceIdx  = BB.deviceIdx
 					AND	AA.pileNo  = BB.pileNo
 					AND	AA.location  = BB.location
+					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = BB.pileStdKey
 				LEFT OUTER JOIN
-				 (select count(*) as cnt, pileNo, location from TB_REPORT
+				 (select count(*) as cnt, pileNo, location,
+				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey
+				  from TB_REPORT
 					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} AND isDel = 0 AND conduct = 0 )
 					   and isDel = 0
-				     group by pileNo, location) CC 
+				     group by pileNo, location, IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) CC
 		             ON AA.pileNo  = CC.pileNo
-					AND	AA.location  = CC.location	
+					AND	AA.location  = CC.location
+					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = CC.pileStdKey
 		    <include refid="allExcelCondition"/>
 		    ORDER BY AA.machineNumber , AA.createDate ASC
     </select> 
@@ -1834,20 +1852,26 @@
 		         and C.id = #{param.constructionIdx} 
 		         and A.isdel = 0 
 			ORDER BY A.createDate asc ) as TB) AA LEFT OUTER JOIN
-				 (select count(*) as cnt, deviceIdx,  pileNo, location from TB_REPORT
+				 (select count(*) as cnt, deviceIdx, pileNo, location,
+				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey
+				  from TB_REPORT
 					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} )
 					   and isDel = 0
-				     group by deviceIdx, pileNo, location) BB 
+				     group by deviceIdx, pileNo, location, IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) BB
 		             ON AA.deviceIdx  = BB.deviceIdx
 					AND	AA.pileNo  = BB.pileNo
 					AND	AA.location  = BB.location
+					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = BB.pileStdKey
 				LEFT OUTER JOIN
-				 (select count(*) as cnt, pileNo, location from TB_REPORT
+				 (select count(*) as cnt, pileNo, location,
+				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey
+				  from TB_REPORT
 					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} AND isDel = 0 AND conduct = 0 )
 					   and isDel = 0
-				     group by pileNo, location) CC 
+				     group by pileNo, location, IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) CC
 		             ON AA.pileNo  = CC.pileNo
-					AND	AA.location  = CC.location	
+					AND	AA.location  = CC.location
+					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = CC.pileStdKey
 		    <include refid="allExcelCondition"/>
 		    ORDER BY AA.machineNumber , AA.createDate ASC
     </select> 
@@ -2019,20 +2043,26 @@
 		         and C.id = #{param.constructionIdx} 
 		         and A.isdel = 0 
 			ORDER BY A.createDate asc ) as TB) AA LEFT OUTER JOIN
-				 (select count(*) as cnt, deviceIdx,  pileNo, location from TB_REPORT
+				 (select count(*) as cnt, deviceIdx, pileNo, location,
+				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey
+				  from TB_REPORT
 					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} )
 					   and isDel = 0
-				     group by deviceIdx, pileNo, location) BB 
+				     group by deviceIdx, pileNo, location, IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) BB
 		             ON AA.deviceIdx  = BB.deviceIdx
 					AND	AA.pileNo  = BB.pileNo
 					AND	AA.location  = BB.location
+					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = BB.pileStdKey
 				LEFT OUTER JOIN
-				 (select count(*) as cnt, pileNo, location from TB_REPORT
+				 (select count(*) as cnt, pileNo, location,
+				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey
+				  from TB_REPORT
 					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} AND isDel = 0 AND conduct = 0 )
 					   and isDel = 0
-				     group by pileNo, location) CC 
+				     group by pileNo, location, IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) CC
 		             ON AA.pileNo  = CC.pileNo
-					AND	AA.location  = CC.location	
+					AND	AA.location  = CC.location
+					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = CC.pileStdKey
 		    <include refid="allExcelCondition"/>
 		    ORDER BY AA.machineNumber , AA.createDate ASC
     </select> 
@@ -2184,20 +2214,26 @@
 		         and C.id = #{param.constructionIdx} 
 		         and A.isdel = 0 
 			ORDER BY A.createDate asc ) as TB) AA LEFT OUTER JOIN
-				 (select count(*) as cnt, deviceIdx,  pileNo, location from TB_REPORT
+				 (select count(*) as cnt, deviceIdx, pileNo, location,
+				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey
+				  from TB_REPORT
 					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} )
 					   and isDel = 0
-				     group by deviceIdx, pileNo, location) BB 
+				     group by deviceIdx, pileNo, location, IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) BB
 		             ON AA.deviceIdx  = BB.deviceIdx
 					AND	AA.pileNo  = BB.pileNo
 					AND	AA.location  = BB.location
+					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = BB.pileStdKey
 				LEFT OUTER JOIN
-				 (select count(*) as cnt, pileNo, location from TB_REPORT
+				 (select count(*) as cnt, pileNo, location,
+				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey
+				  from TB_REPORT
 					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} AND isDel = 0 AND conduct = 0 )
 					   and isDel = 0
-				     group by pileNo, location) CC 
+				     group by pileNo, location, IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) CC
 		             ON AA.pileNo  = CC.pileNo
-					AND	AA.location  = CC.location	
+					AND	AA.location  = CC.location
+					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = CC.pileStdKey
 		    <include refid="allExcelCondition"/>
 		    ORDER BY AA.machineNumber , AA.createDate ASC
     </select> 
@@ -2370,20 +2406,26 @@
 		         and C.id = #{param.constructionIdx} 
 		         and A.isdel = 0 
 		ORDER BY A.createDate asc ) as TB) AA LEFT OUTER JOIN
-				 (select count(*) as cnt, deviceIdx,  pileNo, location from TB_REPORT
+				 (select count(*) as cnt, deviceIdx, pileNo, location,
+				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey
+				  from TB_REPORT
 					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} )
 					   and isDel = 0
-				     group by deviceIdx, pileNo, location) BB 
+				     group by deviceIdx, pileNo, location, IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) BB
 		             ON AA.deviceIdx  = BB.deviceIdx
 					AND	AA.pileNo  = BB.pileNo
 					AND	AA.location  = BB.location
+					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = BB.pileStdKey
 				LEFT OUTER JOIN
-				 (select count(*) as cnt, pileNo, location from TB_REPORT
+				 (select count(*) as cnt, pileNo, location,
+				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey
+				  from TB_REPORT
 					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} AND isDel = 0 AND conduct = 0 )
 					   and isDel = 0
-				     group by pileNo, location) CC 
+				     group by pileNo, location, IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) CC
 		             ON AA.pileNo  = CC.pileNo
-					AND	AA.location  = CC.location	
+					AND	AA.location  = CC.location
+					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = CC.pileStdKey
 		    <include refid="allExcelCondition"/>
 		    	AND AA.deviceIdx = ${param.id}
 		    ORDER BY AA.machineNumber , AA.createDate ASC
@@ -2551,20 +2593,26 @@
 		         and C.id = #{param.constructionIdx} 
 		         and A.isdel = 0 
 		ORDER BY A.createDate asc ) as TB) AA LEFT OUTER JOIN
-				 (select count(*) as cnt, deviceIdx,  pileNo, location from TB_REPORT
+				 (select count(*) as cnt, deviceIdx, pileNo, location,
+				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey
+				  from TB_REPORT
 					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} )
 					   and isDel = 0
-				     group by deviceIdx, pileNo, location) BB 
+				     group by deviceIdx, pileNo, location, IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) BB
 		             ON AA.deviceIdx  = BB.deviceIdx
 					AND	AA.pileNo  = BB.pileNo
 					AND	AA.location  = BB.location
+					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = BB.pileStdKey
 				LEFT OUTER JOIN
-				 (select count(*) as cnt, pileNo, location from TB_REPORT
+				 (select count(*) as cnt, pileNo, location,
+				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey
+				  from TB_REPORT
 					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} AND isDel = 0 AND conduct = 0 )
 					   and isDel = 0
-				     group by pileNo, location) CC 
+				     group by pileNo, location, IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) CC
 		             ON AA.pileNo  = CC.pileNo
-					AND	AA.location  = CC.location	
+					AND	AA.location  = CC.location
+					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = CC.pileStdKey
 		    <include refid="allExcelCondition"/>
 		    	AND AA.deviceIdx = ${param.id}
 		    ORDER BY AA.machineNumber , AA.createDate ASC
@@ -2723,20 +2771,26 @@
 		         and C.id = #{param.constructionIdx} 
 		         and A.isdel = 0 
 			ORDER BY A.createDate asc ) as TB) AA LEFT OUTER JOIN
-					 (select count(*) as cnt, deviceIdx,  pileNo, location from TB_REPORT
+					 (select count(*) as cnt, deviceIdx, pileNo, location,
+				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey
+				  from TB_REPORT
 					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} )
 					   and isDel = 0
-				     group by deviceIdx, pileNo, location) BB 
+				     group by deviceIdx, pileNo, location, IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) BB
 		             ON AA.deviceIdx  = BB.deviceIdx
 					AND	AA.pileNo  = BB.pileNo
 					AND	AA.location  = BB.location
+					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = BB.pileStdKey
 				LEFT OUTER JOIN
-				 (select count(*) as cnt, pileNo, location from TB_REPORT
+				 (select count(*) as cnt, pileNo, location,
+				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey
+				  from TB_REPORT
 					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} AND isDel = 0 AND conduct = 0 )
 					   and isDel = 0
-				     group by pileNo, location) CC 
+				     group by pileNo, location, IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) CC
 		             ON AA.pileNo  = CC.pileNo
-					AND	AA.location  = CC.location	
+					AND	AA.location  = CC.location
+					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = CC.pileStdKey
 		    <include refid="allExcelCondition"/>
 		    	AND AA.deviceIdx = ${param.id}
 		    ORDER BY AA.machineNumber , AA.createDate ASC
@@ -2889,20 +2943,26 @@
 		         and C.id = #{param.constructionIdx} 
 		         and A.isdel = 0 
 			ORDER BY A.createDate asc ) as TB) AA LEFT OUTER JOIN
-					 (select count(*) as cnt, deviceIdx,  pileNo, location from TB_REPORT
+					 (select count(*) as cnt, deviceIdx, pileNo, location,
+				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey
+				  from TB_REPORT
 					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} )
 					   and isDel = 0
-				     group by deviceIdx, pileNo, location) BB 
+				     group by deviceIdx, pileNo, location, IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) BB
 		             ON AA.deviceIdx  = BB.deviceIdx
 					AND	AA.pileNo  = BB.pileNo
 					AND	AA.location  = BB.location
+					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = BB.pileStdKey
 				LEFT OUTER JOIN
-				 (select count(*) as cnt, pileNo, location from TB_REPORT
+				 (select count(*) as cnt, pileNo, location,
+				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey
+				  from TB_REPORT
 					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} AND isDel = 0 AND conduct = 0 )
 					   and isDel = 0
-				     group by pileNo, location) CC 
+				     group by pileNo, location, IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) CC
 		             ON AA.pileNo  = CC.pileNo
-					AND	AA.location  = CC.location	
+					AND	AA.location  = CC.location
+					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = CC.pileStdKey
 		    <include refid="allExcelCondition"/>
 		    	AND AA.deviceIdx = ${param.id}
 		    ORDER BY AA.machineNumber , AA.createDate ASC
