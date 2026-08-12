@@ -257,7 +257,7 @@
 }.reportTypeDashboard .f_td{
 	width: 21px;
 }.reportTypeDashboard .s_td{
-	width: 200px; font-size: 13px;
+	width: 260px; font-size: 13px; word-break: keep-all;
 }.reportTypeDashboard .t_td{
 	vertical-align: bottom;
 }.reportTypeDashboard .t_td .tableCArea{
