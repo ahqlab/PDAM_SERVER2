@@ -261,8 +261,9 @@
 }.mobileReportTypeDashboard .f_td{
 	width: 20px;
 }.mobileReportTypeDashboard .s_td{
-	width: 100%; 
+	width: 100%;
 	font-size: 11px;
+	word-break: keep-all;
 }.mobileReportTypeDashboard .t_td .tableCArea{
 	width: 100%; 
 	text-align: right; 
