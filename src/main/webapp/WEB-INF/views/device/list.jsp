@@ -5,6 +5,7 @@
 <c:set var="useFileMenu" value="${not sessionScope.settingRequired or (sessionScope.isHiddenManager ? sessionScope.constructionSetting.useAdminFileMenu : sessionScope.constructionSetting.useGuestFileMenu)}" />
 <c:set var="useExcel" value="${not sessionScope.settingRequired or (sessionScope.isHiddenManager ? sessionScope.constructionSetting.useAdminExcel : sessionScope.constructionSetting.useGuestExcel)}" />
 <style>
+	.pdfColHidden { display: none !important; }
 	.popup-bg {
 	  position: fixed;
 	  top: 0; left: 0;
@@ -626,6 +627,26 @@ function exportAllPdf(conId){
 function showPdfLoading(){ $('#pdfLoadingOverlay').css('display', 'flex'); }
 function hidePdfLoading(){ $('#pdfLoadingOverlay').css('display', 'none'); }
 
+// PDF: 호기별 전체 출력 (해당 호기 기록지만 모아서 출력)
+function exportDevicePdf(conId, machineNumber){
+	if(conId <= 0 || !machineNumber){
+		alert('에러가 발생했습니다.');
+		return;
+	}
+	if(!confirm(machineNumber + ' 기록지를 PDF로 출력하시겠습니까?\n건수가 많으면 시간이 걸릴 수 있습니다.')) return;
+	showPdfLoading();
+	setTimeout(function(){
+		try {
+			downloadDrivingAllRecoredBook('${pageContext.request.contextPath}', conId, machineNumber);
+		} catch(e) {
+			console.error('PDF 생성 오류 상세:', e);
+			alert('PDF 생성 중 오류가 발생했습니다.\n' + (e && e.message ? e.message : e));
+		} finally {
+			hidePdfLoading();
+		}
+	}, 60);
+}
+
 function formCheck(){
 	//숫자와 문자 포함 형태의 6~12자리 이내의 암호 정규식
 	var passwordRegex = /^[A-Za-z0-9]{6,12}$/;
@@ -1227,6 +1248,7 @@ function changeSpareDevice(targetId, changeId, constructionIdx){
 							<th style="width: 12%; font-size: 15px;">연락처</th>
 							<th style="width: 9%; font-size: 15px;">시작일</th>
 							<th style="width: 10%; font-size: 15px;">종료일</th>
+							<th class="${useExcel ? '' : 'pdfColHidden'}" style="width: 6%; font-size: 15px;">PDF</th>
 							<c:choose>
 								<c:when test="${sessionInfo.role == 0}">
 									<th style="width: 5%; font-size: 15px;">정보변경</th>
@@ -1278,6 +1300,11 @@ function changeSpareDevice(targetId, changeId, constructionIdx){
 										<td>${domain.weContact}</td>
 										<td>${domain.startDate}</td>
 										<td>${domain.endDate}</td>
+										<td class="${useExcel ? '' : 'pdfColHidden'}">
+											<c:if test="${useExcel}">
+												<div class="printBtn" onclick="javascript:exportDevicePdf(${domain.constructionIdx}, '${domain.machineNumber}');" style="background:#c8102e;width:100px;height:25px;line-height:25px;margin:0 auto;padding:0;box-sizing:border-box;font-size:12px;border-radius:5px;color:#fff;text-align:center;cursor:pointer;white-space:nowrap;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" style="vertical-align:-1px;margin-right:4px;"><path d="M6 2h9l5 5v15H6V2z" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><path d="M15 2v5h5" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg>PDF 출력</div>
+											</c:if>
+										</td>
 										<td><div class="tableChange" onclick="javascript:onClickChangeInfo('${domain.id}');">정보변경</div></td>
 										<td>
 											<select id="conductSel" class="state" onchange="conductSel('${domain.id}', this.value)">
@@ -1330,6 +1357,11 @@ function changeSpareDevice(targetId, changeId, constructionIdx){
 										<td>${domain.weContact}</td>
 										<td>${domain.startDate}</td>
 										<td>${domain.endDate}</td>
+										<td class="${useExcel ? '' : 'pdfColHidden'}">
+											<c:if test="${useExcel}">
+												<div class="printBtn" onclick="javascript:exportDevicePdf(${domain.constructionIdx}, '${domain.machineNumber}');" style="background:#c8102e;width:100px;height:25px;line-height:25px;margin:0 auto;padding:0;box-sizing:border-box;font-size:12px;border-radius:5px;color:#fff;text-align:center;cursor:pointer;white-space:nowrap;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" style="vertical-align:-1px;margin-right:4px;"><path d="M6 2h9l5 5v15H6V2z" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><path d="M15 2v5h5" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg>PDF 출력</div>
+											</c:if>
+										</td>
 										<%-- <td><a href="javascript:doDelete('${domain.id}')">[삭제]</a></td> --%>
 									</tr>
 								</c:when>
@@ -1371,6 +1403,11 @@ function changeSpareDevice(targetId, changeId, constructionIdx){
 										<td>${domain.weContact}</td>
 										<td>${domain.startDate}</td>
 										<td>${domain.endDate}</td>
+										<td class="${useExcel ? '' : 'pdfColHidden'}">
+											<c:if test="${useExcel}">
+												<div class="printBtn" onclick="javascript:exportDevicePdf(${domain.constructionIdx}, '${domain.machineNumber}');" style="background:#c8102e;width:100px;height:25px;line-height:25px;margin:0 auto;padding:0;box-sizing:border-box;font-size:12px;border-radius:5px;color:#fff;text-align:center;cursor:pointer;white-space:nowrap;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" style="vertical-align:-1px;margin-right:4px;"><path d="M6 2h9l5 5v15H6V2z" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><path d="M15 2v5h5" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg>PDF 출력</div>
+											</c:if>
+										</td>
 									</tr>
 								</c:otherwise>
 							</c:choose>
@@ -1382,12 +1419,12 @@ function changeSpareDevice(targetId, changeId, constructionIdx){
 							<tr>
 								<c:choose>
 									<c:when test="${sessionInfo.role == 0}">
-										<c:set var="noDataColspan" value="${param.constructionIdx == 588 or param.constructionIdx == 613 or param.constructionIdx == 627 ? 16 : 15}" />
+										<c:set var="noDataColspan" value="${param.constructionIdx == 588 or param.constructionIdx == 613 or param.constructionIdx == 627 ? 17 : 16}" />
 										<c:if test="${not sessionScope.isSystemAdmin}"><c:set var="noDataColspan" value="${noDataColspan - 1}" /></c:if>
 										<td colspan="${noDataColspan}">등록된 데이터가 없습니다.</td>
 									</c:when>
 									<c:otherwise>
-										<td colspan="11">등록된 데이터가 없습니다.</td>
+										<td colspan="12">등록된 데이터가 없습니다.</td>
 									</c:otherwise>
 								</c:choose>
 							</tr>
@@ -1406,6 +1443,7 @@ function changeSpareDevice(targetId, changeId, constructionIdx){
 											<td id="totalSum"></td>
 											<td id="todaySum"></td>
 											<td id="yesterdaySum"></td>
+											<td></td>
 											<td></td>
 											<td></td>
 											<td></td>
@@ -1440,6 +1478,7 @@ function changeSpareDevice(targetId, changeId, constructionIdx){
 													<td></td>
 													<td></td>
 													<td></td>
+													<td></td>
 												</tr>
 											</c:when>
 											<c:otherwise>
@@ -1454,6 +1493,7 @@ function changeSpareDevice(targetId, changeId, constructionIdx){
 													<td id="totalSum"></td>
 													<td id="todaySum"></td>
 													<td id="yesterdaySum"></td>
+													<td></td>
 													<td></td>
 													<td></td>
 													<td></td>

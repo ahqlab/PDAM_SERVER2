@@ -1098,7 +1098,7 @@ $(document).ready( function() {
 					<td class="f_td">
 						<img src="${pageContext.request.contextPath}/new/img/light-b.png">
 					</td>
-					<td class="s_td">&nbsp;호기별 중복(시공위치, 파일번호, 파일규격)</td>
+					<td class="s_td">&nbsp;호기별 중복(시공위치, 파일번호, 파일규격, 파일종류, 시공공법)</td>
 					<td class="t_td" rowspan="4" >
 						<div class="tableCArea">
 							<c:choose>												 
@@ -1116,7 +1116,7 @@ $(document).ready( function() {
 				</tr>
 				<tr>
 					<td><img src="${pageContext.request.contextPath}/new/img/light-p.png"></td>
-					<td>&nbsp;전체 중복(시공위치, 파일번호, 파일규격)</td>
+					<td>&nbsp;전체 중복(시공위치, 파일번호, 파일규격, 파일종류, 시공공법)</td>
 				</tr>
 				<tr>
 					<td><img src="${pageContext.request.contextPath}/new/img/light-o.png"></td>
@@ -1130,11 +1130,11 @@ $(document).ready( function() {
 			<table class="mobileReportTypeDashboard">
 				<tr>
 					<td class="f_td"><img src="${pageContext.request.contextPath}/new/img/light-b.png"></td>
-					<td class="s_td">&nbsp;호기별 중복(시공위치, 파일번호, 파일규격)</td>
+					<td class="s_td">&nbsp;호기별 중복(시공위치, 파일번호, 파일규격, 파일종류, 시공공법)</td>
 				</tr>
 				<tr >
 					<td class="f_td"><img src="${pageContext.request.contextPath}/new/img/light-p.png"></td>
-					<td class="s_td">&nbsp;전체 중복(시공위치, 파일번호, 파일규격)</td>
+					<td class="s_td">&nbsp;전체 중복(시공위치, 파일번호, 파일규격, 파일종류, 시공공법)</td>
 				</tr>
 				<tr>
 					<td class="f_td"><img src="${pageContext.request.contextPath}/new/img/light-o.png"></td>
