@@ -1756,35 +1756,31 @@
 
 	function submitReport(mode) {
 	    var pieces = [];
-	    var pieceIds = ['copy_piOne', 'copy_piTwo', 'copy_piThree', 'copy_piFour', 'copy_piFive', 'copy_piSix', 'copy_piSeven'];
+		var pieceMap = [
+			{ id: 'copy_piOne', name: '단본' },
+			{ id: 'copy_piTwo', name: '하단' },
+			{ id: 'copy_piThree', name: '중단' },
+			{ id: 'copy_piFour', name: '중단' },
+			{ id: 'copy_piFive', name: '중단' },
+			{ id: 'copy_piSix', name: '중단' },
+			{ id: 'copy_piSeven', name: '상단' }
+		];
 
-	    var validInputs = [];
-	    for (var i = 0; i < pieceIds.length; i++) {
-	        var $el = $('#' + pieceIds[i]);
-	        if ($el.is(':visible') && $el.val().trim() !== "") {
-	            validInputs.push($el.val().trim());
-	        }
-	    }
-
-	    for (var i = 0; i < validInputs.length; i++) {
-	        var name;
-	        if (i === 0) {
-	            name = '단본';
-	        } else if (i === 1) {
-	            name = '하단';
-	        } else if (i === validInputs.length - 1) {
-	            name = '상단';
-	        } else {
-	            name = '중단';
-	        }
-
-			pieces.push({ 
-				name: name, 
-				value: validInputs[i], 
-				id: 0, 
-				reportIdx: 0 
-			});
+		for (var i = 0; i < pieceMap.length; i++) {
+			var $el = $('#' + pieceMap[i].id);
+			
+			if ($el.is(':visible')) {
+				var val = $el.val().trim();
+				
+				pieces.push({ 
+					name: pieceMap[i].name, 
+					value: (val !== "") ? val : "0", 
+					id: 0, 
+					reportIdx: 0 
+				});
+			}
 		}
+		
 		var createDateVal = ($('#copy_createDate').val() || "").trim();
 		var dateRegex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]) (0\d|1\d|2[0-3]):([0-5]\d):([0-5]\d)$/;
 
@@ -2746,25 +2742,26 @@
 								<input type="hidden" id="pieceId[${status.index}]" name="pieceId[${status.index}]" value="${domain.pidFour}">
 								<input type="hidden" id="pieceName[${status.index}]" name="pieceName[${status.index}]" value="중단">
 							</td>
-							<td>
-								<input type="text" id="piece[${status.index}]" name="piece[${status.index}]" disabled="disabled"  class="tdInput" value="${domain.piFive}">
-								<input type="hidden" id="pieceId[${status.index}]" name="pieceId[${status.index}]" value="${domain.pidFive}">
-								<input type="hidden" id="pieceName[${status.index}]" name="pieceName[${status.index}]" value="중단">
-							</td>
 							<c:choose>
 								<c:when test="${extensivePileUsage > 0}">
-										<td>
-											<input type="text" id="piece[${status.index}]" name="piece[${status.index}]" disabled="disabled"  class="tdInput" value="${domain.piSix}">
-											<input type="hidden" id="pieceId[${status.index}]" name="pieceId[${status.index}]" value="${domain.pidSix}">
-											<input type="hidden" id="pieceName[${status.index}]" name="pieceName[${status.index}]" value="중단">
-										</td>
-										<td>
-											<input type="text" id="piece[${status.index}]" name="piece[${status.index}]" disabled="disabled"  class="tdInput" value="${domain.piSeven}">
-											<input type="hidden" id="pieceId[${status.index}]" name="pieceId[${status.index}]" value="${domain.pidSeven}">
-											<input type="hidden" id="pieceName[${status.index}]" name="pieceName[${status.index}]" value="상단">
-										</td>
+									<td>
+										<input type="text" id="piece[${status.index}]" name="piece[${status.index}]" disabled="disabled"  class="tdInput" value="${domain.piFive}">
+										<input type="hidden" id="pieceId[${status.index}]" name="pieceId[${status.index}]" value="${domain.pidFive}">
+										<input type="hidden" id="pieceName[${status.index}]" name="pieceName[${status.index}]" value="중단">
+									</td>
+									<td>
+										<input type="text" id="piece[${status.index}]" name="piece[${status.index}]" disabled="disabled"  class="tdInput" value="${domain.piSix}">
+										<input type="hidden" id="pieceId[${status.index}]" name="pieceId[${status.index}]" value="${domain.pidSix}">
+										<input type="hidden" id="pieceName[${status.index}]" name="pieceName[${status.index}]" value="중단">
+									</td>
 								</c:when>
 							</c:choose>
+							<td>
+								<input type="text" id="piece[${status.index}]" name="piece[${status.index}]" disabled="disabled"  class="tdInput" value="${domain.piSeven}">
+								<input type="hidden" id="pieceId[${status.index}]" name="pieceId[${status.index}]" value="${domain.pidSeven}">
+								<input type="hidden" id="pieceName[${status.index}]" name="pieceName[${status.index}]" value="상단">
+							</td>
+								
 							
 							
 							<td>${domain.totalConnectWidth}</td>
@@ -3819,13 +3816,13 @@
 			        <td class="viewTh">상단(M)</td>
 			    </tr>
 			    <tr>
-			        <td><input type="text" class="tdInput copy-input" id="copy_piOne" name="piece" /></td>
-			        <td><input type="text" class="tdInput copy-input" id="copy_piTwo" name="piece" /></td>
-			        <td><input type="text" class="tdInput copy-input" id="copy_piThree" name="piece" /></td>
-			        <td><input type="text" class="tdInput copy-input" id="copy_piFour" name="piece" /></td>
-			        <td class="mid-group" style="display:none;"><input type="text" class="tdInput copy-input" id="copy_piFive" name="piece" /></td>
-			        <td class="mid-group" style="display:none;"><input type="text" class="tdInput copy-input" id="copy_piSix" name="piece" /></td>
-			        <td><input type="text" class="tdInput copy-input" id="copy_piSeven" name="piece" /></td>
+			        <td><input type="text" class="tdInput copy-input" id="copy_piOne" name="piOne" /></td>
+					<td><input type="text" class="tdInput copy-input" id="copy_piTwo" name="piTwo" /></td>
+					<td><input type="text" class="tdInput copy-input" id="copy_piThree" name="piThree" /></td>
+					<td><input type="text" class="tdInput copy-input" id="copy_piFour" name="piFour" /></td>
+					<td class="mid-group" style="display:none;"><input type="text" class="tdInput copy-input" id="copy_piFive" name="piFive" /></td>
+					<td class="mid-group" style="display:none;"><input type="text" class="tdInput copy-input" id="copy_piSix" name="piSix" /></td>
+					<td><input type="text" class="tdInput copy-input" id="copy_piSeven" name="piSeven" /></td>
 			    </tr>
 			    <tr>
 			        <td class="viewTh">합계(M)</td>
