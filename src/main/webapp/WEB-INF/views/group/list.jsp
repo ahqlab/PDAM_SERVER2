@@ -344,7 +344,7 @@ function checkDuplicateGroupName(){
 
 	function countBox(icon, label, value){
 		return '<div class="CountBox01">'
-			+ '<img src="' + ctx + '/new/img/' + icon + '" />'
+			+ '<img src="' + ctx + '/images/' + icon + '" />'
 			+ '<div><p class="s1">' + label + '</p><p class="s2">' + value + '</p></div>'
 			+ '</div>';
 	}
@@ -380,10 +380,10 @@ function checkDuplicateGroupName(){
 			+       editBtnHtml
 			+   '</div>'
 				+   '<div class="CountArea01">'
-				+     countBox('buildIcon01.png', '협력사', (g.cprtCompanyAmount || 0) + ' 개')
-				+     countBox('buildIcon02.png', '본사 운영장비', (g.deviceAmount || 0) + ' 대')
-				+     countBox('buildIcon03.png', '가맹 운영장비', (g.franchAmount || 0) + ' 대')
-				+     countBox('buildIcon04.png', '예비용 장비', (g.spareDeviceAmount || 0) + ' 대')
+				+     countBox('group_icon01.png', '협력사', (g.cprtCompanyAmount || 0) + ' 개')
+				+     countBox('group_icon02.png', '본사 운영장비', (g.deviceAmount || 0) + ' 대')
+				+     countBox('group_icon03.png', '가맹 운영장비', (g.franchAmount || 0) + ' 대')
+				+     countBox('group_icon04.png', '예비용 장비', (g.spareDeviceAmount || 0) + ' 대')
 				+   '</div>'
 				+ '</li>';
 		});

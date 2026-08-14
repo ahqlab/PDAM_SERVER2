@@ -76,6 +76,17 @@ $( document ).ready( function() {
  	}
 	
 </script>
+<style>
+
+.listArea img {
+	width: 70px;
+	height: 70px;
+	padding: 10px;
+	object-fit: contain;
+	margin-right: 10px;
+}
+
+</style>
 <!--컨텐츠-->
 <div class="section-right">
 	<%@ include file="/WEB-INF/views/common/welcomeMsg.jsp" %>
@@ -125,7 +136,7 @@ $( document ).ready( function() {
 			<c:forEach var="domain" items="${domainList}"  varStatus="status">
 				<li onclick="location.href='${pageContext.request.contextPath}/construction/list?fcIdx=${domain.idx}'">
 					<div class="franIcon">
-						<img src="${pageContext.request.contextPath}/new/img/franchiseIcon.png" /> 
+						<img src="${pageContext.request.contextPath}/images/franchiseIcon.png" /> 
 					</div>
 					<p class="franTxt">${domain.fcName} 
 						<c:choose>
