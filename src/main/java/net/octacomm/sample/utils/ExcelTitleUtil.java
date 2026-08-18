@@ -1,6 +1,64 @@
 package net.octacomm.sample.utils;
 
+import java.util.List;
+
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.ss.util.CellRangeAddress;
+
+import net.octacomm.sample.domain.ExcelSignroom;
+
 public class ExcelTitleUtil {
+
+	private static final int APPROVER_COLUMN_COUNT = 3;
+	private static final int MAX_APPROVER_COUNT = 5;
+
+	public static void addFifthApprover(HSSFSheet sheet, List<ExcelSignroom> signRoomList) {
+		if (signRoomList == null || signRoomList.size() < MAX_APPROVER_COUNT) {
+			return;
+		}
+
+		String approver = signRoomList.get(MAX_APPROVER_COUNT - 1).getApprover();
+		if (approver == null || approver.isEmpty()) {
+			return;
+		}
+
+		HSSFRow secondRow = sheet.getRow(0);
+		HSSFRow thirdRow = sheet.getRow(1);
+		if (secondRow == null || thirdRow == null) {
+			return;
+		}
+
+		int startColumn = secondRow.getLastCellNum() - (APPROVER_COLUMN_COUNT * MAX_APPROVER_COUNT);
+		if (startColumn < 0) {
+			return;
+		}
+
+		HSSFCell secondStyleCell = secondRow.getCell(startColumn + APPROVER_COLUMN_COUNT);
+		HSSFCell thirdStyleCell = thirdRow.getCell(startColumn + APPROVER_COLUMN_COUNT);
+
+		for (int column = startColumn; column < startColumn + APPROVER_COLUMN_COUNT; column++) {
+			HSSFCell secondCell = secondRow.getCell(column);
+			HSSFCell thirdCell = thirdRow.getCell(column);
+			if (secondCell == null) {
+				secondCell = secondRow.createCell(column);
+			}
+			if (thirdCell == null) {
+				thirdCell = thirdRow.createCell(column);
+			}
+			if (secondStyleCell != null) {
+				secondCell.setCellStyle(secondStyleCell.getCellStyle());
+			}
+			if (thirdStyleCell != null) {
+				thirdCell.setCellStyle(thirdStyleCell.getCellStyle());
+			}
+			secondCell.setCellValue(approver);
+		}
+
+		sheet.addMergedRegion(new CellRangeAddress(0, 0, startColumn, startColumn + APPROVER_COLUMN_COUNT - 1));
+		sheet.addMergedRegion(new CellRangeAddress(1, 1, startColumn, startColumn + APPROVER_COLUMN_COUNT - 1));
+	}
 	
 	
 	public static final String[] TEN_TOP_UBC = new String[] {  "번호"

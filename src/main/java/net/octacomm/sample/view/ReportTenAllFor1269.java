@@ -649,6 +649,7 @@ public class ReportTenAllFor1269 extends AbstractExcelView
 
 	private void setExcelSignroomLayoutSetting(HSSFSheet sheet, HSSFWorkbook workbook, List<ExcelSignroom> signRoomList) {
 		createExcelSignroom(sheet, workbook, signRoomList);
+		ExcelTitleUtil.addFifthApprover(sheet, signRoomList);
 		
 		if (ubcYn > 0) { // 현장명
 
