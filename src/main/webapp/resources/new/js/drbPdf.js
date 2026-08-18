@@ -251,17 +251,10 @@ function drawCompactChart(
 
 			if(data.length > 0){
 
-				var roomOneWidth = 44;
+				var roomOneWidth = 36;
 
 				var endXSum = 0;
 				$.each(data, function(index, item) {
-
-					if(constructionIdx == 969){
-						roomOneWidth = 60;
-					}else{
-						roomOneWidth = 44;
-					}
-
 
 					var end = (pageWidth - 15) - (roomOneWidth * (index + 1));
 					endXSum = end;
@@ -274,12 +267,6 @@ function drawCompactChart(
 						pageHeight - signRoomBottomY);
 
 				$.each(data, function(index, item) {
-
-					if(constructionIdx == 969){
-						roomOneWidth = 60;
-					}else{
-						roomOneWidth = 44;
-					}
 
 					var x = (pageWidth - 15) - (roomOneWidth * index);
 					var end = (pageWidth - 15) - (roomOneWidth * (index + 1));
@@ -556,17 +543,10 @@ function drawChart(root, index, item, pageWidth, pageHeight, doc, currentAvgPene
 
 		if(data.length > 0){
 
-			var roomOneWidth = 44;
+			var roomOneWidth = 36;
 
 			var endXSum = 0;
 			$.each(data, function(index, item) {
-
-				if(constructionIdx == 969){
-					roomOneWidth = 60;
-				}else{
-					roomOneWidth = 44;
-				}
-
 
 				var end = (pageWidth - 15) - (roomOneWidth * (index + 1));
 				endXSum = end;
@@ -579,12 +559,6 @@ function drawChart(root, index, item, pageWidth, pageHeight, doc, currentAvgPene
 					pageHeight - signRoomBottomY);
 
 			$.each(data, function(index, item) {
-
-				if(constructionIdx == 969){
-					roomOneWidth = 60;
-				}else{
-					roomOneWidth = 44;
-				}
 
 				var x = (pageWidth - 15) - (roomOneWidth * index);
 				var end = (pageWidth - 15) - (roomOneWidth * (index + 1));

@@ -3587,11 +3587,15 @@
 						<col width="15%">
 						<col width="5%">
 						<col width="15%">
+						<col width="5%">
+						<col width="15%">
 					</colgroup>
 					<tr  class="viewTh">
-						<th colspan="8" class="pdfTableDNum" style="text-align: left; font-weight: bold; padding: 5px;">EXCEL 결재방 설정 정보</th>
+						<th colspan="10" class="pdfTableDNum" style="text-align: left; font-weight: bold; padding: 5px;">PDF 결재방 설정 정보</th>
 					</tr>
 					<tr  class="viewTh">
+						<th class="pdfTableDNum">순서</th>
+						<th class="pdfTableDNum">결재자</th>
 						<th class="pdfTableDNum">순서</th>
 						<th class="pdfTableDNum">결재자</th>
 						<th class="pdfTableDNum">순서</th>
@@ -3610,6 +3614,8 @@
 						<td><input type="text" class="tdInput" id="approver3" name="approver3"  disabled="disabled" value="" /></td>
 						<td>4</td>
 						<td><input type="text" class="tdInput" id="approver4" name="approver4"  disabled="disabled" value="" /></td>
+						<td>5</td>
+						<td><input type="text" class="tdInput" id="approver5" name="approver5" disabled="disabled" value="" /></td>
 					</tr>
 				</table>
 			</div>
@@ -3628,7 +3634,7 @@
 						<col width="15%">
 					</colgroup>
 					<tr  class="viewTh">
-						<th colspan="8" class="pdfTableDNum" style="text-align: left; font-weight: bold; padding: 5px;">PDF 결재방 설정 정보</th>
+						<th colspan="8" class="pdfTableDNum" style="text-align: left; font-weight: bold; padding: 5px;">EXCEL 결재방 설정 정보</th>
 					</tr>
 					<tr  class="viewTh">
 						<th class="pdfTableDNum">순서</th>
@@ -3708,6 +3714,15 @@
 							</td>
 							<td style="padding: 3px;">
 								<input type="text" class="tdInput" id="approver" name="approver"  value="" />
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<input type="hidden" id="id" name="id" value=""/>
+								<input type="text" class="tdInput" id="seq" name="seq" disabled="disabled" value="5" />
+							</td>
+							<td style="padding: 3px;">
+								<input type="text" class="tdInput" id="approver" name="approver" value="" />
 							</td>
 						</tr>
 					</table>
