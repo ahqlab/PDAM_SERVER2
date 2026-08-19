@@ -251,7 +251,7 @@ function drawCompactChart(
 
 			if(data.length > 0){
 
-				var roomOneWidth = 36;
+				var roomOneWidth = data.length >= 5 ? 36 : (constructionIdx == 969 ? 60 : 44);
 
 				var endXSum = 0;
 				$.each(data, function(index, item) {
@@ -543,7 +543,7 @@ function drawChart(root, index, item, pageWidth, pageHeight, doc, currentAvgPene
 
 		if(data.length > 0){
 
-			var roomOneWidth = 36;
+			var roomOneWidth = data.length >= 5 ? 36 : (constructionIdx == 969 ? 60 : 44);
 
 			var endXSum = 0;
 			$.each(data, function(index, item) {
