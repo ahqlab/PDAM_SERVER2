@@ -104,6 +104,12 @@
 						<img src="${pageContext.request.contextPath}/images/menu_icon14.png" />사업자정보 관리
 					</a>
 				</div>
+				<!-- 관리자 전용 게시판 -->
+				<div class="mlist">
+					<a href="${pageContext.request.contextPath}/admin/board/list">
+						<img src="${pageContext.request.contextPath}/images/menu_icon15.png"/>관리자 전용 게시판
+					</a>
+				</div>
 <%--				<!-- 계약서 관리 -->
 				<div class="mlist" style="padding:0;display:block;">
 					<a href="javascript:void(0);" onclick="toggleContractNav(this)" style="display:flex;justify-content:space-between;align-items:center;">
@@ -170,3 +176,4 @@ if (typeof window.toggleContractNav !== 'function') {
 }
 </script>
 <!--//왼쪽메뉴-->
+

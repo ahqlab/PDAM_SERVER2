@@ -14,133 +14,133 @@
 	<!-- 사용자 관리 페이지 -->
 	<definition name="construction/**" extends="commomLayout">
 		<put-attribute name="content" value="/WEB-INF/views/construction/{1}.jsp" />
-		<put-attribute name="nav" value="/WEB-INF/views/construction/nav.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
 	</definition>
 	
 	<definition name="group/**" extends="commomLayout">
 		<put-attribute name="content" value="/WEB-INF/views/group/{1}.jsp" />
-		<put-attribute name="nav" value="/WEB-INF/views/group/nav.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
 	</definition>
 	
 	<definition name="franchise/**" extends="commomLayout">
 		<put-attribute name="content" value="/WEB-INF/views/franchise/{1}.jsp" />
-		<put-attribute name="nav" value="/WEB-INF/views/franchise/nav.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
 	</definition>
 	
 	<definition name="device/**" extends="commomLayout">
 		<put-attribute name="content" value="/WEB-INF/views/device/{1}.jsp" />
-		<put-attribute name="nav" value="/WEB-INF/views/device/nav.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
 	</definition>
 	
 	<definition name="report/**" extends="commomLayout">
 		<put-attribute name="content" value="/WEB-INF/views/report/{1}.jsp" />
-		<put-attribute name="nav" value="/WEB-INF/views/report/nav.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
 	</definition>
 	
 	<definition name="report/all/**" extends="commomLayout">
 		<put-attribute name="content" value="/WEB-INF/views/report/all/{1}.jsp" />
-		<put-attribute name="nav" value="/WEB-INF/views/report/all/nav.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
 	</definition>
 	
 	<definition name="simple/report/**" extends="commomLayout">
 		<put-attribute name="content" value="/WEB-INF/views/simple/report/{1}.jsp" />
-		<put-attribute name="nav" value="/WEB-INF/views/simple/report/nav.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
 	</definition>
 
 	<definition name="trashbin/**" extends="commomLayout">
 		<put-attribute name="content" value="/WEB-INF/views/trashbin/{1}.jsp" />
-		<put-attribute name="nav" value="/WEB-INF/views/report/nav.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
 	</definition>
 
 	
 	<definition name="ips/**" extends="commomLayout">
 		<put-attribute name="content" value="/WEB-INF/views/ips/{1}.jsp" />
-		<put-attribute name="nav" value="/WEB-INF/views/ips/nav.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
 	</definition>
 	
 	<definition name="oiluse/**" extends="commomLayout">
 		<put-attribute name="content" value="/WEB-INF/views/oiluse/{1}.jsp" />
-		<put-attribute name="nav" value="/WEB-INF/views/oiluse/nav.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
 	</definition>
 	
 	<definition name="eus/**" extends="commomLayout">
 		<put-attribute name="content" value="/WEB-INF/views/eus/{1}.jsp" />
-		<put-attribute name="nav" value="/WEB-INF/views/eus/nav.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
 	</definition>
 	
 	<definition name="mis/**" extends="commomLayout">
 		<put-attribute name="content" value="/WEB-INF/views/mis/{1}.jsp" />
-		<put-attribute name="nav" value="/WEB-INF/views/mis/nav.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
 	</definition>
 	
 	<definition name="ips/**" extends="commomLayout">
 		<put-attribute name="content" value="/WEB-INF/views/ips/{1}.jsp" />
-		<put-attribute name="nav" value="/WEB-INF/views/ips/nav.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
 	</definition>
 	
 	<definition name="fileinventory/**" extends="commomLayout">
 		<put-attribute name="content" value="/WEB-INF/views/fileinventory/{1}.jsp" />
-		<put-attribute name="nav" value="/WEB-INF/views/fileinventory/nav.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
 	</definition>
 	
 	<definition name="erpAdmin/**" extends="commomLayout">
 		<put-attribute name="content" value="/WEB-INF/views/erpAdmin/{1}.jsp" />
-		<put-attribute name="nav" value="/WEB-INF/views/erpAdmin/nav.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
 	</definition>
 	
 	<definition name="designDepth/**" extends="commomLayout">
 		<put-attribute name="content" value="/WEB-INF/views/designDepth/{1}.jsp" />
-		<put-attribute name="nav" value="/WEB-INF/views/designDepth/nav.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
 	</definition>
 	
 	<definition name="treport/**" extends="commomLayout">
 		<put-attribute name="content" value="/WEB-INF/views/treport/{1}.jsp" />
-		<put-attribute name="nav" value="/WEB-INF/views/treport/nav.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
 	</definition>
 	
 	<definition name="gpsfile/**" extends="commomLayout">
 		<put-attribute name="content" value="/WEB-INF/views/gpsfile/{1}.jsp" />
-		<put-attribute name="nav" value="/WEB-INF/views/gpsfile/nav.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
 	</definition>
 	
 	<definition name="vimmng/**" extends="commomLayout">
 		<put-attribute name="content" value="/WEB-INF/views/vimmng/{1}.jsp" />
-		<put-attribute name="nav" value="/WEB-INF/views/vimmng/nav.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
 	</definition>
 	
 	<definition name="survey/**" extends="commomLayout">
 		<put-attribute name="content" value="/WEB-INF/views/survey/{1}.jsp" />
-		<put-attribute name="nav" value="/WEB-INF/views/survey/nav.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
 	</definition>
 	
 	<definition name="customer/**" extends="commomLayout">
 		<put-attribute name="content" value="/WEB-INF/views/customer/{1}.jsp" />
-		<put-attribute name="nav" value="/WEB-INF/views/customer/nav.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
 	</definition>
 	
 	<definition name="workingdaily/**" extends="commomLayout">
 		<put-attribute name="content" value="/WEB-INF/views/workingdaily/{1}.jsp" />
-		<put-attribute name="nav" value="/WEB-INF/views/workingdaily/nav.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
 	</definition>
 	
 	<definition name="customer/**" extends="commomLayout">
 		<put-attribute name="content" value="/WEB-INF/views/customer/{1}.jsp" />
-		<put-attribute name="nav" value="/WEB-INF/views/customer/nav.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
 	</definition>
 	
 	<definition name="pqpm/**" extends="commomLayout">
 		<put-attribute name="content" value="/WEB-INF/views/pqpm/{1}.jsp" />
-		<put-attribute name="nav" value="/WEB-INF/views/pqpm/nav.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
 	</definition>
 	
 	<definition name="qr/**" extends="commomLayout">
 		<put-attribute name="content" value="/WEB-INF/views/qr/{1}.jsp" />
-		<put-attribute name="nav" value="/WEB-INF/views/qr/nav.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
 	</definition>
 
 	<definition name="contractClause/**" extends="commomLayout">
 		<put-attribute name="content" value="/WEB-INF/views/contractClause/{1}.jsp" />
-		<put-attribute name="nav" value="/WEB-INF/views/contractClause/nav.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
 	</definition>
 
 	<!-- 접속 차단 페이지: 메뉴(계약서 서명 등) 없이 안내만 노출 -->
@@ -151,12 +151,18 @@
 
 	<definition name="contract/**" extends="commomLayout">
 		<put-attribute name="content" value="/WEB-INF/views/contract/{1}.jsp" />
-		<put-attribute name="nav" value="/WEB-INF/views/contract/nav.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
 	</definition>
 
 	<definition name="company/**" extends="commomLayout">
 		<put-attribute name="content" value="/WEB-INF/views/company/{1}.jsp" />
-		<put-attribute name="nav" value="/WEB-INF/views/company/nav.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
+	</definition>
+	
+	<!-- 관리자 전용 게시판 -->
+	<definition name="admin/board/**" extends="commomLayout">
+		<put-attribute name="content" value="/WEB-INF/views/admin/board/{1}.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
 	</definition>
 
 </tiles-definitions>
