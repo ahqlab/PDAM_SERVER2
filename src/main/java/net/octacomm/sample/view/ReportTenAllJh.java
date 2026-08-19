@@ -10,6 +10,7 @@ import net.octacomm.sample.domain.ExcelSignroom;
 import net.octacomm.sample.domain.ReportOneLine;
 import net.octacomm.sample.utils.DateUtil;
 import net.octacomm.sample.utils.ExcelColor;
+import net.octacomm.sample.utils.ExcelTitleUtil;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
@@ -532,6 +533,7 @@ public class ReportTenAllJh extends AbstractExcelView{
   
 	private void  setExcelSignroomLayoutSetting(HSSFSheet sheet, HSSFWorkbook workbook, List<ExcelSignroom> signRoomList) {
 		createExcelSignroom(sheet, workbook, signRoomList);
+		ExcelTitleUtil.addFifthApprover(sheet, signRoomList);
 		
 		if (ubcYn > 0) { // 현장명
 

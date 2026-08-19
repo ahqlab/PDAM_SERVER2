@@ -46,6 +46,51 @@
 	<link href="${pageContext.request.contextPath}/new/css/responsiveCustomPrint.css202310241123123" rel="stylesheet"  rel="stylesheet" media="print"/>
 	<link href="${pageContext.request.contextPath}/new/css/responsiveCustom.css202310241123123" rel="stylesheet"  rel="stylesheet" media="print"/>
 	<link href="${pageContext.request.contextPath}/new/css/popup.css" rel="stylesheet" />
+	<style>
+		.approvalSummaryWrap {
+			width: 100% !important;
+			max-width: 100% !important;
+			overflow-x: auto !important;
+			overflow-y: hidden !important;
+			box-sizing: border-box;
+			-webkit-overflow-scrolling: touch;
+		}
+
+		.approvalSummaryTable {
+			width: 100% !important;
+			min-width: 1200px !important;
+			table-layout: fixed !important;
+		}
+
+		.approvalSummaryTable th,
+		.approvalSummaryTable td {
+			width: auto !important;
+		}
+
+		.approvalSummaryTable .tdInput {
+			width: calc(100% - 10px) !important;
+			box-sizing: border-box;
+		}
+
+		@media screen and (max-width: 1023px) {
+			.approvalSummaryWrap {
+				overflow-x: scroll !important;
+			}
+
+			.approvalSummaryTable {
+				min-width: 800px !important;
+			}
+
+			.approvalSummaryWrap::-webkit-scrollbar {
+				height: 6px;
+			}
+
+			.approvalSummaryWrap::-webkit-scrollbar-thumb {
+				background: #999;
+				border-radius: 3px;
+			}
+		}
+	</style>
 	
 	
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
