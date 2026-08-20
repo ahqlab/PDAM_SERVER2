@@ -195,7 +195,8 @@
             AA.piTwo ,
             AA.piThree ,
             AA.piFour ,
-            AA.piFive ,
+            AA.piFive,
+            AA.piSeven ,
             AA.peLength
 		FROM (
 		SELECT    
@@ -247,7 +248,8 @@
             piTwo,
             piThree,
             piFour,
-            piFive ,
+            piFive,
+            piSeven ,
             peLength
 			FROM ( 
 				SELECT 
@@ -297,9 +299,10 @@
 	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 9,1) as peTen , 
 	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "단본" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piOne,
 	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "하단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piTwo,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 0,1),'') as piThree,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 1,1),'') as piFour,
+	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" ORDER BY TB_PIECE.id ASC LIMIT 0,1),'') as piThree,
+	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" ORDER BY TB_PIECE.id ASC LIMIT 1,1),'') as piFour,
 	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "상단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piFive,
+	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "상단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piSeven,
 	                (SELECT SUM(CASE WHEN VALUE IS NULL THEN 0 ELSE 1 END) AS peLength FROM TB_PENETRATION  WHERE reportIdx = A.id LIMIT 5) as peLength
 				FROM TB_REPORT A , TB_DEVICE B, TB_CONSTRUCTION C 
 		        <include refid="condition"/>
@@ -430,13 +433,15 @@
             AA.piTwo ,
             AA.piThree ,
             AA.piFour ,
-            AA.piFive ,
+            AA.piFive,
+            AA.piSeven ,
             
             AA.pidOne ,
             AA.pidTwo ,
             AA.pidThree ,
             AA.pidFour ,
-            AA.pidFive ,
+            AA.pidFive,
+            AA.pidSeven ,
             
             AA.peLength
             
@@ -503,13 +508,15 @@
             piTwo,
             piThree,
             piFour,
-            piFive ,
+            piFive,
+            piSeven ,
             
             pidOne,
             pidTwo,
             pidThree,
             pidFour,
-            pidFive ,
+            pidFive,
+            pidSeven ,
             
             peLength
 			FROM ( 
@@ -574,15 +581,17 @@
 	                
 	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "단본" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piOne,
 	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "하단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piTwo,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 0,1),'') as piThree,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 1,1),'') as piFour,
+	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" ORDER BY TB_PIECE.id ASC LIMIT 0,1),'') as piThree,
+	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" ORDER BY TB_PIECE.id ASC LIMIT 1,1),'') as piFour,
 	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "상단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piFive,
+	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "상단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piSeven,
 	                
 	                ifnull((SELECT IF(id = 0, '', id) as id FROM TB_PIECE WHERE reportIdx = A.id and name = "단본"),'') as pidOne,
 	                ifnull((SELECT IF(id = 0, '', id) as id FROM TB_PIECE WHERE reportIdx = A.id and name = "하단"),'') as pidTwo,
-	                ifnull((SELECT IF(id = 0, '', id) as id FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 0,1),'') as pidThree,
-	                ifnull((SELECT IF(id = 0, '', id) as id FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 1,1),'') as pidFour,
+	                ifnull((SELECT IF(id = 0, '', id) as id FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" ORDER BY TB_PIECE.id ASC LIMIT 0,1),'') as pidThree,
+	                ifnull((SELECT IF(id = 0, '', id) as id FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" ORDER BY TB_PIECE.id ASC LIMIT 1,1),'') as pidFour,
 	                ifnull((SELECT IF(id = 0, '', id) as id FROM TB_PIECE WHERE reportIdx = A.id and name = "상단"),'') as pidFive,
+	                ifnull((SELECT IF(id = 0, '', id) as id FROM TB_PIECE WHERE reportIdx = A.id and name = "상단"),'') as pidSeven,
 	                (SELECT SUM(CASE WHEN VALUE IS NULL THEN 0 ELSE 1 END) AS peLength FROM TB_PENETRATION  WHERE reportIdx = A.id LIMIT 5) as peLength
 		            
 				FROM TB_REPORT A , TB_DEVICE B, TB_CONSTRUCTION C 
@@ -742,7 +751,8 @@
 			piTwo, 
 			piThree, 
 			piFour, 
-			piFive
+			piFive,
+			piSeven
 		FROM (
 	    	SELECT
 		    	C.name as name ,
@@ -808,8 +818,8 @@
                 (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 9,1) as peTen , 
 				ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "단본"),'') as piOne ,
 				ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "하단"),'') as piTwo ,
-				ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 0,1),'') as piThree ,
-				ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 1,1),'') as piFour ,
+				ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" ORDER BY TB_PIECE.id ASC LIMIT 0,1),'') as piThree ,
+				ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" ORDER BY TB_PIECE.id ASC LIMIT 1,1),'') as piFour ,
 				ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "상단"),'') as piFive
 			FROM 
 				<choose>
@@ -963,7 +973,8 @@
 			piTwo, 
 			piThree, 
 			piFour, 
-			piFive
+			piFive,
+			piSeven
 		FROM (
 	    	SELECT
 		    	C.name as name ,
@@ -1024,8 +1035,8 @@
 				(SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 4,1) as peFive, 
 				ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "단본" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piOne,
 	            ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "하단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piTwo,
-	            ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 0,1),'') as piThree,
-	            ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 1,1),'') as piFour,
+	            ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" ORDER BY TB_PIECE.id ASC LIMIT 0,1),'') as piThree,
+	            ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" ORDER BY TB_PIECE.id ASC LIMIT 1,1),'') as piFour,
 	            ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "상단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piFive
 				
 			FROM 
@@ -1256,7 +1267,8 @@
 		    AA.piTwo, 
 		    AA.piThree, 
 		    AA.piFour, 
-		    AA.piFive, 
+		    AA.piFive,
+		    AA.piSeven, 
 		    AA.constructionIdx 
 		FROM (
 		SELECT    
@@ -1304,7 +1316,8 @@
 		    piTwo, 
 		    piThree, 
 		    piFour, 
-		    piFive, 
+		    piFive,
+		    piSeven, 
 		    constructionIdx 
 			FROM ( 
 				SELECT 
@@ -1346,9 +1359,10 @@
 	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 9,1) as peTen , 
                     ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "단본" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piOne,
 	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "하단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piTwo,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 0,1),'') as piThree,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 1,1),'') as piFour,
+	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" ORDER BY TB_PIECE.id ASC LIMIT 0,1),'') as piThree,
+	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" ORDER BY TB_PIECE.id ASC LIMIT 1,1),'') as piFour,
 	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "상단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piFive,
+	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "상단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piSeven,
 					A.createDate,
 		            C.role , 
 		            IF(A.bigo = 'null','',A.bigo) as bigo ,
@@ -1443,7 +1457,8 @@
 		    AA.piTwo, 
 		    AA.piThree, 
 		    AA.piFour, 
-		    AA.piFive, 
+		    AA.piFive,
+		    AA.piSeven, 
 		    AA.constructionIdx 
 		FROM (
 		SELECT    
@@ -1486,7 +1501,8 @@
 		    piTwo, 
 		    piThree, 
 		    piFour, 
-		    piFive, 
+		    piFive,
+		    piSeven, 
 		    constructionIdx 
 			FROM ( 
 				SELECT 
@@ -1523,9 +1539,10 @@
 	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 4,1) as peFive,
 	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "단본" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piOne,
 	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "하단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piTwo,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 0,1),'') as piThree,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 1,1),'') as piFour,
+	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" ORDER BY TB_PIECE.id ASC LIMIT 0,1),'') as piThree,
+	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" ORDER BY TB_PIECE.id ASC LIMIT 1,1),'') as piFour,
 	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "상단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piFive,
+	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "상단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piSeven,
 					A.createDate,
 		            C.role , 
 		            IF(A.bigo = 'null','',A.bigo) as bigo ,
@@ -1626,7 +1643,8 @@
 		    AA.piTwo, 
 		    AA.piThree, 
 		    AA.piFour, 
-		    AA.piFive, 
+		    AA.piFive,
+		    AA.piSeven, 
 		    AA.constructionIdx 
 		FROM (
 		SELECT    
@@ -1674,7 +1692,8 @@
 		    piTwo, 
 		    piThree, 
 		    piFour, 
-		    piFive, 
+		    piFive,
+		    piSeven, 
 		    constructionIdx 
 			FROM ( 
 				SELECT 
@@ -1716,9 +1735,10 @@
 	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 9,1) as peTen , 
                     ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "단본" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piOne,
 	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "하단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piTwo,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 0,1),'') as piThree,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 1,1),'') as piFour,
+	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" ORDER BY TB_PIECE.id ASC LIMIT 0,1),'') as piThree,
+	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" ORDER BY TB_PIECE.id ASC LIMIT 1,1),'') as piFour,
 	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "상단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piFive,
+	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "상단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piSeven,
 					A.createDate,
 		            C.role , 
 		            IF(A.bigo = 'null','',A.bigo) as bigo ,
@@ -1814,7 +1834,8 @@
 		    AA.piTwo, 
 		    AA.piThree, 
 		    AA.piFour, 
-		    AA.piFive, 
+		    AA.piFive,
+		    AA.piSeven, 
 		    AA.constructionIdx 
 		FROM (
 		SELECT    
@@ -1857,7 +1878,8 @@
 		    piTwo, 
 		    piThree, 
 		    piFour, 
-		    piFive, 
+		    piFive,
+		    piSeven, 
 		    constructionIdx 
 			FROM ( 
 				SELECT 
@@ -1894,9 +1916,10 @@
 	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 4,1) as peFive,
 	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "단본" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piOne,
 	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "하단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piTwo,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 0,1),'') as piThree,
-	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 1,1),'') as piFour,
+	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" ORDER BY TB_PIECE.id ASC LIMIT 0,1),'') as piThree,
+	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" ORDER BY TB_PIECE.id ASC LIMIT 1,1),'') as piFour,
 	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "상단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piFive,
+	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "상단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piSeven,
 					A.createDate,
 		            C.role , 
 		            IF(A.bigo = 'null','',A.bigo) as bigo ,
@@ -2149,8 +2172,8 @@
 	            , (SELECT VALUE  FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 9,1) as peTen
                 , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "단본" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piOne
                 , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "하단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piTwo
-                , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 0,1),'') as piThree
-                , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 1,1),'') as piFour
+                , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" ORDER BY TB_PIECE.id ASC LIMIT 0,1),'') as piThree
+                , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" ORDER BY TB_PIECE.id ASC LIMIT 1,1),'') as piFour
                 , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "상단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piFive
                 , A.createDate
                 , C.role 
@@ -2281,8 +2304,8 @@
 	            , (SELECT VALUE  FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 9,1) as peTen
                 , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "단본" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piOne
                 , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "하단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piTwo
-                , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 0,1),'') as piThree
-                , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" LIMIT 1,1),'') as piFour
+                , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" ORDER BY TB_PIECE.id ASC LIMIT 0,1),'') as piThree
+                , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" ORDER BY TB_PIECE.id ASC LIMIT 1,1),'') as piFour
                 , ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "상단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piFive
                 , A.createDate
                 , C.role 

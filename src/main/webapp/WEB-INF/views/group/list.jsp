@@ -164,7 +164,7 @@ function checkDuplicateGroupName(){
 						</tbody>
 					</table>
 				</div>
-				
+
 				<ul id="groupList" class="listUl cross"></ul>
 			</div>
 			<!--//검색된 리스트 10개씩 노출-->
