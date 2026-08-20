@@ -2,6 +2,7 @@ package net.octacomm.sample.controller;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -53,6 +54,19 @@ public class GroupController extends AbstractGroupCRUDController<GroupMapper, Gr
 		GroupParam param = new GroupParam();
 		param.setRole((int) session.getAttribute("role"));
 		return mapper.getListByParam(0, Integer.MAX_VALUE, param);
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/ajax/operation-trend", method = RequestMethod.GET)
+	public List<Map<String, Object>> getOperationTrend(
+				@RequestParam(value = "period", defaultValue = "day") String period) {
+		if ("month".equals(period)) {
+			return dailyOperationSummaryMapper.getMonthlyOperationTrend();
+		}
+		if ("year".equals(period)) {
+			return dailyOperationSummaryMapper.getYearlyOperationTrend();
+		}
+		return dailyOperationSummaryMapper.getDailyOperationTrend();
 	}
 	
 	@Override

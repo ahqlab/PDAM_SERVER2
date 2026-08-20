@@ -77,4 +77,56 @@
 		WHERE snapshotDate = DATE_SUB(CURDATE(), INTERVAL 1 DAY)
 	</select>
 
+	<select id="getDailyOperationTrend" resultType="java.util.HashMap">
+		SELECT
+			DATE_FORMAT(T.snapshotDate, '%m.%d') AS axisLabel,
+			DATE_FORMAT(T.snapshotDate, '%Y.%m.%d') AS tooltipLabel,
+			T.headquartersDeviceCount + T.franchiseDeviceCount AS deviceCount
+		FROM (
+			SELECT snapshotDate, headquartersDeviceCount, franchiseDeviceCount
+			FROM TB_DAILY_OPERATION_SUMMARY
+			ORDER BY snapshotDate DESC
+			LIMIT 30
+		) T
+		ORDER BY T.snapshotDate ASC
+	</select>
+
+	<select id="getMonthlyOperationTrend" resultType="java.util.HashMap">
+		SELECT
+			DATE_FORMAT(T.snapshotDate, '%m월') AS axisLabel,
+			DATE_FORMAT(T.snapshotDate, '%Y년 %m월') AS tooltipLabel,
+			T.headquartersDeviceCount + T.franchiseDeviceCount AS deviceCount
+		FROM (
+			SELECT S.snapshotDate, S.headquartersDeviceCount, S.franchiseDeviceCount
+			FROM TB_DAILY_OPERATION_SUMMARY S
+			INNER JOIN (
+				SELECT MAX(snapshotDate) AS lastSnapshotDate
+				FROM TB_DAILY_OPERATION_SUMMARY
+				GROUP BY DATE_FORMAT(snapshotDate, '%Y-%m')
+			) L ON S.snapshotDate = L.lastSnapshotDate
+			ORDER BY S.snapshotDate DESC
+			LIMIT 12
+		) T
+		ORDER BY T.snapshotDate ASC
+	</select>
+
+	<select id="getYearlyOperationTrend" resultType="java.util.HashMap">
+		SELECT
+			DATE_FORMAT(T.snapshotDate, '%Y년') AS axisLabel,
+			DATE_FORMAT(T.snapshotDate, '%Y년') AS tooltipLabel,
+			T.headquartersDeviceCount + T.franchiseDeviceCount AS deviceCount
+		FROM (
+			SELECT S.snapshotDate, S.headquartersDeviceCount, S.franchiseDeviceCount
+			FROM TB_DAILY_OPERATION_SUMMARY S
+			INNER JOIN (
+				SELECT MAX(snapshotDate) AS lastSnapshotDate
+				FROM TB_DAILY_OPERATION_SUMMARY
+				GROUP BY YEAR(snapshotDate)
+			) L ON S.snapshotDate = L.lastSnapshotDate
+			ORDER BY S.snapshotDate DESC
+			LIMIT 10
+		) T
+		ORDER BY T.snapshotDate ASC
+	</select>
+
 </mapper>
