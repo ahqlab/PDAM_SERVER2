@@ -422,7 +422,8 @@
 	        piTwo,
 	        piThree,
 	        piFour,
-	        piFive
+	        piFive,
+	        piSeven
 		FROM (
 	    	SELECT
 		    	C.name as name ,
@@ -462,9 +463,10 @@
 	            (SELECT VALUE  FROM TB_PENETRATION_ORIGIN WHERE reportIdx = A.id LIMIT 9,1) as peTen  ,
 	            ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE  FROM TB_PIECE_ORIGIN WHERE reportIdx = A.id and name = "단본"),'') as piOne,
 	            ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE  FROM TB_PIECE_ORIGIN WHERE reportIdx = A.id and name = "하단"),'') as piTwo,
-	            ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE  FROM TB_PIECE_ORIGIN WHERE reportIdx = A.id and name = "중단" LIMIT 0,1),'') as piThree,
-	            ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE  FROM TB_PIECE_ORIGIN WHERE reportIdx = A.id and name = "중단" LIMIT 1,1),'') as piFour,
+	            ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE  FROM TB_PIECE_ORIGIN WHERE reportIdx = A.id and name = "중단" ORDER BY TB_PIECE_ORIGIN.id ASC LIMIT 0,1),'') as piThree,
+	            ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE  FROM TB_PIECE_ORIGIN WHERE reportIdx = A.id and name = "중단" ORDER BY TB_PIECE_ORIGIN.id ASC LIMIT 1,1),'') as piFour,
 	            ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE  FROM TB_PIECE_ORIGIN WHERE reportIdx = A.id and name = "상단"),'') as piFive,
+	            ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE_ORIGIN WHERE reportIdx = A.id and name = "상단"),'') as piSeven,
 	            A.createDate,
 	            C.role ,
 				IF(A.bigo = 'null','',A.bigo) as bigo ,
@@ -543,7 +545,8 @@
 	        piTwo,
 	        piThree,
 	        piFour,
-	        piFive
+	        piFive,
+	        piSeven
 		FROM (
 	    	SELECT
 		    	C.name as name ,
@@ -578,9 +581,10 @@
 	            (SELECT VALUE  FROM TB_PENETRATION_ORIGIN WHERE reportIdx = A.id LIMIT 4,1) as peFive,
 	            ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE_ORIGIN WHERE reportIdx = A.id and name = "단본"),'') as piOne,
 	            ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE_ORIGIN WHERE reportIdx = A.id and name = "하단"),'') as piTwo,
-	            ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE_ORIGIN WHERE reportIdx = A.id and name = "중단" LIMIT 0,1),'') as piThree,
-	            ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE_ORIGIN WHERE reportIdx = A.id and name = "중단" LIMIT 1,1),'') as piFour,
+	            ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE_ORIGIN WHERE reportIdx = A.id and name = "중단" ORDER BY TB_PIECE_ORIGIN.id ASC LIMIT 0,1),'') as piThree,
+	            ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE_ORIGIN WHERE reportIdx = A.id and name = "중단" ORDER BY TB_PIECE_ORIGIN.id ASC LIMIT 1,1),'') as piFour,
 	            ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE_ORIGIN WHERE reportIdx = A.id and name = "상단"),'') as piFive,
+	            ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE_ORIGIN WHERE reportIdx = A.id and name = "상단"),'') as piSeven,
 	            A.createDate,
 	            C.role ,
 				IF(A.bigo = 'null','',A.bigo) as bigo ,

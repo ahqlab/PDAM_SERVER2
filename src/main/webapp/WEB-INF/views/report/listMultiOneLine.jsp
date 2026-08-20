@@ -1689,12 +1689,31 @@
 	        }
 	    });
 
-	    var pieceInputs = $tr.find('input[name*="piece["]'); 
+	    var pieceInputs = $tr.find('input[name*="piece["]');
+	    var pieceNameInputs = $tr.find('input[name*="pieceName["]');
 	    var copyInputs = ['copy_piOne', 'copy_piTwo', 'copy_piThree', 'copy_piFour', 'copy_piFive', 'copy_piSix', 'copy_piSeven'];
-	    
-	    for(var i = 0; i < copyInputs.length; i++) {
-	        var val = (i < pieceInputs.length) ? pieceInputs.eq(i).val() : "";
-	        $('#' + copyInputs[i]).val(val || "");
+	    var midInputs = ['copy_piThree', 'copy_piFour', 'copy_piFive', 'copy_piSix'];
+
+	    // 단본/하단/상단은 항상 1개씩, 중단은 확장형 여부에 따라 화면에 2~4개만 렌더링되고
+	    // 나머지 슬롯은 <td> 자체가 없다. 위치(index)로 그대로 복사하면 중단 개수가 4개보다
+	    // 적은 행에서 상단 값이 엉뚱한 중단 슬롯으로 밀려 들어가므로, DOM 위치가 아니라
+	    // 실제 pieceName(하단/중단/상단) 값을 기준으로 매핑한다.
+	    for (var i = 0; i < copyInputs.length; i++) {
+	        $('#' + copyInputs[i]).val("");
+	    }
+	    var midIdx = 0;
+	    for (var i = 0; i < pieceInputs.length; i++) {
+	        var label = pieceNameInputs.eq(i).val();
+	        var val = pieceInputs.eq(i).val() || "";
+	        var targetId;
+	        if (label === '단본') targetId = 'copy_piOne';
+	        else if (label === '하단') targetId = 'copy_piTwo';
+	        else if (label === '상단') targetId = 'copy_piSeven';
+	        else if (label === '중단') {
+	            targetId = midInputs[midIdx];
+	            midIdx++;
+	        }
+	        if (targetId) $('#' + targetId).val(val);
 	    }
 
 	    var hasExtraMid = ($('#copy_piFive').val().trim() !== "" && $('#copy_piFive').val() !== "0") || 
