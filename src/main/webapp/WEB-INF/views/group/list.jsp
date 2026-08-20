@@ -140,7 +140,7 @@ function checkDuplicateGroupName(){
 					<!-- <div class="buildDown">시행 협력사 정보</div> -->
 				</div>
 
-				<div class="operationSummaryTableWrap">
+				<div class="operationSummaryTableWrap" id="operationTrendTrigger" role="button" tabindex="0" aria-haspopup="dialog" aria-controls="operationTrendLayer" title="운영 장비 추이 보기">
 					<table class="operationSummaryTable">
 						<thead>
 							<tr>
@@ -174,7 +174,31 @@ function checkDuplicateGroupName(){
 			<!--//페이징-->
 		</div>
 		<!--//컨텐츠-->
-		
+
+		<!-- 운영 장비 추이 팝업 -->
+		<div id="operationTrendLayer" class="operationTrendLayer" aria-hidden="true">
+			<div class="operationTrendModal" role="dialog" aria-modal="true" aria-labelledby="operationTrendTitle">
+				<div class="operationTrendHeader">
+					<h2 id="operationTrendTitle">운영 장비 추이</h2>
+					<div class="operationTrendActions">
+						<div class="operationTrendPeriods" role="tablist" aria-label="조회 기간">
+							<button type="button" class="operationTrendPeriod is-active" data-period="day" role="tab" aria-selected="true">일</button>
+							<button type="button" class="operationTrendPeriod" data-period="month" role="tab" aria-selected="false">월</button>
+							<button type="button" class="operationTrendPeriod" data-period="year" role="tab" aria-selected="false">년</button>
+						</div>
+						<button type="button" class="operationTrendClose" aria-label="팝업 닫기">&times;</button>
+					</div>
+				</div>
+				<div class="operationTrendBody">
+					<p class="operationTrendUnit">단위: 대</p>
+					<div id="operationTrendChart" class="operationTrendChart"></div>
+					<div id="operationTrendEmpty" class="operationTrendEmpty">저장된 운영 장비 현황이 없습니다.</div>
+				</div>
+			</div>
+		</div>
+		<!-- //운영 장비 추이 팝업 -->
+
+
 		<!--시공사 등록 팝업-->
 		<%-- <div class="popUp">
 			<div class="popTit">
@@ -246,6 +270,12 @@ function checkDuplicateGroupName(){
 	background:#fff;
 	border-radius:10px;
 	box-shadow:0px 0px 6.79px 0.21px rgb(0 0 0 / 7%);
+	cursor:pointer;
+}
+.operationSummaryTableWrap:hover,
+.operationSummaryTableWrap:focus{
+	box-shadow:0 5px 16px rgb(0 0 0 / 12%);
+	outline:none;
 }
 .operationSummaryTable{
 	width:100%;
@@ -277,6 +307,155 @@ function checkDuplicateGroupName(){
 .operationSummaryTable .operationChange.positive{ color:#e53935; }
 .operationSummaryTable .operationChange.negative{ color:#0e60ff; }
 .operationSummaryTable .operationChange.neutral{ color:#333; }
+
+/* 운영 장비 추이 팝업 */
+.operationTrendLayer{
+	display:none;
+	position:fixed;
+	top:0;
+	right:0;
+	bottom:0;
+	left:0;
+	z-index:10000;
+	padding:32px;
+	align-items:center;
+	justify-content:center;
+	background:rgba(24, 32, 37, 0.43);
+}
+.operationTrendLayer.is-open{ display:flex; }
+.operationTrendModal{
+	width:74%;
+	max-width:1000px;
+	min-width:720px;
+	background:#fff;
+	border-radius:14px;
+	box-shadow:0 18px 50px rgb(0 0 0 / 22%);
+	overflow:hidden;
+}
+.operationTrendHeader{
+	height:78px;
+	padding:0 28px;
+	display:flex;
+	align-items:center;
+	justify-content:space-between;
+	border-bottom:1px solid #e8ecef;
+}
+.operationTrendHeader h2{
+	margin:0;
+	color:#171b1d;
+	font-size:24px;
+	font-weight:600;
+	letter-spacing:-0.8px;
+}
+.operationTrendActions{
+	display:flex;
+	align-items:center;
+	gap:24px;
+}
+.operationTrendPeriods{
+	display:flex;
+	align-items:center;
+	gap:12px;
+}
+.operationTrendPeriod{
+	width:58px;
+	height:40px;
+	padding:0;
+	border:none;
+	outline:none;
+	box-shadow:none;
+	border-radius:10px;
+	background:#f2f4f5;
+	color:#555f64;
+	font-size:15px;
+	font-weight:600;
+	cursor:pointer;
+}
+.operationTrendPeriod:hover{
+	background:#e8f4f7;
+	color:#087f9e;
+}
+.operationTrendPeriod.is-active{
+	background:#0796b5;
+	color:#fff;
+}
+.operationTrendClose{
+	width:36px;
+	height:36px;
+	padding:0;
+	border:none;
+	outline:none;
+	box-shadow:none;
+	background:transparent;
+	color:#202629;
+	font-size:36px;
+	font-weight:300;
+	line-height:32px;
+	cursor:pointer;
+}
+.operationTrendBody{
+	position:relative;
+	height:330px;
+	padding:10px 24px 12px;
+}
+.operationTrendUnit{
+	position:absolute;
+	top:14px;
+	right:32px;
+	z-index:1;
+	margin:0;
+	color:#8c979c;
+	font-size:14px;
+}
+.operationTrendChart{
+	width:100%;
+	height:100%;
+}
+.operationTrendEmpty{
+	display:none;
+	position:absolute;
+	top:50%;
+	left:50%;
+	transform:translate(-50%, -50%);
+	color:#899398;
+	font-size:15px;
+}
+@media (max-width:1023px){
+	.operationTrendLayer{ padding:16px; }
+	.operationTrendModal{ width:100%; min-width:0; }
+	.operationTrendHeader{
+		position:relative;
+		height:auto;
+		padding:18px;
+		flex-direction:column;
+		align-items:flex-start;
+		justify-content:flex-start;
+		gap:16px;
+	}
+	.operationTrendHeader h2{
+		max-width:calc(100% - 44px);
+		font-size:21px;
+		line-height:30px;
+		white-space:nowrap;
+	}
+	.operationTrendActions{
+		width:100%;
+		gap:12px;
+		justify-content:flex-start;
+	}
+	.operationTrendPeriods{ gap:7px; }
+	.operationTrendPeriod{ width:45px; height:36px; font-size:14px; white-space:nowrap; }
+	.operationTrendClose{
+		position:absolute;
+		top:17px;
+		right:15px;
+		width:30px;
+		height:30px;
+		font-size:30px;
+	}
+	.operationTrendBody{ height:350px; padding:8px 8px 10px; }
+	.operationTrendUnit{ top:12px; right:18px; font-size:12px; }
+}
 .groupSpinner{
 	display:inline-block;width:18px;height:18px;vertical-align:middle;margin-right:6px;
 	border:3px solid #e0e0e0;border-top-color:#077b9c;border-radius:50%;
@@ -550,6 +729,256 @@ function checkDuplicateGroupName(){
 	};
 })();
 </script>
+
+<!-- 운영 장비 추이 -->
+<script>
+(function(){
+	var ctx = '${pageContext.request.contextPath}';
+	var trendChart = null;
+	var trendCache = {};
+	var currentTrendPeriod = 'day';
+	var previousBodyOverflow = '';
+	var $trendLayer = $('#operationTrendLayer');
+	var $trendEmpty = $('#operationTrendEmpty');
+
+	function valueOf(point, key){
+		if(point[key] != null) return point[key];
+		if(point[key.toUpperCase()] != null) return point[key.toUpperCase()];
+		return point[key.toLowerCase()];
+	}
+
+	function normalizeTrend(data){
+		return $.map(data || [], function(point){
+			var count = Number(valueOf(point, 'deviceCount'));
+			if(isNaN(count)) return null;
+			return {
+				axisLabel: String(valueOf(point, 'axisLabel') || ''),
+				tooltipLabel: String(valueOf(point, 'tooltipLabel') || ''),
+				deviceCount: count
+			};
+		});
+	}
+
+	function createChart(){
+		if(!trendChart && window.echarts){
+			trendChart = echarts.init(document.getElementById('operationTrendChart'));
+		}
+		return trendChart;
+	}
+
+	function renderTrend(data){
+		var chart = createChart();
+		if(!chart) {
+			$trendEmpty.text('그래프를 불러올 수 없습니다.').show();
+			return;
+		}
+
+		chart.hideLoading();
+		if(!data.length){
+			chart.clear();
+			$trendEmpty.text('저장된 운영 장비 현황이 없습니다.').show();
+			return;
+		}
+		$trendEmpty.hide();
+		var isMobile = window.innerWidth <= 1023;
+
+		var labels = [];
+		var counts = [];
+		var seriesData = [];
+		$.each(data, function(index, point){
+			labels.push(point.axisLabel);
+			counts.push(point.deviceCount);
+			var item = {
+				value: point.deviceCount,
+				tooltipLabel: point.tooltipLabel
+			};
+			if(index === data.length - 1){
+				item.symbolSize = 12;
+				item.itemStyle = {
+					color:'#078faf',
+				};
+			}
+			seriesData.push(item);
+		});
+
+		var minimum = Math.min.apply(null, counts);
+		var maximum = Math.max.apply(null, counts);
+		var rangePadding = Math.max(10, Math.ceil((maximum - minimum) * 0.18));
+		var yMinimum = Math.max(0, Math.floor((minimum - rangePadding) / 10) * 10);
+		var yMaximum = Math.ceil((maximum + rangePadding) / 10) * 10;
+		if(yMinimum === yMaximum) yMaximum = yMinimum + 20;
+
+		var startIndex = Math.max(0, data.length - 7);
+		var endIndex = data.length - 1;
+		var insideZoom = {
+			type:'inside',
+			startValue:startIndex,
+			endValue:endIndex,
+			zoomLock:true,
+			zoomOnMouseWheel:false,
+			moveOnMouseWheel:true,
+			moveOnMouseMove:true
+		};
+		var sliderZoom = {
+			type:'slider',
+			show:data.length > 7,
+			startValue:startIndex,
+			endValue:endIndex,
+			zoomLock:true,
+			height:9,
+			left:52,
+			right:20,
+			bottom:9,
+			showDataShadow:false,
+			showDetail:false,
+			brushSelect:false,
+			borderColor:'transparent',
+			backgroundColor:'#edf0f2',
+			fillerColor:'#6d939e',
+			handleSize:0,
+			moveHandleSize:0
+		};
+		if(data.length > 7){
+			insideZoom.minValueSpan = 6;
+			insideZoom.maxValueSpan = 6;
+			sliderZoom.minValueSpan = 6;
+			sliderZoom.maxValueSpan = 6;
+		}
+
+		chart.setOption({
+			grid:{ left:52, right:20, top:44, bottom:data.length > 7 ? 58 : 42 },
+			tooltip:{
+				trigger:'axis',
+				backgroundColor:'#fff',
+				padding:[11,14],
+				textStyle:{ color:'#202629', fontSize:14 },
+				extraCssText:'box-shadow:0 5px 15px rgba(0,0,0,.14); border-radius:8px;',
+				axisPointer:{ type:'line', lineStyle:{ color:'#d6e8ed', width:1 } },
+				formatter:function(params){
+					var point = params && params[0];
+					if(!point) return '';
+					return point.data.tooltipLabel + '&nbsp;&nbsp;&nbsp;<b>' + point.value + '대</b>';
+				}
+			},
+			xAxis:{
+				type:'category',
+				boundaryGap:false,
+				data:labels,
+				axisLine:{ lineStyle:{ color:'#cfd8dc' } },
+				axisTick:{ show:false },
+				axisLabel:{
+					color:'#374247',
+					fontSize:isMobile ? 10 : 13,
+					margin:14,
+					interval:isMobile ? 1 : 0,
+					hideOverlap:isMobile,
+					formatter:function(value){
+						if(!isMobile) return value;
+						if(currentTrendPeriod === 'day') return value.replace(/^0/, '').replace(/\.0/, '.');
+						if(currentTrendPeriod === 'month') return value.replace(/^0/, '');
+						return value;
+					}
+				}
+			},
+			yAxis:{
+				type:'value',
+				min:yMinimum,
+				max:yMaximum,
+				splitNumber:5,
+				axisLine:{ show:false },
+				axisTick:{ show:false },
+				axisLabel:{ color:'#4f5a5f', fontSize:13 },
+				splitLine:{ lineStyle:{ color:'#e8edef', type:'dashed' } }
+			},
+			dataZoom:[insideZoom, sliderZoom],
+			series:[{
+				type:'line',
+				data:seriesData,
+				symbol:'circle',
+				symbolSize:8,
+				lineStyle:{ color:'#0796b5', width:2.5 },
+				itemStyle:{ color:'#0796b5' },
+				label:{
+					show:true,
+					position:'top',
+					distance:9,
+					color:'#202629',
+					fontSize:13,
+					fontWeight:600,
+					formatter:'{c}'
+				},
+				areaStyle:{
+					color:new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+						{ offset:0, color:'rgba(7, 150, 181, 0.15)' },
+						{ offset:1, color:'rgba(7, 150, 181, 0.02)' }
+					])
+				}
+			}]
+		}, true);
+	}
+
+	function loadTrend(period){
+		currentTrendPeriod = period;
+		$('.operationTrendPeriod').removeClass('is-active').attr('aria-selected', 'false');
+		$('.operationTrendPeriod[data-period="' + period + '"]').addClass('is-active').attr('aria-selected', 'true');
+
+		if(Object.prototype.hasOwnProperty.call(trendCache, period)){
+			renderTrend(trendCache[period]);
+			return;
+		}
+
+		$trendEmpty.hide();
+		var chart = createChart();
+		if(chart){
+			chart.clear();
+			chart.showLoading('default', { text:'불러오는 중...', color:'#0796b5', textColor:'#6f7b80', maskColor:'rgba(255,255,255,0.75)' });
+		}
+		$.getJSON(ctx + '/group/ajax/operation-trend', { period:period })
+			.done(function(data){
+				trendCache[period] = normalizeTrend(data);
+				if(currentTrendPeriod === period) renderTrend(trendCache[period]);
+			})
+			.fail(function(){
+				if(currentTrendPeriod !== period) return;
+				if(chart) { chart.hideLoading(); chart.clear(); }
+				$trendEmpty.text('운영 장비 추이를 불러오지 못했습니다.').show();
+			});
+	}
+
+	function openTrend(){
+		previousBodyOverflow = $('body').css('overflow');
+		trendCache = {};
+		$trendLayer.addClass('is-open').attr('aria-hidden', 'false');
+		$('body').css('overflow', 'hidden');
+		loadTrend('day');
+		setTimeout(function(){
+			if(trendChart) trendChart.resize();
+			$('.operationTrendClose').focus();
+		}, 30);
+	}
+
+	function closeTrend(){
+		$trendLayer.removeClass('is-open').attr('aria-hidden', 'true');
+		$('body').css('overflow', previousBodyOverflow || 'auto');
+		$('#operationTrendTrigger').focus();
+	}
+
+	$('#operationTrendTrigger').on('click', openTrend).on('keydown', function(e){
+		if(e.keyCode === 13 || e.keyCode === 32){
+			e.preventDefault();
+			openTrend();
+		}
+	});
+	$('.operationTrendPeriod').on('click', function(){ loadTrend($(this).data('period')); });
+	$('.operationTrendClose').on('click', closeTrend);
+	$trendLayer.on('click', function(e){ if(e.target === this) closeTrend(); });
+	$(document).on('keydown', function(e){
+		if(e.keyCode === 27 && $trendLayer.hasClass('is-open')) closeTrend();
+	});
+	$(window).on('resize.operationTrend', function(){ if(trendChart) trendChart.resize(); });
+})();
+</script>
+<!-- //운영 장비 추이 -->
 
 <!-- 팝업 -->
 <script>

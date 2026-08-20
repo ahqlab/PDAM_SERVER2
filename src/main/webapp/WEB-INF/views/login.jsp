@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/views/common/tagLib.jsp" %>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
@@ -19,8 +19,7 @@
 	<meta property="og:type" content="website">
 
 	<link href="${pageContext.request.contextPath}/new/css/reset.css" rel="stylesheet" />
-	<link href="${pageContext.request.contextPath}/new/css/style.css" rel="stylesheet" media="screen and (min-width:1024px)">
-	<link href="${pageContext.request.contextPath}/new/css/responsive.css" rel="stylesheet" media="screen and (max-width:1023px)">
+	<link href="${pageContext.request.contextPath}/new/css/login.css?v=20260820-1" rel="stylesheet" />
 	<script src="${pageContext.request.contextPath}/new/js/jquery-3.6.1.min.js"></script>
 	<style type="text/css" media="print">  
 	</style>
@@ -273,58 +272,78 @@
 	</div>  -->
 	
 	<div id="warp">
-		<div class="loginArea">
-			<div class="leftBg">
-				<img class="loginLogo" src="${pageContext.request.contextPath}/new/img/loginLogo.png" />
-				<!-- <div>
-					<p class="p1">파일 항타 관입량 자동측정 시스템</p>
-					<p class="p2"><span>Pile Driving</span>  Automatic Measurement system</p>
-					<p class="p3">우리기술 (주)</p>
-				</div> -->
-			</div>
-			<div class="rightForm">
-				<div>
-					<p class="s1">Welcome to <span>PDAM</span></p>
+		<main class="loginArea">
+			<section class="loginVisual" aria-label="PDAM 시스템 소개">
+				<div class="visualShade"></div>
+				<div class="visualGeometry" aria-hidden="true"></div>
+				<div class="visualContent">
+					<p class="patentBadge">특허 제 10-2039443호 등록</p>
+					<h1><span>PDAM</span> SYSTEM</h1>
+					<p class="visualTitle">파일 항타 최종 관입량<br>자동 측정 시스템</p>
+					<p class="visualDescription">정확한 데이터 측정과 자동화된 관입량 분석으로<br>더 안전한 건설현장을 실현합니다.</p>
+				</div>
 
-					<!-- 입력폼 영역 -->
-					<form:form  id="loginForm" action="${pageContext.request.contextPath}/login" commandName="domain" method="POST">
-					<div class="loginFrom">
-						<div class="inputArea mb-20">
-							<p class="inputTxt">아이디</p>
-							<div class="iconArea">
-								<img src="${pageContext.request.contextPath}/new/img/loginIcon01.png" />
-								
-								<form:input style="background-color: #ffffff;" path="userId" class="loginInput" placeholder="아이디를 입력하세요." value=""/>
+				<div class="visualProducts" aria-hidden="true">
+					<img class="deviceImage" src="${pageContext.request.contextPath}/new/img/login-device.png" alt="">
+					<img class="tabletImage" src="${pageContext.request.contextPath}/new/img/login-tablet.png" alt="">
+				</div>
+
+				<div class="visualBrand">
+					<img src="${pageContext.request.contextPath}/new/img/we-logo.png" alt="WE">
+					<span>우리기술(주)</span>
+				</div>
+			</section>
+
+			<section class="rightForm" aria-label="로그인">
+				<nav class="downArea" aria-label="바로가기">
+					<a class="down_login" href="http://www.we8104.co.kr">
+						<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 21a8 8 0 0 0-16 0M12 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/></svg>
+						<span>우리기술 홈페이지</span>
+					</a>
+					<a class="down_login02" href="http://www.we8104.co.kr/bbs/sub3_3">
+						<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3v12m0 0 5-5m-5 5-5-5M5 19v2h14v-2"/></svg>
+						<span>자료 다운로드</span>
+					</a>
+				</nav>
+
+				<div class="loginCard">
+					<div class="loginHeading">
+						<p class="s1">PDAM</p>
+						<p class="loginSubtitle">Pile Driving Automatic Measurement</p>
+					</div>
+
+					<form:form id="loginForm" action="${pageContext.request.contextPath}/login" commandName="domain" method="POST">
+						<div class="loginFrom">
+							<div class="inputArea">
+								<label class="inputTxt" for="userId">아이디</label>
+								<div class="iconArea">
+									<span class="fieldIcon" aria-hidden="true">
+										<svg viewBox="0 0 24 24"><path d="M20 21a8 8 0 0 0-16 0M12 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/></svg>
+									</span>
+									<form:input path="userId" class="loginInput" placeholder="아이디를 입력하세요." value="" autocomplete="username" />
+								</div>
+							</div>
+							<div class="inputArea">
+								<label class="inputTxt" for="password">비밀번호</label>
+								<div class="iconArea">
+									<span class="fieldIcon" aria-hidden="true">
+										<svg viewBox="0 0 24 24"><path d="M7 10V8a5 5 0 0 1 10 0v2m-11 0h12a1 1 0 0 1 1 1v10H5V11a1 1 0 0 1 1-1Zm6 4v3"/></svg>
+									</span>
+									<form:password path="password" class="loginInput" placeholder="비밀번호를 입력하세요." value="" autocomplete="current-password" />
+								</div>
+							</div>
+
+							<div class="memory">
+								<input type="checkbox" name="idsave" id="idsave" value="1" autocomplete="off"><label for="idsave"><span>아이디 저장</span></label>
 							</div>
 						</div>
-						<div class="inputArea mb-40">
-							<p class="inputTxt">비밀번호</p>
-							<div class="iconArea">
-								<img src="${pageContext.request.contextPath}/new/img/loginIcon02.png" />
-								<form:password style="background-color: #ffffff;" path="password" class="loginInput" placeholder="비밀번호를 입력하세요." value=""  />
-							</div>
-						</div>
-						
-						
-						<div class="memory">
-							<input type="checkbox" name="idsave" id="idsave" value="1" autocomplete="off"><label for="idsave"><span>아이디 저장</span></label>
-						</div>
-						
-					</div>
-					
-					<div class="loginBtn" id="logAlert">
-							<a href="javascript:formSubmit();">로그인</a>
 
-					</div>
+						<div class="loginBtn" id="logAlert">
+							<button type="button" onclick="formSubmit();">로그인</button>
+						</div>
 					</form:form>
-					<!-- //입력폼 영역 -->
 				</div>
-				
-				<div class="downArea">
-					<a class="down_login" href="http://www.we8104.co.kr">우리기술 홈페이지</a>
-					<a class="down_login02" href="http://www.we8104.co.kr/bbs/sub3_3">자료 다운로드</a>
-				</div>
-			</div>
+			</section>
 
 			 <div id="logPop" class="logPop">
 				<div class="logPop-t">
@@ -347,7 +366,7 @@
 			<div class="popLayer"></div>
 
 			
-		</div>
+		</main>
 		
 	</div>
 </body>
