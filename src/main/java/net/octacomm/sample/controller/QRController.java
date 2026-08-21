@@ -53,24 +53,63 @@ public class QRController {
 	private WeQrcodeMapper weQrcodeMapper;
 	
 	@RequestMapping(value = "/list")
-	public void regist(Model model, @ModelAttribute("domainParam") WeQrcodeParam param, BindingResult result, HttpSession session){
-		
-		int totalCount = weQrcodeMapper.getCountByParam(param);
-		
-		QrPagination page;
-		
-		if (param.getPageSize() > 0 && param.getPageGroupSize() > 0) {
-			page = new QrPagination(param.getPageSize(), param.getPageGroupSize(), totalCount, param.getCurrentPage());
-		} else {
-			page = new QrPagination(totalCount, param.getCurrentPage());
-		}
-		
-		List<WeQrcode> domainList = weQrcodeMapper.getListByParam(page.getStartRow(), page.getPageSize(), param);
-	
-		System.err.println("Domain List Size : {}" +  domainList.size());
-		
-		model.addAttribute("page", page);		
-		model.addAttribute("domainList", domainList);
+	public void regist(Model model, @ModelAttribute("domainParam") WeQrcodeParam param, BindingResult result, HttpSession session, HttpServletRequest request) {
+	    
+	    int totalCount = weQrcodeMapper.getCountByParam(param);
+	    
+	    QrPagination page;
+	    
+	    if (param.getPageSize() > 0 && param.getPageGroupSize() > 0) {
+	        page = new QrPagination(param.getPageSize(), param.getPageGroupSize(), totalCount, param.getCurrentPage());
+	    } else {
+	        page = new QrPagination(totalCount, param.getCurrentPage());
+	    }
+	    
+	    List<WeQrcode> domainList = weQrcodeMapper.getListByParam(page.getStartRow(), page.getPageSize(), param);
+
+	    // 저장 경로 설정
+	    String uploadPath = RELEASE_TO_SERVER ? request.getServletContext().getRealPath("/uploads") : "D:/PDGM/uploads";
+	    File uploadDir = new File(uploadPath);
+	    if (!uploadDir.exists()) uploadDir.mkdirs();
+
+	    for (WeQrcode domain : domainList) {
+	        boolean needGenerate = false;
+	        
+	        // 파일명이 없거나 실제 파일이 디스크에 없는 경우
+	        if (domain.getQrSaveFilename() == null || domain.getQrSaveFilename().trim().isEmpty()) {
+	            needGenerate = true;
+	        } else {
+	            File checkFile = new File(uploadDir, domain.getQrSaveFilename());
+	            if (!checkFile.exists()) {
+	                needGenerate = true;
+	            }
+	        }
+
+	        if (needGenerate) {
+	            try {
+	                // QR 스캔 시 연결할 URL 생성
+	                String qrUrl = RELEASE_TO_SERVER ? "https://www.we8104.com/qr/view/" + domain.getId() : "http://localhost:8080/web-template-mybatis/qr/view/" + domain.getId();
+
+	                // QR 이미지 파일 생성
+	                BufferedImage qrImage = createQRImage(qrUrl);
+	                String newFilename = UUID.randomUUID().toString().replaceAll("-", "") + ".png";
+	                File destFile = new File(uploadDir, newFilename);
+	                ImageIO.write(qrImage, "png", destFile);
+
+	                // DB 업데이트
+	                weQrcodeMapper.updateQrCode(String.valueOf(domain.getId()), newFilename);
+
+	                // 리스트 객체 업데이트
+	                domain.setQrSaveFilename(newFilename);
+
+	            } catch (Exception e) {
+	                e.printStackTrace();
+	            }
+	        }
+	    }
+
+	    model.addAttribute("page", page);        
+	    model.addAttribute("domainList", domainList);
 	}
 	
 
