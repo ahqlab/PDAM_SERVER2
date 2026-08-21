@@ -1,11 +1,14 @@
 package net.octacomm.sample.domain;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
-public class ReportHistory implements Domain {
-	private long id;
+@EqualsAndHashCode(callSuper = true)
+public class ReportHistory extends Report {
+	private int id;
 	private int reportId;
 	private String status;
 	private String userId;
+	private String modifiedAt;
 }
