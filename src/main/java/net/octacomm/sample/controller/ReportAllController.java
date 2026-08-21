@@ -8,6 +8,7 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -38,6 +39,7 @@ import net.octacomm.sample.domain.ReportOneLine;
 import net.octacomm.sample.domain.ReportParam;
 import net.octacomm.sample.domain.SessionInfo;
 import net.octacomm.sample.domain.UpdateReport;
+import net.octacomm.sample.service.ReportHistoryService;
 import net.octacomm.sample.utils.MathUtil;
 import net.octacomm.sample.utils.Pagination;
 import net.octacomm.sample.utils.ReportPagination;
@@ -73,7 +75,9 @@ public class ReportAllController{
 	
 	@Autowired
 	private ExcelSignroomMapper excelSignroomMapper;
-	
+
+	@Autowired
+	private ReportHistoryService reportHistoryService;
 	
 	@RequestMapping(value = "/list")
 	public void list(Model model, @ModelAttribute("domainParam") ReportParam param, BindingResult result, HttpSession session) throws UnsupportedEncodingException {
@@ -634,11 +638,12 @@ public class ReportAllController{
 	
 	
 	@ResponseBody
+	@Transactional
 	@RequestMapping(value = "/doRestoreMulti", method = RequestMethod.POST)
-	public boolean doRestoreMulti(@RequestBody List<UpdateReport> report) {
+	public boolean doRestoreMulti(@RequestBody List<UpdateReport> report, HttpSession session) {
 		try {
 			for (UpdateReport updateReport : report) { 
-				doRestore(updateReport);
+				doRestore(updateReport, (String) session.getAttribute("userId"));
 			}
 		}catch (Exception e) {
 			return false;
@@ -647,16 +652,19 @@ public class ReportAllController{
 	}
 	
 	
-	public void doRestore(UpdateReport report) {
+	public void doRestore(UpdateReport report, String userId) {
+		// 기존 복구 로직 실행 직전 전체 스냅샷 저장
+		reportHistoryService.saveBeforeChange(report.getId(), ReportHistoryService.STATUS_RESTORE, userId);
 		mapper.doRestore(report.getId());
 	}
 	
 	@ResponseBody
+	@Transactional
 	@RequestMapping(value = "/doDeleteMulti", method = RequestMethod.POST)
-	public boolean doDeleteMulti(@RequestBody List<UpdateReport> report) {
+	public boolean doDeleteMulti(@RequestBody List<UpdateReport> report, HttpSession session) {
 		try {
 			for (UpdateReport updateReport : report) {  
-				doDelete(updateReport);
+				doDelete(updateReport, (String) session.getAttribute("userId"));
 			}
 		}catch (Exception e) {
 			return false;
@@ -664,16 +672,19 @@ public class ReportAllController{
 		return true;
 	}
 	
-	public void doDelete(UpdateReport report) {
+	public void doDelete(UpdateReport report, String userId) {
+		// 기존 삭제 로직 실행 직전 전체 스냅샷 저장
+		reportHistoryService.saveBeforeChange(report.getId(), ReportHistoryService.STATUS_DELETE, userId);
 		mapper.doDelete(report.getId());
 	}
 	
 	@ResponseBody
+	@Transactional
 	@RequestMapping(value = "/update/reportMulti", method = RequestMethod.POST)
-	public boolean updateReportMulti(@RequestBody List<UpdateReport> report) {
+	public boolean updateReportMulti(@RequestBody List<UpdateReport> report, HttpSession session) {
 		try {
 			for (UpdateReport updateReport : report) {  
-				updateReportOne(updateReport);
+				updateReportOne(updateReport, (String) session.getAttribute("userId"));
 			}
 		}catch (Exception e) {
 			return false;
@@ -684,9 +695,12 @@ public class ReportAllController{
 	
 	
 	@ResponseBody
+	@Transactional
 	@RequestMapping(value = "/update/report", method = RequestMethod.POST)
-	public boolean updateReport(@RequestBody UpdateReport report) {
+	public boolean updateReport(@RequestBody UpdateReport report, HttpSession session) {
 		
+		// 기존 기록지 수정 로직 실행 직전 전체 스냅샷 저장
+		reportHistoryService.saveBeforeChange(report.getId(), ReportHistoryService.STATUS_UPDATE, (String) session.getAttribute("userId"));
 		report.setUltimateBearingCapacity(String.valueOf(calDanish(report)));
 		int result = mapper.update(report);
 		if(result > 0) {
@@ -714,9 +728,11 @@ public class ReportAllController{
 	}
 	
 	
-	public boolean updateReportOne(UpdateReport report) {
+	public boolean updateReportOne(UpdateReport report, String userId) {
 		//원상태값
 		//Report rp = mapper.get(report.getId());
+		// 기존 기록지 수정 로직 실행 직전 전체 스냅샷 저장
+		reportHistoryService.saveBeforeChange(report.getId(), ReportHistoryService.STATUS_UPDATE, userId);
 		report.setUltimateBearingCapacity(String.valueOf(calDanish(report)));
 		//report.setUltimateBearingCapacity(report.getUltimateBearingCapacity());
 		int result = mapper.update(report);
@@ -777,15 +793,21 @@ public class ReportAllController{
 	}
 	
 	@ResponseBody
+	@Transactional
 	@RequestMapping(value = "/doRestore", method = RequestMethod.POST)
-	public boolean doRestore(@RequestParam("id") int id) {
+	public boolean doRestore(@RequestParam("id") int id, HttpSession session) {
+		// 기존 복구 로직 실행 직전 전체 스냅샷 저장
+		reportHistoryService.saveBeforeChange(id, ReportHistoryService.STATUS_RESTORE, (String) session.getAttribute("userId"));
 		return mapper.doRestore(id) > 0;
 	}
 	
 	@ResponseBody
+	@Transactional
 	@RequestMapping(value = "/doDelete", method = RequestMethod.POST)
-	public boolean doDelete(@RequestParam("id") int id) {
+	public boolean doDelete(@RequestParam("id") int id, HttpSession session) {
 		//pieceMapper.delete(id)
+		// 기존 삭제 로직 실행 직전 전체 스냅샷 저장
+		reportHistoryService.saveBeforeChange(id, ReportHistoryService.STATUS_DELETE, (String) session.getAttribute("userId"));
 		return mapper.doDelete(id) > 0;
 	}
 	

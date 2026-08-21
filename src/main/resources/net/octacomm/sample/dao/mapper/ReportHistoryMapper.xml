@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.octacomm.sample.dao.mapper.ReportHistoryMapper">
+
+	<!-- 작업 직전 REPORT 전체 스냅샷 저장 -->
+	<insert id="insertReportHistory" parameterType="net.octacomm.sample.domain.ReportHistory">
+		INSERT INTO TB_REPORT_HISTORY (
+			reportId,
+			status,
+			userId,
+			modifiedAt,
+			deviceIdx,
+			currentDateTime,
+			location,
+			pileNo,
+			pileStandard,
+			drillingDepth,
+			directDrillingDepth,
+			stDrillingDepth,
+			sdDrillingDepth,
+			intrusionDepth,
+			balance,
+			connectLength,
+			managedStandard,
+			avgPenetrationValue,
+			totalPenetrationValue,
+			hammaT,
+			fallMeter,
+			createDate,
+			pileType,
+			method,
+			totalConnectWidth,
+			isDel,
+			ultimateBearingCapacity,
+			crossSection,
+			hammaEfficiency,
+			modulusElasticity,
+			bigo,
+			isDuple,
+			sprCol1,
+			gongSac
+		)
+		SELECT
+			R.id,
+			#{status},
+			#{userId},
+			CURRENT_TIMESTAMP(6),
+			R.deviceIdx,
+			R.currentDateTime,
+			R.location,
+			R.pileNo,
+			R.pileStandard,
+			R.drillingDepth,
+			R.directDrillingDepth,
+			R.stDrillingDepth,
+			R.sdDrillingDepth,
+			R.intrusionDepth,
+			R.balance,
+			R.connectLength,
+			R.managedStandard,
+			R.avgPenetrationValue,
+			R.totalPenetrationValue,
+			R.hammaT,
+			R.fallMeter,
+			R.createDate,
+			R.pileType,
+			R.method,
+			R.totalConnectWidth,
+			R.isDel,
+			R.ultimateBearingCapacity,
+			R.crossSection,
+			R.hammaEfficiency,
+			R.modulusElasticity,
+			R.bigo,
+			R.isDuple,
+			R.sprCol1,
+			R.gongSac
+		FROM TB_REPORT R
+		WHERE R.id = #{reportId}
+		<selectKey keyProperty="id" resultType="long" order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<!-- 동일 작업 시점의 PENETRATION 전체 스냅샷 저장 -->
+	<insert id="insertPenetrationHistory"
+			parameterType="net.octacomm.sample.domain.ReportHistory">
+		INSERT INTO TB_PENETRATION_HISTORY (
+			reportHistoryId,
+			penetrationId,
+			reportIdx,
+			name,
+			value
+		)
+		SELECT
+			#{id},
+			P.id,
+			P.reportIdx,
+			P.name,
+			P.value
+		FROM TB_PENETRATION P
+		WHERE P.reportIdx = #{reportId}
+	</insert>
+	
+	<!-- 동일 작업 시점의 PIECE 전체 스냅샷 저장 -->
+	<insert id="insertPieceHistory" parameterType="net.octacomm.sample.domain.ReportHistory">
+		INSERT INTO TB_PIECE_HISTORY (
+			reportHistoryId,
+			pieceId,
+			reportIdx,
+			name,
+			value
+		)
+		SELECT
+			#{id},
+			P.id,
+			P.reportIdx,
+			P.name,
+			P.value
+		FROM TB_PIECE P
+		WHERE P.reportIdx = #{reportId}
+	</insert>
+	
+</mapper>

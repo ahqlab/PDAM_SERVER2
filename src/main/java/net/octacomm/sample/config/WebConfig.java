@@ -26,6 +26,7 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -43,6 +44,9 @@ import org.springframework.web.servlet.view.tiles2.TilesViewResolver;
 
 @Configuration
 @EnableWebMvc
+
+// HISTORY 저장과 기존 수정 로직을 하나의 트랜잭션으로 묶기
+@EnableTransactionManagement
 @ComponentScan(basePackages = {"net.octacomm.sample.controller", "net.octacomm.sample.interceptor"})
 public class WebConfig extends WebMvcConfigurerAdapter {
 
