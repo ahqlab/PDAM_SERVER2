@@ -37,14 +37,13 @@
 			modulusElasticity,
 			bigo,
 			isDuple,
-			sprCol1,
-			gongSac
+			sprCol1
 		)
 		SELECT
 			R.id,
 			#{status},
 			#{userId},
-			CURRENT_TIMESTAMP(6),
+			DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:00'),
 			R.deviceIdx,
 			R.currentDateTime,
 			R.location,
@@ -73,52 +72,67 @@
 			R.modulusElasticity,
 			R.bigo,
 			R.isDuple,
-			R.sprCol1,
-			R.gongSac
+			R.sprCol1
 		FROM TB_REPORT R
 		WHERE R.id = #{reportId}
-		<selectKey keyProperty="id" resultType="long" order="AFTER">
+		<selectKey keyProperty="id" resultType="int" order="AFTER">
 			SELECT LAST_INSERT_ID()
 		</selectKey>
 	</insert>
 
 	<!-- 동일 작업 시점의 PENETRATION 전체 스냅샷 저장 -->
-	<insert id="insertPenetrationHistory"
-			parameterType="net.octacomm.sample.domain.ReportHistory">
+	<insert id="insertPenetrationHistory" parameterType="net.octacomm.sample.domain.ReportHistory">
 		INSERT INTO TB_PENETRATION_HISTORY (
 			reportHistoryId,
 			penetrationId,
 			reportIdx,
-			name,
-			value
+			p1, p2, p3, p4, p5, p6, p7, p8, p9, p10
 		)
 		SELECT
 			#{id},
-			P.id,
+			MIN(P.id),
 			P.reportIdx,
-			P.name,
-			P.value
-		FROM TB_PENETRATION P
-		WHERE P.reportIdx = #{reportId}
+			MAX(CASE WHEN P.idx = 1 THEN P.value END),
+			MAX(CASE WHEN P.idx = 2 THEN P.value END),
+			MAX(CASE WHEN P.idx = 3 THEN P.value END),
+			MAX(CASE WHEN P.idx = 4 THEN P.value END),
+			MAX(CASE WHEN P.idx = 5 THEN P.value END),
+			MAX(CASE WHEN P.idx = 6 THEN P.value END),
+			MAX(CASE WHEN P.idx = 7 THEN P.value END),
+			MAX(CASE WHEN P.idx = 8 THEN P.value END),
+			MAX(CASE WHEN P.idx = 9 THEN P.value END),
+			MAX(CASE WHEN P.idx = 10 THEN P.value END)
+		FROM (
+			SELECT 
+				P.*, 
+				@row_num1 := @row_num1 + 1 AS idx
+			FROM TB_PENETRATION P, (SELECT @row_num1 := 0) R
+			WHERE P.reportIdx = #{reportId}
+			ORDER BY P.id ASC
+		) P
+		GROUP BY P.reportIdx
 	</insert>
-	
+
 	<!-- 동일 작업 시점의 PIECE 전체 스냅샷 저장 -->
 	<insert id="insertPieceHistory" parameterType="net.octacomm.sample.domain.ReportHistory">
 		INSERT INTO TB_PIECE_HISTORY (
 			reportHistoryId,
-			pieceId,
 			reportIdx,
-			name,
-			value
+			singleLevel,
+			topLevel,
+			middleLevel,
+			bottomLevel
 		)
 		SELECT
 			#{id},
-			P.id,
 			P.reportIdx,
-			P.name,
-			P.value
+			MAX(CASE WHEN P.name = '단본' THEN P.value END),
+			MAX(CASE WHEN P.name = '상단' THEN P.value END),
+			GROUP_CONCAT(CASE WHEN P.name = '중단' THEN P.value END ORDER BY P.id SEPARATOR ','),
+			MAX(CASE WHEN P.name = '하단' THEN P.value END)
 		FROM TB_PIECE P
 		WHERE P.reportIdx = #{reportId}
+		GROUP BY P.reportIdx
 	</insert>
-	
+
 </mapper>
