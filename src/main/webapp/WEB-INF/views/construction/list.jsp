@@ -503,6 +503,91 @@ function setGroupName(){
         width: calc(50% - 53px);
     }
 }
+
+@media (max-width: 1023px) {
+	.searchArea01 .topArea,
+	.searchArea01 .titleBox,
+	.searchArea02 .topArea,
+	.searchArea02 .titleBox {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 10px;
+		width: 100%;
+		height: auto;
+		margin-bottom: 12px;
+	}
+
+	.searchArea01 h2, 
+	.searchArea01 .title,
+	.searchArea02 h2,
+	.searchArea02 .title {
+		font-size: 20px;
+		white-space: nowrap;
+		line-height: 1.2;
+	}
+
+	.searchArea01 .btnArea,
+	.searchArea01 a.btn,
+	.searchArea01 button.btn,
+	.searchArea02 .btnArea,
+	.searchArea02 a.btn,
+	.searchArea02 button.btn {
+		width: auto;
+		white-space: nowrap;
+	}
+
+	.company .TopContArea .searchArea01,
+	.company .TopContArea .searchArea02,
+	.searchArea01, .searchArea02 {
+		width: 100%;
+		box-sizing: border-box;
+	}
+
+	.searchArea01 form,
+	.searchArea01 .searchBox,
+	.searchArea02 form,
+	.searchArea02 .searchBox,
+	.company .TopContArea .searchArea02 .inputDateWrap {
+		display: flex;
+		flex-wrap: wrap;
+		width: 100%;
+		gap: 6px;
+		box-sizing: border-box;
+	}
+
+	.searchArea01 select,
+	.searchArea01 input[type="text"],
+	.searchArea02 select,
+	.searchArea02 input[type="text"],
+	.company .TopContArea .searchArea02 .inputDate {
+		flex: 1 1 auto;
+		width: auto;
+		min-width: 0;
+		box-sizing: border-box;
+	}
+
+	.filterArea {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px 6px;
+		padding-top: 12px;
+		margin-top: 15px;
+	}
+
+	.filterArea .filterChip {
+		padding: 6px 12px;
+		font-size: 13px;
+		white-space: nowrap;
+	}
+
+	.filterArea .filterDivider {
+		display: inline-block;
+		height: 16px;
+		margin: 0 2px;
+		align-self: center;
+	}
+}
 </style>
 
 		<!--컨텐츠-->
