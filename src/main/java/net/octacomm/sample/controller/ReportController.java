@@ -5,7 +5,9 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
@@ -40,6 +42,7 @@ import net.octacomm.sample.domain.ExtensivePileUsage;
 import net.octacomm.sample.domain.Penetration;
 import net.octacomm.sample.domain.Piece;
 import net.octacomm.sample.domain.Report;
+import net.octacomm.sample.domain.ReportHistory;
 import net.octacomm.sample.domain.ReportMaxCount;
 import net.octacomm.sample.domain.ReportOneLine;
 import net.octacomm.sample.domain.ReportParam;
@@ -182,6 +185,88 @@ public class ReportController{
 		model.addAttribute("extensivePileUsage", extensivePileUsage);
 		
 		return "report/listMultiOneLine";
+	}
+
+	@RequestMapping(value = "/history/list", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> historyList(
+			@RequestParam("deviceIdx") int deviceIdx,
+			@RequestParam(value = "workDate", required = false) String workDate,
+			@RequestParam(value = "page", defaultValue = "1") int requestedPage) {
+		final int pageSize = 5;
+		Map<String, Object> response = new LinkedHashMap<String, Object>();
+
+		if (deviceMapper.get(deviceIdx) == null) {
+			response.put("items", new ArrayList<Map<String, Object>>());
+			response.put("currentPage", 1);
+			response.put("pageSize", pageSize);
+			response.put("totalCount", 0);
+			response.put("totalPages", 0);
+			return response;
+		}
+
+		int totalCount = reportHistoryService.countByDeviceAndDate(deviceIdx, workDate);
+		int totalPages = totalCount == 0 ? 0 : (totalCount + pageSize - 1) / pageSize;
+		int currentPage = Math.max(1, requestedPage);
+		if (totalPages > 0 && currentPage > totalPages) {
+			currentPage = totalPages;
+		}
+
+		List<ReportHistory> histories = reportHistoryService.findPageByDeviceAndDate(
+				deviceIdx, workDate, (currentPage - 1) * pageSize, pageSize);
+		List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
+		for (ReportHistory history : histories) {
+			Map<String, Object> item = new LinkedHashMap<String, Object>();
+			item.put("id", history.getId());
+			item.put("modifiedAt", history.getModifiedAt());
+			item.put("userId", history.getUserId());
+			item.put("status", history.getStatus());
+			item.put("statusLabel", historyStatusLabel(history.getStatus()));
+			item.put("pileNo", history.getPileNo());
+			item.put("changeSummary", history.getChangeSummary());
+			item.put("changeCount", history.getChangeCount());
+			items.add(item);
+		}
+
+		response.put("items", items);
+		response.put("currentPage", currentPage);
+		response.put("pageSize", pageSize);
+		response.put("totalCount", totalCount);
+		response.put("totalPages", totalPages);
+		return response;
+	}
+
+	@RequestMapping(value = "/history/detail", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> historyDetail(
+			@RequestParam("deviceIdx") int deviceIdx,
+			@RequestParam("historyId") long historyId) {
+		Map<String, Object> response = new LinkedHashMap<String, Object>();
+		ReportHistory history = reportHistoryService.findById(historyId);
+		if (history == null || history.getDeviceIdx() != deviceIdx) {
+			response.put("success", false);
+			response.put("message", "수정 이력을 찾을 수 없습니다.");
+			response.put("changes", new ArrayList<Map<String, String>>());
+			return response;
+		}
+
+		response.put("success", true);
+		response.put("modifiedAt", history.getModifiedAt());
+		response.put("userId", history.getUserId());
+		response.put("status", history.getStatus());
+		response.put("statusLabel", historyStatusLabel(history.getStatus()));
+		response.put("changes", reportHistoryService.findChanges(historyId));
+		return response;
+	}
+
+	private String historyStatusLabel(String status) {
+		if (ReportHistoryService.STATUS_DELETE.equals(status)) {
+			return "삭제";
+		}
+		if (ReportHistoryService.STATUS_RESTORE.equals(status)) {
+			return "복구";
+		}
+		return "수정";
 	}
 
 	/**

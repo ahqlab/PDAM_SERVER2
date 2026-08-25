@@ -2,6 +2,48 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="net.octacomm.sample.dao.mapper.ReportHistoryMapper">
 
+	<sql id="historySnapshotColumns">
+		H.id,
+		H.reportId,
+		H.status,
+		H.userId,
+		DATE_FORMAT(H.modifiedAt, '%Y-%m-%d %H:%i') AS modifiedAt,
+		H.deviceIdx,
+		H.currentDateTime,
+		H.location,
+		H.pileNo,
+		H.pileStandard,
+		H.drillingDepth,
+		H.directDrillingDepth,
+		H.stDrillingDepth,
+		H.sdDrillingDepth,
+		H.intrusionDepth,
+		H.connectLength,
+		H.managedStandard,
+		H.avgPenetrationValue,
+		H.totalPenetrationValue,
+		H.hammaT,
+		H.fallMeter,
+		H.createDate,
+		H.pileType,
+		H.method,
+		H.totalConnectWidth,
+		H.isDel,
+		H.ultimateBearingCapacity,
+		H.crossSection,
+		H.hammaEfficiency,
+		H.modulusElasticity,
+		H.bigo,
+		H.isDuple,
+		H.sprCol1,
+		D.constructionIdx AS constructionIdx,
+		D.machineNumber AS machineNumber,
+		CAST(H.balance AS CHAR) AS balanceSnapshot,
+		PH.p1, PH.p2, PH.p3, PH.p4, PH.p5,
+		PH.p6, PH.p7, PH.p8, PH.p9, PH.p10,
+		PI.singleLevel, PI.topLevel, PI.middleLevel, PI.bottomLevel
+	</sql>
+
 	<!-- 작업 직전 REPORT 전체 스냅샷 저장 -->
 	<insert id="insertReportHistory" parameterType="net.octacomm.sample.domain.ReportHistory">
 		INSERT INTO TB_REPORT_HISTORY (
@@ -134,5 +176,116 @@
 		WHERE P.reportIdx = #{reportId}
 		GROUP BY P.reportIdx
 	</insert>
+
+	<sql id="historyListCondition">
+		WHERE R.deviceIdx = #{deviceIdx}
+		<if test="workDate != null and workDate != ''">
+			<choose>
+				<when test="workDate == 'today'">
+					AND DATE(R.currentDateTime) = CURDATE()
+				</when>
+				<otherwise>
+					AND DATE(R.currentDateTime) = DATE(#{workDate})
+				</otherwise>
+			</choose>
+		</if>
+	</sql>
+
+	<select id="countByDeviceAndDate" resultType="int">
+		SELECT COUNT(*)
+		FROM TB_REPORT_HISTORY H
+		INNER JOIN TB_REPORT R ON R.id = H.reportId
+		<include refid="historyListCondition" />
+	</select>
+
+	<select id="findPageByDeviceAndDate" resultType="net.octacomm.sample.domain.ReportHistory">
+		SELECT
+			<include refid="historySnapshotColumns" />
+		FROM TB_REPORT_HISTORY H
+		INNER JOIN TB_REPORT R ON R.id = H.reportId
+		LEFT JOIN TB_DEVICE D ON D.id = H.deviceIdx
+		LEFT JOIN TB_PENETRATION_HISTORY PH ON PH.reportHistoryId = H.id
+		LEFT JOIN TB_PIECE_HISTORY PI ON PI.reportHistoryId = H.id
+		<include refid="historyListCondition" />
+		ORDER BY H.modifiedAt DESC, H.id DESC
+		LIMIT #{startRow}, #{pageSize}
+	</select>
+
+	<select id="findSnapshotById" resultType="net.octacomm.sample.domain.ReportHistory">
+		SELECT
+			<include refid="historySnapshotColumns" />
+		FROM TB_REPORT_HISTORY H
+		LEFT JOIN TB_DEVICE D ON D.id = H.deviceIdx
+		LEFT JOIN TB_PENETRATION_HISTORY PH ON PH.reportHistoryId = H.id
+		LEFT JOIN TB_PIECE_HISTORY PI ON PI.reportHistoryId = H.id
+		WHERE H.id = #{id}
+	</select>
+
+	<select id="findNextSnapshot" resultType="net.octacomm.sample.domain.ReportHistory">
+		SELECT
+			<include refid="historySnapshotColumns" />
+		FROM TB_REPORT_HISTORY H
+		LEFT JOIN TB_DEVICE D ON D.id = H.deviceIdx
+		LEFT JOIN TB_PENETRATION_HISTORY PH ON PH.reportHistoryId = H.id
+		LEFT JOIN TB_PIECE_HISTORY PI ON PI.reportHistoryId = H.id
+		WHERE H.reportId = #{reportId}
+		  AND H.id &gt; #{historyId}
+		ORDER BY H.id ASC
+		LIMIT 1
+	</select>
+
+	<select id="findCurrentSnapshot" resultType="net.octacomm.sample.domain.ReportHistory">
+		SELECT
+			0 AS id,
+			R.id AS reportId,
+			R.deviceIdx,
+			D.constructionIdx AS constructionIdx,
+			D.machineNumber AS machineNumber,
+			R.currentDateTime,
+			R.location,
+			R.pileNo,
+			R.pileStandard,
+			R.drillingDepth,
+			R.directDrillingDepth,
+			R.stDrillingDepth,
+			R.sdDrillingDepth,
+			R.intrusionDepth,
+			R.connectLength,
+			R.managedStandard,
+			R.avgPenetrationValue,
+			R.totalPenetrationValue,
+			R.hammaT,
+			R.fallMeter,
+			R.createDate,
+			R.pileType,
+			R.method,
+			R.totalConnectWidth,
+			R.isDel,
+			R.ultimateBearingCapacity,
+			R.crossSection,
+			R.hammaEfficiency,
+			R.modulusElasticity,
+			R.bigo,
+			R.isDuple,
+			R.sprCol1,
+			CAST(R.balance AS CHAR) AS balanceSnapshot,
+			(SELECT P.value FROM TB_PENETRATION P WHERE P.reportIdx = R.id ORDER BY P.id LIMIT 0, 1) AS p1,
+			(SELECT P.value FROM TB_PENETRATION P WHERE P.reportIdx = R.id ORDER BY P.id LIMIT 1, 1) AS p2,
+			(SELECT P.value FROM TB_PENETRATION P WHERE P.reportIdx = R.id ORDER BY P.id LIMIT 2, 1) AS p3,
+			(SELECT P.value FROM TB_PENETRATION P WHERE P.reportIdx = R.id ORDER BY P.id LIMIT 3, 1) AS p4,
+			(SELECT P.value FROM TB_PENETRATION P WHERE P.reportIdx = R.id ORDER BY P.id LIMIT 4, 1) AS p5,
+			(SELECT P.value FROM TB_PENETRATION P WHERE P.reportIdx = R.id ORDER BY P.id LIMIT 5, 1) AS p6,
+			(SELECT P.value FROM TB_PENETRATION P WHERE P.reportIdx = R.id ORDER BY P.id LIMIT 6, 1) AS p7,
+			(SELECT P.value FROM TB_PENETRATION P WHERE P.reportIdx = R.id ORDER BY P.id LIMIT 7, 1) AS p8,
+			(SELECT P.value FROM TB_PENETRATION P WHERE P.reportIdx = R.id ORDER BY P.id LIMIT 8, 1) AS p9,
+			(SELECT P.value FROM TB_PENETRATION P WHERE P.reportIdx = R.id ORDER BY P.id LIMIT 9, 1) AS p10,
+			(SELECT P.value FROM TB_PIECE P WHERE P.reportIdx = R.id AND P.name = '단본' ORDER BY P.id LIMIT 1) AS singleLevel,
+			(SELECT P.value FROM TB_PIECE P WHERE P.reportIdx = R.id AND P.name = '하단' ORDER BY P.id LIMIT 1) AS bottomLevel,
+			(SELECT GROUP_CONCAT(P.value ORDER BY P.id SEPARATOR ',') FROM TB_PIECE P WHERE P.reportIdx = R.id AND P.name = '중단') AS middleLevel,
+			(SELECT P.value FROM TB_PIECE P WHERE P.reportIdx = R.id AND P.name = '상단' ORDER BY P.id LIMIT 1) AS topLevel
+		FROM TB_REPORT R
+		LEFT JOIN TB_DEVICE D ON D.id = R.deviceIdx
+		WHERE R.id = #{reportId}
+	</select>
 
 </mapper>
