@@ -16,7 +16,7 @@
                     AND auth = #{keyword}
                 </when>
                 <otherwise>
-                    AND title LIKE CONCAT('%', #{keyword}, '%')
+                    AND board_name LIKE CONCAT('%', #{keyword}, '%')
                 </otherwise>
             </choose>
         </if>
@@ -42,7 +42,7 @@
                     AND auth = #{keyword}
                 </when>
                 <otherwise>
-                    AND title LIKE CONCAT('%', #{keyword}, '%')
+                    AND board_name LIKE CONCAT('%', #{keyword}, '%')
                 </otherwise>
             </choose>
         </if>
