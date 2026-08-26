@@ -59,7 +59,13 @@ public class GroupController extends AbstractGroupCRUDController<GroupMapper, Gr
 	@ResponseBody
 	@RequestMapping(value = "/ajax/operation-trend", method = RequestMethod.GET)
 	public List<Map<String, Object>> getOperationTrend(
-				@RequestParam(value = "period", defaultValue = "day") String period) {
+				@RequestParam(value = "period", defaultValue = "day") String period,
+				HttpSession session) {
+		// 전체 시공사/가맹점 집계인 "운영 장비 추이" 팝업은 시스템관리자(role 0)에게만 노출되므로
+		// 서버에서도 동일하게 제한한다.
+		if (!Integer.valueOf(0).equals(session.getAttribute("role"))) {
+			return java.util.Collections.emptyList();
+		}
 		if ("month".equals(period)) {
 			return dailyOperationSummaryMapper.getMonthlyOperationTrend();
 		}
