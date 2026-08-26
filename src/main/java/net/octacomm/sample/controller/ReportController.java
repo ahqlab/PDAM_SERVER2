@@ -14,6 +14,7 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -192,11 +193,13 @@ public class ReportController{
 	public Map<String, Object> historyList(
 			@RequestParam("deviceIdx") int deviceIdx,
 			@RequestParam(value = "workDate", required = false) String workDate,
-			@RequestParam(value = "page", defaultValue = "1") int requestedPage) {
+			@RequestParam(value = "page", defaultValue = "1") int requestedPage,
+			HttpSession session) {
 		final int pageSize = 5;
 		Map<String, Object> response = new LinkedHashMap<String, Object>();
 
-		if (deviceMapper.get(deviceIdx) == null) {
+		Device device = deviceMapper.get(deviceIdx);
+		if (device == null || !isDeviceAccessible(device, session)) {
 			response.put("items", new ArrayList<Map<String, Object>>());
 			response.put("currentPage", 1);
 			response.put("pageSize", pageSize);
@@ -240,10 +243,17 @@ public class ReportController{
 	@ResponseBody
 	public Map<String, Object> historyDetail(
 			@RequestParam("deviceIdx") int deviceIdx,
-			@RequestParam("historyId") long historyId) {
+			@RequestParam("historyId") long historyId,
+			HttpSession session) {
 		Map<String, Object> response = new LinkedHashMap<String, Object>();
 		ReportHistory history = reportHistoryService.findById(historyId);
-		if (history == null || history.getDeviceIdx() != deviceIdx) {
+		// historyList와 동일하게 "현재" 소속 기기(R.deviceIdx) 기준으로 맞춰야 한다.
+		// 스냅샷 당시 deviceIdx(history.getDeviceIdx())로 비교하면 기기 이관된 리포트의
+		// 과거 이력은 목록엔 보이는데 상세는 열리지 않는 불일치가 생긴다.
+		Report report = history == null ? null : mapper.get(history.getReportId());
+		Device device = report == null ? null : deviceMapper.get(report.getDeviceIdx());
+		if (history == null || report == null || report.getDeviceIdx() != deviceIdx
+				|| device == null || !isDeviceAccessible(device, session)) {
 			response.put("success", false);
 			response.put("message", "수정 이력을 찾을 수 없습니다.");
 			response.put("changes", new ArrayList<Map<String, String>>());
@@ -257,6 +267,30 @@ public class ReportController{
 		response.put("statusLabel", historyStatusLabel(history.getStatus()));
 		response.put("changes", reportHistoryService.findChanges(historyId));
 		return response;
+	}
+
+	// 기록지 이력 팝업(role별 데이터 접근범위)에서만 쓰는 경량 체크.
+	// role 0(시스템관리자)은 전체 허용, 그 외는 세션에 저장된 자신의
+	// constructionIdx/groupIdx/fcIdx가 기기의 소속과 일치할 때만 허용한다.
+	private boolean isDeviceAccessible(Device device, HttpSession session) {
+		Object roleAttr = session.getAttribute("role");
+		if (roleAttr == null) {
+			return false;
+		}
+		int role = (int) roleAttr;
+		if (role == 0) {
+			return true;
+		} else if (role == 1) {
+			Object constructionIdx = session.getAttribute("constructionIdx");
+			return constructionIdx != null && device.getConstructionIdx() == (int) constructionIdx;
+		} else if (role == 2) {
+			Object groupIdx = session.getAttribute("groupIdx");
+			return groupIdx != null && device.getGroupIdx() == (int) groupIdx;
+		} else if (role == 3) {
+			Object fcIdx = session.getAttribute("fcIdx");
+			return fcIdx != null && device.getFcIdx() == (int) fcIdx;
+		}
+		return false;
 	}
 
 	private String historyStatusLabel(String status) {
@@ -990,10 +1024,13 @@ public class ReportController{
 	@RequestMapping(value = "/doRestoreMulti", method = RequestMethod.POST)
 	public boolean doRestoreMulti(@RequestBody List<UpdateReport> report, HttpSession session) {
 		try {
-			for (UpdateReport updateReport : report) { 
+			for (UpdateReport updateReport : report) {
 				doRestore(updateReport, (String) session.getAttribute("userId"));
 			}
 		}catch (Exception e) {
+			// catch만 하고 예외를 삼키면 @Transactional 경계 밖으로 예외가 나가지 않아
+			// 이미 처리된 앞 항목들이 롤백되지 않고 그대로 커밋된다. 명시적으로 rollback-only 표시.
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			return false;
 		}
 		return true;
@@ -1011,11 +1048,12 @@ public class ReportController{
 	@RequestMapping(value = "/doDeleteMulti", method = RequestMethod.POST)
 	public boolean doDeleteMulti(@RequestBody List<UpdateReport> report, HttpSession session) {
 		try {
-			for (UpdateReport updateReport : report) {  
-			
+			for (UpdateReport updateReport : report) {
+
 				doDelete(updateReport, (String) session.getAttribute("userId"));
 			}
 		}catch (Exception e) {
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			return false;
 		}
 		return true;
@@ -1071,8 +1109,14 @@ public class ReportController{
 			extensivePileUsage = 0;
 		}
 		
-		// 기존 기록지 수정 로직 실행 직전 전체 스냅샷 저장
-		reportHistoryService.saveBeforeChange(report.getId(), ReportHistoryService.STATUS_UPDATE, (String) session.getAttribute("userId"));
+		try {
+			// 기존 기록지 수정 로직 실행 직전 전체 스냅샷 저장
+			reportHistoryService.saveBeforeChange(report.getId(), ReportHistoryService.STATUS_UPDATE, (String) session.getAttribute("userId"));
+		} catch (Exception e) {
+			// 이미 삭제된 id 등으로 스냅샷 저장이 실패하는 경우 500 대신 기존처럼 false를 반환
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+			return false;
+		}
 		report.setUltimateBearingCapacity(String.valueOf(calDanish(report)));
 		int result = mapper.update(report);
 		if(result > 0) {
@@ -1254,19 +1298,31 @@ public class ReportController{
 	@Transactional
 	@RequestMapping(value = "/doRestore", method = RequestMethod.POST)
 	public boolean doRestore(@RequestParam("id") int id, HttpSession session) {
-		// 기존 복구 로직 실행 직전 전체 스냅샷 저장
-		reportHistoryService.saveBeforeChange(id,  ReportHistoryService.STATUS_RESTORE, (String) session.getAttribute("userId"));
-		return mapper.doRestore(id) > 0;
+		try {
+			// 기존 복구 로직 실행 직전 전체 스냅샷 저장
+			reportHistoryService.saveBeforeChange(id,  ReportHistoryService.STATUS_RESTORE, (String) session.getAttribute("userId"));
+			return mapper.doRestore(id) > 0;
+		} catch (Exception e) {
+			// 이미 삭제/변경되어 존재하지 않는 id 등으로 스냅샷 저장이 실패하는 경우
+			// 기존처럼(예외 없이) false를 반환해 프론트의 성공/실패 처리와 호환되게 한다.
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+			return false;
+		}
 	}
-	
+
 	@ResponseBody
 	@Transactional
 	@RequestMapping(value = "/doDelete", method = RequestMethod.POST)
 	public boolean doDelete(@RequestParam("id") int id, HttpSession session) {
-		//pieceMapper.delete(id)
-		// 기존 삭제 로직 실행 직전 전체 스냅샷 저장
-		reportHistoryService.saveBeforeChange(id, ReportHistoryService.STATUS_DELETE, (String) session.getAttribute("userId"));
-		return mapper.doDelete(id) > 0;
+		try {
+			//pieceMapper.delete(id)
+			// 기존 삭제 로직 실행 직전 전체 스냅샷 저장
+			reportHistoryService.saveBeforeChange(id, ReportHistoryService.STATUS_DELETE, (String) session.getAttribute("userId"));
+			return mapper.doDelete(id) > 0;
+		} catch (Exception e) {
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+			return false;
+		}
 	}
 	
 //	private double calDanish(float S){

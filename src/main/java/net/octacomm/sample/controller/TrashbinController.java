@@ -9,6 +9,7 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -667,10 +668,13 @@ public class TrashbinController {
 	@RequestMapping(value = "/doRestoreMulti", method = RequestMethod.POST)
 	public boolean doRestoreMulti(@RequestBody List<UpdateReport> report, HttpSession session) {
 		try {
-			for (UpdateReport updateReport : report) { 
+			for (UpdateReport updateReport : report) {
 				doRestore(updateReport, (String) session.getAttribute("userId"));
 			}
 		}catch (Exception e) {
+			// catch만 하고 예외를 삼키면 @Transactional 경계 밖으로 예외가 나가지 않아
+			// 이미 처리된 앞 항목들이 롤백되지 않고 그대로 커밋된다. 명시적으로 rollback-only 표시.
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			return false;
 		}
 		return true;
@@ -688,10 +692,11 @@ public class TrashbinController {
 	@RequestMapping(value = "/doDeleteMulti", method = RequestMethod.POST)
 	public boolean doDeleteMulti(@RequestBody List<UpdateReport> report, HttpSession session) {
 		try {
-			for (UpdateReport updateReport : report) {  
+			for (UpdateReport updateReport : report) {
 				doDelete(updateReport, (String) session.getAttribute("userId"));
 			}
 		}catch (Exception e) {
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			return false;
 		}
 		return true;
@@ -708,10 +713,11 @@ public class TrashbinController {
 	@RequestMapping(value = "/update/reportMulti", method = RequestMethod.POST)
 	public boolean updateReportMulti(@RequestBody List<UpdateReport> report, HttpSession session) {
 		try {
-			for (UpdateReport updateReport : report) {  
+			for (UpdateReport updateReport : report) {
 				updateReportOne(updateReport, (String) session.getAttribute("userId"));
 			}
 		}catch (Exception e) {
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			return false;
 		}
 		return true;
@@ -723,9 +729,14 @@ public class TrashbinController {
 	@Transactional
 	@RequestMapping(value = "/update/report", method = RequestMethod.POST)
 	public boolean updateReport(@RequestBody UpdateReport report, HttpSession session) {
-		
-		// 기존 기록지 수정 로직 실행 직전 전체 스냅샷 저장
-		reportHistoryService.saveBeforeChange(report.getId(), ReportHistoryService.STATUS_UPDATE, (String) session.getAttribute("userId"));
+
+		try {
+			// 기존 기록지 수정 로직 실행 직전 전체 스냅샷 저장
+			reportHistoryService.saveBeforeChange(report.getId(), ReportHistoryService.STATUS_UPDATE, (String) session.getAttribute("userId"));
+		} catch (Exception e) {
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+			return false;
+		}
 		report.setUltimateBearingCapacity(String.valueOf(calDanish(report)));
 		int result = mapper.update(report);
 		if(result > 0) {
@@ -821,19 +832,29 @@ public class TrashbinController {
 	@Transactional
 	@RequestMapping(value = "/doRestore", method = RequestMethod.POST)
 	public boolean doRestore(@RequestParam("id") int id, HttpSession session) {
-		// 기존 복구 로직 실행 직전 전체 스냅샷 저장
-		reportHistoryService.saveBeforeChange(id, ReportHistoryService.STATUS_RESTORE, (String) session.getAttribute("userId"));
-		return mapper.doRestore(id) > 0;
+		try {
+			// 기존 복구 로직 실행 직전 전체 스냅샷 저장
+			reportHistoryService.saveBeforeChange(id, ReportHistoryService.STATUS_RESTORE, (String) session.getAttribute("userId"));
+			return mapper.doRestore(id) > 0;
+		} catch (Exception e) {
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+			return false;
+		}
 	}
-	
+
 	@ResponseBody
 	@Transactional
 	@RequestMapping(value = "/doDelete", method = RequestMethod.POST)
 	public boolean doDelete(@RequestParam("id") int id, HttpSession session) {
-		//pieceMapper.delete(id)
-		// 기존 삭제 로직 실행 직전 전체 스냅샷 저장
-		reportHistoryService.saveBeforeChange(id, ReportHistoryService.STATUS_DELETE, (String) session.getAttribute("userId"));
-		return mapper.doDelete(id) > 0;
+		try {
+			//pieceMapper.delete(id)
+			// 기존 삭제 로직 실행 직전 전체 스냅샷 저장
+			reportHistoryService.saveBeforeChange(id, ReportHistoryService.STATUS_DELETE, (String) session.getAttribute("userId"));
+			return mapper.doDelete(id) > 0;
+		} catch (Exception e) {
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+			return false;
+		}
 	}
 	
 //	private double calDanish(float S){
