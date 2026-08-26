@@ -11,15 +11,12 @@ import lombok.ToString;
 public class AdminBoard implements Domain {
 
     private Long id;
-    private String title;
-    private String content;
     
-    private String fileName;
-    private byte[] fileData; 
-    private long fileSize;
-    private String contentType;
+    private String boardName;
+    private String useYn;
+    private String auth;
+    private String allowedExts;
     
-    private String regUser;
     private Date regDate;
     private Date updateAt;
     private Date deleteAt;
