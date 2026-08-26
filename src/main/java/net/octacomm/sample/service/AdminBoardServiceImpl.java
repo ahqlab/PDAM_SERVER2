@@ -26,15 +26,10 @@ public class AdminBoardServiceImpl implements AdminBoardService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void insertBoard(Map<String, Object> paramMap) throws Exception {
-        adminBoardMapper.insertBoard(paramMap);
+    public void insertBoard(AdminBoard board) throws Exception {
+        adminBoardMapper.insertBoard(board);
     }
 
-    @Override
-    public AdminBoard getFile(Long id) {
-        return adminBoardMapper.getFile(id);
-    }
-    
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteBoard(Long id) throws Exception {
@@ -48,7 +43,7 @@ public class AdminBoardServiceImpl implements AdminBoardService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateBoard(Map<String, Object> paramMap) throws Exception {
-        adminBoardMapper.updateBoard(paramMap);
+    public void updateBoard(AdminBoard board) throws Exception {
+        adminBoardMapper.updateBoard(board);
     }
 }

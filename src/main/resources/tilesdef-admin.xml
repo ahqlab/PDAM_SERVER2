@@ -32,11 +32,6 @@
 		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
 	</definition>
 	
-	<definition name="report/**" extends="commomLayout">
-		<put-attribute name="content" value="/WEB-INF/views/report/{1}.jsp" />
-		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
-	</definition>
-	
 	<definition name="report/all/**" extends="commomLayout">
 		<put-attribute name="content" value="/WEB-INF/views/report/all/{1}.jsp" />
 		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
@@ -46,12 +41,16 @@
 		<put-attribute name="content" value="/WEB-INF/views/simple/report/{1}.jsp" />
 		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
 	</definition>
-
+	
+	<definition name="report/**" extends="commomLayout">
+		<put-attribute name="content" value="/WEB-INF/views/report/{1}.jsp" />
+		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
+	</definition>
+	
 	<definition name="trashbin/**" extends="commomLayout">
 		<put-attribute name="content" value="/WEB-INF/views/trashbin/{1}.jsp" />
 		<put-attribute name="nav" value="/WEB-INF/views/common/nav.jsp" />
 	</definition>
-
 	
 	<definition name="ips/**" extends="commomLayout">
 		<put-attribute name="content" value="/WEB-INF/views/ips/{1}.jsp" />

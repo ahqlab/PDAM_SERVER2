@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.octacomm.sample.dao.mapper.BoardPostMapper">
+
+    <select id="getPostTotalCount" parameterType="map" resultType="int">
+        SELECT COUNT(id) FROM TB_BOARD_POST
+        WHERE delete_at IS NULL AND board_id = #{boardId}
+        <if test="keyword != null and keyword != ''">
+            <choose>
+                <when test="searchType == 'title'">AND title LIKE CONCAT('%', #{keyword}, '%')</when>
+                <when test="searchType == 'regUser'">AND reg_user LIKE CONCAT('%', #{keyword}, '%')</when>
+            </choose>
+        </if>
+    </select>
+
+    <select id="getPostList" parameterType="map" resultType="net.octacomm.sample.domain.BoardPost">
+        SELECT 
+            @RNUM:=@RNUM+1 AS rowNum, 
+            originalId AS id,
+            boardId,
+            title,
+            content,
+            fileName1,
+            fileName2,
+            fileName3,
+            regUser,
+            regDate,
+            updateAt
+        FROM (
+            SELECT 
+                id AS originalId,
+                board_id AS boardId, 
+                title, 
+                content, 
+                file_name_1 AS fileName1, 
+                file_name_2 AS fileName2, 
+                file_name_3 AS fileName3,
+                reg_user AS regUser, 
+                reg_date AS regDate, 
+                update_at AS updateAt
+            FROM TB_BOARD_POST
+            WHERE delete_at IS NULL AND board_id = #{boardId}
+            <if test="keyword != null and keyword != ''">
+                <choose>
+                    <when test="searchType == 'title'">AND title LIKE CONCAT('%', #{keyword}, '%')</when>
+                    <when test="searchType == 'regUser'">AND reg_user LIKE CONCAT('%', #{keyword}, '%')</when>
+                </choose>
+            </if>
+            ORDER BY id ASC
+        ) T, (SELECT @RNUM:=0) R
+        ORDER BY id DESC
+        LIMIT #{startRow}, #{size}
+    </select>
+
+    <insert id="insertPost" parameterType="net.octacomm.sample.domain.BoardPost" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO TB_BOARD_POST (
+            board_id, title, content, 
+            file_name_1, file_data_1, file_size_1, content_type_1,
+            file_name_2, file_data_2, file_size_2, content_type_2,
+            file_name_3, file_data_3, file_size_3, content_type_3,
+            reg_user, reg_date
+        ) VALUES (
+            #{boardId}, #{title}, #{content}, 
+            #{fileName1}, #{fileData1, javaType=[B, jdbcType=BLOB}, #{fileSize1}, #{contentType1},
+            #{fileName2}, #{fileData2, javaType=[B, jdbcType=BLOB}, #{fileSize2}, #{contentType2},
+            #{fileName3}, #{fileData3, javaType=[B, jdbcType=BLOB}, #{fileSize3}, #{contentType3},
+            #{regUser}, NOW()
+        )
+    </insert>
+
+    <select id="getPost" parameterType="long" resultType="net.octacomm.sample.domain.BoardPost">
+        SELECT 
+            id, board_id AS boardId, title, content, 
+            file_name_1 AS fileName1, file_data_1 AS fileData1, file_size_1 AS fileSize1, content_type_1 AS contentType1,
+            file_name_2 AS fileName2, file_data_2 AS fileData2, file_size_2 AS fileSize2, content_type_2 AS contentType2,
+            file_name_3 AS fileName3, file_data_3 AS fileData3, file_size_3 AS fileSize3, content_type_3 AS contentType3,
+            reg_user AS regUser, reg_date AS regDate, update_at AS updateAt
+        FROM TB_BOARD_POST WHERE id = #{id} AND delete_at IS NULL
+    </select>
+
+    <update id="updatePost" parameterType="net.octacomm.sample.domain.BoardPost">
+        UPDATE TB_BOARD_POST
+        SET title = #{title}, content = #{content}, reg_user = #{regUser}, update_at = NOW(),
+            file_name_1 = #{fileName1}, file_data_1 = #{fileData1, javaType=[B, jdbcType=BLOB}, file_size_1 = #{fileSize1}, content_type_1 = #{contentType1},
+            file_name_2 = #{fileName2}, file_data_2 = #{fileData2, javaType=[B, jdbcType=BLOB}, file_size_2 = #{fileSize2}, content_type_2 = #{contentType2},
+            file_name_3 = #{fileName3}, file_data_3 = #{fileData3, javaType=[B, jdbcType=BLOB}, file_size_3 = #{fileSize3}, content_type_3 = #{contentType3}
+        WHERE id = #{id}
+    </update>
+
+    <update id="deletePost" parameterType="long">
+        UPDATE TB_BOARD_POST SET delete_at = NOW() WHERE id = #{id}
+    </update>
+
+    <!-- 개별 첨부파일 슬롯만 삭제(NULL 처리)하는 쿼리 -->
+    <update id="deleteFileSlot" parameterType="map">
+        UPDATE TB_BOARD_POST
+        <set>
+            <if test="slot == 1">file_name_1=NULL, file_data_1=NULL, file_size_1=NULL, content_type_1=NULL</if>
+            <if test="slot == 2">file_name_2=NULL, file_data_2=NULL, file_size_2=NULL, content_type_2=NULL</if>
+            <if test="slot == 3">file_name_3=NULL, file_data_3=NULL, file_size_3=NULL, content_type_3=NULL</if>
+        </set>
+        WHERE id = #{postId}
+    </update>
+</mapper>

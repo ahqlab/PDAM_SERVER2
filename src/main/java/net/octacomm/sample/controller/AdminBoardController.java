@@ -1,11 +1,9 @@
 package net.octacomm.sample.controller;
 
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import net.octacomm.sample.domain.AdminBoard;
@@ -48,7 +45,28 @@ public class AdminBoardController {
         }
 
         Integer role = (Integer) session.getAttribute("role");
-        SessionInfo sessionInfo = (SessionInfo) session.getAttribute("sessionInfo");
+        SessionInfo sessionInfo = null;
+        Object sessionInfoObj = session.getAttribute("sessionInfo");
+
+        if (sessionInfoObj instanceof SessionInfo) {
+            sessionInfo = (SessionInfo) sessionInfoObj;
+        } else if (sessionInfoObj instanceof Map) {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> map = (Map<String, Object>) sessionInfoObj;
+            
+            sessionInfo = new SessionInfo();
+            Object mapRole = map.get("role");
+            if (mapRole instanceof Integer) {
+                sessionInfo.setRole((Integer) mapRole);
+            } else {
+                sessionInfo.setRole(role);
+            }
+            sessionInfo.setUserId((String) map.get("userId"));
+            sessionInfo.setUserName((String) map.get("userName"));
+
+            session.setAttribute("sessionInfo", sessionInfo);
+        }
+
         if (sessionInfo == null) {
             sessionInfo = new SessionInfo();
             sessionInfo.setRole(role);
@@ -78,13 +96,7 @@ public class AdminBoardController {
 
     @RequestMapping(value = "/regist", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String, Object> createPost(
-            HttpServletRequest request,
-            @RequestParam("regUser") String regUser,
-            @RequestParam("title") String title,
-            @RequestParam("content") String content,
-            @RequestParam("file") MultipartFile file) {
-        
+    public Map<String, Object> createPost(HttpServletRequest request, AdminBoard board) {
         Map<String, Object> resultMap = new HashMap<>();
         HttpSession session = request.getSession();
         
@@ -94,27 +106,10 @@ public class AdminBoardController {
             return resultMap;
         }
 
-        if (file == null || file.isEmpty()) {
-            resultMap.put("success", false);
-            resultMap.put("message", "첨부파일은 필수입니다.");
-            return resultMap;
-        }
-
         try {
-            Map<String, Object> boardData = new HashMap<>();
-            boardData.put("regUser", regUser);
-            boardData.put("title", title);
-            boardData.put("content", content);
-            
-            boardData.put("fileName", file.getOriginalFilename());
-            boardData.put("fileData", file.getBytes()); 
-            boardData.put("fileSize", file.getSize());
-            boardData.put("contentType", file.getContentType());
-
-            adminBoardService.insertBoard(boardData); 
-
+            adminBoardService.insertBoard(board); 
             resultMap.put("success", true);
-            resultMap.put("message", "성공적으로 저장되었습니다.");
+            resultMap.put("message", "게시판이 성공적으로 생성되었습니다.");
         } catch (Exception e) {
             resultMap.put("success", false);
             resultMap.put("message", "오류가 발생했습니다: " + e.getMessage());
@@ -123,43 +118,9 @@ public class AdminBoardController {
         return resultMap;
     }
 
-    @RequestMapping(value = "/download", method = RequestMethod.GET)
-    public void downloadFile(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            @RequestParam("id") Long id) throws Exception {
-        
-        HttpSession session = request.getSession();
-        
-        if (!isSystemAdmin(session)) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "권한이 없습니다.");
-            return;
-        }
-
-        AdminBoard fileDto = adminBoardService.getFile(id);
-
-        if (fileDto != null && fileDto.getFileData() != null) {
-            String encodedFileName = URLEncoder.encode(fileDto.getFileName(), "UTF-8").replaceAll("\\+", "%20");
-            
-            response.setContentType(fileDto.getContentType() != null ? fileDto.getContentType() : "application/octet-stream");
-            response.setContentLength(fileDto.getFileData().length);
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + encodedFileName + "\";");
-            response.setHeader("Content-Transfer-Encoding", "binary");
-            
-            response.getOutputStream().write(fileDto.getFileData());
-            response.getOutputStream().flush();
-            response.getOutputStream().close();
-        } else {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, "파일을 찾을 수 없습니다.");
-        }
-    }
-    
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String, Object> deletePost(
-            HttpServletRequest request,
-            @RequestParam("id") Long id) {
-        
+    public Map<String, Object> deletePost(HttpServletRequest request, @RequestParam("id") Long id) {
         Map<String, Object> resultMap = new HashMap<>();
         HttpSession session = request.getSession();
         
@@ -183,10 +144,7 @@ public class AdminBoardController {
 
     @RequestMapping(value = "/detail", method = RequestMethod.GET)
     @ResponseBody
-    public Map<String, Object> getBoardDetail(
-            HttpServletRequest request,
-            @RequestParam("id") Long id) {
-        
+    public Map<String, Object> getBoardDetail(HttpServletRequest request, @RequestParam("id") Long id) {
         Map<String, Object> resultMap = new HashMap<>();
         HttpSession session = request.getSession();
         
@@ -202,21 +160,14 @@ public class AdminBoardController {
             resultMap.put("board", board);
         } else {
             resultMap.put("success", false);
-            resultMap.put("message", "게시글을 찾을 수 없습니다.");
+            resultMap.put("message", "게시판 정보를 찾을 수 없습니다.");
         }
         return resultMap;
     }
 
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String, Object> updatePost(
-            HttpServletRequest request,
-            @RequestParam("id") Long id,
-            @RequestParam("regUser") String regUser,
-            @RequestParam("title") String title,
-            @RequestParam("content") String content,
-            @RequestParam(value = "file", required = false) MultipartFile file) {
-        
+    public Map<String, Object> updatePost(HttpServletRequest request, AdminBoard board) {
         Map<String, Object> resultMap = new HashMap<>();
         HttpSession session = request.getSession();
         
@@ -227,22 +178,9 @@ public class AdminBoardController {
         }
 
         try {
-            Map<String, Object> boardData = new HashMap<>();
-            boardData.put("id", id);
-            boardData.put("regUser", regUser);
-            boardData.put("title", title);
-            boardData.put("content", content);
-            
-            if (file != null && !file.isEmpty()) {
-                boardData.put("fileName", file.getOriginalFilename());
-                boardData.put("fileData", file.getBytes());
-                boardData.put("fileSize", file.getSize());
-                boardData.put("contentType", file.getContentType());
-            }
-
-            adminBoardService.updateBoard(boardData);
+            adminBoardService.updateBoard(board);
             resultMap.put("success", true);
-            resultMap.put("message", "성공적으로 수정되었습니다.");
+            resultMap.put("message", "게시판 설정이 성공적으로 수정되었습니다.");
         } catch (Exception e) {
             resultMap.put("success", false);
             resultMap.put("message", "수정 중 오류가 발생했습니다: " + e.getMessage());

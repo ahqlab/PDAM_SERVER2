@@ -10,13 +10,11 @@ public interface AdminBoardMapper {
     
     List<AdminBoard> getBoardList(Map<String, Object> paramMap);
 
-    int insertBoard(Map<String, Object> paramMap);
-
-    AdminBoard getFile(Long id);
+    int insertBoard(AdminBoard board);
     
     int deleteBoard(Long id);
     
     AdminBoard getBoard(Long id);
     
-    int updateBoard(Map<String, Object> paramMap);
+    int updateBoard(AdminBoard board);
 }
