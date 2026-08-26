@@ -18,6 +18,9 @@
                 <when test="searchType == 'regUser'">
                     AND reg_user LIKE CONCAT('%', #{keyword}, '%')
                 </when>
+                <otherwise>
+                    AND title LIKE CONCAT('%', #{keyword}, '%')
+                </otherwise>
             </choose>
         </if>
     </select>
@@ -45,6 +48,9 @@
                 <when test="searchType == 'regUser'">
                     AND reg_user LIKE CONCAT('%', #{keyword}, '%')
                 </when>
+                <otherwise>
+                    AND title LIKE CONCAT('%', #{keyword}, '%')
+                </otherwise>
             </choose>
         </if>
         ORDER BY id DESC

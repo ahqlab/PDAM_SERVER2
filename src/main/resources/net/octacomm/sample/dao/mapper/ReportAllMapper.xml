@@ -820,8 +820,9 @@
 				ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "하단"),'') as piTwo ,
 				ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" ORDER BY TB_PIECE.id ASC LIMIT 0,1),'') as piThree ,
 				ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" ORDER BY TB_PIECE.id ASC LIMIT 1,1),'') as piFour ,
-				ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "상단"),'') as piFive
-			FROM 
+				ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "상단"),'') as piFive ,
+				ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "상단"),'') as piSeven
+			FROM
 				<choose>
 		    		<when test="param.type != null and param.type != '' and param.type != null and param.type != ''">
 		    			<choose>
@@ -1037,7 +1038,8 @@
 	            ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "하단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piTwo,
 	            ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" ORDER BY TB_PIECE.id ASC LIMIT 0,1),'') as piThree,
 	            ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" ORDER BY TB_PIECE.id ASC LIMIT 1,1),'') as piFour,
-	            ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "상단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piFive
+	            ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "상단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piFive,
+	            ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "상단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piSeven
 				
 			FROM 
 				<choose>
