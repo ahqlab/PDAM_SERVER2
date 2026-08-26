@@ -231,8 +231,11 @@ function generateQR() {
     /* 전체 컨테이너 */
     .qr-page {
         display: flex;
+        flex-direction: row;
         gap: 20px;
         font-family: Arial, sans-serif;
+        box-sizing: border-box;
+        width: 100%;
     }
 
     /* 왼쪽 등록 폼 영역 */
@@ -242,6 +245,7 @@ function generateQR() {
         border: 1px solid #ccc;
         border-radius: 10px;
         background-color: #f9f9f9;
+        box-sizing: border-box;
     }
 
     .qr-container .form-row {
@@ -257,9 +261,11 @@ function generateQR() {
 
     .qr-container input[type="text"],
     .qr-container input[type="file"] {
+    	width: 100%;
         padding: 8px;
         border: 1px solid #ccc;
         border-radius: 5px;
+        box-sizing: border-box;
     }
 
     .qr-container .btn-area {
@@ -288,6 +294,7 @@ function generateQR() {
         border: 1px solid #ccc;
         border-radius: 10px;
         background-color: #fff;
+        box-sizing: border-box;
     }
 
     .qr-list-container h2 {
@@ -306,17 +313,21 @@ function generateQR() {
         justify-content: space-between;
         padding: 10px;
         border-bottom: 1px solid #eee;
+        gap: 10px;
     }
 
     .qr-list img {
         width: 50px;
         height: 50px;
         margin-right: 10px;
+        flex-shrink: 0;
     }
 
     .qr-list .qr-info {
         display: flex;
         align-items: center;
+        flex: 1;
+        min-width: 0;
     }
 
     /* .qr-list button {
@@ -328,9 +339,17 @@ function generateQR() {
         cursor: pointer;
     } */
     
+    .qr-list .qr-info span {
+    	white-space: nowrap;
+    	overflow: hidden;
+    	text-overflow: ellipsis;
+    	word-break: break-all;
+    }
+    
     .qr-list .list-btn-area {
         display: flex;
         gap: 5px;
+        flex-shrink: 0;
     }
 
     .qr-list button {
@@ -340,6 +359,8 @@ function generateQR() {
         color: white;
         cursor: pointer;
         transition: background 0.2s;
+        font-size: 13px;
+        white-space: nowrap;
     }
 
     .btn-download {
@@ -406,6 +427,26 @@ function generateQR() {
 
     #downloadQRBtn:hover {
         background-color: #1e7e34;
+    }
+    
+    @media screen and (max-width: 768px) {
+    	.qr-page {
+    		flex-direction: column;
+    	}
+    	
+    	.qr-container,
+    	.qr-list-container {
+    		width: 100%;
+    	}
+    	
+    	.qr-list li {
+    		padding: 8px 0;
+    	}
+    	
+    	.qr-list button {
+    		padding: 5px 8px;
+    		font-size: 12px;
+    	}
     }
 </style>
 		

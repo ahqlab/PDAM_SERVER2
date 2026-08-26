@@ -455,6 +455,31 @@ function checkDuplicateGroupName(){
 	}
 	.operationTrendBody{ height:350px; padding:8px 8px 10px; }
 	.operationTrendUnit{ top:12px; right:18px; font-size:12px; }
+	
+	.searchArea01,
+	.searchArea01 form,
+	.searchArea01 .searchBox {
+		display: flex;
+		flex-wrap: wrap;
+		width: 100%;
+		box-sizing: border-box;
+		gap: 6px;
+	}
+	
+	.searchArea01 select,
+	.searchArea input[type="text"] {
+		flex: 1 1 auto;
+		min-width: 0;
+		box-sizing: border-box;
+	}
+	
+	.btnAll {
+		height: 35px;
+		padding: 0 10px;
+		margin-left: 0;
+		font-size: 13px;
+		flex-shrink: 0;
+	}
 }
 .groupSpinner{
 	display:inline-block;width:18px;height:18px;vertical-align:middle;margin-right:6px;

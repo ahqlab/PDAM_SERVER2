@@ -5,13 +5,16 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -40,11 +43,13 @@ import net.octacomm.sample.domain.ExtensivePileUsage;
 import net.octacomm.sample.domain.Penetration;
 import net.octacomm.sample.domain.Piece;
 import net.octacomm.sample.domain.Report;
+import net.octacomm.sample.domain.ReportHistory;
 import net.octacomm.sample.domain.ReportMaxCount;
 import net.octacomm.sample.domain.ReportOneLine;
 import net.octacomm.sample.domain.ReportParam;
 import net.octacomm.sample.domain.SessionInfo;
 import net.octacomm.sample.domain.UpdateReport;
+import net.octacomm.sample.service.ReportHistoryService;
 import net.octacomm.sample.utils.MathUtil;
 import net.octacomm.sample.utils.Pagination;
 import net.octacomm.sample.utils.ReportPagination;
@@ -83,7 +88,9 @@ public class ReportController{
 	
 	@Autowired
 	private ExtensivePileUsageMapper extensivePileUsageMapper;
-	
+
+	@Autowired
+	private ReportHistoryService reportHistoryService;
 	
 	@RequestMapping(value = "/list")
 	public String list(Model model, @ModelAttribute("domainParam") ReportParam param, BindingResult result, HttpSession session) throws UnsupportedEncodingException {
@@ -179,6 +186,121 @@ public class ReportController{
 		model.addAttribute("extensivePileUsage", extensivePileUsage);
 		
 		return "report/listMultiOneLine";
+	}
+
+	@RequestMapping(value = "/history/list", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> historyList(
+			@RequestParam("deviceIdx") int deviceIdx,
+			@RequestParam(value = "workDate", required = false) String workDate,
+			@RequestParam(value = "page", defaultValue = "1") int requestedPage,
+			HttpSession session) {
+		final int pageSize = 5;
+		Map<String, Object> response = new LinkedHashMap<String, Object>();
+
+		Device device = deviceMapper.get(deviceIdx);
+		if (device == null || !isDeviceAccessible(device, session)) {
+			response.put("items", new ArrayList<Map<String, Object>>());
+			response.put("currentPage", 1);
+			response.put("pageSize", pageSize);
+			response.put("totalCount", 0);
+			response.put("totalPages", 0);
+			return response;
+		}
+
+		int totalCount = reportHistoryService.countByDeviceAndDate(deviceIdx, workDate);
+		int totalPages = totalCount == 0 ? 0 : (totalCount + pageSize - 1) / pageSize;
+		int currentPage = Math.max(1, requestedPage);
+		if (totalPages > 0 && currentPage > totalPages) {
+			currentPage = totalPages;
+		}
+
+		List<ReportHistory> histories = reportHistoryService.findPageByDeviceAndDate(
+				deviceIdx, workDate, (currentPage - 1) * pageSize, pageSize);
+		List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
+		for (ReportHistory history : histories) {
+			Map<String, Object> item = new LinkedHashMap<String, Object>();
+			item.put("id", history.getId());
+			item.put("modifiedAt", history.getModifiedAt());
+			item.put("userId", history.getUserId());
+			item.put("status", history.getStatus());
+			item.put("statusLabel", historyStatusLabel(history.getStatus()));
+			item.put("pileNo", history.getPileNo());
+			item.put("changeSummary", history.getChangeSummary());
+			item.put("changeCount", history.getChangeCount());
+			items.add(item);
+		}
+
+		response.put("items", items);
+		response.put("currentPage", currentPage);
+		response.put("pageSize", pageSize);
+		response.put("totalCount", totalCount);
+		response.put("totalPages", totalPages);
+		return response;
+	}
+
+	@RequestMapping(value = "/history/detail", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> historyDetail(
+			@RequestParam("deviceIdx") int deviceIdx,
+			@RequestParam("historyId") long historyId,
+			HttpSession session) {
+		Map<String, Object> response = new LinkedHashMap<String, Object>();
+		ReportHistory history = reportHistoryService.findById(historyId);
+		// historyList와 동일하게 "현재" 소속 기기(R.deviceIdx) 기준으로 맞춰야 한다.
+		// 스냅샷 당시 deviceIdx(history.getDeviceIdx())로 비교하면 기기 이관된 리포트의
+		// 과거 이력은 목록엔 보이는데 상세는 열리지 않는 불일치가 생긴다.
+		Report report = history == null ? null : mapper.get(history.getReportId());
+		Device device = report == null ? null : deviceMapper.get(report.getDeviceIdx());
+		if (history == null || report == null || report.getDeviceIdx() != deviceIdx
+				|| device == null || !isDeviceAccessible(device, session)) {
+			response.put("success", false);
+			response.put("message", "수정 이력을 찾을 수 없습니다.");
+			response.put("changes", new ArrayList<Map<String, String>>());
+			return response;
+		}
+
+		response.put("success", true);
+		response.put("modifiedAt", history.getModifiedAt());
+		response.put("userId", history.getUserId());
+		response.put("status", history.getStatus());
+		response.put("statusLabel", historyStatusLabel(history.getStatus()));
+		response.put("changes", reportHistoryService.findChanges(historyId));
+		return response;
+	}
+
+	// 기록지 이력 팝업(role별 데이터 접근범위)에서만 쓰는 경량 체크.
+	// role 0(시스템관리자)은 전체 허용, 그 외는 세션에 저장된 자신의
+	// constructionIdx/groupIdx/fcIdx가 기기의 소속과 일치할 때만 허용한다.
+	private boolean isDeviceAccessible(Device device, HttpSession session) {
+		Object roleAttr = session.getAttribute("role");
+		if (roleAttr == null) {
+			return false;
+		}
+		int role = (int) roleAttr;
+		if (role == 0) {
+			return true;
+		} else if (role == 1) {
+			Object constructionIdx = session.getAttribute("constructionIdx");
+			return constructionIdx != null && device.getConstructionIdx() == (int) constructionIdx;
+		} else if (role == 2) {
+			Object groupIdx = session.getAttribute("groupIdx");
+			return groupIdx != null && device.getGroupIdx() == (int) groupIdx;
+		} else if (role == 3) {
+			Object fcIdx = session.getAttribute("fcIdx");
+			return fcIdx != null && device.getFcIdx() == (int) fcIdx;
+		}
+		return false;
+	}
+
+	private String historyStatusLabel(String status) {
+		if (ReportHistoryService.STATUS_DELETE.equals(status)) {
+			return "삭제";
+		}
+		if (ReportHistoryService.STATUS_RESTORE.equals(status)) {
+			return "복구";
+		}
+		return "수정";
 	}
 
 	/**
@@ -898,45 +1020,55 @@ public class ReportController{
 	**/
 	
 	@ResponseBody
+	@Transactional
 	@RequestMapping(value = "/doRestoreMulti", method = RequestMethod.POST)
-	public boolean doRestoreMulti(@RequestBody List<UpdateReport> report) {
+	public boolean doRestoreMulti(@RequestBody List<UpdateReport> report, HttpSession session) {
 		try {
-			for (UpdateReport updateReport : report) { 
-				doRestore(updateReport);
+			for (UpdateReport updateReport : report) {
+				doRestore(updateReport, (String) session.getAttribute("userId"));
 			}
 		}catch (Exception e) {
+			// catch만 하고 예외를 삼키면 @Transactional 경계 밖으로 예외가 나가지 않아
+			// 이미 처리된 앞 항목들이 롤백되지 않고 그대로 커밋된다. 명시적으로 rollback-only 표시.
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			return false;
 		}
 		return true;
 	}
 	
 	
-	public void doRestore(UpdateReport report) {
+	public void doRestore(UpdateReport report, String userId) {
+		// 기존 복구 로직 실행 직전 전체 스냅샷 저장
+		reportHistoryService.saveBeforeChange(report.getId(), ReportHistoryService.STATUS_RESTORE, userId);
 		mapper.doRestore(report.getId());
 	}
 	
 	@ResponseBody
+	@Transactional
 	@RequestMapping(value = "/doDeleteMulti", method = RequestMethod.POST)
-	public boolean doDeleteMulti(@RequestBody List<UpdateReport> report) {
+	public boolean doDeleteMulti(@RequestBody List<UpdateReport> report, HttpSession session) {
 		try {
-			for (UpdateReport updateReport : report) {  
-			
-				doDelete(updateReport);
+			for (UpdateReport updateReport : report) {
+
+				doDelete(updateReport, (String) session.getAttribute("userId"));
 			}
 		}catch (Exception e) {
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			return false;
 		}
 		return true;
 	}
 	
-	public void doDelete(UpdateReport report) {
+	public void doDelete(UpdateReport report, String userId) {
+		// 기존 삭제 로직 실행 직전 전체 스냅샷 저장
+		reportHistoryService.saveBeforeChange(report.getId(), ReportHistoryService.STATUS_DELETE, userId);
 		mapper.doDelete(report.getId());
 	}
 	
 	@ResponseBody
 	@Transactional
 	@RequestMapping(value = "/update/report", method = RequestMethod.POST)
-	public boolean updateReport(@RequestBody UpdateReport report) {
+	public boolean updateReport(@RequestBody UpdateReport report, HttpSession session) {
 		
 		
 		/**report.setUltimateBearingCapacity(String.valueOf(calDanish(report)));
@@ -977,6 +1109,14 @@ public class ReportController{
 			extensivePileUsage = 0;
 		}
 		
+		try {
+			// 기존 기록지 수정 로직 실행 직전 전체 스냅샷 저장
+			reportHistoryService.saveBeforeChange(report.getId(), ReportHistoryService.STATUS_UPDATE, (String) session.getAttribute("userId"));
+		} catch (Exception e) {
+			// 이미 삭제된 id 등으로 스냅샷 저장이 실패하는 경우 500 대신 기존처럼 false를 반환
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+			return false;
+		}
 		report.setUltimateBearingCapacity(String.valueOf(calDanish(report)));
 		int result = mapper.update(report);
 		if(result > 0) {
@@ -1023,13 +1163,13 @@ public class ReportController{
 	@Transactional
 	@ResponseBody
 	@RequestMapping(value = "/update/reportMulti", method = RequestMethod.POST)
-	public boolean updateReportMulti(@RequestBody List<UpdateReport> reports) {
+	public boolean updateReportMulti(@RequestBody List<UpdateReport> reports, HttpSession session) {
 		if (reports == null || reports.isEmpty()) {
 			return false;
 		}
 
 		for (UpdateReport report : reports) {
-			if (!updateReportOne(report)) {
+			if (!updateReportOne(report, (String) session.getAttribute("userId"))) {
 				throw new IllegalStateException("기록지 수정 중 오류가 발생했습니다.");
 			}
 		}
@@ -1038,7 +1178,7 @@ public class ReportController{
 	
 	
 	@Transactional
-	public boolean updateReportOne(UpdateReport report) {
+	public boolean updateReportOne(UpdateReport report, String userId) {
 		
 		int extensivePileUsage = 0;
 		
@@ -1051,6 +1191,9 @@ public class ReportController{
 		}else {
 			extensivePileUsage = 0;
 		}
+	    // 기존 기록지 수정 로직 실행 직전 전체 스냅샷 저장
+		reportHistoryService.saveBeforeChange(report.getId(), ReportHistoryService.STATUS_UPDATE, userId);
+
 	    // 1. 계산값 설정
 	    report.setUltimateBearingCapacity(String.valueOf(calDanish(report)));
 
@@ -1152,16 +1295,34 @@ public class ReportController{
 	}
 	
 	@ResponseBody
+	@Transactional
 	@RequestMapping(value = "/doRestore", method = RequestMethod.POST)
-	public boolean doRestore(@RequestParam("id") int id) {
-		return mapper.doRestore(id) > 0;
+	public boolean doRestore(@RequestParam("id") int id, HttpSession session) {
+		try {
+			// 기존 복구 로직 실행 직전 전체 스냅샷 저장
+			reportHistoryService.saveBeforeChange(id,  ReportHistoryService.STATUS_RESTORE, (String) session.getAttribute("userId"));
+			return mapper.doRestore(id) > 0;
+		} catch (Exception e) {
+			// 이미 삭제/변경되어 존재하지 않는 id 등으로 스냅샷 저장이 실패하는 경우
+			// 기존처럼(예외 없이) false를 반환해 프론트의 성공/실패 처리와 호환되게 한다.
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+			return false;
+		}
 	}
-	
+
 	@ResponseBody
+	@Transactional
 	@RequestMapping(value = "/doDelete", method = RequestMethod.POST)
-	public boolean doDelete(@RequestParam("id") int id) {
-		//pieceMapper.delete(id)
-		return mapper.doDelete(id) > 0;
+	public boolean doDelete(@RequestParam("id") int id, HttpSession session) {
+		try {
+			//pieceMapper.delete(id)
+			// 기존 삭제 로직 실행 직전 전체 스냅샷 저장
+			reportHistoryService.saveBeforeChange(id, ReportHistoryService.STATUS_DELETE, (String) session.getAttribute("userId"));
+			return mapper.doDelete(id) > 0;
+		} catch (Exception e) {
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+			return false;
+		}
 	}
 	
 //	private double calDanish(float S){
@@ -1294,12 +1455,15 @@ public class ReportController{
 	}
 	
 	@ResponseBody
+	@Transactional
 	@RequestMapping(value = "/update/date", method = RequestMethod.POST)
 	public boolean updateReportDate(@RequestBody UpdateReport report, HttpSession session) {
 	    Integer role = (Integer) session.getAttribute("role");
 	    if (role == null || role != 0) return false;
 
 	    try {
+			// 기존 시공일 수정 로직 실행 직전 전체 스냅샷 저장
+	    	reportHistoryService.saveBeforeChange(report.getId(), ReportHistoryService.STATUS_UPDATE, (String) session.getAttribute("userId"));
 	        return mapper.updateDateOnly(report) > 0;
 	    } catch (Exception e) {
 	        e.printStackTrace();
@@ -1308,6 +1472,7 @@ public class ReportController{
 	}
 	
 	@ResponseBody
+	@Transactional
 	@RequestMapping(value = "/update/changeDeviceMulti", method = RequestMethod.POST)
 	public boolean changeDeviceMulti(@RequestBody List<Report> reportList, HttpSession session) {
 		Integer role = (Integer) session.getAttribute("role");
@@ -1315,6 +1480,8 @@ public class ReportController{
 
 		int successCount = 0;
 		for (Report report : reportList) {
+			// 기존 호기 변경 로직 실행 직전 전체 스냅샷 저장
+			reportHistoryService.saveBeforeChange(report.getId(), ReportHistoryService.STATUS_UPDATE, (String) session.getAttribute("userId"));
 			successCount += mapper.updateChangeDevice(report);
 		}
 		return successCount == reportList.size();

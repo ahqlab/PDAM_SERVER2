@@ -77,7 +77,6 @@ $( document ).ready( function() {
 	
 </script>
 <style>
-
 .listArea img {
 	width: 70px;
 	height: 70px;
@@ -86,6 +85,54 @@ $( document ).ready( function() {
 	margin-right: 10px;
 }
 
+@media (max-width:1023px){
+	.listArea .listUl li .franIcon,
+	.listArea .listUl li .franTxt {
+		background: transparent !important;
+		width: 100%;
+		max-width: 100%;
+		box-sizing: border-box;
+	}
+
+	.listArea .listUl li .franIcon img {
+		background: transparent !important;
+	}
+	
+	.searchArea01,
+	.searchArea01 form,
+	.searchArea01 .searchBox {
+		display: flex;
+		flex-wrap: wrap;
+		width: 100%;
+		box-sizing: border-box;
+		gap: 6px;
+	}
+
+	.searchArea01 .topArea,
+	.searchArea01 .titleBox {
+		display: flex;
+		flex-wrap: wrap ;
+		align-items: center;
+		justify-content: space-between;
+		width: 100%;
+		height: auto;
+		margin-bottom: 10px;
+	}
+
+	.searchArea01 h2,
+	.searchArea01 .title {
+		font-size: 18px;
+		line-height: 1.3;
+		white-space: nowrap;
+	}
+
+	.searchArea01 select,
+	.searchArea01 input[type="text"] {
+		flex: 1 1 auto;
+		min-width: 0;
+		box-sizing: border-box;
+	}
+}
 </style>
 <!--컨텐츠-->
 <div class="section-right">

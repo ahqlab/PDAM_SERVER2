@@ -169,6 +169,261 @@
 		.popUp06 { width: 95%; max-height: 90vh; }
 		.popUp06 .row-date-input, .popUp06 .row-device-select { font-size: 13px; height: 34px; }
 	}
+
+	.view .tableCArea div.reportHistoryBtn {
+		background: #063f52;
+		border-color: #063f52;
+	}
+
+	.report-actions-stack {
+		display: flex;
+		flex-direction: column;
+		align-items: stretch;
+		width: 325px;
+		max-width: 100%;
+		margin-left: auto;
+	}
+
+	.report-actions-stack-basic {
+		width: 210px;
+	}
+
+	.view .report-actions-stack .tableCArea {
+		display: flex;
+		width: 100%;
+		height: auto;
+		margin: 0;
+		gap: 5px;
+	}
+
+	.view .report-actions-stack-basic .tableCArea {
+		justify-content: flex-end;
+	}
+
+	.view .report-actions-stack .tableCArea > div {
+		margin: 0;
+	}
+
+	.view .report-actions-stack .tableCArea.report-approval-row {
+		margin-bottom: 5px;
+	}
+
+	.view .report-actions-stack .tableCArea .report-excel-setting {
+		width: 100%;
+	}
+
+	.report-history-popup {
+		display: none;
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		width: 640px;
+		max-width: 94vw;
+		max-height: 88vh;
+		z-index: 10001;
+		background: #fff;
+		border-radius: 8px;
+		box-shadow: 0 8px 30px rgba(0, 0, 0, 0.32);
+		overflow: hidden;
+		flex-direction: column;
+	}
+
+	.report-history-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		height: 56px;
+		padding: 0 20px;
+		background: #0783a5;
+		color: #fff;
+		box-sizing: border-box;
+	}
+
+	.report-history-header h2 {
+		margin: 0;
+		font-size: 20px;
+		font-weight: 500;
+	}
+
+	.report-history-close {
+		border: 0;
+		background: transparent;
+		color: #fff;
+		font-size: 26px;
+		line-height: 1;
+		cursor: pointer;
+		padding: 4px;
+	}
+
+	.report-history-body {
+		padding: 34px 18px 16px;
+		box-sizing: border-box;
+	}
+
+	.report-history-table {
+		width: 100%;
+		border-collapse: collapse;
+		table-layout: fixed;
+		font-size: 13px;
+		color: #222;
+	}
+
+	.report-history-table th,
+	.report-history-table td {
+		border: 1px solid #aaa;
+		padding: 7px 5px;
+		text-align: center;
+		vertical-align: middle;
+		box-sizing: border-box;
+	}
+
+	.report-history-table th {
+		background: #f1f1f1;
+		font-weight: 700;
+	}
+
+	.report-history-table tbody tr {
+		height: 46px;
+	}
+
+	.report-history-table tbody tr.is-selected {
+		background: #eef8fc;
+	}
+
+	.history-status {
+		display: inline-block;
+		min-width: 54px;
+		padding: 5px 7px;
+		border: 1px solid;
+		border-radius: 4px;
+		box-sizing: border-box;
+		background: #fff;
+	}
+
+	.history-status.UPDATE { color: #075cff; border-color: #075cff; background: #f2f6ff; }
+	.history-status.DELETE { color: #ff2020; border-color: #ff2020; background: #fff3f3; }
+	.history-status.RESTORE { color: #149345; border-color: #149345; background: #f1fbf4; }
+
+	.history-view-button {
+		min-width: 52px;
+		height: 30px;
+		border: 1px solid #777;
+		border-radius: 4px;
+		background: #fff;
+		color: #222;
+		cursor: pointer;
+	}
+
+	.history-view-button:hover,
+	.history-view-button.is-selected {
+		border-color: #0783a5;
+		color: #0783a5;
+		background: #f0fbff;
+	}
+
+	.report-history-pagination {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 4px;
+		min-height: 52px;
+	}
+
+	.report-history-pagination button {
+		min-width: 25px;
+		height: 25px;
+		padding: 0 5px;
+		border: 1px solid #e2e2e2;
+		background: #fff;
+		color: #222;
+		cursor: pointer;
+	}
+
+	.report-history-pagination button.is-current {
+		background: #267eb7;
+		border-color: #267eb7;
+		color: #fff;
+	}
+
+	.report-history-detail {
+		border: 1px solid #aaa;
+		border-radius: 6px;
+		background: #fff;
+		overflow: hidden;
+	}
+
+	.report-history-detail-head {
+		display: flex;
+		align-items: center;
+		gap: 42px;
+		height: 40px;
+		padding: 0 12px;
+		border-bottom: 1px solid #ddd;
+		box-sizing: border-box;
+		font-size: 13px;
+	}
+
+	.report-history-detail-head strong {
+		font-weight: 700;
+	}
+
+	.report-history-detail-scroll {
+		max-height: 190px;
+		overflow-y: auto;
+		overscroll-behavior: contain;
+	}
+
+	.report-history-change-row {
+		display: grid;
+		grid-template-columns: 120px minmax(120px, 1fr) 44px minmax(120px, 1fr);
+		align-items: center;
+		min-height: 44px;
+		margin: 0 10px;
+		border-bottom: 1px solid #e5e5e5;
+		font-size: 13px;
+	}
+
+	.report-history-change-row:last-child {
+		border-bottom: 0;
+	}
+
+	.report-history-field {
+		justify-self: start;
+		padding: 5px 10px;
+		background: #f5f5f5;
+	}
+
+	.report-history-value {
+		padding: 5px 10px;
+		word-break: break-all;
+	}
+
+	.report-history-arrow {
+		text-align: center;
+		font-size: 20px;
+	}
+
+	.report-history-message {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 44px;
+		padding: 10px;
+		box-sizing: border-box;
+		color: #777;
+	}
+
+	@media screen and (max-width: 767px) {
+		.report-actions-stack { width: 305px; }
+		.report-actions-stack-basic { width: 130px; }
+		.report-history-popup { width: 96vw; }
+		.report-history-body { padding: 18px 10px 12px; }
+		.report-history-table { font-size: 11px; }
+		.report-history-table th, .report-history-table td { padding: 5px 2px; }
+		.report-history-change-row { grid-template-columns: 82px 1fr 28px 1fr; }
+		.report-history-detail-head { gap: 16px; }
+	}
 	
 	
 </style>
@@ -2126,6 +2381,145 @@
 		});
 	}
 
+	function openReportHistory(page) {
+		$('#reportHistoryPopup').css('display', 'flex');
+		$('.popLayer').show();
+		$('body').css('overflow', 'hidden');
+		loadReportHistoryPage(page || 1);
+	}
+
+	function closeReportHistory() {
+		$('#reportHistoryPopup').hide();
+		$('.popLayer').hide();
+		$('body').css('overflow', 'auto');
+	}
+
+	function loadReportHistoryPage(page) {
+		$('#reportHistoryBody').html('<tr><td colspan="5">수정 이력을 불러오는 중입니다.</td></tr>');
+		$('#reportHistoryPagination').empty();
+		resetReportHistoryDetail('상세 내역을 선택해주세요.');
+
+		$.ajax({
+			type: 'GET',
+			url: '${pageContext.request.contextPath}/report/history/list',
+			dataType: 'json',
+			data: {
+				deviceIdx: Number('${param.id}'),
+				workDate: '${param.date}',
+				page: page
+			},
+			success: function(data) {
+				renderReportHistoryList(data);
+			},
+			error: function() {
+				$('#reportHistoryBody').html('<tr><td colspan="5">수정 이력을 불러오지 못했습니다.</td></tr>');
+			}
+		});
+	}
+
+	function renderReportHistoryList(data) {
+		var items = data.items || [];
+		var html = '';
+		if (items.length === 0) {
+			html = '<tr><td colspan="5">저장된 수정 이력이 없습니다.</td></tr>';
+		} else {
+			$.each(items, function(index, item) {
+				var modifiedAt = escapeHistoryHtml(item.modifiedAt || '-').replace(' ', '<br>');
+				html += '<tr data-history-id="' + item.id + '">';
+				html += '<td>' + modifiedAt + '</td>';
+				html += '<td><span class="history-status ' + escapeHistoryHtml(item.status) + '">' + escapeHistoryHtml(item.statusLabel) + '</span></td>';
+				html += '<td>' + escapeHistoryHtml(item.pileNo || '-') + '</td>';
+				html += '<td>' + escapeHistoryHtml(item.changeSummary || '-') + '</td>';
+				html += '<td><button type="button" class="history-view-button" onclick="loadReportHistoryDetail(' + item.id + ', this);">보기</button></td>';
+				html += '</tr>';
+			});
+		}
+		$('#reportHistoryBody').html(html);
+		renderReportHistoryPagination(data.currentPage || 1, data.totalPages || 0);
+
+		if (items.length > 0) {
+			var firstButton = $('#reportHistoryBody .history-view-button').first();
+			loadReportHistoryDetail(items[0].id, firstButton.get(0));
+		}
+	}
+
+	function renderReportHistoryPagination(currentPage, totalPages) {
+		var html = '';
+		if (totalPages > 0) {
+			var groupStart = Math.floor((currentPage - 1) / 10) * 10 + 1;
+			var groupEnd = Math.min(groupStart + 9, totalPages);
+			if (groupStart > 1) {
+				html += '<button type="button" onclick="loadReportHistoryPage(' + (groupStart - 1) + ');">이전</button>';
+			}
+			for (var page = groupStart; page <= groupEnd; page++) {
+				html += '<button type="button" class="' + (page === currentPage ? 'is-current' : '') + '" onclick="loadReportHistoryPage(' + page + ');">' + page + '</button>';
+			}
+			if (groupEnd < totalPages) {
+				html += '<button type="button" onclick="loadReportHistoryPage(' + (groupEnd + 1) + ');">다음</button>';
+			}
+		}
+		$('#reportHistoryPagination').html(html);
+	}
+
+	function loadReportHistoryDetail(historyId, button) {
+		$('#reportHistoryBody tr').removeClass('is-selected');
+		$('#reportHistoryBody .history-view-button').removeClass('is-selected');
+		if (button) {
+			$(button).addClass('is-selected').closest('tr').addClass('is-selected');
+		}
+		$('#reportHistoryDetailMeta').text('불러오는 중...');
+		$('#reportHistoryDetailScroll').html('<div class="report-history-message">변경 상세를 불러오는 중입니다.</div>');
+
+		$.ajax({
+			type: 'GET',
+			url: '${pageContext.request.contextPath}/report/history/detail',
+			dataType: 'json',
+			data: {
+				deviceIdx: Number('${param.id}'),
+				historyId: historyId
+			},
+			success: function(data) {
+				if (!data.success) {
+					resetReportHistoryDetail(data.message || '상세 내역을 불러오지 못했습니다.');
+					return;
+				}
+				$('#reportHistoryDetailMeta').text(data.modifiedAt || '-');
+				var changes = data.changes || [];
+				if (changes.length === 0) {
+					$('#reportHistoryDetailScroll').html('<div class="report-history-message">변경된 항목이 없습니다.</div>');
+					return;
+				}
+				var html = '';
+				$.each(changes, function(index, change) {
+					html += '<div class="report-history-change-row">';
+					html += '<span class="report-history-field">' + escapeHistoryHtml(change.fieldName) + '</span>';
+					html += '<span class="report-history-value">' + escapeHistoryHtml(change.beforeValue) + '</span>';
+					html += '<span class="report-history-arrow">→</span>';
+					html += '<span class="report-history-value">' + escapeHistoryHtml(change.afterValue) + '</span>';
+					html += '</div>';
+				});
+				$('#reportHistoryDetailScroll').html(html).scrollTop(0);
+			},
+			error: function() {
+				resetReportHistoryDetail('상세 내역을 불러오지 못했습니다.');
+			}
+		});
+	}
+
+	function resetReportHistoryDetail(message) {
+		$('#reportHistoryDetailMeta').text('');
+		$('#reportHistoryDetailScroll').html('<div class="report-history-message">' + escapeHistoryHtml(message) + '</div>');
+	}
+
+	function escapeHistoryHtml(value) {
+		return String(value == null ? '' : value)
+			.replace(/&/g, '&amp;')
+			.replace(/</g, '&lt;')
+			.replace(/>/g, '&gt;')
+			.replace(/"/g, '&quot;')
+			.replace(/'/g, '&#39;');
+	}
+
 </script>
 <!--컨텐츠-->
 <div class="section-right" >
@@ -2205,13 +2599,14 @@
 								<div class="btnType02 bg02" onclick="javascript:openDateEditPopupBtn();" style="width: 90px; background: #9C27B0; color:#fff; border: 1px solid #9C27B0; margin: 0;">시공일 수정</div>
 							</div>
 						</c:if> 
-						<div class="tableCArea">
-							<c:choose>												 
+						<div class="report-actions-stack${sessionInfo.role == 0 || sessionInfo.hiddenManager == true || sessionInfo.role == 3 ? '' : ' report-actions-stack-basic'}">
+						<div class="tableCArea report-approval-row">
+							<c:choose>
 								<c:when test="${sessionInfo.role == 0 || sessionInfo.hiddenManager == true || sessionInfo.role == 3}">
-									<c:if test="${useExcel}"><div class="btnType02 bg02" onclick="javascript:onClickExcelSignRoom();"   style="width: 210px; margin-bottom : 5px; background: #FFD400; color:#000000; border: 1px solid #258348;">EXCEL 결재방 설정</div></c:if>
+									<c:if test="${useExcel}"><div class="btnType02 bg02 report-excel-setting" onclick="javascript:onClickExcelSignRoom();" style="background: #FFD400; color:#000000; border: 1px solid #258348;">EXCEL 결재방 설정</div></c:if>
 								</c:when>
 								<c:otherwise>
-									<c:if test="${useExcel}"><div class="btnType02 bg02" onclick="javascript:onClickExcelSignRoom();" style="width: 210px; margin-bottom : 5px; background: #FFD400; color:#000000; border: 1px solid #258348;">EXCEL 결재방 설정</div></c:if>
+									<c:if test="${useExcel}"><div class="btnType02 bg02 report-excel-setting" onclick="javascript:onClickExcelSignRoom();" style="background: #FFD400; color:#000000; border: 1px solid #258348;">EXCEL 결재방 설정</div></c:if>
 								</c:otherwise>
 							</c:choose>
 						</div>
@@ -2220,12 +2615,14 @@
 								<c:when test="${sessionInfo.role == 0 || sessionInfo.hiddenManager == true || sessionInfo.role == 3}">
 									<c:if test="${useExcel}"><div class="btnType02 bg02" onclick="javascript:downloadExcel();">엑셀 출력</div></c:if>
 									<div class="btnType01" onclick="javascript:onClickReportUpdate();">기록지 수정</div>
+									<div class="btnType01 reportHistoryBtn" onclick="javascript:openReportHistory(1);">수정 이력</div>
 								</c:when>
 								<c:otherwise>
 									<c:if test="${useExcel}"><div class="btnType02 bg02" onclick="javascript:downloadExcel();">엑셀 출력</div></c:if>
 									<div class="btnType01" onclick="javascript:onClickReportUpdate();" style="display: none;">기록지 수정</div>
 								</c:otherwise>
 							</c:choose>
+						</div>
 						</div>
 					</td>
 				</tr>
@@ -2269,13 +2666,14 @@
 								<div class="btnType02 bg02" onclick="javascript:openDateEditPopupBtn();" style="width: 90px; background: #9C27B0; color:#fff; border: 1px solid #9C27B0; margin: 0;">시공일 수정</div>
 							</div>
 						</c:if>
-						<div class="tableCArea" style="margin-bottom: 0px;">
-							<c:choose>												 
+						<div class="report-actions-stack${sessionInfo.role == 0 || sessionInfo.hiddenManager == true || sessionInfo.role == 3 ? '' : ' report-actions-stack-basic'}">
+						<div class="tableCArea report-approval-row">
+							<c:choose>
 								<c:when test="${sessionInfo.role == 0 || sessionInfo.hiddenManager == true || sessionInfo.role == 3}">
-									<c:if test="${useExcel}"><div class="btnType02 bg02" id="excelSignRoomSetting" style="float: right; width: 130px; margin-bottom : 5px; background: #FFD400; color:#000000; border: 1px solid #258348;">EXCEL 결재방 설정</div></c:if>
+									<c:if test="${useExcel}"><div class="btnType02 bg02 report-excel-setting" id="excelSignRoomSetting" style="background: #FFD400; color:#000000; border: 1px solid #258348;">EXCEL 결재방 설정</div></c:if>
 								</c:when>
 								<c:otherwise>
-									<c:if test="${useExcel}"><div class="btnType02 bg02" id="excelSignRoomSetting" style="float: right; width: 130px; margin-bottom : 5px; background: #FFD400; color:#000000; border: 1px solid #258348;">EXCEL 결재방 설정</div></c:if>
+									<c:if test="${useExcel}"><div class="btnType02 bg02 report-excel-setting" id="excelSignRoomSetting" style="background: #FFD400; color:#000000; border: 1px solid #258348;">EXCEL 결재방 설정</div></c:if>
 								</c:otherwise>
 							</c:choose>
 						</div>
@@ -2284,12 +2682,14 @@
 								<c:when test="${sessionInfo.role == 0 || sessionInfo.hiddenManager == true || sessionInfo.role == 3}">
 									<c:if test="${useExcel}"><div class="btnType02 bg02" onclick="javascript:downloadExcel();">엑셀 출력</div></c:if>
 									<div class="btnType01" onclick="javascript:onClickReportUpdate();">기록지 수정</div>
+									<div class="btnType01 reportHistoryBtn" onclick="javascript:openReportHistory(1);">수정 이력</div>
 								</c:when>
 								<c:otherwise>
 									<c:if test="${useExcel}"><div class="btnType02 bg02" onclick="javascript:downloadExcel();" style="float: right;">엑셀 출력</div></c:if>
 									<!-- <div class="btnType01" onclick="javascript:onClickReportUpdate();" style="display: none;">기록지 수정</div> -->
 								</c:otherwise>
 							</c:choose>
+						</div>
 						</div>
 					</td>
 				</tr>
@@ -4014,6 +4414,46 @@
 			<div onclick="javascript:submitDeviceChange();" style="margin-top: 20px; background:#077b9c; color:#fff; text-align: center; padding: 14px; cursor: pointer; font-weight: bold; font-size: 16px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">개별 이전 및 수정 저장</div>
 		</div>
 	</div>
+
+	<div id="reportHistoryPopup" class="report-history-popup" role="dialog" aria-modal="true" aria-labelledby="reportHistoryTitle">
+		<div class="report-history-header">
+			<h2 id="reportHistoryTitle">수정이력</h2>
+			<button type="button" class="report-history-close" onclick="closeReportHistory();" aria-label="닫기">×</button>
+		</div>
+		<div class="report-history-body">
+			<table class="report-history-table">
+				<colgroup>
+					<col width="20%">
+					<col width="20%">
+					<col width="20%">
+					<col width="20%">
+					<col width="20%">
+				</colgroup>
+				<thead>
+					<tr>
+						<th>변경일시</th>
+						<th>작업유형</th>
+						<th>파일번호</th>
+						<th>변경내용</th>
+						<th>상세</th>
+					</tr>
+				</thead>
+				<tbody id="reportHistoryBody">
+					<tr><td colspan="5">수정 이력을 불러오는 중입니다.</td></tr>
+				</tbody>
+			</table>
+			<div id="reportHistoryPagination" class="report-history-pagination"></div>
+			<div class="report-history-detail">
+				<div class="report-history-detail-head">
+					<strong>변경 상세</strong>
+					<span id="reportHistoryDetailMeta"></span>
+				</div>
+				<div id="reportHistoryDetailScroll" class="report-history-detail-scroll">
+					<div class="report-history-message">상세 내역을 선택해주세요.</div>
+				</div>
+			</div>
+		</div>
+	</div>
 	
 	
 	<div id="drivingRecordOverlay" style="display:none;"></div>
@@ -4047,6 +4487,11 @@
 
 	$('.popUp').hide();
 	$('.popLayer').hide();
+	$('.popLayer').on('click.reportHistory', function() {
+		if ($('#reportHistoryPopup').is(':visible')) {
+			closeReportHistory();
+		}
+	});
 
 	$('.popBtn, .tableChange').on('click', function(e){
 		$('.popUp').show();

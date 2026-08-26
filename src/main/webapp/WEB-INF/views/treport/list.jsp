@@ -144,6 +144,73 @@ function onClickDeleteBtn(idx){
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     padding: 20px;
 }
+
+@media (max-width: 1023px) {
+	.searchArea01 .topArea,
+	.searchArea01 .titleBox,
+	.searchArea01 > p:first-child {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		justify-content: flex-start;
+		width: 100%;
+		height: auto;
+		float: none;
+		gap: 8px;
+		margin-bottom: 12px;
+	}
+
+	.searchArea01 h2,
+	.searchArea01 .title,
+	.searchArea01 > p:first-child > span:first-child {
+		display: block;
+		width: 100%;
+		font-size: 18px;
+		line-height: 1.3;
+		white-space: nowrap;
+		word-break: keep-all;
+		float: none;
+	}
+
+	.searchArea01 a,
+	.searchArea01 button,
+	.searchArea01 .btn,
+	.searchArea01 .btnArea {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		position: static;
+		float: none;
+		width: auto;
+		height: 36px;
+		padding: 0 12px;
+		margin: 0;
+		white-space: nowrap;
+		word-break: keep-all;
+	}
+
+	.searchArea01,
+	.searchArea01 form,
+	.searchArea01 .searchBox {
+		display: flex;
+		flex-wrap: wrap;
+		width: 100%;
+		box-sizing: border-box;
+		gap: 6px;
+	}
+
+	.searchArea01 select,
+	.searchArea01 input[type="text"] {
+		flex: 1 1 calc(50% - 6px); 
+		min-width: 120px;
+		box-sizing: border-box;
+	}
+
+	.searchArea01 .btnSearch,
+	.searchArea01 button[type="submit"] {
+		flex: 0 0 auto;
+	}
+}
 </style>
 
 <!-- 팝업 -->
