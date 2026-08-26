@@ -105,9 +105,14 @@ public class AdminBoardController {
             resultMap.put("message", "권한이 없습니다.");
             return resultMap;
         }
+        if (board.getAuth() == null || board.getAuth().trim().isEmpty()) {
+            resultMap.put("success", false);
+            resultMap.put("message", "접근 권한을 하나 이상 선택하세요.");
+            return resultMap;
+        }
 
         try {
-            adminBoardService.insertBoard(board); 
+            adminBoardService.insertBoard(board);
             resultMap.put("success", true);
             resultMap.put("message", "게시판이 성공적으로 생성되었습니다.");
         } catch (Exception e) {
@@ -174,6 +179,11 @@ public class AdminBoardController {
         if (!isSystemAdmin(session)) {
             resultMap.put("success", false);
             resultMap.put("message", "권한이 없습니다.");
+            return resultMap;
+        }
+        if (board.getAuth() == null || board.getAuth().trim().isEmpty()) {
+            resultMap.put("success", false);
+            resultMap.put("message", "접근 권한을 하나 이상 선택하세요.");
             return resultMap;
         }
 

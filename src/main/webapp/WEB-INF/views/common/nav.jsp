@@ -134,5 +134,5 @@ document.addEventListener("DOMContentLoaded", function () {
 			menuLinks[i].classList.add('menuActive');
 		}
 	}
-})();
+});
 </script>
