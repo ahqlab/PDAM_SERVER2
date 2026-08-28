@@ -320,7 +320,7 @@
 									<span class="fieldIcon" aria-hidden="true">
 										<svg viewBox="0 0 24 24"><path d="M20 21a8 8 0 0 0-16 0M12 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/></svg>
 									</span>
-									<form:input path="userId" class="loginInput" placeholder="아이디를 입력하세요." value="" autocomplete="username" />
+									<form:input path="userId" class="loginInput" placeholder="아이디를 입력하세요." value="" autocomplete="off" />
 								</div>
 							</div>
 							<div class="inputArea">
@@ -392,44 +392,45 @@ $('.BtnClose, .popClose, .bg02').on('click', function(e){
     	 formSubmit();
      }
  });
- 
+
  $(document).ready(function(){
-		var key = getCookie("idChk"); //user1
+		var key = getCookie("idChk");
 		if(key!=""){
-			$("#userId").val(key); 
+			$("#userId").val(key);
 		}
-		 
-		if($("#userId").val() != ""){ 
-			$("#idsave").attr("checked", true); 
+
+		if($("#userId").val() != ""){
+			$("#idsave").attr("checked", true);
 		}
-		 
-		$("#idsave").change(function(){ 
-			if($("#idsave").is(":checked")){ 
-				setCookie("idChk", $("#userId").val(), 7); 
-			}else{ 
+
+		$("#idsave").change(function(){
+			if($("#idsave").is(":checked")){
+				setCookie("idChk", $("#userId").val(), 7);
+			}else{
 				deleteCookie("idChk");
 			}
 		});
-		 
-		$("#userId").keyup(function(){ 
+
+		$("#userId").keyup(function(){
 			if($("#idsave").is(":checked")){
-				setCookie("idChk", $("#userId").val(), 7); 
+				setCookie("idChk", $("#userId").val(), 7);
 			}
 		});
 	});
+
 	function setCookie(cookieName, value, exdays){
 	    var exdate = new Date();
 	    exdate.setDate(exdate.getDate() + exdays);
 	    var cookieValue = escape(value) + ((exdays==null) ? "" : "; expires=" + exdate.toGMTString());
 	    document.cookie = cookieName + "=" + cookieValue;
 	}
-	 
+
 	function deleteCookie(cookieName){
 		var expireDate = new Date();
 		expireDate.setDate(expireDate.getDate() - 1);
 		document.cookie = cookieName + "= " + "; expires=" + expireDate.toGMTString();
 	}
-		 
+
 	function getCookie(cookieName) {
 		cookieName = cookieName + '=';
 		var cookieData = document.cookie;
