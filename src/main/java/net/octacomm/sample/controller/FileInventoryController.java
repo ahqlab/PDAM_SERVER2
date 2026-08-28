@@ -153,4 +153,14 @@ public class FileInventoryController
 		}
 		return inventory != null ? false : true;
 	}
+	
+	@ModelAttribute
+	public void setBreadcrumbData(@RequestParam(value = "constructionIdx", required = false, defaultValue = "0") int constructionIdx, Model model) {
+	    if(constructionIdx > 0) {
+	        FileInventory breadcrumb = mapper.getBreadcrumbInfo(constructionIdx);
+	        if(breadcrumb != null) {
+	            model.addAttribute("breadcrumb", breadcrumb); 
+	        }
+	    }
+	}
 }

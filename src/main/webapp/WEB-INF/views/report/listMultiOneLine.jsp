@@ -413,7 +413,38 @@
 		box-sizing: border-box;
 		color: #777;
 	}
-
+	
+	.custom-breadcrumb {
+	    display: flex;
+	    align-items: center;
+	    flex-wrap: wrap;
+	    gap: 14px;
+	    font-size: 1.25rem;
+	    color: #ffffff;
+	    letter-spacing: -0.02em;
+	    margin-top: 5px;
+	}
+	.step-item {
+	    font-weight: 500;
+	    padding-bottom: 6px;
+	    border-bottom: 3px solid rgba(255, 255, 255, 0.4);
+	    opacity: 0.85;
+	    line-height: 1;
+	    word-break: keep-all;
+	}
+	.step-item.active {
+	    border-bottom: 3px solid #5bc0de;
+	    font-weight: 700;
+	    opacity: 1;
+	}
+	.step-arrow {
+	    opacity: 0.5;
+	    font-size: 1.1rem;
+	    padding-bottom: 6px;
+	    border-bottom: 3px solid transparent;
+	    line-height: 1;
+	}
+	
 	@media screen and (max-width: 767px) {
 		.report-actions-stack { width: 305px; }
 		.report-actions-stack-basic { width: 130px; }
@@ -423,6 +454,23 @@
 		.report-history-table th, .report-history-table td { padding: 5px 2px; }
 		.report-history-change-row { grid-template-columns: 82px 1fr 28px 1fr; }
 		.report-history-detail-head { gap: 16px; }
+		.custom-breadcrumb {
+	        font-size: 0.95rem;
+	        gap: 6px;
+	        margin-top: 2px;
+	    }
+	    .step-item {
+	        padding-bottom: 4px;
+	        border-bottom-width: 2px;
+	    }
+	    .step-item.active {
+	        border-bottom-width: 2px;
+	    }
+	    .step-arrow {
+	        font-size: 0.85rem;
+	        padding-bottom: 4px;
+	        border-bottom-width: 2px;
+	    }
 	}
 	
 	
@@ -2526,7 +2574,22 @@
 	<%@ include file="/WEB-INF/views/common/welcomeMsg.jsp" %>
 	<div class="TopContArea">
 		<div class="titArea mb-40">
-			<p class="h1Tit">${device.machineNumber} 시공현황</p>
+			<div>
+				<p class="h1Tit" style="margin-bottom: 8px;">시공현황</p>
+				<div class="custom-breadcrumb">
+					<div class="step-item">
+						<span>${breadcrumb.groupName}</span>
+					</div>
+					<span class="step-arrow">&gt;</span>
+					<div class="step-item">
+						<span>${breadcrumb.constructionName}</span>
+					</div>
+					<span class="step-arrow">&gt;</span>
+					<div class="step-item active">
+						<span>${breadcrumb.machineNumber}</span>
+					</div>
+				</div>
+			</div>
 			<input type="hidden" id="machineNumber" name="machineNumber" value="${device.machineNumber}">
 			<input type="hidden" id="constructionName" name="constructionName" value="">
 			<input type="hidden" id="root" name="root" value="${pageContext.request.contextPath}">

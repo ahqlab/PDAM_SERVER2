@@ -4351,4 +4351,16 @@
 			currentDateTime = #{currentDateTime}
 		WHERE id = #{id}
 	</update>
+	
+	<select id="getBreadcrumbInfo" resultType="net.octacomm.sample.domain.Report">
+	    SELECT 
+	        G.groupName, 
+	        C.name AS constructionName, 
+	        B.machineNumber
+	    FROM TB_DEVICE B
+	    INNER JOIN TB_CONSTRUCTION C ON B.constructionIdx = C.id
+	    LEFT JOIN TB_GROUP G ON C.groupIdx = G.idx
+	    WHERE B.id = #{id}
+	</select>
+   
 </mapper>

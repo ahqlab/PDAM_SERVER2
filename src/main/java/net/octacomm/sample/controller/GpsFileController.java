@@ -19,6 +19,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -150,5 +152,13 @@ public class GpsFileController extends AbstractGpsFileCRUDController<GpsFileMapp
 		return mapper.delete(id) > 0;
 	}
 	
-	
+	@ModelAttribute
+	public void setBreadcrumbData(@RequestParam(value = "constructionIdx", required = false, defaultValue = "0") int constructionIdx, Model model) {
+	    if(constructionIdx > 0) {
+	        GpsFile breadcrumb = mapper.getBreadcrumbInfo(constructionIdx);
+	        if(breadcrumb != null) {
+	            model.addAttribute("breadcrumb", breadcrumb); 
+	        }
+	    }
+	}
 }

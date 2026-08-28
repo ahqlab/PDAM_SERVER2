@@ -267,4 +267,10 @@ public class FileInventory implements Domain{
 	//???
 	private String machineNumber;
 	
+	private String groupName;
+	
+	private String constructionName;
+	
+	private String location;
+	
 }

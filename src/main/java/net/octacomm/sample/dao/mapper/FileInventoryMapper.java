@@ -109,5 +109,6 @@ public interface FileInventoryMapper extends CRUDMapper<FileInventory, FileInven
 	
 	@Select("SELECT * FROM " + TABLE_NAME + " WHERE registDate =  #{registDate} and maker =  #{maker} and pileType =  #{pileType} and pileStandard =  #{pileStandard} and constructionIdx =  #{constructionIdx}")
 	FileInventory getFileInventory2(@Param("registDate") String registDate , @Param("maker") String maker , @Param("pileType") String pileType,  @Param("pileStandard") String pileStandard, @Param("constructionIdx") int constructionIdx);
-
+	
+	FileInventory getBreadcrumbInfo(@Param("constructionIdx") int constructionIdx);
 }

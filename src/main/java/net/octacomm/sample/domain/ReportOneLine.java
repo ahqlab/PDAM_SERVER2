@@ -251,4 +251,7 @@ public class ReportOneLine implements Domain {
 		this.balance = balance;
 	}
 	
+	private String groupName;
+	
+	private String constructionName;
 }

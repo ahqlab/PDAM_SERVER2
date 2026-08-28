@@ -8,11 +8,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import net.octacomm.sample.dao.mapper.ReportMapper;
 import net.octacomm.sample.dao.mapper.SimpleReportMapper;
 import net.octacomm.sample.domain.Report;
 import net.octacomm.sample.domain.ReportParam;
+import net.octacomm.sample.domain.SimpleReport;
 
 
 @RequestMapping("/simple/report")
@@ -43,5 +45,15 @@ public class SimpleReportController extends AbstractSimpleReportCRUDController<S
 		}else{
 			model.addAttribute("menuIndex", 2);
 		}
+	}
+	
+	@ModelAttribute
+	public void setBreadcrumbData(@RequestParam(value = "id", required = false, defaultValue = "0") int id, Model model) {
+	    if(id > 0) {
+	        SimpleReport device = mapper.getBreadcrumbInfo(id);
+	        if(device != null) {
+	            model.addAttribute("device", device);
+	        }
+	    }
 	}
 }
