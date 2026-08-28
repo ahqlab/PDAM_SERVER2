@@ -1361,4 +1361,14 @@
 		LIMIT #{pageSize} OFFSET #{startRow}
     </select> 
     
+    <select id="getBreadcrumbInfo" resultType="net.octacomm.sample.domain.FileInventory">
+	    SELECT 
+	        G.groupName, 
+	        C.name AS constructionName, 
+	        C.location 
+	    FROM TB_CONSTRUCTION C
+	    LEFT JOIN TB_GROUP G ON C.groupIdx = G.idx
+	    WHERE C.id = #{constructionIdx}
+	</select>
+    
 </mapper>

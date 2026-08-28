@@ -29,6 +29,10 @@ public class GpsFile  implements Domain{
 	  
 	private int fcIdx;
 	 
+	private String groupName;
 	
+	private String constructionName;
+	
+	private String location;
 	
 }

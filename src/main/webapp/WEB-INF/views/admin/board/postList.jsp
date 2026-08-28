@@ -291,6 +291,15 @@
 		allowedExts = allowedExtsStr.replace(/\s/g, '').toLowerCase().split(',');
 	}
 
+	function formatBytes(bytes) {
+		if (bytes === 0) return '0 Bytes';
+		if (!bytes) return '';
+		var k = 1024;
+		var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+		var i = Math.floor(Math.log(bytes) / Math.log(k));
+		return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+	}
+
 	function openRegPopup() {
 		$('#popTitleText').text('새 게시글 작성');
 		$('#submitBtn').text('게시글 등록');
@@ -328,10 +337,15 @@
 					var hasFile = false;
 					for(var i=1; i<=3; i++) {
 						var fName = post['fileName'+i];
+						var fSize = post['fileSize'+i];
+						
 						if(fName) {
 							hasFile = true;
 							var url = "${pageContext.request.contextPath}/board/download?id=" + post.id + "&slot=" + i;
-							$('#detailFileList').append('<div style="margin-bottom:6px;"><a href="'+url+'" style="color:#077b9c;font-weight:bold;text-decoration:none;">💾 '+fName+'</a></div>');
+							
+							var sizeStr = fSize ? ' <span style="font-weight:normal;color:#777;font-size:12px;">(' + formatBytes(fSize) + ')</span>' : '';
+							
+							$('#detailFileList').append('<div style="margin-bottom:6px;"><a href="'+url+'" style="color:#077b9c;font-weight:bold;text-decoration:none;">💾 '+fName + sizeStr + '</a></div>');
 						}
 					}
 					if(!hasFile) $('#detailFileList').text('첨부파일 없음');
@@ -376,9 +390,12 @@
 			$('#fileAttachArea').show();
 			for(var i=1; i<=3; i++) {
 				var fName = post['fileName'+i];
+				var fSize = post['fileSize'+i];
+				
 				if(fName) {
+					var sizeStr = fSize ? ' <span style="color:#888;">(' + formatBytes(fSize) + ')</span>' : '';
 					var html = '<div id="fileSlot_'+i+'" style="font-size:13px; margin-bottom:5px; background:#fff; padding:5px; border:1px solid #ccc;">' + 
-							   '💾 ' + fName + 
+							   '💾 ' + fName + sizeStr +
 							   ' <span style="color:red; cursor:pointer; font-weight:bold; float:right;" onclick="removeFile('+post.id+', '+i+')">[삭제]</span></div>';
 					$('#existingFilesArea').append(html);
 				}

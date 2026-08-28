@@ -9,6 +9,7 @@ public interface BoardPostMapper {
     List<BoardPost> getPostList(Map<String, Object> paramMap);
     int insertPost(BoardPost post);
     BoardPost getPost(Long id);
+    BoardPost getPostFileData(Long id);
     int updatePost(BoardPost post);
     int deletePost(Long id);
     int deleteFileSlot(Map<String, Object> paramMap);

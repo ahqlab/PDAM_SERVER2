@@ -54,5 +54,15 @@
 	    )
     </foreach>
 </insert>
+
+<select id="getBreadcrumbInfo" resultType="net.octacomm.sample.domain.GpsFile">
+    SELECT 
+        G.groupName, 
+        C.name AS constructionName, 
+        C.location 
+    FROM TB_CONSTRUCTION C
+    LEFT JOIN TB_GROUP G ON C.groupIdx = G.idx
+    WHERE C.id = #{constructionIdx}
+</select>
        
 </mapper>

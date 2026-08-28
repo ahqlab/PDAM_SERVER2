@@ -103,6 +103,10 @@ public class Report implements Domain {
 	
 	private String zone;
 	
+	private String groupName;
+	
+	private String constructionName;
+	
 	/** new **/
 	/**
 	public float getGongSac() {

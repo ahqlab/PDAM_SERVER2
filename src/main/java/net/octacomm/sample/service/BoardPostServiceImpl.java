@@ -37,6 +37,11 @@ public class BoardPostServiceImpl implements BoardPostService {
     public BoardPost getPost(Long id) { 
         return boardPostMapper.getPost(id); 
     }
+    
+    @Override
+    public BoardPost getPostFileData(Long id) {
+        return boardPostMapper.getPostFileData(id);
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)

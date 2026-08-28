@@ -21,4 +21,5 @@ public interface SimpleReportMapper extends CRUDMapper<Report, ReportParam, Inte
 	// 총 시공량(전체 파일 수): 목록 조건과 동일, GROUP BY 없이 전체 COUNT
 	int getTotalConstruction(@Param("param") ReportParam param);
 
+	SimpleReport getBreadcrumbInfo(@Param("id") int id);
 }

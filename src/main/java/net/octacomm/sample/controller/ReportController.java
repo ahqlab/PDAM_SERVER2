@@ -1486,4 +1486,14 @@ public class ReportController{
 		}
 		return successCount == reportList.size();
 	}
+	
+	@ModelAttribute
+	public void setBreadcrumbData(@RequestParam(value = "id", required = false, defaultValue = "0") int id, Model model) {
+	    if(id > 0) {
+	    	Report breadcrumb = mapper.getBreadcrumbInfo(id);
+	        if(breadcrumb != null) {
+	            model.addAttribute("breadcrumb", breadcrumb);
+	        }
+	    }
+	}
 }

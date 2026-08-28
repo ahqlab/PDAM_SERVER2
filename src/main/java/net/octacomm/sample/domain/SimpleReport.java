@@ -76,6 +76,10 @@ public class SimpleReport implements Domain {
 	private int isDel;
 	
 	private int isUpload;
+	
+	private String groupName;
+	
+	private String constructionName;
 
 	public float getGongSac() {
 		return Float.parseFloat(String.format("%.1f", gongSac));

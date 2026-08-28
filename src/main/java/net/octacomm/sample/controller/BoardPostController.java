@@ -238,6 +238,13 @@ public class BoardPostController {
                 return resultMap;
             }
 
+            BoardPost filePost = boardPostService.getPostFileData(id);
+            if (filePost != null) {
+                post.setFileData1(filePost.getFileData1());
+                post.setFileData2(filePost.getFileData2());
+                post.setFileData3(filePost.getFileData3());
+            }
+
             post.setTitle(title);
             post.setContent(content);
 
@@ -288,15 +295,28 @@ public class BoardPostController {
             return;
         }
 
+        BoardPost filePost = boardPostService.getPostFileData(id);
+        if (filePost == null) return;
+
         String fileName = null;
         byte[] fileData = null;
         String contentType = null;
 
-        if (slot == 1) { fileName = post.getFileName1(); fileData = post.getFileData1(); contentType = post.getContentType1(); }
-        else if (slot == 2) { fileName = post.getFileName2(); fileData = post.getFileData2(); contentType = post.getContentType2(); }
-        else if (slot == 3) { fileName = post.getFileName3(); fileData = post.getFileData3(); contentType = post.getContentType3(); }
+        if (slot == 1) {
+        	fileName = filePost.getFileName1();
+        	fileData = filePost.getFileData1();
+        	contentType = filePost.getContentType1();
+        } else if (slot == 2) {
+        	fileName = filePost.getFileName2();
+        	fileData = filePost.getFileData2();
+        	contentType = filePost.getContentType2();
+        } else if (slot == 3) {
+        	fileName = filePost.getFileName3();
+        	fileData = filePost.getFileData3();
+        	contentType = filePost.getContentType3();
+        }
 
-        if (fileData != null) {
+        if (fileData != null && fileName != null) {
             String encodedFileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
             response.setContentType(contentType != null ? contentType : "application/octet-stream");
             response.setContentLength(fileData.length);

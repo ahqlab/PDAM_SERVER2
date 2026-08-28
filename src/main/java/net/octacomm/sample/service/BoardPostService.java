@@ -9,6 +9,7 @@ public interface BoardPostService {
     List<BoardPost> getPostList(Map<String, Object> paramMap);
     void insertPost(BoardPost post) throws Exception;
     BoardPost getPost(Long id);
+    BoardPost getPostFileData(Long id);
     void updatePost(BoardPost post) throws Exception;
     void deletePost(Long id) throws Exception;
     void deleteFileSlot(Long postId, int slot) throws Exception;

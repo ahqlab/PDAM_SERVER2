@@ -57,4 +57,6 @@ public interface GpsFileMapper extends CRUDMapper<GpsFile, GpsFileParam, Integer
 	List<GpsFile>  selectByConstructionIdx(int constructionIdx);
 	
 	int insertMulti(@Param("list") List<GpsFile> list);
+	
+	GpsFile getBreadcrumbInfo(@Param("constructionIdx") int constructionIdx);
 }
