@@ -71,15 +71,15 @@
         )
     </insert>
 
-    <select id="getPost" parameterType="long" resultType="net.octacomm.sample.domain.BoardPost">
-        SELECT 
-            id, board_id AS boardId, title, content, 
-            file_name_1 AS fileName1, file_data_1 AS fileData1, file_size_1 AS fileSize1, content_type_1 AS contentType1,
-            file_name_2 AS fileName2, file_data_2 AS fileData2, file_size_2 AS fileSize2, content_type_2 AS contentType2,
-            file_name_3 AS fileName3, file_data_3 AS fileData3, file_size_3 AS fileSize3, content_type_3 AS contentType3,
-            reg_user AS regUser, reg_date AS regDate, update_at AS updateAt
-        FROM TB_BOARD_POST WHERE id = #{id} AND delete_at IS NULL
-    </select>
+	<select id="getPost" parameterType="long" resultType="net.octacomm.sample.domain.BoardPost">
+	    SELECT
+	        id, board_id AS boardId, title, content,
+	        file_name_1 AS fileName1, file_size_1 AS fileSize1, content_type_1 AS contentType1,
+	        file_name_2 AS fileName2, file_size_2 AS fileSize2, content_type_2 AS contentType2,
+	        file_name_3 AS fileName3, file_size_3 AS fileSize3, content_type_3 AS contentType3,
+	        reg_user AS regUser, reg_date AS regDate, update_at AS updateAt
+	    FROM TB_BOARD_POST WHERE id = #{id} AND delete_at IS NULL
+	</select>
 
     <update id="updatePost" parameterType="net.octacomm.sample.domain.BoardPost">
         UPDATE TB_BOARD_POST
@@ -94,7 +94,6 @@
         UPDATE TB_BOARD_POST SET delete_at = NOW() WHERE id = #{id}
     </update>
 
-    <!-- 개별 첨부파일 슬롯만 삭제(NULL 처리)하는 쿼리 -->
     <update id="deleteFileSlot" parameterType="map">
         UPDATE TB_BOARD_POST
         <set>
@@ -104,4 +103,14 @@
         </set>
         WHERE id = #{postId}
     </update>
+    
+    <select id="getPostFileData" parameterType="long" resultType="net.octacomm.sample.domain.BoardPost">
+	    SELECT 
+	        id, 
+	        file_name_1 AS fileName1, file_data_1 AS fileData1, content_type_1 AS contentType1,
+	        file_name_2 AS fileName2, file_data_2 AS fileData2, content_type_2 AS contentType2,
+	        file_name_3 AS fileName3, file_data_3 AS fileData3, content_type_3 AS contentType3
+	    FROM TB_BOARD_POST 
+	    WHERE id = #{id} AND delete_at IS NULL
+	</select>
 </mapper>
