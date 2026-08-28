@@ -1403,7 +1403,14 @@ public class ReportController{
 	@ResponseBody
 	@RequestMapping(value = "/machine/list", method = RequestMethod.POST)
 	public List<ReportOneLine> getTodayList(@RequestParam("constructionIdx") int constructionIdx , @RequestParam("machineNumber") String machineNumber){
-		return mapper.getMachineListByPdf(constructionIdx, machineNumber);
+		int extensivePileUsage = 0;
+		ExtensivePileUsage usage = extensivePileUsageMapper.findByConstructionIdx(constructionIdx);
+		if(usage != null) {
+			extensivePileUsage = usage.getIsUsed();
+		}else {
+			extensivePileUsage = 0;
+		}
+		return extensivePileUsage > 0 ? mapper.getMachineListByPdfExtensivePileUsage(constructionIdx, machineNumber) : mapper.getMachineListByPdf(constructionIdx, machineNumber);
 	}
 	
 	@ModelAttribute
