@@ -2567,8 +2567,9 @@
 						return true;
 					}
 
+					var automaticLabel = change.automatic === 'true' ? '<br>(자동수정)' : '';
 					html += '<div class="report-history-change-row">';
-					html += '<span class="report-history-field">' + escapeHistoryHtml(fieldName) + '</span>';
+					html += '<span class="report-history-field">' + escapeHistoryHtml(fieldName) + automaticLabel + '</span>';
 					html += '<span class="report-history-value">' + escapeHistoryHtml(change.beforeValue == null ? '-' : change.beforeValue) + '</span>';
 					html += '<span class="report-history-arrow">→</span>';
 					html += '<span class="report-history-value">' + escapeHistoryHtml(change.afterValue == null ? '-' : change.afterValue) + '</span>';
