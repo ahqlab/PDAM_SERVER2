@@ -2512,11 +2512,15 @@
 	function loadReportHistoryDetail(historyId, button) {
 		$('#reportHistoryBody tr').removeClass('is-selected');
 		$('#reportHistoryBody .history-view-button').removeClass('is-selected');
+
 		if (button) {
 			$(button).addClass('is-selected').closest('tr').addClass('is-selected');
 		}
+
 		$('#reportHistoryDetailMeta').text('불러오는 중...');
-		$('#reportHistoryDetailScroll').html('<div class="report-history-message">변경 상세를 불러오는 중입니다.</div>');
+		$('#reportHistoryDetailScroll').html(
+			'<div class="report-history-message">변경 상세를 불러오는 중입니다.</div>'
+		);
 
 		$.ajax({
 			type: 'GET',
@@ -2526,32 +2530,107 @@
 				deviceIdx: Number('${param.id}'),
 				historyId: historyId
 			},
+
 			success: function(data) {
-				if (!data.success) {
-					resetReportHistoryDetail(data.message || '상세 내역을 불러오지 못했습니다.');
+				if (!data || !data.success) {
+					resetReportHistoryDetail(
+						data && data.message
+							? data.message
+							: '상세 내역을 불러오지 못했습니다.'
+					);
 					return;
 				}
+
 				$('#reportHistoryDetailMeta').text(data.modifiedAt || '-');
+
 				var changes = data.changes || [];
-				if (changes.length === 0) {
-					$('#reportHistoryDetailScroll').html('<div class="report-history-message">변경된 항목이 없습니다.</div>');
-					return;
-				}
+				var excludeFields = [
+					'직타깊이',
+					'전석층천공',
+					'토사천공'
+				];
 				var html = '';
+
 				$.each(changes, function(index, change) {
+					if (!change) return true;
+
+					var fieldName = change.fieldName || '';
+
+					if (excludeFields.indexOf(fieldName) !== -1) {
+						return true;
+					}
+
+					var before = normalizeHistoryValue(change.beforeValue);
+					var after = normalizeHistoryValue(change.afterValue);
+
+					if (before === after) {
+						return true;
+					}
+
 					html += '<div class="report-history-change-row">';
-					html += '<span class="report-history-field">' + escapeHistoryHtml(change.fieldName) + '</span>';
-					html += '<span class="report-history-value">' + escapeHistoryHtml(change.beforeValue) + '</span>';
+					html += '<span class="report-history-field">' + escapeHistoryHtml(fieldName) + '</span>';
+					html += '<span class="report-history-value">' + escapeHistoryHtml(change.beforeValue == null ? '-' : change.beforeValue) + '</span>';
 					html += '<span class="report-history-arrow">→</span>';
-					html += '<span class="report-history-value">' + escapeHistoryHtml(change.afterValue) + '</span>';
+					html += '<span class="report-history-value">' + escapeHistoryHtml(change.afterValue == null ? '-' : change.afterValue) + '</span>';
 					html += '</div>';
 				});
-				$('#reportHistoryDetailScroll').html(html).scrollTop(0);
+
+				if (html === '') {
+					$('#reportHistoryDetailScroll').html(
+						'<div class="report-history-message">변경된 항목이 없습니다.</div>'
+					);
+				} else {
+					$('#reportHistoryDetailScroll').html(html).scrollTop(0);
+				}
 			},
+
 			error: function() {
-				resetReportHistoryDetail('상세 내역을 불러오지 못했습니다.');
+				resetReportHistoryDetail(
+					'상세 내역을 불러오지 못했습니다.'
+				);
 			}
 		});
+	}
+
+	function normalizeHistoryValue(value) {
+		if (value == null) {
+			return '0';
+		}
+
+		var str = String(value).trim();
+
+		if (
+			str === '' ||
+			str === '-' ||
+			str === 'null' ||
+			str === 'undefined'
+		) {
+			return '0';
+		}
+
+		if (!isNaN(str) && Number(str) === 0) {
+			return '0';
+		}
+
+		if (str.indexOf(',') !== -1) {
+			var values = str.split(',');
+			var allZero = true;
+
+			for (var i = 0; i < values.length; i++) {
+				var v = values[i].trim();
+
+				if (v === '' || isNaN(v) || Number(v) !== 0) {
+					allZero = false;
+					break;
+				}
+			}
+
+			if (allZero) {
+				return '0';
+			}
+		}
+
+		return str;
 	}
 
 	function resetReportHistoryDetail(message) {
