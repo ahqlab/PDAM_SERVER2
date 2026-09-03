@@ -34,7 +34,7 @@ public class BoardPostController {
     @Autowired
     private AdminBoardService adminBoardService;
 
-    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/postList", method = RequestMethod.GET)
     public ModelAndView getPostList(
             @RequestParam("boardId") Long boardId,
             @RequestParam(value = "page", defaultValue = "1") int page,
@@ -104,6 +104,9 @@ public class BoardPostController {
         }
         String authStr = "," + board.getAuth() + ",";
         if (authStr.contains(",ALL,")) {
+            return true;
+        }
+        if (Boolean.TRUE.equals(session.getAttribute("isResearchAdmin")) && authStr.contains(",RESEARCH_ADMIN,")) {
             return true;
         }
         Object role = session.getAttribute("role");

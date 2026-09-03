@@ -43,6 +43,8 @@ public class LoginServiceImpl implements LoginService{
 			session.setAttribute("isHiddenManager", false);
 			// TB_SYSTEM_ADMIN 계정(현장에 종속되지 않는 독립 로그인)인지 id offset으로 판별
 			session.setAttribute("isSystemAdmin", result1.getId() >= SYSTEM_ADMIN_ID_OFFSET);
+			boolean isResearch = (result1.getRole() == 9);
+		    session.setAttribute("isResearchAdmin", isResearch);
 			session.setAttribute("groupIdx", result1.getGroupIdx());
 			session.setAttribute("fcIdx", result1.getFcIdx());
 			boolean result = false;

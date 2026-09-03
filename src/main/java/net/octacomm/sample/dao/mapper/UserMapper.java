@@ -29,6 +29,8 @@ public interface UserMapper {
 			"   SELECT userId, userName, constructionIdx, role, password , 0 as groupIdx, idx as fcIdx, 0 as showPdfYn FROM TB_MOU_USER WHERE TB_MOU_USER.userid is not null " +
 			"	UNION ALL " +
 			"	SELECT userId, name, (id + 90000000) as id, 0 as role, password, 0 as groupIdx, 0 as fcIdx, 0 as showPdfYn FROM TB_SYSTEM_ADMIN WHERE isDel = 0 " +
+			" 	UNION ALL " +
+			"	SELECT userId, name, (id + 80000000) as id, 9 as role, password, 0 as groupIdx, 0 as fcIdx, 0 as showPdfYn FROM TB_RESEARCH_ADMIN WHERE isDel = 0 " +
 			") A WHERE userId = #{userId} ")
 	Construction getUser(Construction construction);
 
@@ -43,6 +45,8 @@ public interface UserMapper {
 			"   SELECT userId, userName, constructionIdx, role, password , 0 as groupIdx, idx as fcIdx, 0 as showPdfYn FROM TB_MOU_USER WHERE TB_MOU_USER.userid is not null " +
 			"	UNION ALL " +
 			"	SELECT userId, name, (id + 90000000) as id, 0 as role, password, 0 as groupIdx, 0 as fcIdx, 0 as showPdfYn FROM TB_SYSTEM_ADMIN WHERE isDel = 0 " +
+			"	UNION ALL " +
+			"	SELECT userId, name, (id + 80000000) as id, 9 as role, password, 0 as groupIdx, 0 as fcIdx, 0 as showPdfYn FROM TB_RESEARCH_ADMIN WHERE isDel = 0 " +
 			") A WHERE userId = #{userId}  AND password = #{password} ")
 	Construction getUserForAuth(Construction construction);
 	

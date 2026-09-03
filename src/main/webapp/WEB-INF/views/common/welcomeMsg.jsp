@@ -7,6 +7,11 @@
 	 	<%-- 시스템관리자 --%>
 	    <c:when test="${sessionScope.isSystemAdmin}">
 	        <font color="blue">시스템관리자</font> 계정으로 로그인하셨습니다.
+	    </c:when>
+	    	
+	    <%-- 연구소 --%>
+	    <c:when test="${sessionScope.isResearchAdmin}">
+	        <font color="blue">연구소</font> 계정으로 로그인하셨습니다.
 	    </c:when>	
 	 	
         <%-- role == 0 : 슈퍼관리자 --%>
