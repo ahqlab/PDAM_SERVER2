@@ -243,6 +243,7 @@
 						<input type="checkbox" name="auth" value="ALL" id="authAll" checked> 전체 허용
 					</label><br/>
 					<label class="ext-label"><input type="checkbox" name="auth" value="SYS_ADMIN" class="auth-role"> 시스템 관리자</label>
+					<label class="ext-label"><input type="checkbox" name="auth" value="RESEARCH_ADMIN" class="auth-role"> 연구소</label>
 					<label class="ext-label"><input type="checkbox" name="auth" value="0" class="auth-role"> 관리자</label>
 					<label class="ext-label"><input type="checkbox" name="auth" value="1" class="auth-role"> 협력사</label>
 					<label class="ext-label"><input type="checkbox" name="auth" value="2" class="auth-role"> 시공사</label>

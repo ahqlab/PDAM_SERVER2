@@ -1,6 +1,8 @@
 package net.octacomm.sample.controller;
 
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
@@ -16,9 +18,11 @@ import net.octacomm.sample.domain.ContractConfig;
 import net.octacomm.sample.domain.Franchise;
 import net.octacomm.sample.domain.Group;
 import net.octacomm.sample.domain.Survey;
+import net.octacomm.sample.domain.AdminBoard;
 import net.octacomm.sample.exceptions.InvalidPasswordException;
 import net.octacomm.sample.exceptions.NotFoundUserException;
 import net.octacomm.sample.service.LoginService;
+import net.octacomm.sample.service.AdminBoardService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -42,6 +46,8 @@ public class LoginController {
 	public static final String DEFAULT_FC_TARGET_URL = "/construction/list";
 	
 	public static final String DEFAULT_TARGET_URL = "/device/list";
+	
+	public static final String DEFAULT_RESEARCH_TARGET_URL = "/board/postList";
 
 	@Autowired
 	private LoginService loginService;
@@ -63,6 +69,9 @@ public class LoginController {
 	
 	@Autowired
 	private SurveyMapper surveyMapper;
+	
+	@Autowired
+	private AdminBoardService adminBoardService;
 	
 
 	@RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
@@ -141,6 +150,35 @@ public class LoginController {
 			Construction result = loginService.login(construction, session);
 			
 			if(result != null) {
+				Boolean isResearchAdmin = (Boolean) session.getAttribute("isResearchAdmin");
+				if (isResearchAdmin != null && isResearchAdmin) {
+					Map<String, Object> boardParam = new HashMap<String, Object>();
+					boardParam.put("startRow", 0);
+					boardParam.put("size", 100);
+					
+					List<AdminBoard> boardList = adminBoardService.getBoardList(boardParam);
+					Long targetBoardId = null;
+					
+					if (boardList != null) {
+						for (AdminBoard board : boardList) {
+							if ("Y".equals(board.getUseYn()) && board.getAuth() != null) {
+								String authStr = "," + board.getAuth() + ",";
+								if (authStr.contains(",ALL,") || authStr.contains(",RESEARCH_ADMIN,")) {
+									targetBoardId = board.getId();
+									break;
+								}
+							}
+						}
+					}
+					
+					if (targetBoardId != null) {
+						return "redirect:/board/postList?boardId=" + targetBoardId;
+					} else {
+						model.addAttribute("errorMessage", "접근 권한이 있는 게시판이 없습니다.");
+						return LOGIN_URL;
+					}
+				}
+
 				//현장이 시작되고 2주가 흘렀는지 확인
 				//2주가 흘렀다면 설문 대상임.
 				Construction yes = conMapper.findByIdAndCreateDate(result.getId());
@@ -196,7 +234,7 @@ public class LoginController {
 				return "redirect:" + DEFAULT_TARGET_URL + "?constructionIdx=" + result.getId();
 			}
 
-			model.addAttribute("errorMessage", "아이디가 비밀번호를 확인하세요.");
+			model.addAttribute("errorMessage", "아이디와 비밀번호를 확인하세요.");
 			model.addAttribute("domain", new Construction());
 			return LOGIN_URL;
 			//return SURVEY_URL;

@@ -2,6 +2,7 @@
 <%@ include file="/WEB-INF/views/common/tagLib.jsp" %>
 
 <c:set var="isSysAdmin" value="${not empty sessionScope.isSystemAdmin and sessionScope.isSystemAdmin}" />
+<c:set var="isResAdmin" value="${not empty sessionScope.isResearchAdmin and sessionScope.isResearchAdmin}" />
 <c:set var="roleNum" value="${not empty sessionScope.role ? sessionScope.role : 99}" />
 <c:set var="canWrite" value="false" />
 <c:set var="authStr" value=",${boardMaster.auth}," />
@@ -11,6 +12,9 @@
 		<c:set var="canWrite" value="true" />
 	</c:when>
 	<c:when test="${isSysAdmin}">
+		<c:set var="canWrite" value="true" />
+	</c:when>
+	<c:when test="${isResAdmin and fn:contains(authStr, ',RESEARCH_ADMIN,')}">
 		<c:set var="canWrite" value="true" />
 	</c:when>
 	<c:when test="${not isSysAdmin and roleNum == 0 and fn:contains(authStr, ',0,')}">
@@ -255,7 +259,7 @@
 			
 			<div class="inputArea02 mb-20">
 				<p class="inputTxt02">작성자</p>
-				<input type="text" autocomplete="off" class="Input02" id="regUser" name="regUser" placeholder="작성자명을 입력하세요." required>
+				<input type="text" autocomplete="off" class="Input02" id="regUser" name="regUser" value="${sessionScope.userName}" readonly style="background-color: #f0f0f0; color: #555; cursor: not-allowed;" required>
 			</div>
 			<div class="inputArea02 mb-20">
 				<p class="inputTxt02">제목</p>
@@ -305,7 +309,7 @@
 		$('#submitBtn').text('게시글 등록');
 		$('#registForm')[0].reset();
 		$('#postId').val('');
-		$('#regUser').prop('readonly', false);
+		$('#regUser').val('${sessionScope.userName}').prop('readonly', true);
 		$('#existingFilesArea').empty();
 		
 		if(allowedExts.length === 0) {

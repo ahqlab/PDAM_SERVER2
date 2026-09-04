@@ -57,6 +57,8 @@
 					<div class="mlist"><a href="${pageContext.request.contextPath}/fileinventory/list?constructionIdx=${param.constructionIdx}" class="${navActive eq 'fileinventory' ? 'menuActive' : ''}"><img src="${pageContext.request.contextPath}/images/menu_icon08.png" />파일반입 및 수정</a></div>
 				</c:if>
 			</c:when>
+			<c:when test="${not empty sessionScope.isResearchAdmin and sessionScope.isResearchAdmin}">
+			</c:when>
 			<c:otherwise>
 				<div class="mlist"><a href="${pageContext.request.contextPath}/construction/list" class="${fn:contains(currentPath, '/construction/') ? 'menuActive' : ''}"><img src="${pageContext.request.contextPath}/images/menu_icon07.png" />협력사</a></div>
 				<c:if test="${not empty param.constructionIdx}"><div class="mlist"><a href="${pageContext.request.contextPath}/device/list?constructionIdx=${param.constructionIdx}" class="${(fn:contains(currentPath, '/device/') or fn:contains(currentPath, '/simple/report/') or fn:contains(currentPath, '/report/')) ? 'menuActive' : ''}"><img src="${pageContext.request.contextPath}/images/menu_icon10.png" />기기관리</a></div><c:if test="${sessionInfo.role == 4}"><div class="mlist"><a href="${pageContext.request.contextPath}/gpsfile/list?constructionIdx=${param.constructionIdx}" class="${fn:contains(currentPath, '/gpsfile/') ? 'menuActive' : ''}"><img src="${pageContext.request.contextPath}/images/menu_icon09.png" />GPS파일관리</a></div></c:if><div class="mlist"><a href="${pageContext.request.contextPath}/pqpm/list?constructionIdx=${param.constructionIdx}" class="${fn:contains(currentPath, '/pqpm/') ? 'menuActive' : ''}"><img src="${pageContext.request.contextPath}/images/menu_icon08.png" />파일수량 관리계획</a></div></c:if>
@@ -66,28 +68,35 @@
 		<c:forEach var="board" items="${globalBoardList}">
 			<c:if test="${board.useYn eq 'Y'}">
 				
-				<c:set var="isSysAdmin" value="${sessionScope.isSystemAdmin}" />
+				<c:set var="isSysAdmin" value="${not empty sessionScope.isSystemAdmin and sessionScope.isSystemAdmin}" />
+				<c:set var="isResAdmin" value="${not empty sessionScope.isResearchAdmin and sessionScope.isResearchAdmin}" />
 				<c:set var="userRoleStr" value="${sessionInfo.role}" />
+				
+				<c:set var="authStr" value=",${board.auth}," />
+				<c:set var="searchRole" value=",${userRoleStr}," />
 				<c:set var="hasAccess" value="false" />
 				
 				<c:choose>
-					<c:when test="${fn:contains(board.auth, 'ALL')}">
+					<c:when test="${fn:contains(authStr, ',ALL,')}">
 						<c:set var="hasAccess" value="true" />
 					</c:when>
 					<c:when test="${isSysAdmin and (fn:contains(board.auth, 'SYS_ADMIN') or fn:contains(board.auth, '0'))}">
 						<c:set var="hasAccess" value="true" />
 					</c:when>
+					<c:when test="${isResAdmin and fn:contains(authStr, ',RESEARCH_ADMIN,')}">
+						<c:set var="hasAccess" value="true" />
+					</c:when>
 					<c:when test="${not isSysAdmin and userRoleStr eq '0' and fn:contains(board.auth, '0')}">
 						<c:set var="hasAccess" value="true" />
 					</c:when>
-					<c:when test="${userRoleStr ne '0' and not empty userRoleStr and fn:contains(board.auth, userRoleStr)}">
+					<c:when test="${not isSysAdmin and not isResAdmin and not empty userRoleStr and fn:contains(authStr, searchRole)}">
 						<c:set var="hasAccess" value="true" />
 					</c:when>
 				</c:choose>
 				
 				<c:if test="${hasAccess}">
 					<div class="mlist">
-						<a href="${pageContext.request.contextPath}/board/list?boardId=${board.id}" class="${(fn:contains(currentPath, '/board/list') and param.boardId eq board.id) ? 'menuActive' : ''}">
+						<a href="${pageContext.request.contextPath}/board/postList?boardId=${board.id}" class="${(fn:contains(currentPath, '/board/postList') and param.boardId eq board.id) ? 'menuActive' : ''}">
 							<img src="${pageContext.request.contextPath}/images/menu_icon15.png" />${board.boardName}
 						</a>
 					</div>
@@ -116,7 +125,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		var linkPath = menuLinks[i].pathname;
 		var linkSearch = menuLinks[i].search;
 		
-		if (linkPath && linkPath.indexOf('/board/list') !== -1 && linkPath.indexOf('/admin/board') === -1) {
+		if (linkPath && linkPath.indexOf('/board/postList') !== -1 && linkPath.indexOf('/admin/board') === -1) {
 			var currentBoardId = getQueryParam(currentSearch, 'boardId');
 			var linkBoardId = getQueryParam(linkSearch, 'boardId');
 			
