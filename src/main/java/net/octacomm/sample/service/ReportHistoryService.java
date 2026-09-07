@@ -152,7 +152,17 @@ public class ReportHistoryService {
 		change.put("fieldName", fieldName);
 		change.put("beforeValue", beforeValue);
 		change.put("afterValue", afterValue);
+		change.put("automatic", String.valueOf(isAutomaticField(fieldName)));
 		return change;
+	}
+
+	private boolean isAutomaticField(String fieldName) {
+		return "파일합계".equals(fieldName)
+				|| "이음(개소)".equals(fieldName)
+				|| "파일잔량".equals(fieldName)
+				|| "평균관입".equals(fieldName)
+				|| "최종관입".equals(fieldName)
+				|| "극한지지력".equals(fieldName);
 	}
 
 	private String normalize(String value) {
@@ -180,9 +190,14 @@ public class ReportHistoryService {
 			return "기록 수정";
 		}
 		if (changes.size() == 1) {
-			return changes.get(0).get("fieldName") + " 변경";
+			return summaryFieldName(changes.get(0)) + " 변경";
 		}
-		return changes.get(0).get("fieldName") + " 외 " + (changes.size() - 1) + "건 변경";
+		return summaryFieldName(changes.get(0)) + " 외 " + (changes.size() - 1) + "건 변경";
+	}
+
+	private String summaryFieldName(Map<String, String> change) {
+		String fieldName = change.get("fieldName");
+		return "true".equals(change.get("automatic")) ? fieldName + " (자동수정)" : fieldName;
 	}
 
 	private void validate(String status, String userId) {
