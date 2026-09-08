@@ -3,8 +3,19 @@
 <tiles:importAttribute name="navActive" ignore="true" />
 <c:set var="currentPath" value="${pageContext.request.requestURI}" />
 
+<c:set var="isResearchAdmin" value="${not empty sessionScope.isResearchAdmin and sessionScope.isResearchAdmin}" />
+<c:if test="${isResearchAdmin}">
+	<c:forEach var="board" items="${globalBoardList}">
+		<c:set var="boardAuth" value=",${board.auth}," />
+		<c:if test="${empty researchAdminBoardId and board.useYn eq 'Y' and (fn:contains(boardAuth, ',ALL,') or fn:contains(boardAuth, ',RESEARCH_ADMIN,'))}">
+			<c:set var="researchAdminBoardId" value="${board.id}" />
+		</c:if>
+	</c:forEach>
+</c:if>
+
 <div class="logo_top m_hide">
 	<c:choose>
+		<c:when test="${isResearchAdmin and not empty researchAdminBoardId}"><c:set var="homeUrl" value="${pageContext.request.contextPath}/board/postList?boardId=${researchAdminBoardId}" /></c:when>
 		<c:when test="${sessionInfo.role == 0}"><c:set var="homeUrl" value="${pageContext.request.contextPath}/group/list" /></c:when>
 		<c:when test="${sessionInfo.role == 2}"><c:set var="homeUrl" value="${pageContext.request.contextPath}/construction/list?groupIdx=${sessionInfo.groupIdx}" /></c:when>
 		<c:when test="${sessionInfo.role == 3}"><c:set var="homeUrl" value="${pageContext.request.contextPath}/construction/list?fcIdx=${sessionInfo.fcIdx}" /></c:when>
