@@ -93,8 +93,8 @@ public class ReportHistoryService {
 		Map<String, String> beforeValues = snapshotValues(before);
 		Map<String, String> afterValues = snapshotValues(after);
 		for (Map.Entry<String, String> entry : beforeValues.entrySet()) {
-			String beforeValue = normalize(entry.getValue());
-			String afterValue = normalize(afterValues.get(entry.getKey()));
+			String beforeValue = normalizeHistoryValue(entry.getKey(), entry.getValue());
+			String afterValue = normalizeHistoryValue(entry.getKey(), afterValues.get(entry.getKey()));
 			if (!beforeValue.equals(afterValue)) {
 				changes.add(change(entry.getKey(), beforeValue, afterValue));
 			}
@@ -163,6 +163,47 @@ public class ReportHistoryService {
 				|| "평균관입".equals(fieldName)
 				|| "최종관입".equals(fieldName)
 				|| "극한지지력".equals(fieldName);
+	}
+
+	private String normalizeHistoryValue(String fieldName, String value) {
+	    if (!isPieceField(fieldName)) {
+	        return normalize(value);
+	    }
+
+	    String normalized = normalize(value);
+	    if ("-".equals(normalized) || isZero(normalized)) {
+	        return "-";
+	    }
+
+	    StringBuilder meaningfulValues = new StringBuilder();
+	    String[] pieceValues = normalized.split(",");
+	    for (String pieceValue : pieceValues) {
+	        String trimmedValue = pieceValue.trim();
+	        if (trimmedValue.isEmpty() || isZero(trimmedValue)) {
+	            continue;
+	        }
+	        if (meaningfulValues.length() > 0) {
+	            meaningfulValues.append(", ");
+	        }
+	        meaningfulValues.append(trimmedValue);
+	    }
+	    
+	    return meaningfulValues.length() == 0 ? "-" : meaningfulValues.toString();
+	}
+
+	private boolean isPieceField(String fieldName) {
+		return "단본".equals(fieldName)
+				|| "하단".equals(fieldName)
+				|| "중단".equals(fieldName)
+				|| "상단".equals(fieldName);
+	}
+
+	private boolean isZero(String value) {
+		try {
+			return Double.compare(Double.parseDouble(value), 0D) == 0;
+		} catch (NumberFormatException e) {
+			return false;
+		}
 	}
 
 	private String normalize(String value) {
