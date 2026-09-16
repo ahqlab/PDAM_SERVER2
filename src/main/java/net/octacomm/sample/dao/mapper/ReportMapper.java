@@ -39,6 +39,7 @@ public interface ReportMapper extends CRUDMapper<Report, ReportParam, Integer> {
 			+ "directDrillingDepth = #{directDrillingDepth} , "
 			+ "sdDrillingDepth = #{sdDrillingDepth} , "
 			+ "stDrillingDepth = #{stDrillingDepth} , "
+			+ "gongSac = #{gongSac} , "
 			+ "intrusionDepth = #{intrusionDepth}  , "  
 			+ "balance = #{balance}  ,"
 			+ "connectLength = #{connectLength}  , "
@@ -55,7 +56,7 @@ public interface ReportMapper extends CRUDMapper<Report, ReportParam, Integer> {
 			+ "isDuple = (select * from (select IF(count(*) > 1, 1, 0) from TB_REPORT where deviceIdx = #{deviceIdx} and pileNo = #{pileNo} and location = #{location} AND isDel = 0 AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=#{deviceIdx} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=#{deviceIdx})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx<>0 DESC,constructionIdx<>0 DESC LIMIT 1), pileStandard = #{pileStandard}, 1) = 1 AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=#{deviceIdx} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=#{deviceIdx})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx<>0 DESC,constructionIdx<>0 DESC LIMIT 1), pileType = #{pileType}, 1) = 1 AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=#{deviceIdx} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=#{deviceIdx})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx<>0 DESC,constructionIdx<>0 DESC LIMIT 1), method = #{method}, 1) = 1 )  as a ) , "
 			+ "bigo = #{bigo} , "
 			+ "sprCol1 = #{sprCol1} ";
-	public String SELECT_FIELDS = " id, deviceIdx, currentDateTime, location, pileNo , drillingDepth , intrusionDepth, balance, connectLength, managedStandard, avgPenetrationValue, totalPenetrationValue , hammaT, fallMeter, ultimateBearingCapacity, crossSection , hammaEfficiency , modulusElasticity, bigo , sprCol1";
+	public String SELECT_FIELDS = " id, deviceIdx, currentDateTime, location, pileNo , drillingDepth , gongSac, intrusionDepth, balance, connectLength, managedStandard, avgPenetrationValue, totalPenetrationValue , hammaT, fallMeter, ultimateBearingCapacity, crossSection , hammaEfficiency , modulusElasticity, bigo , sprCol1";
 
 	@Override
 	int insert(Report report);

@@ -869,6 +869,15 @@
 			
 		}		
 		
+		var selectedRow = $('#reportTable tr').eq(index);
+		var selectedTotalConnectWidth = 0;
+		selectedRow.find('input[name^="piece["]').each(function() {
+			selectedTotalConnectWidth += parseReportNumber($(this).val());
+		});
+		currentIntrusionDepth = selectedRow.find('#intrusionDepth').val() || '0';
+		currentBalance = formatReportNumber(calculateReportBalance(selectedTotalConnectWidth, parseReportNumber(currentIntrusionDepth), parseReportNumber(currentDrillingDepth)));
+		currentGongSac = formatReportNumber(parseReportNumber(selectedRow.find('#gongSac').val()));
+
 		$('#curNo').text(currentNo);
 		if(currentDate.length > 10){
 			var date1 = currentDate.split(" ");
@@ -1128,6 +1137,57 @@
 		
 	}
 	
+	function parseReportNumber(value) {
+		var parsed = parseFloat(value);
+		return isNaN(parsed) ? 0 : parsed;
+	}
+
+	function formatReportNumber(value) {
+		if (!isFinite(value)) {
+			return '0';
+		}
+		return String(Number(value.toFixed(12)));
+	}
+
+	function calculateReportBalance(total, intrusion, drilling) {
+		var constructionIdx = Number('${param.constructionIdx}') || Number('${sessionInfo.constructionIdx}');
+		var result = total - intrusion;
+		if (constructionIdx === 944 || constructionIdx === 1136) {
+			result = Math.fround(Math.fround(Math.fround(total) - Math.fround(intrusion)) - Math.fround(drilling));
+			return isFinite(result) ? Math.max(0, Number(result.toFixed(2))) : 0;
+		}
+		result = Math.sign(result) * Math.round((Math.abs(result) + Number.EPSILON) * 100) / 100;
+		return constructionIdx === 944 || constructionIdx === 1136 ? Math.max(0, result) : result;
+	}
+
+	function recalculateReportRow(rowIndex, preserveIntrusion) {
+		var $row = $('#reportTable tr').eq(rowIndex);
+		preserveIntrusion = preserveIntrusion || $row.data('intrusionDepthEdited') === true;
+		var totalConnectWidth = 0;
+
+		$row.find('input[name^="piece["]').each(function() {
+			totalConnectWidth += parseReportNumber($(this).val());
+		});
+
+		var drillingDepth = parseReportNumber($row.find('input[name="drillingDepth"]').val());
+		var gongSac = parseReportNumber($row.find('input[name="gongSac"]').val());
+		var intrusionDepth = preserveIntrusion ? parseReportNumber($row.find('input[name="intrusionDepth"]').val()) : drillingDepth - gongSac;
+		var balance = calculateReportBalance(totalConnectWidth, intrusionDepth, drillingDepth);
+
+		if (!preserveIntrusion) {
+			$row.find('input[name="intrusionDepth"]').val(formatReportNumber(intrusionDepth));
+		}
+		$row.find('.balance-value').text(formatReportNumber(balance));
+	}
+
+	$(document).on('input change', '#reportTable input[name="gongSac"], #reportTable input[name="drillingDepth"], #reportTable input[name^="piece["]', function() {
+		recalculateReportRow($(this).closest('tr').index(), this.name.indexOf('piece[') === 0);
+	});
+	$(document).on('input change', '#reportTable input[name="intrusionDepth"]', function() {
+		$(this).closest('tr').data('intrusionDepthEdited', true);
+		recalculateReportRow($(this).closest('tr').index(), true);
+	});
+
 	function onClickReportUpdate(){
 		
 		var deleteCd = 1;
@@ -1183,13 +1243,16 @@
 			if(role == 0){
 				
 				var penetrationss = [];
+				var tenMeasurementMode = Number('${isBig}') > 0;
 				
 				for(var k=0; k<penetrations.length; k++){
-					if(penetrations[k].value != ""){
+					var penetrationValue = (penetrations[k].value || "").trim();
+					var penetrationId = Number(penetrationsId[k].value || 0);
+					if(tenMeasurementMode || penetrationValue != "" || penetrationId > 0){
 						var onePenetrations = {
 								name: penetrationsName[k].value != "" ? penetrationsName[k].value : "null",
-								value : penetrations[k].value != "" ? 	penetrations[k].value : "0",
-								id : Number(penetrationsId[k].value) != Number(0) ? Number(penetrationsId[k].value) : Number(0),
+								value : penetrationValue != "" ? penetrationValue : "0",
+								id : penetrationId,
 								reportIdx :Number($('#reportTable tr').eq(i).find('#id').val())
 						};
 						penetrationss.push(onePenetrations);
@@ -1214,6 +1277,7 @@
 						sdDrillingDepth: $('#reportTable tr').eq(i).find('#sdDrillingDepth').val() != "" ? $('#reportTable tr').eq(i).find('#sdDrillingDepth').val()  : "0", 
 						stDrillingDepth: $('#reportTable tr').eq(i).find('#stDrillingDepth').val() != "" ? $('#reportTable tr').eq(i).find('#stDrillingDepth').val()  : "0", 
 						intrusionDepth: $('#reportTable tr').eq(i).find('#intrusionDepth').val() != "" ? $('#reportTable tr').eq(i).find('#intrusionDepth').val()  : "0", 
+						gongSac: $('#reportTable tr').eq(i).find('input[name="gongSac"]').val() != "" ? $('#reportTable tr').eq(i).find('input[name="gongSac"]').val() : "0",
 						hammaT: $('#reportTable tr').eq(i).find('#hammaT').val() != "" ? $('#reportTable tr').eq(i).find('#hammaT').val()  : "0",
 						fallMeter: $('#reportTable tr').eq(i).find('#fallMeter').val() != "" ? $('#reportTable tr').eq(i).find('#fallMeter').val() : "0",
 						managedStandard: $('#reportTable tr').eq(i).find('#managedStandard').val() != "" ? $('#reportTable tr').eq(i).find('#managedStandard').val()  : "0"
@@ -1241,6 +1305,7 @@
 						sdDrillingDepth: $('#reportTable tr').eq(i).find('#sdDrillingDepth').val() != "" ? $('#reportTable tr').eq(i).find('#sdDrillingDepth').val()  : "0", 
 						stDrillingDepth: $('#reportTable tr').eq(i).find('#stDrillingDepth').val() != "" ? $('#reportTable tr').eq(i).find('#stDrillingDepth').val()  : "0", 
 						intrusionDepth: $('#reportTable tr').eq(i).find('#intrusionDepth').val() != "" ? $('#reportTable tr').eq(i).find('#intrusionDepth').val()  : "0", 
+						gongSac: $('#reportTable tr').eq(i).find('input[name="gongSac"]').val() != "" ? $('#reportTable tr').eq(i).find('input[name="gongSac"]').val() : "0",
 						hammaT: $('#reportTable tr').eq(i).find('#hammaT').val() != "" ? $('#reportTable tr').eq(i).find('#hammaT').val()  : "0",
 						fallMeter: $('#reportTable tr').eq(i).find('#fallMeter').val() != "" ? $('#reportTable tr').eq(i).find('#fallMeter').val() : "0",
 						managedStandard: $('#reportTable tr').eq(i).find('#managedStandard').val() != "" ? $('#reportTable tr').eq(i).find('#managedStandard').val()  : "0"
@@ -1314,6 +1379,7 @@
 
 		var drillingDepth = document.getElementsByName("drillingDepth");
 		var intrusionDepth = document.getElementsByName("intrusionDepth");
+		var gongSac = document.getElementsByName("gongSac");
 		var hammaT = document.getElementsByName("hammaT");
 		var fallMeter = document.getElementsByName("fallMeter");
 		var managedStandard = document.getElementsByName("managedStandard");
@@ -1356,6 +1422,7 @@
 		}else{
 			drillingDepth[index].disabled = true;
 			intrusionDepth[index].disabled = true;
+			gongSac[index].disabled = true;
 		}
 		
 		
@@ -1405,6 +1472,7 @@
 		var drillingDepth = document.getElementsByName("drillingDepth");
 		//var directDrillingDepth = document.getElementsByName("directDrillingDepth");
 		var intrusionDepth = document.getElementsByName("intrusionDepth");
+		var gongSac = document.getElementsByName("gongSac");
 		var hammaT = document.getElementsByName("hammaT");
 		var fallMeter = document.getElementsByName("fallMeter");
 		var managedStandard = document.getElementsByName("managedStandard");
@@ -1447,6 +1515,8 @@
 		}else{
 			drillingDepth[index].disabled = false;
 			intrusionDepth[index].disabled = false;
+			gongSac[index].disabled = false;
+			recalculateReportRow(index, true);
 		}
 		
 		if(constructionIdx == 1082 || conIdx == 1082 ){
@@ -1505,6 +1575,7 @@
 		var drillingDepth = document.getElementsByName("drillingDepth");
 		//var directDrillingDepth = document.getElementsByName("directDrillingDepth");
 		var intrusionDepth = document.getElementsByName("intrusionDepth");
+		var gongSac = document.getElementsByName("gongSac");
 		var hammaT = document.getElementsByName("hammaT");
 		var fallMeter = document.getElementsByName("fallMeter");
 		var managedStandard = document.getElementsByName("managedStandard");
@@ -1551,6 +1622,8 @@
 				//directDrillingDepth[index].disabled = false;
 				drillingDepth[index].disabled = false;
 				intrusionDepth[index].disabled = false;
+				gongSac[index].disabled = false;
+				recalculateReportRow(index, true);
 			}
 			
 			
@@ -1608,6 +1681,7 @@
 				//directDrillingDepth[index].disabled = true;
 				drillingDepth[index].disabled = true;
 				intrusionDepth[index].disabled = true;
+				gongSac[index].disabled = true;
 			}
 			
 			if(constructionIdx == 1082 || conIdx == 1082 ){
@@ -1951,7 +2025,9 @@
 	
 	function openNewReportPopup() {
 	    $('.copy-input').val(""); 
+	    $('#copy_intrusionDepth').data('intrusionDepthEdited', false);
 	    $('#copy_rownum').val("신규");
+	    recalculateNewReportDepths();
 	    
 	    $('#saveBtn').attr('onclick', "submitReport('new')");
 	    $('#saveBtn').text('신규 데이터 저장');
@@ -2043,8 +2119,8 @@
 	    
 	    var $drillTd = $tr.find('input[name="drillingDepth"]').closest('td');
 	    if($drillTd.length > 0) {
-	        $('#copy_connectLength').val($drillTd.prev().text().trim());          
-	        $('#copy_totalConnectWidth').val($drillTd.prev().prev().text().trim()); 
+	        $('#copy_connectLength').text($drillTd.prev().text().trim());
+	        $('#copy_totalConnectWidth').text($drillTd.prev().prev().text().trim());
 	    }
 	            
 	    var isBig = ${isBig};
@@ -2056,8 +2132,8 @@
 	    
 	    var $hammaTd = $tr.find('input[name="hammaT"]').closest('td');
 	    if($hammaTd.length > 0) {
-	        $('#copy_gongSac').val($hammaTd.prev().text().trim());          
-	        $('#copy_balance').val($hammaTd.prev().prev().text().trim());  
+	        $('#copy_gongSac').val($tr.find('input[name="gongSac"]').val() || "0");
+	        $('#copy_balance').val($tr.find('.balance-value').text().trim() || "0");
 	    }
 
 	    var $effTd = $tr.find('input[name="hammaEfficiency"]').closest('td');
@@ -2067,6 +2143,8 @@
 
 	    $('#copy_avgPenetrationValue').val($tr.find('#avgPenetrationValue').val());
 	    $('#copy_totalPenetrationValue').val($tr.find('#totalPenetrationValue').val());
+	    $('#copy_intrusionDepth').data('intrusionDepthEdited', true);
+	    recalculateNewReportDepths(true);
 	    
 	    $('.popUp04').css('display', 'flex');
 	    $('.popLayer').show();
@@ -2075,8 +2153,58 @@
 	    $('#saveBtn').text('수정 데이터 저장 및 복사');
 	}
 
+	function parseNewReportNumber(value) {
+	    var parsed = parseFloat(value);
+	    return isNaN(parsed) ? 0 : parsed;
+	}
+
+	function formatNewReportNumber(value) {
+	    if (!isFinite(value)) {
+	        return '0';
+	    }
+	    return String(Number(value.toFixed(12)));
+	}
+
+	function recalculateNewReportDepths(preserveIntrusion) {
+	    preserveIntrusion = preserveIntrusion || $('#copy_intrusionDepth').data('intrusionDepthEdited') === true;
+	    var pieceIds = ['copy_piOne', 'copy_piTwo', 'copy_piThree', 'copy_piFour',
+	                    'copy_piFive', 'copy_piSix', 'copy_piSeven'];
+	    var totalConnectWidth = 0;
+	    var connectLength = 0;
+
+	    for (var i = 0; i < pieceIds.length; i++) {
+	        if (!$('#' + pieceIds[i]).is(':visible')) continue;
+	        var value = parseNewReportNumber($('#' + pieceIds[i]).val());
+	        totalConnectWidth += value;
+	        if (value !== 0) {
+	            connectLength++;
+	        }
+	    }
+
+	    var drillingDepth = parseNewReportNumber($('#copy_drillingDepth').val());
+	    var gongSac = parseNewReportNumber($('#copy_gongSac').val());
+	    var intrusionDepth = preserveIntrusion ? parseNewReportNumber($('#copy_intrusionDepth').val()) : drillingDepth - gongSac;
+	    var balance = calculateReportBalance(totalConnectWidth, intrusionDepth, drillingDepth);
+
+	    $('#copy_totalConnectWidth').text(formatNewReportNumber(totalConnectWidth));
+	    $('#copy_connectLength').text(String(Math.max(connectLength - 1, 0)));
+	    if (!preserveIntrusion) {
+	        $('#copy_intrusionDepth').val(formatNewReportNumber(intrusionDepth));
+	    }
+	    $('#copy_balance').val(formatNewReportNumber(balance));
+	}
+
+	$(document).on('input change', '#copy_piOne, #copy_piTwo, #copy_piThree, #copy_piFour, #copy_piFive, #copy_piSix, #copy_piSeven, #copy_drillingDepth, #copy_gongSac', function() {
+	    recalculateNewReportDepths(this.id.indexOf('copy_pi') === 0);
+	});
+	$(document).on('input change', '#copy_intrusionDepth', function() {
+	    $(this).data('intrusionDepthEdited', true);
+	    recalculateNewReportDepths(true);
+	});
+
 
 	function submitReport(mode) {
+		recalculateNewReportDepths(true);
 	    var pieces = [];
 		var pieceMap = [
 			{ id: 'copy_piOne', name: '단본' },
@@ -2116,14 +2244,15 @@
 		var penetrationss = [];
 		var measIds = ['copy_meas1', 'copy_meas2', 'copy_meas3', 'copy_meas4', 'copy_meas5', 
 					   'copy_meas6', 'copy_meas7', 'copy_meas8', 'copy_meas9', 'copy_meas10'];
+		var tenMeasurementMode = Number('${isBig}') > 0;
 		
 		for (var j = 0; j < measIds.length; j++) {
-			var val = $('#' + measIds[j]).val();
-			if ('${isBig}' === '0' && j >= 5) break; 
-			if (val) {
+			var val = ($('#' + measIds[j]).val() || '').trim();
+			if (!tenMeasurementMode && j >= 5) break;
+			if (tenMeasurementMode || val) {
 				penetrationss.push({
 					name: (j + 1) + "회",
-					value: val,
+					value: val || "0",
 					id: 0,
 					reportIdx: 0
 				});
@@ -2647,6 +2776,52 @@
 			.replace(/"/g, '&quot;')
 			.replace(/'/g, '&#39;');
 	}
+	
+	$(document).ready(function() {
+	    $('#reportTable').on('input change', 'input[name^="penetrations["]', function() {
+	        var row = $(this).closest('tr');
+	        if (row.is('.lampOn, .lampOn-b, .lampOn-p')) return;
+	        if (!row.data('penetrationLampBeforeEdit')) {
+	            row.data('penetrationLampBeforeEdit', {
+	                orange: row.hasClass('lampOn-o'),
+	                color: row.hasClass('lampOn-l') ? '' : row[0].style.backgroundColor
+	            });
+	        }
+	        var missing = false;
+	        row.find('input[name^="penetrations["]').each(function() {
+	            var value = $.trim(this.value);
+	            if (value === '' || value === 'null' || Number(value) === 0) missing = true;
+	        });
+	        var previous = row.data('penetrationLampBeforeEdit');
+	        row.toggleClass('lampOn-l', missing);
+	        row.toggleClass('lampOn-o', !missing && previous.orange);
+	        row.css('background-color', missing ? '#F0DDA4' : previous.color);
+	    });
+	    $(document).on('change', '.lamp-filter', function() {
+	        var checkedClasses = [];
+	        
+	        $('.lamp-filter:checked').each(function() {
+	            var val = $(this).val();
+	            if (checkedClasses.indexOf(val) === -1) {
+	                checkedClasses.push(val);
+	            }
+	        });
+
+	        if (checkedClasses.length === 0) {
+	            $('#reportTable tr').show();
+	        } else {
+	            $('#reportTable tr').hide();
+	            
+	            if ($('#reportTable tr td[colspan="34"]').length > 0) {
+	                 $('#reportTable tr').has('td[colspan="34"]').show();
+	            }
+	            
+	            $.each(checkedClasses, function(index, cls) {
+	                $('#reportTable tr.' + cls).show();
+	            });
+	        }
+	    });
+	});
 
 </script>
 <!--컨텐츠-->
@@ -3103,7 +3278,7 @@
 													<tr class="lampOn-p" onclick="javascript:onRowClick(${status.index});" style="background-color: #D4C0FE;">
 												</c:when>
 												<c:otherwise>
-													<c:choose>
+													<%-- <c:choose>
 														<c:when test="${domain.managedStandard + 0 < domain.avgPenetrationValue + 0}">
 														 	<tr class="lampOn-o" onclick="javascript:onRowClick(${status.index});" style="background-color: #FEB896;">
 														 </c:when>
@@ -3139,6 +3314,65 @@
 																</c:otherwise>	
 														 	</c:choose>
 														 </c:otherwise> 
+													</c:choose> --%>
+													
+													<c:choose>
+												    	<c:when test="${domain.managedStandard + 0 < domain.avgPenetrationValue + 0}">
+												        	<tr class="lampOn-o" onclick="javascript:onRowClick(${status.index});" style="background-color: #FEB896;">
+												    	</c:when>
+												    	<c:otherwise>
+												        
+												        	<c:set var="isNotPenetrated" value="false" />
+												        
+												        	<c:if test="${empty domain.peOne or domain.peOne eq '0' or domain.peOne eq '0.0' or domain.peOne eq 'null' or
+												                      empty domain.peTwo or domain.peTwo eq '0' or domain.peTwo eq '0.0' or domain.peTwo eq 'null' or
+												                      empty domain.peThree or domain.peThree eq '0' or domain.peThree eq '0.0' or domain.peThree eq 'null' or
+												                      empty domain.peFour or domain.peFour eq '0' or domain.peFour eq '0.0' or domain.peFour eq 'null' or
+												                      empty domain.peFive or domain.peFive eq '0' or domain.peFive eq '0.0' or domain.peFive eq 'null'}">
+												            	<c:set var="isNotPenetrated" value="true" />
+												        	</c:if>
+												
+												        	<c:if test="${isBig > 0 and not isNotPenetrated}">
+												            	<c:if test="${empty domain.peSix or domain.peSix eq '0' or domain.peSix eq '0.0' or domain.peSix eq 'null' or
+												                          	empty domain.peSeven or domain.peSeven eq '0' or domain.peSeven eq '0.0' or domain.peSeven eq 'null' or
+												                          	empty domain.peEight or domain.peEight eq '0' or domain.peEight eq '0.0' or domain.peEight eq 'null' or
+												                          	empty domain.peNine or domain.peNine eq '0' or domain.peNine eq '0.0' or domain.peNine eq 'null' or
+												                          	empty domain.peTen or domain.peTen eq '0' or domain.peTen eq '0.0' or domain.peTen eq 'null'}">
+												                	<c:set var="isNotPenetrated" value="true" />
+												            	</c:if>
+												        	</c:if>
+												
+												        	<c:choose>
+												            	<c:when test="${isNotPenetrated}">
+												                	<c:choose>
+												                    	<c:when test="${domain.deviceIdx == 2061}">
+												                        	<c:choose>
+												                            	<c:when test="${domain.peLength < 3}">
+												                                	<tr class="lampOn-l" onclick="javascript:onRowClick(${status.index});" style="background-color: #F0DDA4;">		
+												                            	</c:when>
+												                            	<c:otherwise>
+												                                	<tr onclick="javascript:onRowClick(${status.index});">	
+												                            	</c:otherwise>
+												                        	</c:choose>
+												                    	</c:when>
+												                    	<c:otherwise>
+												                        	<c:choose>
+												                            	<c:when test="${param.constructionIdx == 1619 or sessionInfo.constructionIdx == 1619}">
+												                                	<tr onclick="javascript:onRowClick(${status.index});">
+												                            	</c:when>
+												                            	<c:otherwise>
+												                                	<tr class="lampOn-l" onclick="javascript:onRowClick(${status.index});" style="background-color: #F0DDA4;">	
+												                            	</c:otherwise>
+												                        	</c:choose>
+												                    	</c:otherwise>
+												                	</c:choose>
+												            	</c:when>
+												            	<c:otherwise>
+												                	<tr onclick="javascript:onRowClick(${status.index});">
+												            	</c:otherwise>	
+												        	</c:choose>
+												        	
+												    	</c:otherwise> 
 													</c:choose>
 												</c:otherwise>
 											</c:choose>
@@ -3337,7 +3571,7 @@
 										<input type="text" id="drillingDepth" name="drillingDepth" disabled="disabled"  class="tdInput" value="<fmt:formatNumber value='${calDrillingDepth}' pattern='.0' />" />
 									</c:when>
 									<c:otherwise>
-										<input type="text" id="drillingDepth" name="drillingDepth" disabled="disabled"  class="tdInput" value="${domain.drillingDepth}"/>
+										<input type="number" step="any" id="drillingDepth" name="drillingDepth" disabled="disabled" class="tdInput" value="${domain.drillingDepth}"/>
 									</c:otherwise>
 								</c:choose>
 							</td>
@@ -3416,11 +3650,14 @@
 												</c:choose>
 											</c:when>
 											<c:otherwise>
-												${domain.gongSac}
+												<input type="number" step="any" id="gongSac" name="gongSac" disabled="disabled" class="tdInput" value="${domain.gongSac}" />
 											</c:otherwise>
 										</c:choose>
 									</c:otherwise>
 								</c:choose>
+								<c:if test="${sessionInfo.constructionIdx == 783 or param.constructionIdx == 783 or sessionInfo.constructionIdx == 1082 or param.constructionIdx == 1082}">
+									<input type="hidden" id="gongSac" name="gongSac" value="${domain.gongSac}" />
+								</c:if>
 							</td>
 							<td><input type="text" id="hammaT" name="hammaT"  disabled="disabled" class="tdInput" value="${domain.hammaT}"/></td>
 							<td><input type="text" id="fallMeter" name="fallMeter"  disabled="disabled"  class="tdInput" value="${domain.fallMeter}"/></td>
@@ -4430,10 +4667,10 @@
 	                <td class="viewTh">해머무게</td><td class="viewTh">낙하높이</td><td class="viewTh">관리기준</td>
 	            </tr>
 	            <tr>
-	                <td><input type="text" class="tdInput copy-input" id="copy_drillingDepth" name="drillingDepth" /></td>
-	                <td><input type="text" class="tdInput copy-input" id="copy_intrusionDepth" name="intrusionDepth" /></td>
-	                <td><input type="text" class="tdInput copy-input" id="copy_balance" /></td>
-	                <td><input type="text" class="tdInput copy-input" id="copy_gongSac" /></td>
+	                <td><input type="number" step="any" class="tdInput copy-input" id="copy_drillingDepth" name="drillingDepth" /></td>
+	                <td><input type="number" step="any" class="tdInput copy-input" id="copy_intrusionDepth" name="intrusionDepth" /></td>
+	                <td><input type="text" class="tdInput copy-input" id="copy_balance" readonly /></td>
+	                <td><input type="number" step="any" class="tdInput copy-input" id="copy_gongSac" name="gongSac" /></td>
 	                <td><input type="text" class="tdInput copy-input" id="copy_hammaT" name="hammaT" /></td>
 	                <td><input type="text" class="tdInput copy-input" id="copy_fallMeter" name="fallMeter" /></td>
 	                <td><input type="text" class="tdInput copy-input" id="copy_managedStandard" name="managedStandard" /></td>

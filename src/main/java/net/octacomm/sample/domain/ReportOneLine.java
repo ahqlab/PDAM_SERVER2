@@ -1,7 +1,7 @@
 package net.octacomm.sample.domain;
 
 import java.util.List;
-
+import java.math.BigDecimal;
 import lombok.Data;
 
 @Data
@@ -73,7 +73,7 @@ public class ReportOneLine implements Domain {
     //탄성 계수
     private String modulusElasticity;
 
-	private float gongSac;
+	private Float gongSac;
 	
 	private String bigo;
 	
@@ -195,7 +195,7 @@ public class ReportOneLine implements Domain {
 	**/
 	
 	/** old **/
-	public float getGongSac() {
+	/** public float getGongSac() {
 		//if (getDeviceIdx() == 3042 || "isoo".equals(getSprCol1())) {
 		if ("isoo".equals(getSprCol1())) {
 		//if (getConstructionIdx() == 1482) {
@@ -210,6 +210,19 @@ public class ReportOneLine implements Domain {
 			}
 		}
 		return Float.parseFloat(String.format("%.1f", gongSac));
+	} **/
+
+	public float getGongSac() {
+		if (gongSac != null) {
+			return gongSac;
+		}
+		try {
+			BigDecimal drilling = new BigDecimal(getDrillingDepth() != null && !getDrillingDepth().isEmpty() ? getDrillingDepth() : "0");
+			BigDecimal intrusion = new BigDecimal(getIntrusionDepth() != null && !getIntrusionDepth().isEmpty() ? getIntrusionDepth() : "0");
+			return drilling.subtract(intrusion).floatValue();
+		} catch (Exception e) {
+			return 0;
+		}
 	}
 
 	public void setGongSac(float gongSac) {
@@ -230,7 +243,7 @@ public class ReportOneLine implements Domain {
 		}
 		if(value < 0)
 		{
-			setGongSac(value);
+			if(gongSac == null) setGongSac(value);
 			return 0;
 		}
 		float result;
