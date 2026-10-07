@@ -74,7 +74,7 @@ public class UpdateReport implements Domain {
     private int isDuple;
 	
 	public float getGongSac() {
-		return Float.parseFloat(String.format("%.1f", gongSac));
+		return gongSac;
 	}
 	public void setGongSac(float gongSac) {
 		this.gongSac = gongSac;
@@ -82,13 +82,7 @@ public class UpdateReport implements Domain {
 
 	//잔량
 	public float getBalance() {
-		float value = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0");
-		if(value < 0)
-		{
-			setGongSac(value);
-			return 0;
-		}
-		return Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0");
+		return balance;
 	}
 	//잔량
 	public void setBalance(float balance) {
@@ -129,11 +123,27 @@ public class UpdateReport implements Domain {
 			if(penetrations.size() > 0) {
 				try {
 					for (Penetration penetration : penetrations) {
-						width += Float.parseFloat(penetration.getValue() != "" ? penetration.getValue() : "0");
+						String value = penetration.getValue();
+						if(value == null || value.trim().isEmpty() || Float.parseFloat(value) == 0) {
+							continue;
+						}
+						width += Float.parseFloat(value);
 					}
-					System.err.println("평균관입량 :  " + String.valueOf(width / penetrations.size()));
-					return String.valueOf(String.format("%.1f" , width / penetrations.size()));
+					int enteredCount = 0;
+					for (Penetration penetration : penetrations) {
+						String value = penetration.getValue();
+						if(value != null && !value.trim().isEmpty() && Float.parseFloat(value) != 0) {
+							enteredCount++;
+						}
+					}
+					if(enteredCount == 0) {
+						return "0";
+					}
+					System.err.println("평균관입량 :  " + String.valueOf(width / enteredCount));
+					return String.valueOf(String.format("%.1f" , width / enteredCount));
 				}catch (NullPointerException e) {
+					return avgPenetrationValue;
+				}catch (NumberFormatException e) {
 					return avgPenetrationValue;
 				}
 			}
@@ -157,11 +167,16 @@ public class UpdateReport implements Domain {
 				float width = 0;
 				try {
 					for (Penetration penetration : penetrations) {
-						width += Float.parseFloat(penetration.getValue() != "" ? penetration.getValue() : "0");
+						String value = penetration.getValue();
+						if(value != null && !value.trim().isEmpty()) {
+							width += Float.parseFloat(value);
+						}
 					}
 					System.err.println("최종관입량 :" + String.valueOf(width));
 					return String.valueOf(String.format("%.1f" , width));
 				}catch (NullPointerException e) {
+					return totalPenetrationValue;
+				}catch (NumberFormatException e) {
 					return totalPenetrationValue;
 				}
 			}

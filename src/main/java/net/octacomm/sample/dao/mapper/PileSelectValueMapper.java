@@ -14,15 +14,15 @@ import net.octacomm.sample.domain.PileSelectValue;
 @CacheNamespace
 public interface PileSelectValueMapper {
 	
-	public String INSERT_FIELDS = " ( id, pileType, pileStandard , thickness, crossSection   )";
+	public String INSERT_FIELDS = " ( id, pileType, pileStandard , thickness, crossSection, modulusElasticity   )";
 	
-	public String INSERT_VALUES = " ( null, #{pileType}, #{pileStandard} , #{thickness}, #{crossSection} )";
+	public String INSERT_VALUES = " ( null, #{pileType}, #{pileStandard} , #{thickness}, #{crossSection}, #{modulusElasticity} )";
 	
 	public String TABLE_NAME = " TB_PILE_SELECT_VALUE ";
 	
-	public String UPDATE_VALUES = " pileType = #{pileType} , pileStandard = #{pileStandard},  thickness = #{thickness}, crossSection = #{crossSection}, ";
+	public String UPDATE_VALUES = " pileType = #{pileType} , pileStandard = #{pileStandard},  thickness = #{thickness}, crossSection = #{crossSection}, modulusElasticity = #{modulusElasticity}, ";
 	
-	public String SELECT_FIELDS = " id, pileType, pileStandard , thickness, crossSection, sortSeq , subSortSeq ";
+	public String SELECT_FIELDS = " id, pileType, pileStandard , thickness, crossSection, modulusElasticity, sortSeq , subSortSeq ";
 	
 	@Insert("INSERT INTO " + TABLE_NAME + " " + INSERT_FIELDS + " VALUES " + INSERT_VALUES)
 	int insert(PileSelectValue domain);
@@ -45,4 +45,9 @@ public interface PileSelectValueMapper {
 	@Select("SELECT" + SELECT_FIELDS + " FROM " + TABLE_NAME + " WHERE deviceIdx =  #{deviceIdx} ")
 	public List<PileSelectValue> getListByDeviceIdx(@Param("deviceIdx") int deviceIdx);
 
+	@Select("SELECT modulusElasticity FROM " + TABLE_NAME
+			+ " WHERE UPPER(pileType) = UPPER(#{pileType})"
+			+ " AND modulusElasticity IS NOT NULL AND modulusElasticity <> ''"
+			+ " ORDER BY deviceIdx DESC LIMIT 1")
+	String getModulusElasticityByPileType(@Param("pileType") String pileType);
 }

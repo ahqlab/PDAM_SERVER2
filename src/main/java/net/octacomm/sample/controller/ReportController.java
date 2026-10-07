@@ -4,6 +4,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -1117,6 +1119,7 @@ public class ReportController{
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			return false;
 		}
+		applyDepthCalculations(report);
 		report.setUltimateBearingCapacity(String.valueOf(calDanish(report)));
 		int result = mapper.update(report);
 		if(result > 0) {
@@ -1195,6 +1198,7 @@ public class ReportController{
 		reportHistoryService.saveBeforeChange(report.getId(), ReportHistoryService.STATUS_UPDATE, userId);
 
 	    // 1. 계산값 설정
+	    applyDepthCalculations(report);
 	    report.setUltimateBearingCapacity(String.valueOf(calDanish(report)));
 
 	    // 2. 메인 report update
@@ -1456,9 +1460,54 @@ public class ReportController{
 	        }
 	        return true; 
 	    } catch (Exception e) {
+	        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 	        e.printStackTrace();
 	        return false;
 	    }
+	}
+
+	private void applyDepthCalculations(UpdateReport report) {
+	    String enteredDepth = report.getIntrusionDepth();
+	    BigDecimal drilling = report.getDrillingDepth() == null || report.getDrillingDepth().trim().isEmpty()
+	            ? BigDecimal.ZERO : new BigDecimal(report.getDrillingDepth().trim());
+	    BigDecimal intrusionDepth = enteredDepth == null || enteredDepth.trim().isEmpty()
+	            ? drilling.subtract(new BigDecimal(Float.toString(report.getGongSac())))
+	            : new BigDecimal(enteredDepth.trim());
+	    report.setIntrusionDepth(intrusionDepth.stripTrailingZeros().toPlainString());
+	    Device device = deviceMapper.get(report.getDeviceIdx());
+	    int constructionIdx = report.getId() > 0 ? mapper.getConstructionIdx(report.getId())
+	            : (device == null ? 0 : device.getConstructionIdx());
+	    report.setBalance(displayedBalance(constructionIdx, report.getTotalConnectWidth(),
+	            intrusionDepth.toPlainString(), report.getDrillingDepth()).floatValue());
+	}
+
+	private BigDecimal displayedBalance(int constructionIdx, String total, String intrusion, String drilling) {
+	    BigDecimal result;
+	    if (constructionIdx == 944 || constructionIdx == 1136) {
+	        result = legacyBalance(total, intrusion, drilling);
+	        return result.max(BigDecimal.ZERO);
+	    }
+	    try {
+	        result = decimal(total).subtract(decimal(intrusion));
+	        return result.setScale(2, RoundingMode.HALF_UP);
+	    } catch (NumberFormatException e) {
+	        return BigDecimal.ZERO;
+	    }
+	}
+
+	private BigDecimal legacyBalance(String total, String intrusion, String drilling) {
+	    try {
+	        float result = Float.parseFloat(total)
+	                - Float.parseFloat("".equals(intrusion) ? "0" : intrusion)
+	                - Float.parseFloat("".equals(drilling) ? "0" : drilling);
+	        return new BigDecimal(String.format(java.util.Locale.ROOT, "%.2f", result));
+	    } catch (Exception e) {
+	        return BigDecimal.ZERO;
+	    }
+	}
+
+	private BigDecimal decimal(String value) {
+	    return value == null || value.trim().isEmpty() ? BigDecimal.ZERO : new BigDecimal(value.trim());
 	}
 	
 	@ResponseBody

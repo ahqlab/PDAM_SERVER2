@@ -16,7 +16,7 @@
 	    		</when>
 	    	</choose>
 	    	
-	    	, createDate  )
+	    	, gongSac, createDate  )
 	     VALUES 
 	     ( #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo} , #{pileStandard},  #{drillingDepth} , #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter},  #{pileType}, #{method}, #{totalConnectWidth},  #{ultimateBearingCapacity} , #{crossSection} , #{hammaEfficiency} , #{modulusElasticity} 
 	     	
@@ -29,7 +29,7 @@
 	    		</when>
 	    	</choose>
 	     	
-	     	, now() )
+	      	, #{gongSac}, now() )
 	    <selectKey resultType="int" keyProperty="id" order="AFTER">
         SELECT LAST_INSERT_ID()
     	</selectKey>
@@ -47,7 +47,7 @@
 	    		</when>
 	    		
 	    	</choose>
-	    	, createDate  )
+	     	, gongSac, createDate  )
 	     VALUES 
 	     ( #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo} , #{pileStandard},  #{drillingDepth} , #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter},  #{pileType}, #{method}, #{totalConnectWidth},   #{ultimateBearingCapacity}, #{crossSection} , #{hammaEfficiency} , #{modulusElasticity} 
 	     	<choose>
@@ -58,7 +58,7 @@
 	    		,  #{sprCol1} 
 	    		</when>
 	    	</choose>
-	     	, #{createDate} )
+	      	, #{gongSac}, #{createDate} )
 	    <selectKey resultType="int" keyProperty="id" order="AFTER">
         	SELECT LAST_INSERT_ID()
     	</selectKey>

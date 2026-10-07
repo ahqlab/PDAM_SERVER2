@@ -338,7 +338,7 @@
 	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" ORDER BY TB_PIECE.id ASC LIMIT 1,1),'') as piFour,
 	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "상단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piFive,
 	                ifnull((SELECT IF(VALUE = 0, '', VALUE) as VALUE FROM TB_PIECE WHERE reportIdx = A.id and name = "상단" ORDER BY TB_PIECE.id ASC LIMIT 0, 1 ),'') as piSeven,
-	                (SELECT SUM(CASE WHEN VALUE IS NULL THEN 0 ELSE 1 END) AS peLength FROM TB_PENETRATION  WHERE reportIdx = A.id LIMIT 5) as peLength
+	                (SELECT IFNULL(SUM(CASE WHEN VALUE IS NULL OR VALUE = 0 THEN 0 ELSE 1 END), 0) AS peLength FROM TB_PENETRATION WHERE reportIdx = A.id) as peLength
 		            
 				FROM TB_REPORT A , TB_DEVICE B, TB_CONSTRUCTION C 
 		        <include refid="condition"/>
@@ -424,6 +424,7 @@
 			AA.crossSection ,
 			AA.hammaEfficiency ,
 			AA.modulusElasticity ,
+			AA.gongSac ,
 			AA.createDate, 
 			AA.isDel ,
 			AA.isDuple , 
@@ -501,6 +502,7 @@
 			crossSection , 
 			hammaEfficiency , 
 			modulusElasticity , 
+			gongSac ,
 			isDel,
 			isDuple, 
 			role , 
@@ -578,6 +580,7 @@
 		            A.crossSection , 
 		            A.hammaEfficiency , 
 		            A.modulusElasticity , 
+		            A.gongSac ,
 					A.isDel,
                     A.isDuple, 
 		            C.role , 
@@ -623,7 +626,7 @@
 	                ifnull((SELECT IF(id = 0, '', id) as id FROM TB_PIECE WHERE reportIdx = A.id and name = "상단"),'') as pidFive,
 	                ifnull((SELECT IF(id = 0, '', id) as id FROM TB_PIECE WHERE reportIdx = A.id and name = "상단"),'') as pidSeven,
 	                
-	                (SELECT SUM(CASE WHEN VALUE IS NULL THEN 0 ELSE 1 END) AS peLength FROM TB_PENETRATION  WHERE reportIdx = A.id LIMIT 5) as peLength
+	                (SELECT IFNULL(SUM(CASE WHEN VALUE IS NULL OR VALUE = 0 THEN 0 ELSE 1 END), 0) AS peLength FROM TB_PENETRATION WHERE reportIdx = A.id) as peLength
 		            
 				FROM TB_REPORT A , TB_DEVICE B, TB_CONSTRUCTION C 
 		        <include refid="condition"/>
@@ -709,6 +712,7 @@
 			AA.crossSection ,
 			AA.hammaEfficiency ,
 			AA.modulusElasticity ,
+			AA.gongSac ,
 			AA.createDate, 
 			AA.isDel ,
 			AA.isDuple , 
@@ -788,6 +792,7 @@
 			crossSection , 
 			hammaEfficiency , 
 			modulusElasticity , 
+			gongSac ,
 			isDel,
 			isDuple, 
 			role , 
@@ -867,6 +872,7 @@
 		            A.crossSection , 
 		            A.hammaEfficiency , 
 		            A.modulusElasticity , 
+		            A.gongSac ,
 					A.isDel,
                     A.isDuple, 
 		            C.role , 
@@ -914,7 +920,7 @@
 	                ifnull((SELECT IF(id = 0, '', id) as id FROM TB_PIECE WHERE reportIdx = A.id and name = "중단" ORDER BY TB_PIECE.id ASC LIMIT 3,1),'') as pidSix,
 	                ifnull((SELECT IF(id = 0, '', id) as id FROM TB_PIECE WHERE reportIdx = A.id and name = "상단"),'') as pidSeven,
 	                
-	                (SELECT SUM(CASE WHEN VALUE IS NULL THEN 0 ELSE 1 END) AS peLength FROM TB_PENETRATION  WHERE reportIdx = A.id LIMIT 5) as peLength
+	                (SELECT IFNULL(SUM(CASE WHEN VALUE IS NULL OR VALUE = 0 THEN 0 ELSE 1 END), 0) AS peLength FROM TB_PENETRATION WHERE reportIdx = A.id) as peLength
 		            
 				FROM TB_REPORT A , TB_DEVICE B, TB_CONSTRUCTION C 
 		        <include refid="condition"/>
@@ -1477,6 +1483,7 @@
 			crossSection ,
 			hammaEfficiency ,
 			modulusElasticity ,
+			gongSac ,
 			createDate ,
 			role, 
 			isDel, 
@@ -1513,6 +1520,7 @@
 				A.crossSection ,
 				A.hammaEfficiency ,
 				A.modulusElasticity ,
+				A.gongSac ,
 				A.createDate ,
 				C.role ,
 				IF(A.bigo = 'null','',A.bigo) as bigo ,
@@ -1583,6 +1591,7 @@
 		    AA.crossSection , 
 		    AA.hammaEfficiency , 
 		    AA.modulusElasticity , 
+		    AA.gongSac ,
 		    AA.createDate , 
 		    AA.role, 
 		    AA.isDel, 
@@ -1636,6 +1645,7 @@
 		    crossSection , 
 		    hammaEfficiency , 
 		    modulusElasticity , 
+		    gongSac ,
 		    createDate , 
 		    role, 
 		    isDel, 
@@ -1690,6 +1700,7 @@
 		            A.crossSection , 
 		            A.hammaEfficiency , 
 		            A.modulusElasticity , 
+		            A.gongSac ,
 					(SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 0,1) as peOne,
 	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 1,1) as peTwo,
 	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 2,1) as peThree,
@@ -1792,6 +1803,7 @@
 		    AA.crossSection , 
 		    AA.hammaEfficiency , 
 		    AA.modulusElasticity , 
+		    AA.gongSac ,
 		    AA.createDate , 
 		    AA.role, 
 		    AA.isDel, 
@@ -1844,6 +1856,7 @@
 		    crossSection , 
 		    hammaEfficiency , 
 		    modulusElasticity , 
+		    gongSac ,
 		    createDate , 
 		    role, 
 		    isDel, 
@@ -1897,6 +1910,7 @@
 		            A.crossSection , 
 		            A.hammaEfficiency , 
 		            A.modulusElasticity , 
+		            A.gongSac ,
 					(SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 0,1) as peOne,
 	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 1,1) as peTwo,
 	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 2,1) as peThree,
@@ -1994,6 +2008,7 @@
 		    AA.crossSection , 
 		    AA.hammaEfficiency , 
 		    AA.modulusElasticity , 
+		    AA.gongSac ,
 		    AA.createDate , 
 		    AA.role, 
 		    AA.isDel, 
@@ -2047,6 +2062,7 @@
 		    crossSection , 
 		    hammaEfficiency , 
 		    modulusElasticity , 
+		    gongSac ,
 		    createDate , 
 		    role, 
 		    isDel, 
@@ -2101,6 +2117,7 @@
 		            A.crossSection , 
 		            A.hammaEfficiency , 
 		            A.modulusElasticity , 
+		            A.gongSac ,
 					(SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 0,1) as peOne,
 	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 1,1) as peTwo,
 	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 2,1) as peThree,
@@ -2200,6 +2217,7 @@
 		    AA.crossSection , 
 		    AA.hammaEfficiency , 
 		    AA.modulusElasticity , 
+		    AA.gongSac ,
 		    AA.createDate , 
 		    AA.role, 
 		    AA.isDel, 
@@ -2247,6 +2265,7 @@
 		    crossSection , 
 		    hammaEfficiency , 
 		    modulusElasticity , 
+		    gongSac ,
 		    createDate , 
 		    role, 
 		    isDel, 
@@ -2295,6 +2314,7 @@
 		            A.crossSection , 
 		            A.hammaEfficiency , 
 		            A.modulusElasticity , 
+		            A.gongSac ,
 					(SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 0,1) as peOne,
 	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 1,1) as peTwo,
 	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 2,1) as peThree,
@@ -2388,6 +2408,7 @@
 		    AA.crossSection , 
 		    AA.hammaEfficiency , 
 		    AA.modulusElasticity , 
+		    AA.gongSac ,
 		    AA.createDate , 
 		    AA.role, 
 		    AA.isDel, 
@@ -2441,6 +2462,7 @@
 		    crossSection , 
 		    hammaEfficiency , 
 		    modulusElasticity , 
+		    gongSac ,
 		    createDate , 
 		    role, 
 		    isDel, 
@@ -2495,6 +2517,7 @@
 		            A.crossSection , 
 		            A.hammaEfficiency , 
 		            A.modulusElasticity , 
+		            A.gongSac ,
 					(SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 0,1) as peOne,
 	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 1,1) as peTwo,
 	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 2,1) as peThree,
@@ -2595,6 +2618,7 @@
 		    AA.crossSection , 
 		    AA.hammaEfficiency , 
 		    AA.modulusElasticity , 
+		    AA.gongSac ,
 		    AA.createDate , 
 		    AA.role, 
 		    AA.isDel, 
@@ -2647,6 +2671,7 @@
 		    crossSection , 
 		    hammaEfficiency , 
 		    modulusElasticity , 
+		    gongSac ,
 		    createDate , 
 		    role, 
 		    isDel, 
@@ -2700,6 +2725,7 @@
 		            A.crossSection , 
 		            A.hammaEfficiency , 
 		            A.modulusElasticity , 
+		            A.gongSac ,
 					(SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 0,1) as peOne,
 	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 1,1) as peTwo,
 	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 2,1) as peThree,
@@ -2799,6 +2825,7 @@
 		    AA.crossSection , 
 		    AA.hammaEfficiency , 
 		    AA.modulusElasticity , 
+		    AA.gongSac ,
 		    AA.createDate , 
 		    AA.role, 
 		    AA.isDel, 
@@ -2847,6 +2874,7 @@
 		    crossSection , 
 		    hammaEfficiency , 
 		    modulusElasticity , 
+		    gongSac ,
 		    createDate , 
 		    role, 
 		    isDel, 
@@ -2896,6 +2924,7 @@
 		            A.crossSection , 
 		            A.hammaEfficiency , 
 		            A.modulusElasticity , 
+		            A.gongSac ,
 					(SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 0,1) as peOne,
 	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 1,1) as peTwo,
 	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 2,1) as peThree,
@@ -2991,6 +3020,7 @@
 		    AA.crossSection , 
 		    AA.hammaEfficiency , 
 		    AA.modulusElasticity , 
+		    AA.gongSac ,
 		    AA.createDate , 
 		    AA.role, 
 		    AA.isDel, 
@@ -3038,6 +3068,7 @@
 		    crossSection , 
 		    hammaEfficiency , 
 		    modulusElasticity , 
+		    gongSac ,
 		    createDate , 
 		    role, 
 		    isDel, 
@@ -3086,6 +3117,7 @@
 		            A.crossSection , 
 		            A.hammaEfficiency , 
 		            A.modulusElasticity , 
+		            A.gongSac ,
 					(SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 0,1) as peOne,
 	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 1,1) as peTwo,
 	                (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 2,1) as peThree,
@@ -3199,7 +3231,7 @@
 	    		</when>
 	    	</choose>
 	    	
-	    	, createDate  )
+	    	, gongSac, createDate  )
 	     VALUES 
 	     ( 
 	     	#{deviceIdx},
@@ -3248,7 +3280,7 @@
 	    		, #{sprCol1}  
 	    		</when>
 	    	</choose>
-	     	, now() )
+	      	, #{gongSac}, now() )
 	    <selectKey resultType="int" keyProperty="id" order="AFTER">
         SELECT LAST_INSERT_ID()
     	</selectKey>
@@ -3408,7 +3440,7 @@
 	    		, sprCol1 
 	    		</when>
 	    	</choose>
-	    	, createDate  
+	     	, gongSac, createDate
 	    )
 	    VALUES 
 	    ( 
@@ -3458,7 +3490,7 @@
 	    		, #{sprCol1}  
 	    		</when>
 	    	</choose>
-	     	, #{createDate} )
+	      	, #{gongSac}, #{createDate} )
 	    <selectKey resultType="int" keyProperty="id" order="AFTER">
         	SELECT LAST_INSERT_ID()
     	</selectKey>
@@ -3616,6 +3648,7 @@
 		    , crossSection 
 		    , hammaEfficiency 
 		    , modulusElasticity 
+		    , gongSac
 		    , createDate 
 		    , role
 		    , isDel
@@ -3665,6 +3698,7 @@
                 , A.crossSection 
                 , A.hammaEfficiency 
                 , A.modulusElasticity 
+                , A.gongSac
                 , (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 0,1)  as peOne
                 , (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 1,1)  as peTwo
                 , (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 2,1)  as peThree
@@ -3747,6 +3781,7 @@
 		    , crossSection 
 		    , hammaEfficiency 
 		    , modulusElasticity 
+		    , gongSac
 		    , createDate 
 		    , role
 		    , isDel
@@ -3794,6 +3829,7 @@
                 , A.crossSection 
                 , A.hammaEfficiency 
                 , A.modulusElasticity 
+                , A.gongSac
                 , (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 0,1)  as peOne
                 , (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 1,1)  as peTwo
                 , (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 2,1)  as peThree
@@ -3874,6 +3910,7 @@
 		    , crossSection 
 		    , hammaEfficiency 
 		    , modulusElasticity 
+		    , gongSac
 		    , createDate 
 		    , role
 		    , isDel
@@ -3923,6 +3960,7 @@
                 , A.crossSection 
                 , A.hammaEfficiency 
                 , A.modulusElasticity 
+                , A.gongSac
                 , (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 0,1)  as peOne
                 , (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 1,1)  as peTwo
                 , (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 2,1)  as peThree
@@ -3985,6 +4023,7 @@
 		    , crossSection
 		    , hammaEfficiency
 		    , modulusElasticity
+		    , gongSac
 		    , createDate
 		    , role
 		    , isDel
@@ -4038,6 +4077,7 @@
                 , A.crossSection 
                 , A.hammaEfficiency 
                 , A.modulusElasticity 
+                , A.gongSac
                 , (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 0,1)  as peOne
                 , (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 1,1)  as peTwo
                 , (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 2,1)  as peThree
@@ -4116,6 +4156,7 @@
 		    , crossSection 
 		    , hammaEfficiency 
 		    , modulusElasticity 
+		    , gongSac
 		    , createDate 
 		    , role
 		    , isDel
@@ -4163,6 +4204,7 @@
                 , A.crossSection 
                 , A.hammaEfficiency 
                 , A.modulusElasticity 
+                , A.gongSac
                 , (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 0,1)  as peOne
                 , (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 1,1)  as peTwo
                 , (SELECT VALUE FROM TB_PENETRATION WHERE reportIdx = A.id LIMIT 2,1)  as peThree
@@ -4300,7 +4342,6 @@
 			AND B.id = C.deviceIdx
 			AND C.id = D.reportIdx
 			AND A.ID = #{constructionIdx}
-			AND D.value > 0
 		GROUP BY D.reportIdx HAVING  COUNT(*) > 5) A
     </select>
     
@@ -4308,7 +4349,7 @@
 	    INSERT INTO TB_REPORT 
 	    (
 	        deviceIdx, currentDateTime, location, pileNo, pileStandard, 
-	        drillingDepth, directDrillingDepth, stDrillingDepth, sdDrillingDepth, 
+	        drillingDepth, gongSac, directDrillingDepth, stDrillingDepth, sdDrillingDepth,
 	        intrusionDepth, balance, connectLength, managedStandard, 
 	        avgPenetrationValue, totalPenetrationValue, hammaT, fallMeter, 
 	        pileType, method, totalConnectWidth, ultimateBearingCapacity, 
@@ -4317,7 +4358,7 @@
 	    VALUES 
 	    (
 	        #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo}, #{pileStandard}, 
-	        #{drillingDepth}, #{directDrillingDepth}, #{stDrillingDepth}, #{sdDrillingDepth}, 
+	        #{drillingDepth}, #{gongSac}, #{directDrillingDepth}, #{stDrillingDepth}, #{sdDrillingDepth},
 	        #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, 
 	        #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter}, 
 	        #{pileType}, #{method}, #{totalConnectWidth}, #{ultimateBearingCapacity}, 

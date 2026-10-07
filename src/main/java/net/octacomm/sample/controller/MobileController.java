@@ -106,6 +106,7 @@ public class MobileController {
 	public CommonResponse<Boolean> registReport(@RequestBody Report report, BindingResult result){
 		System.err.println("/regist/report report sTring : "  + report);
 		System.err.println("/regist/report report : " + report.getGongSac() + " balance : " + report.getBalance());
+		applyModulusElasticity(report);
 		CommonResponse<Boolean> response = new CommonResponse<Boolean>();
 		try{
 			if(report.getCreateDate() != null) {
@@ -169,6 +170,7 @@ public class MobileController {
 		System.err.println("report : " + report.size());
 		CommonResponse<Boolean> response = new CommonResponse<Boolean>();
 		for (Report report2 : report) {
+			applyModulusElasticity(report2);
 			try{
 				if(report2.getCreateDate() != null) {
 					reportMapper.insert2(report2);
@@ -226,6 +228,7 @@ public class MobileController {
 	@RequestMapping(value = "/regist/report3", method = RequestMethod.POST)
 	public CommonResponse<Boolean> registReport3(@RequestBody GReport report, BindingResult result){
 		System.err.println("report : " + report);
+		applyModulusElasticity(report);
 		CommonResponse<Boolean> response = new CommonResponse<Boolean>();
 		try{
 			if(report.getCreateDate() != null) {
@@ -286,6 +289,7 @@ public class MobileController {
 	public CommonResponse<Boolean> registReport4(@RequestBody ReportWithFallMeter report, BindingResult result){
 		System.err.println("/regist/report report sTring : "  + report);
 		System.err.println("/regist/report report : " + report.getGongSac() + " balance : " + report.getBalance());
+		applyModulusElasticity(report);
 		
 		report.setBigo("");
 		report.setDrillingDepth(report.getIntrusionDepth());
@@ -369,6 +373,7 @@ public class MobileController {
 		System.err.println("report : " + report.size());
 		CommonResponse<Boolean> response = new CommonResponse<Boolean>();
 		for (ReportWithFallMeter report2 : report) {
+			applyModulusElasticity(report2);
 			try{
 				if(report2.getCreateDate() != null) {
 					reportWithFallMeterMapper.insert2(report2);
@@ -520,6 +525,28 @@ public class MobileController {
 		response.setDomain(parent);
 		response.setResultMessage("성공");
 		return response;
+	}
+	
+	
+	private void applyModulusElasticity(Report report) {
+		String modulusElasticity = pileSelectValueMapper.getModulusElasticityByPileType(report.getPileType());
+		if (modulusElasticity != null) {
+			report.setModulusElasticity(modulusElasticity);
+		}
+	}
+
+	private void applyModulusElasticity(GReport report) {
+		String modulusElasticity = pileSelectValueMapper.getModulusElasticityByPileType(report.getPileType());
+		if (modulusElasticity != null) {
+			report.setModulusElasticity(modulusElasticity);
+		}
+	}
+
+	private void applyModulusElasticity(ReportWithFallMeter report) {
+		String modulusElasticity = pileSelectValueMapper.getModulusElasticityByPileType(report.getPileType());
+		if (modulusElasticity != null) {
+			report.setModulusElasticity(modulusElasticity);
+		}
 	}
 	
 	

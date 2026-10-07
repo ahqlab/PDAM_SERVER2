@@ -73,7 +73,7 @@ public class Report implements Domain {
     //탄성 계수
     private String modulusElasticity;
 
-	private float gongSac;
+	private Float gongSac;
 	
 	private String bigo;
 	
@@ -129,7 +129,8 @@ public class Report implements Domain {
 	**/
 	
 	/** old **/
-	public float getGongSac() {
+	/**public float getGongSac() {
+		if(gongSac != null) return gongSac;
 		//if (getDeviceIdx() == 3042 || "isoo".equals(getSprCol1())) {
 		if ("isoo".equals(getSprCol1())) {
 		//if (getConstructionIdx() == 1482) {
@@ -142,7 +143,36 @@ public class Report implements Domain {
 				return 0;
 			}
 		}
-		return Float.parseFloat(String.format("%.1f", gongSac));
+		return 0;
+	}
+	**/
+	
+	public float getGongSac() {
+	    if (gongSac != null) {
+	        return Math.round(gongSac * 10.0f) / 10.0f;
+	    }
+
+	    if ("isoo".equals(getSprCol1())) {
+	        try {
+	            float drilling = Float.parseFloat(
+	                getDrillingDepth() == null || getDrillingDepth().isEmpty()
+	                    ? "0"
+	                    : getDrillingDepth()
+	            );
+
+	            float intrusion = Float.parseFloat(
+	                getIntrusionDepth() == null || getIntrusionDepth().isEmpty()
+	                    ? "0"
+	                    : getIntrusionDepth()
+	            );
+
+	            return Math.round((drilling - intrusion) * 10.0f) / 10.0f;
+	        } catch (Exception e) {
+	            return 0.0f;
+	        }
+	    }
+
+	    return 0.0f;
 	}
 
 	public void setGongSac(float gongSac) {
@@ -153,7 +183,7 @@ public class Report implements Domain {
 		float value;
 		try {
 			if(getConstructionIdx() == 944 || getConstructionIdx() == 1136){
-				value = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0") - Float.parseFloat(getDrillingDepth() != "" ? getDrillingDepth() : "0");;
+				value = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0") - Float.parseFloat(getDrillingDepth() != "" ? getDrillingDepth() : "0");
 			}else {
 				value = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0");
 			}
@@ -162,7 +192,7 @@ public class Report implements Domain {
 		}
 		if(value < 0)
 		{
-			setGongSac(value);
+			if(gongSac == null) setGongSac(value);
 			return 0;
 		}
 		float result;

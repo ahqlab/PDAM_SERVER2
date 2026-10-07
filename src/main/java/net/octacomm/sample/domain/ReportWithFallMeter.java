@@ -73,7 +73,7 @@ public class ReportWithFallMeter implements Domain {
     //탄성 계수
     private String modulusElasticity;
 
-	private float gongSac;
+	private Float gongSac;
 	
 	private String bigo;
 	
@@ -126,7 +126,8 @@ public class ReportWithFallMeter implements Domain {
 	
 	/** old **/
 	public float getGongSac() {
-		return Float.parseFloat(String.format("%.1f", gongSac));
+		if(gongSac != null) return gongSac;
+		return 0;
 	}
 	
 	public void setGongSac(float gongSac) {
@@ -137,7 +138,7 @@ public class ReportWithFallMeter implements Domain {
 		float value;
 		try {
 			if(getConstructionIdx() == 944 || getConstructionIdx() == 1136){
-				value = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0") - Float.parseFloat(getDrillingDepth() != "" ? getDrillingDepth() : "0");;
+				value = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0") - Float.parseFloat(getDrillingDepth() != "" ? getDrillingDepth() : "0");
 			}else {
 				value = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0");
 			}
@@ -146,7 +147,7 @@ public class ReportWithFallMeter implements Domain {
 		}
 		if(value < 0)
 		{
-			setGongSac(value);
+			if(gongSac == null) setGongSac(value);
 			return 0;
 		}
 		float result;
