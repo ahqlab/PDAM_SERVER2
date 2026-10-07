@@ -3148,7 +3148,7 @@
 								<td rowspan="2">탄성계수(t/cm2)</td>
 								<td rowspan="2">파일단면적(cm2)</td>
 								<td rowspan="2">비고</td>
-								<td rowspan="2">메모</td>
+								<td rowspan="2">상부RPM</td>
 							</c:when>
 							<c:when test="${sessionInfo.role == 1}">
 								<!-- 일반 협력사 -->
@@ -3182,7 +3182,7 @@
 										<td rowspan="2">비고</td>
 										<c:choose>
 											<c:when test="${param.constructionIdx == 492}">
-												<td rowspan="2">메모</td>
+														<td rowspan="2">상부RPM</td>
 											</c:when>
 										</c:choose>
 									</c:otherwise>
@@ -3219,7 +3219,7 @@
 							<td rowspan="2">비고</td>
 							<c:choose>
 								<c:when test="${param.constructionIdx == 492}">
-									<td rowspan="2">메모</td>
+									<td rowspan="2">상부RPM</td>
 								</c:when>
 							</c:choose>
 						</c:when>
@@ -3230,7 +3230,7 @@
 								<td rowspan="2">탄성계수(t/cm2)</td>
 								<td rowspan="2">파일단면적(cm2)</td>
 								<td rowspan="2">비고</td>
-								<td rowspan="2">메모</td>
+								<td rowspan="2">상부RPM</td>
 							</c:when>
 						</c:choose> --%>
 					</tr>	
@@ -4722,7 +4722,7 @@
 	                <td class="viewTh" style="width:20%">단면적</td><td style="width:30%"><input type="text" class="tdInput copy-input" id="copy_crossSection" name="crossSection" /></td>
 	            </tr>
 	            <tr>
-	                <td class="viewTh">메모</td><td colspan="6"><input type="text" class="tdInput copy-input" id="copy_sprCol1" name="sprCol1" /></td>
+	                <td class="viewTh">상부RPM</td><td colspan="6"><input type="text" class="tdInput copy-input" id="copy_sprCol1" name="sprCol1" /></td>
 	            </tr>
 	            <tr>
 	                <td class="viewTh">비고</td><td colspan="6"><input type="text" class="tdInput copy-input" id="copy_bigo" name="bigo" /></td>

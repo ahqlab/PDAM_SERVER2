@@ -129,7 +129,7 @@ public class Report implements Domain {
 	**/
 	
 	/** old **/
-	public float getGongSac() {
+	/**public float getGongSac() {
 		if(gongSac != null) return gongSac;
 		//if (getDeviceIdx() == 3042 || "isoo".equals(getSprCol1())) {
 		if ("isoo".equals(getSprCol1())) {
@@ -144,6 +144,35 @@ public class Report implements Domain {
 			}
 		}
 		return 0;
+	}
+	**/
+	
+	public float getGongSac() {
+	    if (gongSac != null) {
+	        return Math.round(gongSac * 10.0f) / 10.0f;
+	    }
+
+	    if ("isoo".equals(getSprCol1())) {
+	        try {
+	            float drilling = Float.parseFloat(
+	                getDrillingDepth() == null || getDrillingDepth().isEmpty()
+	                    ? "0"
+	                    : getDrillingDepth()
+	            );
+
+	            float intrusion = Float.parseFloat(
+	                getIntrusionDepth() == null || getIntrusionDepth().isEmpty()
+	                    ? "0"
+	                    : getIntrusionDepth()
+	            );
+
+	            return Math.round((drilling - intrusion) * 10.0f) / 10.0f;
+	        } catch (Exception e) {
+	            return 0.0f;
+	        }
+	    }
+
+	    return 0.0f;
 	}
 
 	public void setGongSac(float gongSac) {

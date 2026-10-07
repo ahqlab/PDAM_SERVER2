@@ -3231,7 +3231,7 @@
 	    		</when>
 	    	</choose>
 	    	
-	    	, createDate  )
+	    	, gongSac, createDate  )
 	     VALUES 
 	     ( 
 	     	#{deviceIdx},
@@ -3280,7 +3280,7 @@
 	    		, #{sprCol1}  
 	    		</when>
 	    	</choose>
-	     	, now() )
+	      	, #{gongSac}, now() )
 	    <selectKey resultType="int" keyProperty="id" order="AFTER">
         SELECT LAST_INSERT_ID()
     	</selectKey>
@@ -3440,7 +3440,7 @@
 	    		, sprCol1 
 	    		</when>
 	    	</choose>
-	    	, createDate  
+	     	, gongSac, createDate
 	    )
 	    VALUES 
 	    ( 
@@ -3490,7 +3490,7 @@
 	    		, #{sprCol1}  
 	    		</when>
 	    	</choose>
-	     	, #{createDate} )
+	      	, #{gongSac}, #{createDate} )
 	    <selectKey resultType="int" keyProperty="id" order="AFTER">
         	SELECT LAST_INSERT_ID()
     	</selectKey>

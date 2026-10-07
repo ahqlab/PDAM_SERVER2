@@ -214,12 +214,14 @@ public class ReportOneLine implements Domain {
 
 	public float getGongSac() {
 		if (gongSac != null) {
-			return gongSac;
+			return Math.round(gongSac * 10.0f) / 10.0f;
 		}
 		try {
 			BigDecimal drilling = new BigDecimal(getDrillingDepth() != null && !getDrillingDepth().isEmpty() ? getDrillingDepth() : "0");
 			BigDecimal intrusion = new BigDecimal(getIntrusionDepth() != null && !getIntrusionDepth().isEmpty() ? getIntrusionDepth() : "0");
-			return drilling.subtract(intrusion).floatValue();
+			return drilling.subtract(intrusion)
+					.setScale(1, java.math.RoundingMode.HALF_UP)
+					.floatValue();
 		} catch (Exception e) {
 			return 0;
 		}

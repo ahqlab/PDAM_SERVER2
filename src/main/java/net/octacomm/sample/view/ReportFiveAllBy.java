@@ -1299,14 +1299,9 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
 		return balance;
 	  }
   }
-  
+
   private float gongSacFixExp(double balance) {
-	  
-	  if(balance < 0){
-		return (float) balance;
-	  }else{
-		return 0;
-	  }
+    return (float) balance;
   }
  
 }

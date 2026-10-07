@@ -15,6 +15,8 @@ public class PileSelectValue implements Domain{
 	
 	private String crossSection;
 	
+	private String modulusElasticity;
+	
 	private int sortSeq;
 	
 	private int subSortSeq; 
