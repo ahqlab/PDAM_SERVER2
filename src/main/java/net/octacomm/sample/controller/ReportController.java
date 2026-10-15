@@ -4,6 +4,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -1110,6 +1112,12 @@ public class ReportController{
 		}
 		
 		try {
+			// 클라이언트가 빈 값을 0으로 보내더라도 DB의 기존 NULL은 유지한다.
+			Float originalGongSac = mapper.getRawGongSac(report.getId());
+			report.setVersion(originalGongSac == null ? "v2" : "v3");
+			if (originalGongSac == null) {
+				report.setPreserveNullGongSac(true);
+			}
 			// 기존 기록지 수정 로직 실행 직전 전체 스냅샷 저장
 			reportHistoryService.saveBeforeChange(report.getId(), ReportHistoryService.STATUS_UPDATE, (String) session.getAttribute("userId"));
 		} catch (Exception e) {
@@ -1117,8 +1125,12 @@ public class ReportController{
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			return false;
 		}
+		applyDepthCalculations(report);
 		report.setUltimateBearingCapacity(String.valueOf(calDanish(report)));
 		int result = mapper.update(report);
+		if (result > 0 && report.isPreserveNullGongSac()) {
+			mapper.clearGongSac(report.getId());
+		}
 		if(result > 0) {
 			//전체를 다 삭제하고.
 			System.err.println("Piece 전체를 다 삭제하고.");
@@ -1193,12 +1205,22 @@ public class ReportController{
 		}
 	    // 기존 기록지 수정 로직 실행 직전 전체 스냅샷 저장
 		reportHistoryService.saveBeforeChange(report.getId(), ReportHistoryService.STATUS_UPDATE, userId);
+		// V2에서 전송한 기록지의 NULL 공삭공은 수정 요청으로 0/계산값으로 바꾸지 않음
+		Float originalGongSac = mapper.getRawGongSac(report.getId());
+		report.setVersion(originalGongSac == null ? "v2" : "v3");
+		if (originalGongSac == null) {
+			report.setPreserveNullGongSac(true);
+		}
 
 	    // 1. 계산값 설정
+	    applyDepthCalculations(report);
 	    report.setUltimateBearingCapacity(String.valueOf(calDanish(report)));
 
 	    // 2. 메인 report update
 	    int result = mapper.update(report);
+		if (result > 0 && report.isPreserveNullGongSac()) {
+			mapper.clearGongSac(report.getId());
+		}
 	    if (result <= 0) {
 	        System.out.println("Report update 실패: ID = " + report.getId());
 	        return false;
@@ -1439,8 +1461,19 @@ public class ReportController{
 	    }
 	    
 	    try {
+	        // 복사 원본이 NULL이면 새 기록지에도 NULL을 그대로 저장
+	        Float sourceGongSac = newReport.getSourceReportId() > 0
+	                ? mapper.getRawGongSac(newReport.getSourceReportId())
+	                : (newReport.isGongSacNull() ? null : newReport.getGongSac());
+	        newReport.setVersion(sourceGongSac == null ? "v2" : "v3");
+	        if (sourceGongSac == null) {
+	            newReport.setPreserveNullGongSac(true);
+	        }
 	        mapper.insertCopiedReport(newReport);
 	        int newReportId = newReport.getId(); 
+	        if (newReport.isPreserveNullGongSac()) {
+	            mapper.clearGongSac(newReportId);
+	        }
 
 	        if (newReport.getPiece() != null) {
 	            for (Piece piece : newReport.getPiece()) {
@@ -1456,9 +1489,53 @@ public class ReportController{
 	        }
 	        return true; 
 	    } catch (Exception e) {
+	        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 	        e.printStackTrace();
 	        return false;
 	    }
+	}
+
+	private void applyDepthCalculations(UpdateReport report) {
+	    String enteredDepth = report.getIntrusionDepth();
+	    BigDecimal drilling = report.getDrillingDepth() == null || report.getDrillingDepth().trim().isEmpty()
+	            ? BigDecimal.ZERO : new BigDecimal(report.getDrillingDepth().trim());
+	    BigDecimal gongSac = new BigDecimal(Float.toString(report.getGongSac()));
+	    BigDecimal intrusionDepth = enteredDepth == null || enteredDepth.trim().isEmpty()
+	            ? drilling.subtract(gongSac)
+	            : new BigDecimal(enteredDepth.trim());
+	    report.setIntrusionDepth(intrusionDepth.stripTrailingZeros().toPlainString());
+	    Device device = deviceMapper.get(report.getDeviceIdx());
+	    int constructionIdx = report.getId() > 0 ? mapper.getConstructionIdx(report.getId())
+	            : (device == null ? 0 : device.getConstructionIdx());
+	    report.setBalance(displayedBalance(constructionIdx, report.getTotalConnectWidth(),
+	            intrusionDepth.toPlainString(), drilling.toPlainString()).floatValue());
+	}
+
+	private BigDecimal displayedBalance(int constructionIdx, String total, String intrusion, String drilling) {
+	    BigDecimal result;
+	    if (constructionIdx == 944 || constructionIdx == 1136) {
+	        result = legacyBalance(total, intrusion, drilling);
+	        return result.max(BigDecimal.ZERO);
+	    }
+	    try {
+	        result = decimal(total).subtract(decimal(intrusion));
+	        return result.setScale(2, RoundingMode.HALF_UP).max(BigDecimal.ZERO);
+	    } catch (NumberFormatException e) {
+	        return BigDecimal.ZERO;
+	    }
+	}
+
+	private BigDecimal legacyBalance(String total, String intrusion, String drilling) {
+	    try {
+	        return decimal(total).subtract(decimal(intrusion)).subtract(decimal(drilling))
+	                .setScale(2, RoundingMode.HALF_UP);
+	    } catch (NumberFormatException e) {
+	        return BigDecimal.ZERO;
+	    }
+	}
+
+	private BigDecimal decimal(String value) {
+	    return value == null || value.trim().isEmpty() ? BigDecimal.ZERO : new BigDecimal(value.trim());
 	}
 	
 	@ResponseBody

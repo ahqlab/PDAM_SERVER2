@@ -1556,7 +1556,7 @@ $(document).ready( function() {
 														 </c:when>
 														 <c:otherwise>
 														 	<c:choose>
-														 		<c:when test="${domain.peLength < 5 }">
+																<c:when test="${domain.peLength < (isBig > 0 ? 10 : 5) }">
 																	<tr class="lampOn-l" onclick="javascript:onRowClick(${status.index});" style="background-color: #F0DDA4;">
 																</c:when>
 																<c:otherwise>

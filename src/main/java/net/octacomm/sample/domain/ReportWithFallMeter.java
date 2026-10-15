@@ -75,9 +75,13 @@ public class ReportWithFallMeter implements Domain {
 
 	private float gongSac;
 	
+	private boolean gongSacNull = true;
+	
 	private String bigo;
 	
 	private String sprCol1;
+
+	private String version;
 	
 	private int todayConstruction;
 	
@@ -129,15 +133,20 @@ public class ReportWithFallMeter implements Domain {
 		return Float.parseFloat(String.format("%.1f", gongSac));
 	}
 	
-	public void setGongSac(float gongSac) {
-		this.gongSac = gongSac;
+	public void setGongSac(Float gongSac) {
+		this.gongSacNull = gongSac == null || gongSac == 0.0f;
+		this.gongSac = gongSac == null ? 0.0f : gongSac;
+	}
+
+	public boolean isGongSacNull() {
+		return gongSacNull;
 	}
 	//잔량
 	public float getBalance() {
 		float value;
 		try {
 			if(getConstructionIdx() == 944 || getConstructionIdx() == 1136){
-				value = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0") - Float.parseFloat(getDrillingDepth() != "" ? getDrillingDepth() : "0");;
+				value = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0") - Float.parseFloat(getDrillingDepth() != "" ? getDrillingDepth() : "0");
 			}else {
 				value = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0");
 			}
@@ -146,7 +155,7 @@ public class ReportWithFallMeter implements Domain {
 		}
 		if(value < 0)
 		{
-			setGongSac(value);
+			if(gongSac == 0.0f) setGongSac(value);
 			return 0;
 		}
 		float result;

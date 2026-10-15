@@ -805,6 +805,17 @@ function gongSacFixExp(balance, gongSac, constructionIdx){
 	}
 }
 
+function gongSacForDailyPdf(item, balance, constructionIdx){
+	if(constructionIdx == 783 || constructionIdx == 1082){
+		return gongSacFixExp(balance, calGongSac(item.totalConnectWidth, item.intrusionDepth, item.drillingDepth, constructionIdx), constructionIdx);
+	}
+	var storedGongSac = Number(item.gongSac);
+	if(isFinite(storedGongSac) && storedGongSac !== 0){
+		return storedGongSac;
+	}
+	return gongSacFixExp(balance, calGongSac(item.totalConnectWidth, item.intrusionDepth, item.drillingDepth, constructionIdx), constructionIdx);
+}
+
 function downloadDrivingRecoredBook(root, constructionIdx, machineNumber, currentDateTime, option){
 	
 	if(confirm("일일 기록지를 출력하시겠습니까?")){
@@ -861,7 +872,7 @@ function downloadDrivingRecoredBook(root, constructionIdx, machineNumber, curren
 						if(constructionIdx == '1082'){
 							currentBalance = balanceFixExp1082(getBalance1082(item));
 						}
-						var currentGongSac = gongSacFixExp(item.balance, calGongSac(item.totalConnectWidth, item.intrusionDepth, item.drillingDepth, constructionIdx), constructionIdx);
+						var currentGongSac = gongSacForDailyPdf(item, item.balance, constructionIdx);
 						if(constructionIdx == '1082'){
 							currentGongSac = gongSacFixExp1082(currentBalance);
 						}
