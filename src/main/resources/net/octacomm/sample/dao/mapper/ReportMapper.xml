@@ -3231,7 +3231,7 @@
 	    		</when>
 	    	</choose>
 	    	
-	    	, gongSac, createDate  )
+	    	, gongSac, `version`, createDate  )
 	     VALUES 
 	     ( 
 	     	#{deviceIdx},
@@ -3280,7 +3280,7 @@
 	    		, #{sprCol1}  
 	    		</when>
 	    	</choose>
-	      	, #{gongSac}, now() )
+	      	, #{gongSac}, #{version}, now() )
 	    <selectKey resultType="int" keyProperty="id" order="AFTER">
         SELECT LAST_INSERT_ID()
     	</selectKey>
@@ -3440,7 +3440,7 @@
 	    		, sprCol1 
 	    		</when>
 	    	</choose>
-	     	, gongSac, createDate
+	     	, gongSac, `version`, createDate
 	    )
 	    VALUES 
 	    ( 
@@ -3490,7 +3490,7 @@
 	    		, #{sprCol1}  
 	    		</when>
 	    	</choose>
-	      	, #{gongSac}, #{createDate} )
+	      	, #{gongSac}, #{version}, #{createDate} )
 	    <selectKey resultType="int" keyProperty="id" order="AFTER">
         	SELECT LAST_INSERT_ID()
     	</selectKey>
@@ -4247,7 +4247,7 @@
 	    		</when>
 	    	</choose>
 	    	
-	    	, createDate , gongSac  )
+	    	, createDate , gongSac, `version`  )
 	     VALUES 
 	     ( #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo} , #{pileStandard},  #{drillingDepth} , #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter},  #{pileType}, #{method}, #{totalConnectWidth},  #{ultimateBearingCapacity} , #{crossSection} , #{hammaEfficiency} , #{modulusElasticity} 
 	     	
@@ -4257,7 +4257,7 @@
 	    		</when>
 	    	</choose>
 	     	
-	     	, now(), #{gongSac} )
+	      	, now(), #{gongSac}, #{version} )
 	    <selectKey resultType="int" keyProperty="id" order="AFTER">
         SELECT LAST_INSERT_ID()
     	</selectKey>
@@ -4294,7 +4294,7 @@
 	    		, bigo 
 	    		</when>
 	    	</choose>
-	    	, createDate , gongSac  )
+	     	, createDate , gongSac, `version`  )
 	     VALUES 
 	     ( #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo} , #{pileStandard},  #{drillingDepth} , #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter},  #{pileType}, #{method}, #{totalConnectWidth},   #{ultimateBearingCapacity}, #{crossSection} , #{hammaEfficiency} , #{modulusElasticity} 
 	     	<choose>
@@ -4302,7 +4302,7 @@
 	    		,  #{bigo} 
 	    		</when>
 	    	</choose>
-	     	, #{createDate}, #{gongSac} )
+	      	, #{createDate}, #{gongSac}, #{version} )
 	    <selectKey resultType="int" keyProperty="id" order="AFTER">
         	SELECT LAST_INSERT_ID()
     	</selectKey>
@@ -4353,7 +4353,7 @@
 	        intrusionDepth, balance, connectLength, managedStandard, 
 	        avgPenetrationValue, totalPenetrationValue, hammaT, fallMeter, 
 	        pileType, method, totalConnectWidth, ultimateBearingCapacity, 
-	        crossSection, hammaEfficiency, modulusElasticity, bigo, sprCol1, createDate
+	        crossSection, hammaEfficiency, modulusElasticity, bigo, sprCol1, `version`, createDate
 	    )
 	    VALUES 
 	    (
@@ -4362,7 +4362,7 @@
 	        #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, 
 	        #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter}, 
 	        #{pileType}, #{method}, #{totalConnectWidth}, #{ultimateBearingCapacity}, 
-	        #{crossSection}, #{hammaEfficiency}, #{modulusElasticity}, #{bigo}, #{sprCol1}, #{createDate}
+	        #{crossSection}, #{hammaEfficiency}, #{modulusElasticity}, #{bigo}, #{sprCol1}, #{version}, #{createDate}
 	    )
 	    
 	    <selectKey keyProperty="id" resultType="int" order="AFTER">

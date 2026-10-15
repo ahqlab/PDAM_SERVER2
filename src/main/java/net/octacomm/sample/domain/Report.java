@@ -73,11 +73,15 @@ public class Report implements Domain {
     //탄성 계수
     private String modulusElasticity;
 
-	private Float gongSac;
+	private float gongSac;
+	/* v2 gongSac 0.0을 NULL */
+	private boolean gongSacNull = true;
 	
 	private String bigo;
 	
 	private String sprCol1;
+
+	private String version;
 	
 	private int todayConstruction;
 	
@@ -148,7 +152,7 @@ public class Report implements Domain {
 	**/
 	
 	public float getGongSac() {
-	    if (gongSac != null) {
+	    if (gongSac != 0.0f) {
 	        return Math.round(gongSac * 10.0f) / 10.0f;
 	    }
 
@@ -175,8 +179,9 @@ public class Report implements Domain {
 	    return 0.0f;
 	}
 
-	public void setGongSac(float gongSac) {
-		this.gongSac = gongSac;
+	public void setGongSac(Float gongSac) {
+		this.gongSacNull = gongSac == null || gongSac == 0.0f;
+		this.gongSac = gongSac == null ? 0.0f : gongSac;
 	}
 	//잔량
 	public float getBalance() {
@@ -192,7 +197,7 @@ public class Report implements Domain {
 		}
 		if(value < 0)
 		{
-			if(gongSac == null) setGongSac(value);
+			if(gongSac == 0.0f) setGongSac(value);
 			return 0;
 		}
 		float result;

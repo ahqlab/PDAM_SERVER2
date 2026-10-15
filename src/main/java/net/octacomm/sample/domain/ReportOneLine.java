@@ -73,7 +73,7 @@ public class ReportOneLine implements Domain {
     //탄성 계수
     private String modulusElasticity;
 
-	private Float gongSac;
+	private float gongSac;
 	
 	private String bigo;
 	
@@ -213,7 +213,7 @@ public class ReportOneLine implements Domain {
 	} **/
 
 	public float getGongSac() {
-		if (gongSac != null) {
+		if (gongSac != 0.0f) {
 			return Math.round(gongSac * 10.0f) / 10.0f;
 		}
 		try {
@@ -245,7 +245,7 @@ public class ReportOneLine implements Domain {
 		}
 		if(value < 0)
 		{
-			if(gongSac == null) setGongSac(value);
+			if(gongSac == 0.0f) setGongSac(value);
 			return 0;
 		}
 		float result;

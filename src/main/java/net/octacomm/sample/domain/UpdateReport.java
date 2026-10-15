@@ -58,6 +58,17 @@ public class UpdateReport implements Domain {
 	private String currentDateTime;
 	
 	private float gongSac;
+
+	/* 복사 작업에 사용된 원본 기록지 */
+	private int sourceReportId;
+
+	/* DB 원본 gongSac이 NULL인 레거시 기록인지 여부 */
+	private boolean preserveNullGongSac;
+
+	/* JSON 원문에서 gongSac 입력값이 비어 있었는지 여부 */
+	private boolean gongSacNull;
+
+	private String version;
    //단면적
     private String crossSection;
     //함마 효율
@@ -78,6 +89,38 @@ public class UpdateReport implements Domain {
 	}
 	public void setGongSac(float gongSac) {
 		this.gongSac = gongSac;
+	}
+
+	public int getSourceReportId() {
+		return sourceReportId;
+	}
+
+	public void setSourceReportId(int sourceReportId) {
+		this.sourceReportId = sourceReportId;
+	}
+
+	public boolean isPreserveNullGongSac() {
+		return preserveNullGongSac;
+	}
+
+	public void setPreserveNullGongSac(boolean preserveNullGongSac) {
+		this.preserveNullGongSac = preserveNullGongSac;
+	}
+
+	public boolean isGongSacNull() {
+		return gongSacNull;
+	}
+
+	public void setGongSacNull(boolean gongSacNull) {
+		this.gongSacNull = gongSacNull;
+	}
+
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
 	}
 
 	//잔량

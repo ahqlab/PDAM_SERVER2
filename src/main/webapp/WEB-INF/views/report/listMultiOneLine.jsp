@@ -2025,6 +2025,7 @@
 	
 	function openNewReportPopup() {
 	    $('.copy-input').val(""); 
+	    $('#copy_gongSac').removeData('sourceReportId');
 	    $('#copy_intrusionDepth').data('intrusionDepthEdited', false);
 	    $('#copy_rownum').val("신규");
 	    recalculateNewReportDepths();
@@ -2053,6 +2054,7 @@
 	
 	function copyAndInsertReport(element) {
 	    var $tr = $(element).closest('tr');
+	    $('#copy_gongSac').data('sourceReportId', Number($tr.find('#id').val() || 0));
 	    
 	    $('.copy-input').each(function() {
 	        var name = $(this).attr('name'); 
@@ -2259,6 +2261,8 @@
 			}
 		}
 
+		var sourceReportId = Number($('#copy_gongSac').data('sourceReportId') || 0);
+		var gongSacInput = ($('#copy_gongSac').val() || '').trim();
 		var data = {
 			deviceIdx: Number($('input[name="deviceIdx"]').first().val() || 0), 
 			currentDateTime: currentDateTimeVal,
@@ -2273,7 +2277,9 @@
 			drillingDepth: $('#copy_drillingDepth').val() || "0",
 			intrusionDepth: $('#copy_intrusionDepth').val() || "0",
 			balance: $('#copy_balance').val() || "0",
-			gongSac: $('#copy_gongSac').val() || "0",
+			gongSac: gongSacInput === '' ? null : gongSacInput,
+			gongSacNull: gongSacInput === '',
+			sourceReportId: sourceReportId,
 			hammaT: $('#copy_hammaT').val() || "0",
 			fallMeter: $('#copy_fallMeter').val() || "0",
 			managedStandard: $('#copy_managedStandard').val() || "0",
@@ -3571,7 +3577,7 @@
 										<input type="text" id="drillingDepth" name="drillingDepth" disabled="disabled"  class="tdInput" value="<fmt:formatNumber value='${calDrillingDepth}' pattern='.0' />" />
 									</c:when>
 									<c:otherwise>
-										<input type="number" step="any" id="drillingDepth" name="drillingDepth" disabled="disabled" class="tdInput" value="${domain.drillingDepth}"/>
+										<input type="text" id="drillingDepth" name="drillingDepth" disabled="disabled" class="tdInput" value="${domain.drillingDepth}"/>
 									</c:otherwise>
 								</c:choose>
 							</td>
@@ -3650,7 +3656,7 @@
 												</c:choose>
 											</c:when>
 											<c:otherwise>
-												<input type="number" step="any" id="gongSac" name="gongSac" disabled="disabled" class="tdInput" value="${domain.gongSac}" />
+												<input type="text" id="gongSac" name="gongSac" disabled="disabled" class="tdInput" value="${domain.gongSac}" />
 											</c:otherwise>
 										</c:choose>
 									</c:otherwise>
@@ -4667,10 +4673,10 @@
 	                <td class="viewTh">해머무게</td><td class="viewTh">낙하높이</td><td class="viewTh">관리기준</td>
 	            </tr>
 	            <tr>
-	                <td><input type="number" step="any" class="tdInput copy-input" id="copy_drillingDepth" name="drillingDepth" /></td>
+		                <td><input type="text" class="tdInput copy-input" id="copy_drillingDepth" name="drillingDepth" /></td>
 	                <td><input type="number" step="any" class="tdInput copy-input" id="copy_intrusionDepth" name="intrusionDepth" /></td>
 	                <td><input type="text" class="tdInput copy-input" id="copy_balance" readonly /></td>
-	                <td><input type="number" step="any" class="tdInput copy-input" id="copy_gongSac" name="gongSac" /></td>
+		                <td><input type="text" class="tdInput copy-input" id="copy_gongSac" name="gongSac" /></td>
 	                <td><input type="text" class="tdInput copy-input" id="copy_hammaT" name="hammaT" /></td>
 	                <td><input type="text" class="tdInput copy-input" id="copy_fallMeter" name="fallMeter" /></td>
 	                <td><input type="text" class="tdInput copy-input" id="copy_managedStandard" name="managedStandard" /></td>

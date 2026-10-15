@@ -66,6 +66,9 @@ public class GReport implements Domain {
     private String modulusElasticity;
 
 	private float gongSac;
+	private boolean gongSacNull = true;
+
+	private String version;
 	
 	private String bigo;
 	

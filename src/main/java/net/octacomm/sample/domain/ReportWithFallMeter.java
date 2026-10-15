@@ -73,11 +73,15 @@ public class ReportWithFallMeter implements Domain {
     //탄성 계수
     private String modulusElasticity;
 
-	private Float gongSac;
+	private float gongSac;
+	
+	private boolean gongSacNull = true;
 	
 	private String bigo;
 	
 	private String sprCol1;
+
+	private String version;
 	
 	private int todayConstruction;
 	
@@ -126,12 +130,16 @@ public class ReportWithFallMeter implements Domain {
 	
 	/** old **/
 	public float getGongSac() {
-		if(gongSac != null) return gongSac;
-		return 0;
+		return gongSac;
 	}
 	
-	public void setGongSac(float gongSac) {
-		this.gongSac = gongSac;
+	public void setGongSac(Float gongSac) {
+		this.gongSacNull = gongSac == null || gongSac == 0.0f;
+		this.gongSac = gongSac == null ? 0.0f : gongSac;
+	}
+
+	public boolean isGongSacNull() {
+		return gongSacNull;
 	}
 	//잔량
 	public float getBalance() {
@@ -147,7 +155,7 @@ public class ReportWithFallMeter implements Domain {
 		}
 		if(value < 0)
 		{
-			if(gongSac == null) setGongSac(value);
+			if(gongSac == 0.0f) setGongSac(value);
 			return 0;
 		}
 		float result;

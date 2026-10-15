@@ -104,6 +104,7 @@ public class MobileController {
 	@ResponseBody
 	@RequestMapping(value = "/regist/report", method = RequestMethod.POST)
 	public CommonResponse<Boolean> registReport(@RequestBody Report report, BindingResult result){
+		report.setVersion(report.isGongSacNull() ? "v2" : "v3");
 		System.err.println("/regist/report report sTring : "  + report);
 		System.err.println("/regist/report report : " + report.getGongSac() + " balance : " + report.getBalance());
 		applyModulusElasticity(report);
@@ -111,6 +112,7 @@ public class MobileController {
 		try{
 			if(report.getCreateDate() != null) {
 				reportMapper.insert2(report);
+				if (report.isGongSacNull()) reportMapper.clearGongSac(report.getId());
 				try {
 					reportMapper.insert2Origin(report);
 				}catch (Exception e) {
@@ -119,6 +121,7 @@ public class MobileController {
 			}else {
 				System.err.println("여기서 입력이지??ㄴㄴㄴ");
 				reportMapper.insert(report);
+				if (report.isGongSacNull()) reportMapper.clearGongSac(report.getId());
 				try {
 					reportMapper.insertOrigin(report);
 				}catch (Exception e) {
@@ -170,15 +173,18 @@ public class MobileController {
 		System.err.println("report : " + report.size());
 		CommonResponse<Boolean> response = new CommonResponse<Boolean>();
 		for (Report report2 : report) {
+			report2.setVersion(report2.isGongSacNull() ? "v2" : "v3");
 			applyModulusElasticity(report2);
 			try{
 				if(report2.getCreateDate() != null) {
 					reportMapper.insert2(report2);
+					if (report2.isGongSacNull()) reportMapper.clearGongSac(report2.getId());
 					try {
 						reportMapper.insert2Origin(report2);
 					}catch (Exception e) {}
 				}else {
 					reportMapper.insert(report2);
+					if (report2.isGongSacNull()) reportMapper.clearGongSac(report2.getId());
 					try {
 						reportMapper.insertOrigin(report2);
 					}catch (Exception e) {}
@@ -228,11 +234,13 @@ public class MobileController {
 	@RequestMapping(value = "/regist/report3", method = RequestMethod.POST)
 	public CommonResponse<Boolean> registReport3(@RequestBody GReport report, BindingResult result){
 		System.err.println("report : " + report);
+		report.setVersion(report.isGongSacNull() ? "v2" : "v3");
 		applyModulusElasticity(report);
 		CommonResponse<Boolean> response = new CommonResponse<Boolean>();
 		try{
 			if(report.getCreateDate() != null) {
 				reportMapper.insertG2(report);
+				if (report.isGongSacNull()) reportMapper.clearGongSac(report.getId());
 				try {
 					reportMapper.insertG2Origin(report);
 				}catch (Exception e) {
@@ -240,6 +248,7 @@ public class MobileController {
 				}
 			} else {
 				reportMapper.insertG(report);
+				if (report.isGongSacNull()) reportMapper.clearGongSac(report.getId());
 				try {
 					reportMapper.insertGOrigin(report);
 				}catch (Exception e) {
@@ -287,6 +296,7 @@ public class MobileController {
 	@ResponseBody
 	@RequestMapping(value = "/regist/report4", method = RequestMethod.POST)
 	public CommonResponse<Boolean> registReport4(@RequestBody ReportWithFallMeter report, BindingResult result){
+		report.setVersion(report.isGongSacNull() ? "v2" : "v3");
 		System.err.println("/regist/report report sTring : "  + report);
 		System.err.println("/regist/report report : " + report.getGongSac() + " balance : " + report.getBalance());
 		applyModulusElasticity(report);
@@ -298,6 +308,7 @@ public class MobileController {
 		try{
 			if(report.getCreateDate() != null) {
 				reportWithFallMeterMapper.insert2(report);
+				if (report.isGongSacNull()) reportMapper.clearGongSac(report.getId());
 				try {
 					reportWithFallMeterMapper.insert2Origin(report);
 				}catch (Exception e) {
@@ -306,6 +317,7 @@ public class MobileController {
 			}else {
 				System.err.println("여기서 입력이지??ㄴㄴㄴ");
 				reportWithFallMeterMapper.insert(report);
+				if (report.isGongSacNull()) reportMapper.clearGongSac(report.getId());
 				try {
 					reportWithFallMeterMapper.insertOrigin(report);
 				}catch (Exception e) {
@@ -373,15 +385,18 @@ public class MobileController {
 		System.err.println("report : " + report.size());
 		CommonResponse<Boolean> response = new CommonResponse<Boolean>();
 		for (ReportWithFallMeter report2 : report) {
+			report2.setVersion(report2.isGongSacNull() ? "v2" : "v3");
 			applyModulusElasticity(report2);
 			try{
 				if(report2.getCreateDate() != null) {
 					reportWithFallMeterMapper.insert2(report2);
+					if (report2.isGongSacNull()) reportMapper.clearGongSac(report2.getId());
 					try {
 						reportWithFallMeterMapper.insert2Origin(report2);
 					}catch (Exception e) {}
 				}else {
 					reportWithFallMeterMapper.insert(report2);
+					if (report2.isGongSacNull()) reportMapper.clearGongSac(report2.getId());
 					try {
 						reportWithFallMeterMapper.insertOrigin(report2);
 					}catch (Exception e) {}
