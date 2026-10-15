@@ -1301,7 +1301,11 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
   }
 
   private float gongSacFixExp(double balance) {
-    return (float) balance;
+	  if(balance < 0){
+		return (float) balance;
+	  }else{
+		return 0;
+	  }
   }
  
 }

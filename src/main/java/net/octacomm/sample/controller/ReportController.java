@@ -1508,7 +1508,7 @@ public class ReportController{
 	    int constructionIdx = report.getId() > 0 ? mapper.getConstructionIdx(report.getId())
 	            : (device == null ? 0 : device.getConstructionIdx());
 	    report.setBalance(displayedBalance(constructionIdx, report.getTotalConnectWidth(),
-	            intrusionDepth.toPlainString(), report.getDrillingDepth()).floatValue());
+	            intrusionDepth.toPlainString(), drilling.toPlainString()).floatValue());
 	}
 
 	private BigDecimal displayedBalance(int constructionIdx, String total, String intrusion, String drilling) {
@@ -1519,7 +1519,7 @@ public class ReportController{
 	    }
 	    try {
 	        result = decimal(total).subtract(decimal(intrusion));
-	        return result.setScale(2, RoundingMode.HALF_UP);
+	        return result.setScale(2, RoundingMode.HALF_UP).max(BigDecimal.ZERO);
 	    } catch (NumberFormatException e) {
 	        return BigDecimal.ZERO;
 	    }
@@ -1527,11 +1527,9 @@ public class ReportController{
 
 	private BigDecimal legacyBalance(String total, String intrusion, String drilling) {
 	    try {
-	        float result = Float.parseFloat(total)
-	                - Float.parseFloat("".equals(intrusion) ? "0" : intrusion)
-	                - Float.parseFloat("".equals(drilling) ? "0" : drilling);
-	        return new BigDecimal(String.format(java.util.Locale.ROOT, "%.2f", result));
-	    } catch (Exception e) {
+	        return decimal(total).subtract(decimal(intrusion)).subtract(decimal(drilling))
+	                .setScale(2, RoundingMode.HALF_UP);
+	    } catch (NumberFormatException e) {
 	        return BigDecimal.ZERO;
 	    }
 	}

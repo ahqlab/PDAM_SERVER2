@@ -1151,13 +1151,13 @@
 
 	function calculateReportBalance(total, intrusion, drilling) {
 		var constructionIdx = Number('${param.constructionIdx}') || Number('${sessionInfo.constructionIdx}');
-		var result = total - intrusion;
 		if (constructionIdx === 944 || constructionIdx === 1136) {
-			result = Math.fround(Math.fround(Math.fround(total) - Math.fround(intrusion)) - Math.fround(drilling));
+			var result = Math.fround(Math.fround(Math.fround(total) - Math.fround(intrusion)) - Math.fround(drilling));
 			return isFinite(result) ? Math.max(0, Number(result.toFixed(2))) : 0;
 		}
+		var result = total - intrusion;
 		result = Math.sign(result) * Math.round((Math.abs(result) + Number.EPSILON) * 100) / 100;
-		return constructionIdx === 944 || constructionIdx === 1136 ? Math.max(0, result) : result;
+		return Math.max(0, result);
 	}
 
 	function recalculateReportRow(rowIndex, preserveIntrusion) {

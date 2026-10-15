@@ -48,6 +48,7 @@ public interface PileSelectValueMapper {
 	@Select("SELECT modulusElasticity FROM " + TABLE_NAME
 			+ " WHERE UPPER(pileType) = UPPER(#{pileType})"
 			+ " AND modulusElasticity IS NOT NULL AND modulusElasticity <> ''"
-			+ " ORDER BY deviceIdx DESC LIMIT 1")
-	String getModulusElasticityByPileType(@Param("pileType") String pileType);
+			+ " AND (deviceIdx = #{deviceIdx} OR deviceIdx = 0)"
+			+ " ORDER BY (deviceIdx = #{deviceIdx}) DESC, deviceIdx DESC LIMIT 1")
+	String getModulusElasticityByPileType(@Param("pileType") String pileType, @Param("deviceIdx") int deviceIdx);
 }

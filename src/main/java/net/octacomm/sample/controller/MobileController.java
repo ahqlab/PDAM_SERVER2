@@ -544,21 +544,21 @@ public class MobileController {
 	
 	
 	private void applyModulusElasticity(Report report) {
-		String modulusElasticity = pileSelectValueMapper.getModulusElasticityByPileType(report.getPileType());
+		String modulusElasticity = pileSelectValueMapper.getModulusElasticityByPileType(report.getPileType(), report.getDeviceIdx());
 		if (modulusElasticity != null) {
 			report.setModulusElasticity(modulusElasticity);
 		}
 	}
 
 	private void applyModulusElasticity(GReport report) {
-		String modulusElasticity = pileSelectValueMapper.getModulusElasticityByPileType(report.getPileType());
+		String modulusElasticity = pileSelectValueMapper.getModulusElasticityByPileType(report.getPileType(), report.getDeviceIdx());
 		if (modulusElasticity != null) {
 			report.setModulusElasticity(modulusElasticity);
 		}
 	}
 
 	private void applyModulusElasticity(ReportWithFallMeter report) {
-		String modulusElasticity = pileSelectValueMapper.getModulusElasticityByPileType(report.getPileType());
+		String modulusElasticity = pileSelectValueMapper.getModulusElasticityByPileType(report.getPileType(), report.getDeviceIdx());
 		if (modulusElasticity != null) {
 			report.setModulusElasticity(modulusElasticity);
 		}

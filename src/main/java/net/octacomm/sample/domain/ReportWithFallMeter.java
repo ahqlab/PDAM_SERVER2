@@ -130,7 +130,7 @@ public class ReportWithFallMeter implements Domain {
 	
 	/** old **/
 	public float getGongSac() {
-		return gongSac;
+		return Float.parseFloat(String.format("%.1f", gongSac));
 	}
 	
 	public void setGongSac(Float gongSac) {
