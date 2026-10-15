@@ -25,7 +25,7 @@ public class GpsFile  implements Domain{
 	
 	private String lastModifiedDate;
 	
-	private MultipartFile file;
+	private transient MultipartFile file;
 	  
 	private int fcIdx;
 	 

@@ -7,6 +7,8 @@ import lombok.Setter;
 @Data
 public class SessionInfo implements Domain{
 	
+	private static final long serialVersionUID = 1L;
+	
 	private String userId;
 	
 	private String userName;
