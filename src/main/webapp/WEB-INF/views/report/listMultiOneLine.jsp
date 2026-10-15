@@ -953,6 +953,8 @@
 		var arrGepValues = new Array();    //배열 선언
 		const markLineArr = [];
 		var sum = 0;
+		arrValues.push(sum.toFixed(1));
+		arrLabelValues.push("영점");
 		for(var k=0; k<penetrations.length; k++){
 			var value = penetrations[k].value != "" ? Number(penetrations[k].value) : Number(0);
 			sum = sum + value;

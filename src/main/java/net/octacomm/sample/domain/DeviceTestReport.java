@@ -24,7 +24,7 @@ public class DeviceTestReport implements Domain{
 	
 	private String filePath;
 	
-	private MultipartFile file;
+	private transient MultipartFile file;
 	
 	private String bigo;
 	

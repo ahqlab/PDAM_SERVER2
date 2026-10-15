@@ -52,21 +52,24 @@ function writeValue(penetrations , pointArr, doc, index){
 	for(var i=0; i<pointArr.length; i++){
 		var x = Number(pointArr[i][0]);
 		var y = Number(pointArr[i][1]) - 2.5;
-		var value = penetrations[i] != "" ? Number(penetrations[i]) : Number(0);
-		penetrationsSum = penetrationsSum + value;
-		
-		if(i > 0){
-			//doc.setTextColor(63,232,108);
-			doc.setTextColor(0,153,0);
-			doc.text(x, y, ' ' +   value.toFixed(1) + '', {align: 'left'});
-			doc.setTextColor(0,0,0);
-			doc.text(x, y,  ' , ', {align: 'center'});
+
+		if(i == 0){
+			//영점
 			doc.setTextColor(0,173,239);
-			doc.text(x, y,  penetrationsSum.toFixed(1) + ' ', {align: 'right'});
-		}else{
-			doc.setTextColor(0,173,239);
-			doc.text(x, y,  value.toFixed(1), {align: 'center'});
+			doc.text(x, y, (0).toFixed(1), {align: 'center'});
+			continue;
 		}
+
+		var value = penetrations[i - 1] != "" ? Number(penetrations[i - 1]) : Number(0);
+		penetrationsSum = penetrationsSum + value;
+
+		//doc.setTextColor(63,232,108);
+		doc.setTextColor(0,153,0);
+		doc.text(x, y, ' ' +   value.toFixed(1) + '', {align: 'left'});
+		doc.setTextColor(0,0,0);
+		doc.text(x, y,  ' , ', {align: 'center'});
+		doc.setTextColor(0,173,239);
+		doc.text(x, y,  penetrationsSum.toFixed(1) + ' ', {align: 'right'});
 	}
 	doc.setTextColor(null);
 }
@@ -216,6 +219,16 @@ function drawCompactChart(
 	    var verticalGap = (pageWidth - 30) / (penetrations.length + 1);
 	    var pointArr = [];
 
+	    // 영점(0점) 시작점
+	    var zeroX = lectLeftPadding + verticalGap * 0;
+	    var zeroY = graphBottomY;
+	    doc.setFillColor(0, 173, 239);
+	    doc.circle(zeroX, zeroY, 1.2, 'F');
+	    pointArr.push([zeroX, zeroY]);
+	    doc.line(zeroX, lectTopY, zeroX, graphBottomY);
+	    doc.setFontSize(penetrations.length > 5 ? 8 : 9);
+	    doc.text('영점', zeroX, graphBottomY + 6, { align: 'center' });
+
 	    for (var i = 0; i < penetrations.length; i++) {
 
 	        var value = penetrations[i] !== "" ? Number(penetrations[i]) : 0;
@@ -353,6 +366,12 @@ function drawCompactChart(
 	        doc.line(x2, y1, x2, y2);
 	    }
 
+	    // 마지막 점에서 그래프 오른쪽 끝까지 이어주는 선
+	    if (pointArr.length > 0) {
+	        var lastPoint = pointArr[pointArr.length - 1];
+	        doc.line(lastPoint[0], lastPoint[1], lectRightX, lastPoint[1]);
+	    }
+
 	    // =========================
 	    // 값 표시
 	    // =========================
@@ -488,8 +507,20 @@ function drawChart(root, index, item, pageWidth, pageHeight, doc, currentAvgPene
 	var sum = 0;
 	var verticalGap = (pageWidth - 30) / Number(penetrations.length + 1);
 	var pointArr = [];
+
+	//영점(0점) 시작점
+	var zeroX = 15 + (verticalGap * 0);
+	var zeroY = lectCenterHeight;
+	doc.setLineWidth(null);
+	doc.setFillColor(0,173,239);
+	doc.circle(zeroX, zeroY, 1, 'F');
+	pointArr.push([zeroX, zeroY]);
+	doc.line(zeroX, lectTopY, zeroX, lectStartY);
+	doc.setFontSize(penetrations.length > 5 ? 8 : 9);
+	doc.text('영점', zeroX, lectStartY + 5, {align: 'center'});
+
 	for(var i=0; i<penetrations.length; i++){
-		
+
 		var value = penetrations[i] != "" ? Number(penetrations[i]) : Number(0);
 		sum = sum + value;
 		var Rvalue = numberOne * sum;
@@ -636,7 +667,14 @@ function drawChart(root, index, item, pageWidth, pageHeight, doc, currentAvgPene
 			doc.line(pointArr[Number(i + 1)][0], pointArr[i][1] , pointArr[Number(i + 1)][0], pointArr[Number(i + 1)][1]);
 		}
 	}
-	
+
+	//마지막 점에서 그래프 오른쪽 끝까지 이어주는 선
+	if(pointArr.length > 0){
+		var lastPoint = pointArr[pointArr.length - 1];
+		doc.setDrawColor(0,173,239);
+		doc.line(lastPoint[0], lastPoint[1], lectRightX, lastPoint[1]);
+	}
+
 	//값의 숫자를 쓴다.
 	writeValue(penetrations, pointArr, doc, index);
 	
