@@ -225,6 +225,7 @@ public class ReportController{
 			item.put("id", history.getId());
 			item.put("modifiedAt", history.getModifiedAt());
 			item.put("userId", history.getUserId());
+			item.put("modifierLabel", historyModifierLabel(history.getUserId()));
 			item.put("status", history.getStatus());
 			item.put("statusLabel", historyStatusLabel(history.getStatus()));
 			item.put("pileNo", history.getPileNo());
@@ -265,6 +266,7 @@ public class ReportController{
 		response.put("success", true);
 		response.put("modifiedAt", history.getModifiedAt());
 		response.put("userId", history.getUserId());
+		response.put("modifierLabel", historyModifierLabel(history.getUserId()));
 		response.put("status", history.getStatus());
 		response.put("statusLabel", historyStatusLabel(history.getStatus()));
 		response.put("changes", reportHistoryService.findChanges(historyId));
@@ -303,6 +305,14 @@ public class ReportController{
 			return "복구";
 		}
 		return "수정";
+	}
+
+	// 수정자 표시 추가 (TB_HISTORY.userId로 구분)
+	private String historyModifierLabel(String userId) {
+		if ("admin".equalsIgnoreCase(userId) || "yujin".equalsIgnoreCase(userId) || "jiyun".equalsIgnoreCase(userId) || "hjlee".equalsIgnoreCase(userId)) {
+			return "슈퍼관리자";
+		}
+		return "관리자";
 	}
 
 	/**

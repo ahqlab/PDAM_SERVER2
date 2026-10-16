@@ -291,6 +291,11 @@
 		background: #eef8fc;
 	}
 
+	.report-history-modifier {
+		font-size: 12px;
+		line-height: 1.4;
+	}
+
 	.history-status {
 		display: inline-block;
 		min-width: 54px;
@@ -2610,8 +2615,12 @@
 		} else {
 			$.each(items, function(index, item) {
 				var modifiedAt = escapeHistoryHtml(item.modifiedAt || '-').replace(' ', '<br>');
+				// 변경일시 아래에 변경한 사용자 표시
+				var modifierLabel = item.modifierLabel
+					? '<br><span class="report-history-modifier">(' + escapeHistoryHtml(item.modifierLabel) + ')</span>'
+					: '';
 				html += '<tr data-history-id="' + item.id + '">';
-				html += '<td>' + modifiedAt + '</td>';
+				html += '<td>' + modifiedAt + modifierLabel + '</td>';
 				html += '<td><span class="history-status ' + escapeHistoryHtml(item.status) + '">' + escapeHistoryHtml(item.statusLabel) + '</span></td>';
 				html += '<td>' + escapeHistoryHtml(item.pileNo || '-') + '</td>';
 				html += '<td>' + escapeHistoryHtml(item.changeSummary || '-') + '</td>';
