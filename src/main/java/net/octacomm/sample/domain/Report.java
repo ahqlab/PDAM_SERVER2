@@ -180,37 +180,38 @@ public class Report implements Domain {
 	}
 
 	public void setGongSac(Float gongSac) {
-		this.gongSacNull = gongSac == null || gongSac == 0.0f;
-		this.gongSac = gongSac == null ? 0.0f : gongSac;
+	    this.gongSacNull = gongSac == null;
+	    this.gongSac = gongSac == null ? 0.0f : gongSac;
 	}
+	
+	public boolean isGongSacNull() {
+	    return gongSacNull;
+	}
+	
 	//잔량
 	public float getBalance() {
-		float value;
-		try {
-			if(getConstructionIdx() == 944 || getConstructionIdx() == 1136){
-				value = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0") - Float.parseFloat(getDrillingDepth() != "" ? getDrillingDepth() : "0");
-			}else {
-				value = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0");
-			}
-		}catch (Exception e) {
-			value = 0;
-		}
-		if(value < 0)
-		{
-			if(gongSac == 0.0f) setGongSac(value);
-			return 0;
-		}
-		float result;
-		try {
-			if(getConstructionIdx() == 944 || getConstructionIdx() == 1136) {
-				result = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0") - Float.parseFloat(getDrillingDepth() != "" ? getDrillingDepth() : "0");
-			}else {
-				result = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0");
-			}
-		}catch (Exception e) {
-			result = 0;
-		}
-		return Float.parseFloat(String.format("%.2f", result));
+	    try {
+	        float totalConnectWidth = parseFloatOrZero(getTotalConnectWidth());
+	        float intrusionDepth = parseFloatOrZero(getIntrusionDepth());
+
+	        float result = totalConnectWidth - intrusionDepth;
+
+	        if (getConstructionIdx() == 944 || getConstructionIdx() == 1136) {
+	            float drillingDepth = parseFloatOrZero(getDrillingDepth());
+	            result -= drillingDepth;
+	        }
+
+	        return Math.round(result * 100.0f) / 100.0f;
+
+	    } catch (Exception e) {
+	        return 0.0f;
+	    }
+	}
+
+	private float parseFloatOrZero(String value) {
+	    return value == null || value.trim().isEmpty()
+	            ? 0.0f
+	            : Float.parseFloat(value);
 	}
 	//잔량
 	public void setBalance(float balance) {

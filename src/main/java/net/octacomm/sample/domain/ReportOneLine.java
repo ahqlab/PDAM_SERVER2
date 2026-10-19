@@ -75,6 +75,8 @@ public class ReportOneLine implements Domain {
 
 	private float gongSac;
 	
+	private boolean gongSacNull = true;
+	
 	private String bigo;
 	
 	private String sprCol1;
@@ -213,53 +215,66 @@ public class ReportOneLine implements Domain {
 	} **/
 
 	public float getGongSac() {
-		if (gongSac != 0.0f) {
-			return Math.round(gongSac * 10.0f) / 10.0f;
-		}
-		try {
-			BigDecimal drilling = new BigDecimal(getDrillingDepth() != null && !getDrillingDepth().isEmpty() ? getDrillingDepth() : "0");
-			BigDecimal intrusion = new BigDecimal(getIntrusionDepth() != null && !getIntrusionDepth().isEmpty() ? getIntrusionDepth() : "0");
-			return drilling.subtract(intrusion)
-					.setScale(1, java.math.RoundingMode.HALF_UP)
-					.floatValue();
-		} catch (Exception e) {
-			return 0;
-		}
+	    if ("isoo".equals(getSprCol1())) {
+	        try {
+	            float drilling = Float.parseFloat(
+	                getDrillingDepth() != null && !getDrillingDepth().isEmpty()
+	                    ? getDrillingDepth() : "0"
+	            );
+
+	            float intrusion = Float.parseFloat(
+	                getIntrusionDepth() != null && !getIntrusionDepth().isEmpty()
+	                    ? getIntrusionDepth() : "0"
+	            );
+
+	            return Float.parseFloat(
+	                String.format("%.2f", drilling - intrusion)
+	            );
+	        } catch (Exception e) {
+	            return 0.0f;
+	        }
+	    }
+
+	    return Float.parseFloat(String.format("%.1f", gongSac));
 	}
 
-	public void setGongSac(float gongSac) {
-		this.gongSac = gongSac;
+	public void setGongSac(Float gongSac) {
+	    this.gongSacNull = gongSac == null;
+	    this.gongSac = gongSac == null ? 0.0f : gongSac;
 	}
+	
+	public void setGongSacNull() {
+	    this.gongSac = 0.0f;
+	    this.gongSacNull = true;
+	}
+
+	
+	public boolean isGongSacNull() {
+	    return gongSacNull;
+	}
+	
 	//잔량
 	public float getBalance() {
-		float value;
-		try {
-			//System.err.println("시공사 아이디 : " + getConstructionIdx());
-			if(getConstructionIdx() == 944 || getConstructionIdx() == 1136){
-				value = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0") - Float.parseFloat(getDrillingDepth() != "" ? getDrillingDepth() : "0");;
-			}else {
-				value = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0");
-			}
-		}catch (Exception e) {
-			value = 0;
-		}
-		if(value < 0)
-		{
-			if(gongSac == 0.0f) setGongSac(value);
-			return 0;
-		}
-		float result;
-		try {
-			//System.err.println("시공사 아이디 : " + getConstructionIdx());
-			if(getConstructionIdx() == 944 || getConstructionIdx() == 1136) {
-				result = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0") - Float.parseFloat(getDrillingDepth() != "" ? getDrillingDepth() : "0");
-			}else {
-				result = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0");
-			}
-		}catch (Exception e) {
-			result = 0;
-		}
-		return Float.parseFloat(String.format("%.2f", result));
+	    try {
+	        float total = parseFloatOrZero(getTotalConnectWidth());
+	        float intrusion = parseFloatOrZero(getIntrusionDepth());
+
+	        float result = total - intrusion;
+
+	        if (getConstructionIdx() == 944 || getConstructionIdx() == 1136) {
+	            result -= parseFloatOrZero(getDrillingDepth());
+	        }
+
+	        return Math.round(result * 100.0f) / 100.0f;
+	    } catch (Exception e) {
+	        return 0.0f;
+	    }
+	}
+
+	private float parseFloatOrZero(String value) {
+	    return value == null || value.trim().isEmpty()
+	            ? 0.0f
+	            : Float.parseFloat(value);
 	}
 	//잔량
 	public void setBalance(float balance) {

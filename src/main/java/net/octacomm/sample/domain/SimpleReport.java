@@ -67,6 +67,8 @@ public class SimpleReport implements Domain {
 
 	private float gongSac;
 	
+	private boolean gongSacNull = true;
+	
 	private String bigo;
 	
 	private int todayConstruction;
@@ -82,22 +84,39 @@ public class SimpleReport implements Domain {
 	private String constructionName;
 
 	public float getGongSac() {
-		return Float.parseFloat(String.format("%.1f", gongSac));
+	    return Math.round(gongSac * 10.0f) / 10.0f;
 	}
 	
-	public void setGongSac(float gongSac) {
-		this.gongSac = gongSac;
+	public void setGongSac(Float gongSac) {
+	    this.gongSacNull = gongSac == null;
+	    this.gongSac = gongSac == null ? 0.0f : gongSac;
 	}
+	
+	public boolean isGongSacNull() {
+	    return gongSacNull;
+	}
+	
 	//잔량
 	public float getBalance() {
-		float value = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0");
-		if(value < 0)
-		{
-			setGongSac(value);
-			return 0;
-		}
-		float result = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0");
-		return Float.parseFloat(String.format("%.2f", result));
+	    try {
+	        float total = Float.parseFloat(
+	            getTotalConnectWidth() != null && !getTotalConnectWidth().isEmpty()
+	                ? getTotalConnectWidth()
+	                : "0"
+	        );
+
+	        float intrusion = Float.parseFloat(
+	            getIntrusionDepth() != null && !getIntrusionDepth().isEmpty()
+	                ? getIntrusionDepth()
+	                : "0"
+	        );
+
+	        float value = total - intrusion;
+
+	        return Float.parseFloat(String.format("%.2f", value));
+	    } catch (Exception e) {
+	        return 0.0f;
+	    }
 	}
 	//잔량
 	public void setBalance(float balance) {

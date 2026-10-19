@@ -66,7 +66,7 @@ public class UpdateReport implements Domain {
 	private boolean preserveNullGongSac;
 
 	/* JSON 원문에서 gongSac 입력값이 비어 있었는지 여부 */
-	private boolean gongSacNull;
+	private boolean gongSacNull = true;
 
 	private String version;
    //단면적
