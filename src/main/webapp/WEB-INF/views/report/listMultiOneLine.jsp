@@ -4,6 +4,22 @@
 	.tableScroll {
 	  width: 100%;
 	}
+
+	.report-sticky-scrollbar {
+		display: none;
+		position: fixed;
+		z-index: 9000;
+		height: 18px;
+		overflow-x: auto;
+		overflow-y: hidden;
+		background: rgba(245, 245, 245, 0.97);
+		border-top: 1px solid #aaa;
+		box-sizing: border-box;
+	}
+
+	.report-sticky-scrollbar-inner {
+		height: 1px;
+	}
 	
 	.reportTable {
 	  width: auto;
@@ -506,7 +522,81 @@
 	    getPdfSignInfo();
 	    getExcelSignInfo();
 	    calcIntrusionFromSprCol1();
+	    initReportStickyScrollbar();
 	});
+
+	// 표 가로 스크롤과 보조 바를 연결하고, 보조 바를 표 하단 경계에서 멈춤
+	function initReportStickyScrollbar() {
+		var reportTable = document.getElementById('reportTable');
+		var tableArea = document.querySelector('.min485 .tableArea');
+		var stickyScrollbar = document.getElementById('reportStickyScrollbar');
+		var stickyInner = document.getElementById('reportStickyScrollbarInner');
+		if (!reportTable || !tableArea || !stickyScrollbar || !stickyInner) return;
+
+		// 기록지 헤더와 본문을 함께 감싸는 실제 가로 스크롤 영역
+		var scrollArea = reportTable.closest('.viewTable');
+		if (!scrollArea || !tableArea.contains(scrollArea)) return;
+
+		document.body.appendChild(stickyScrollbar);
+		var lastVerticalScroll = window.pageYOffset || 0;
+		var needsSizing = true;
+		var pointerOverSticky = false;
+
+		function updateStickyScrollbar(updateWidth) {
+			if (updateWidth) needsSizing = true;
+			var areaRect = tableArea.getBoundingClientRect();
+			var visible = areaRect.bottom > 0 && areaRect.top < window.innerHeight;
+			var maxScroll = scrollArea.scrollWidth - scrollArea.clientWidth;
+			if (!visible || maxScroll <= 1 || areaRect.height <= 18) {
+				stickyScrollbar.style.display = 'none';
+				return;
+			}
+
+			var barTop = Math.min(window.innerHeight - 18, areaRect.bottom - 18);
+			if (barTop < areaRect.top) {
+				stickyScrollbar.style.display = 'none';
+				return;
+			}
+
+			stickyScrollbar.style.top = barTop + 'px';
+			if (stickyScrollbar.style.display !== 'block') stickyScrollbar.style.display = 'block';
+			if (needsSizing) {
+				stickyScrollbar.style.left = scrollArea.getBoundingClientRect().left + 'px';
+				stickyScrollbar.style.width = scrollArea.clientWidth + 'px';
+				stickyInner.style.width = (scrollArea.clientWidth + maxScroll) + 'px';
+				stickyScrollbar.scrollLeft = scrollArea.scrollLeft;
+				needsSizing = false;
+			}
+		}
+
+		function syncToSticky() {
+			// 드래그 중 늦게 도착한 원본 스크롤 이벤트가 보조 바를 되돌리지 않도록 함
+			if (pointerOverSticky) return;
+			if (stickyScrollbar.scrollLeft !== scrollArea.scrollLeft) {
+				stickyScrollbar.scrollLeft = scrollArea.scrollLeft;
+			}
+		}
+		function syncToTable() {
+			if (scrollArea.scrollLeft !== stickyScrollbar.scrollLeft) {
+				scrollArea.scrollLeft = stickyScrollbar.scrollLeft;
+			}
+		}
+
+		stickyScrollbar.addEventListener('pointerenter', function() { pointerOverSticky = true; });
+		stickyScrollbar.addEventListener('pointerleave', function() {
+			pointerOverSticky = false;
+		});
+		scrollArea.addEventListener('scroll', syncToSticky);
+		stickyScrollbar.addEventListener('scroll', syncToTable);
+		window.addEventListener('scroll', function() {
+			var verticalScroll = window.pageYOffset || 0;
+			if (verticalScroll === lastVerticalScroll) return;
+			lastVerticalScroll = verticalScroll;
+			updateStickyScrollbar(false);
+		});
+		window.addEventListener('resize', function() { updateStickyScrollbar(true); });
+		updateStickyScrollbar(true);
+	}
 
 	function calcIntrusionFromSprCol1() {
 		if ('${param.constructionIdx}' != '1823' && '${sessionInfo.constructionIdx}' != '1823') return;
@@ -3835,6 +3925,9 @@
 				</div>
 			</div>
 		</div>
+	</div>
+	<div id="reportStickyScrollbar" class="report-sticky-scrollbar" aria-label="기록지 가로 스크롤">
+		<div id="reportStickyScrollbarInner" class="report-sticky-scrollbar-inner"></div>
 	</div>
 
 	<!--페이징-->			
