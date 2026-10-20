@@ -74,6 +74,8 @@ public class ReportOneLine implements Domain {
     private String modulusElasticity;
 
 	private float gongSac;
+	// v2 화면 자동 계산용. DB 저장 대상 gongSac과 분리
+	private float calculatedGongSac;
 	
 	private boolean gongSacNull = true;
 	
@@ -235,12 +237,53 @@ public class ReportOneLine implements Domain {
 	        }
 	    }
 
-	    return Float.parseFloat(String.format("%.1f", gongSac));
+	    if (gongSacNull) {
+	        calculatedGongSac = calculateV2GongSac();
+	        return Math.round(calculatedGongSac * 10.0f) / 10.0f;
+	    }
+
+	    return Math.round(gongSac * 10.0f) / 10.0f;
+	}
+
+	private float calculateV2GongSac() {
+	    try {
+	        float result = parseFloatOrZero(getTotalConnectWidth())
+                - parseFloatOrZero(getIntrusionDepth());
+
+        if (getConstructionIdx() == 944 || getConstructionIdx() == 1136) {
+            float drillingDepth = parseFloatOrZero(getDrillingDepth());
+            result -= drillingDepth;
+        }
+
+	        return result < 0 ? result : 0.0f;
+	    } catch (Exception e) {
+	        return 0.0f;
+	    }
 	}
 
 	public void setGongSac(Float gongSac) {
+	    resetCalculatedGongSac();
 	    this.gongSacNull = gongSac == null;
 	    this.gongSac = gongSac == null ? 0.0f : gongSac;
+	}
+
+	private void resetCalculatedGongSac() {
+	    this.calculatedGongSac = 0.0f;
+	}
+
+	public void setTotalConnectWidth(String totalConnectWidth) {
+	    this.totalConnectWidth = totalConnectWidth;
+	    resetCalculatedGongSac();
+	}
+
+	public void setIntrusionDepth(String intrusionDepth) {
+	    this.intrusionDepth = intrusionDepth;
+	    resetCalculatedGongSac();
+	}
+
+	public void setDrillingDepth(String drillingDepth) {
+	    this.drillingDepth = drillingDepth;
+	    resetCalculatedGongSac();
 	}
 	
 	public void setGongSacNull() {
@@ -255,6 +298,10 @@ public class ReportOneLine implements Domain {
 	
 	//잔량
 	public float getBalance() {
+	    return gongSacNull ? getBalanceV2() : getBalanceV3();
+	}
+
+	private float getBalanceV2() {
 	    try {
 	        float total = parseFloatOrZero(getTotalConnectWidth());
 	        float intrusion = parseFloatOrZero(getIntrusionDepth());
@@ -262,10 +309,35 @@ public class ReportOneLine implements Domain {
 	        float result = total - intrusion;
 
 	        if (getConstructionIdx() == 944 || getConstructionIdx() == 1136) {
-	            result -= parseFloatOrZero(getDrillingDepth());
+	            float drillingDepth = parseFloatOrZero(getDrillingDepth());
+	            result -= drillingDepth;
 	        }
 
-	        return Math.round(result * 100.0f) / 100.0f;
+	        if (result < 0) {
+	        if (calculatedGongSac == 0.0f) {
+	            calculatedGongSac = result;
+	        }
+	            return 0.0f;
+	        }
+
+	        calculatedGongSac = 0.0f;
+	        return Float.parseFloat(String.format("%.2f", result));
+	    } catch (Exception e) {
+	        calculatedGongSac = 0.0f;
+	        return 0.0f;
+	    }
+	}
+
+	private float getBalanceV3() {
+	    try {
+	        float result = parseFloatOrZero(getTotalConnectWidth())
+	                - parseFloatOrZero(getIntrusionDepth());
+
+        if (getConstructionIdx() == 944 || getConstructionIdx() == 1136) {
+            result -= parseFloatOrZero(getDrillingDepth());
+        }
+
+        return Float.parseFloat(String.format("%.2f", result));
 	    } catch (Exception e) {
 	        return 0.0f;
 	    }
