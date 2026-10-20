@@ -58,6 +58,8 @@ public class UpdateReport implements Domain {
 	private String currentDateTime;
 	
 	private float gongSac;
+	/* JSON 원문에 gongSac 키가 포함되었는지 여부 */
+	private boolean gongSacProvided;
 
 	/* 복사 작업에 사용된 원본 기록지 */
 	private int sourceReportId;
@@ -66,7 +68,7 @@ public class UpdateReport implements Domain {
 	private boolean preserveNullGongSac;
 
 	/* JSON 원문에서 gongSac 입력값이 비어 있었는지 여부 */
-	private boolean gongSacNull = true;
+	private boolean gongSacNull = false;
 
 	private String version;
    //단면적
@@ -88,7 +90,17 @@ public class UpdateReport implements Domain {
 		return gongSac;
 	}
 	public void setGongSac(float gongSac) {
+		this.gongSacProvided = true;
 		this.gongSac = gongSac;
+	}
+
+	public boolean isGongSacProvided() {
+		return gongSacProvided;
+	}
+
+	/* 요청에 gongSac이 없을 때 */
+	public void setExistingGongSac(Float gongSac) {
+		this.gongSac = gongSac == null ? 0.0f : gongSac;
 	}
 
 	public int getSourceReportId() {
