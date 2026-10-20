@@ -127,8 +127,8 @@ public class GReport implements Domain {
 	**/
 
 	public void setGongSac(Float gongSac) {
-		this.gongSacNull = gongSac == null || gongSac == 0.0f;
-		this.gongSac = gongSac == null ? 0.0f : gongSac;
+	    this.gongSacNull = gongSac == null;
+	    this.gongSac = gongSac == null ? 0.0f : gongSac;
 	}
 
 }

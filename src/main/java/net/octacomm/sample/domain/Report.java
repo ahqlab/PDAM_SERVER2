@@ -74,6 +74,8 @@ public class Report implements Domain {
     private String modulusElasticity;
 
 	private float gongSac;
+	// v2 화면 자동 계산용. DB 저장 대상 gongSac과 분리
+	private float calculatedGongSac;
 	/* v2 gongSac 0.0을 NULL */
 	private boolean gongSacNull = true;
 	
@@ -152,65 +154,109 @@ public class Report implements Domain {
 	**/
 	
 	public float getGongSac() {
-	    if (gongSac != 0.0f) {
-	        return Math.round(gongSac * 10.0f) / 10.0f;
-	    }
-
 	    if ("isoo".equals(getSprCol1())) {
 	        try {
 	            float drilling = Float.parseFloat(
-	                getDrillingDepth() == null || getDrillingDepth().isEmpty()
-	                    ? "0"
-	                    : getDrillingDepth()
-	            );
-
+	                    getDrillingDepth() != null && !getDrillingDepth().isEmpty()
+                            ? getDrillingDepth() : "0");
 	            float intrusion = Float.parseFloat(
-	                getIntrusionDepth() == null || getIntrusionDepth().isEmpty()
-	                    ? "0"
-	                    : getIntrusionDepth()
-	            );
+	                    getIntrusionDepth() != null && !getIntrusionDepth().isEmpty()
+                            ? getIntrusionDepth() : "0");
 
-	            return Math.round((drilling - intrusion) * 10.0f) / 10.0f;
+	            return Float.parseFloat(String.format("%.2f", drilling - intrusion));
 	        } catch (Exception e) {
 	            return 0.0f;
 	        }
 	    }
 
-	    return 0.0f;
+	    if (gongSacNull) {
+	        return Math.round(calculatedGongSac * 10.0f) / 10.0f;
+	    }
+
+	    return Math.round(gongSac * 10.0f) / 10.0f;
 	}
 
 	public void setGongSac(Float gongSac) {
-		this.gongSacNull = gongSac == null || gongSac == 0.0f;
-		this.gongSac = gongSac == null ? 0.0f : gongSac;
+	    resetCalculatedGongSac();
+	    this.gongSacNull = gongSac == null;
+	    this.gongSac = gongSac == null ? 0.0f : gongSac;
 	}
+
+	private void resetCalculatedGongSac() {
+	    this.calculatedGongSac = 0.0f;
+	}
+
+	public void setTotalConnectWidth(String totalConnectWidth) {
+	    this.totalConnectWidth = totalConnectWidth;
+	    resetCalculatedGongSac();
+	}
+
+	public void setIntrusionDepth(String intrusionDepth) {
+	    this.intrusionDepth = intrusionDepth;
+	    resetCalculatedGongSac();
+	}
+
+	public void setDrillingDepth(String drillingDepth) {
+	    this.drillingDepth = drillingDepth;
+	    resetCalculatedGongSac();
+	}
+	
+	public boolean isGongSacNull() {
+	    return gongSacNull;
+	}
+	
 	//잔량
 	public float getBalance() {
-		float value;
-		try {
-			if(getConstructionIdx() == 944 || getConstructionIdx() == 1136){
-				value = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0") - Float.parseFloat(getDrillingDepth() != "" ? getDrillingDepth() : "0");
-			}else {
-				value = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0");
-			}
-		}catch (Exception e) {
-			value = 0;
-		}
-		if(value < 0)
-		{
-			if(gongSac == 0.0f) setGongSac(value);
-			return 0;
-		}
-		float result;
-		try {
-			if(getConstructionIdx() == 944 || getConstructionIdx() == 1136) {
-				result = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0") - Float.parseFloat(getDrillingDepth() != "" ? getDrillingDepth() : "0");
-			}else {
-				result = Float.parseFloat(getTotalConnectWidth()) - Float.parseFloat(getIntrusionDepth() != "" ? getIntrusionDepth() : "0");
-			}
-		}catch (Exception e) {
-			result = 0;
-		}
-		return Float.parseFloat(String.format("%.2f", result));
+	    return gongSacNull ? getBalanceV2() : getBalanceV3();
+	}
+
+	private float getBalanceV2() {
+	    try {
+	        float totalConnectWidth = parseFloatOrZero(getTotalConnectWidth());
+	        float intrusionDepth = parseFloatOrZero(getIntrusionDepth());
+
+	        float result = totalConnectWidth - intrusionDepth;
+
+		        if (getConstructionIdx() == 944 || getConstructionIdx() == 1136) {
+		            float drillingDepth = parseFloatOrZero(getDrillingDepth());
+		            result -= drillingDepth;
+		        }
+
+		        if (result < 0) {
+	            if (calculatedGongSac == 0.0f) {
+	                calculatedGongSac = result;
+	            }
+			            return 0.0f;
+		        }
+
+	        calculatedGongSac = 0.0f;
+	        return Float.parseFloat(String.format("%.2f", result));
+
+	    } catch (Exception e) {
+	        calculatedGongSac = 0.0f;
+	        return 0.0f;
+	    }
+	}
+
+	private float getBalanceV3() {
+	    try {
+	        float result = parseFloatOrZero(getTotalConnectWidth())
+	                - parseFloatOrZero(getIntrusionDepth());
+
+	        if (getConstructionIdx() == 944 || getConstructionIdx() == 1136) {
+	            result -= parseFloatOrZero(getDrillingDepth());
+	        }
+
+	        return Float.parseFloat(String.format("%.2f", result));
+	    } catch (Exception e) {
+	        return 0.0f;
+	    }
+	}
+
+	private float parseFloatOrZero(String value) {
+	    return value == null || value.trim().isEmpty()
+	            ? 0.0f
+	            : Float.parseFloat(value);
 	}
 	//잔량
 	public void setBalance(float balance) {
