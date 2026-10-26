@@ -1117,10 +1117,10 @@ public class ReportController{
 			if (!report.isGongSacProvided()) {
 				report.setExistingGongSac(originalGongSac);
 			}
-			report.setVersion(originalGongSac == null ? "v2" : "v3");
 			if (originalGongSac == null) {
 				report.setPreserveNullGongSac(true);
 			}
+		report.setVersion(report.getStoredGongSac() == null ? "v2" : "v3");
 			// 기존 기록지 수정 로직 실행 직전 전체 스냅샷 저장
 			reportHistoryService.saveBeforeChange(report.getId(), ReportHistoryService.STATUS_UPDATE, (String) session.getAttribute("userId"));
 		} catch (Exception e) {
@@ -1213,10 +1213,10 @@ public class ReportController{
 		if (!report.isGongSacProvided()) {
 			report.setExistingGongSac(originalGongSac);
 		}
-		report.setVersion(originalGongSac == null ? "v2" : "v3");
 		if (originalGongSac == null) {
 			report.setPreserveNullGongSac(true);
 		}
+		report.setVersion(report.getStoredGongSac() == null ? "v2" : "v3");
 
 	    // 1. 계산값 설정
 	    applyDepthCalculations(report);
@@ -1475,10 +1475,10 @@ public class ReportController{
 	        if (newReport.getSourceReportId() > 0 && !newReport.isGongSacProvided()) {
 	            newReport.setExistingGongSac(sourceGongSac);
 	        }
-	        newReport.setVersion(sourceGongSac == null ? "v2" : "v3");
 	        if (sourceGongSac == null) {
 	            newReport.setPreserveNullGongSac(true);
 	        }
+	        newReport.setVersion(newReport.getStoredGongSac() == null ? "v2" : "v3");
 	        mapper.insertCopiedReport(newReport);
 	        int newReportId = newReport.getId(); 
 	        if (newReport.isPreserveNullGongSac()) {

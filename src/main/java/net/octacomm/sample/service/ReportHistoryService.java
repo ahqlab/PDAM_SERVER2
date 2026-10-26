@@ -118,6 +118,7 @@ public class ReportHistoryService {
 		values.put("파일합계", history.getTotalConnectWidth());
 		values.put("이음(개소)", history.getConnectLength());
 		values.put("천공깊이", history.getDrillingDepth());
+		values.put("공삭공", history.getStoredGongSac() == null ? null : String.valueOf(history.getStoredGongSac()));
 		values.put("직타깊이", history.getDirectDrillingDepth());
 		values.put("전석층천공", history.getStDrillingDepth());
 		values.put("토사천공", history.getSdDrillingDepth());
@@ -143,6 +144,8 @@ public class ReportHistoryService {
 		values.put("탄성계수", history.getModulusElasticity());
 		values.put("파일단면적", history.getCrossSection());
 		values.put("비고", history.getBigo());
+		values.put("항타기 종류", history.getMachineType());
+		values.put("상부RPM", history.getTopRpm());
 		values.put("메모", history.getSprCol1());
 		return values;
 	}

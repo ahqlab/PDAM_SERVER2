@@ -186,6 +186,7 @@
 			AA.pileNo ,
 			AA.pileStandard ,
 			AA.drillingDepth ,
+			AA.gongSac ,
 			AA.directDrillingDepth ,
 			AA.stDrillingDepth ,
 			AA.sdDrillingDepth ,
@@ -208,6 +209,8 @@
 			AA.isDel ,
 			AA.isDuple , 
             AA.bigo ,
+			AA.machineType ,
+			AA.topRpm ,
 			AA.sprCol1 ,
 			AA.constructionIdx ,
 			AA.peOne ,
@@ -241,6 +244,7 @@
 			pileNo , 
 			pileStandard , 
 			drillingDepth , 
+			gongSac ,
 			directDrillingDepth ,
 			stDrillingDepth , 
             sdDrillingDepth , 
@@ -263,6 +267,8 @@
 			isDuple, 
 			role , 
 			IF(bigo = 'null','', bigo) as bigo ,
+			IF(machineType = 'null','', machineType) as machineType ,
+			IF(topRpm = 'null','', topRpm) as topRpm ,
 			IF(sprCol1 = 'null','', sprCol1) as sprCol1 ,
 			createDate,
 			constructionIdx,
@@ -297,6 +303,7 @@
 		            A.pileNo , 
 		            A.pileStandard , 
 		            A.drillingDepth , 
+		            A.gongSac ,
 		            A.directDrillingDepth , 
 		            A.stDrillingDepth , 
 		            A.sdDrillingDepth , 
@@ -319,6 +326,8 @@
                     A.isDuple, 
 		            C.role , 
 		            IF(A.bigo = 'null','', A.bigo) as bigo ,
+		            IF(A.machineType = 'null','', A.machineType) as machineType ,
+		            IF(A.topRpm = 'null','', A.topRpm) as topRpm ,
 		            IF(A.sprCol1 = 'null','', A.sprCol1) as sprCol1 ,
                     A.createDate ,
 		            B.constructionIdx ,
@@ -429,6 +438,8 @@
 			AA.isDel ,
 			AA.isDuple , 
             AA.bigo ,
+			AA.machineType ,
+			AA.topRpm ,
 			AA.sprCol1 ,
 			AA.constructionIdx ,
 			
@@ -507,6 +518,8 @@
 			isDuple, 
 			role , 
 			IF(bigo = 'null','', bigo) as bigo ,
+			IF(machineType = 'null','', machineType) as machineType ,
+			IF(topRpm = 'null','', topRpm) as topRpm ,
 			IF(sprCol1 = 'null','', sprCol1) as sprCol1 ,
 			createDate,
 			constructionIdx,
@@ -585,6 +598,8 @@
                     A.isDuple, 
 		            C.role , 
 		            IF(A.bigo = 'null','', A.bigo) as bigo ,
+		            IF(A.machineType = 'null','', A.machineType) as machineType ,
+		            IF(A.topRpm = 'null','', A.topRpm) as topRpm ,
 		            IF(A.sprCol1 = 'null','', A.sprCol1) as sprCol1 ,
                     A.createDate ,
 		            B.constructionIdx ,
@@ -717,6 +732,8 @@
 			AA.isDel ,
 			AA.isDuple , 
             AA.bigo ,
+			AA.machineType ,
+			AA.topRpm ,
 			AA.sprCol1 ,
 			AA.constructionIdx ,
 			
@@ -797,6 +814,8 @@
 			isDuple, 
 			role , 
 			IF(bigo = 'null','', bigo) as bigo ,
+			IF(machineType = 'null','', machineType) as machineType ,
+			IF(topRpm = 'null','', topRpm) as topRpm ,
 			IF(sprCol1 = 'null','', sprCol1) as sprCol1 ,
 			createDate,
 			constructionIdx,
@@ -877,6 +896,8 @@
                     A.isDuple, 
 		            C.role , 
 		            IF(A.bigo = 'null','', A.bigo) as bigo ,
+		            IF(A.machineType = 'null','', A.machineType) as machineType ,
+		            IF(A.topRpm = 'null','', A.topRpm) as topRpm ,
 		            IF(A.sprCol1 = 'null','', A.sprCol1) as sprCol1 ,
                     A.createDate ,
 		            B.constructionIdx ,
@@ -1027,6 +1048,7 @@
 			pileNo ,
 			pileStandard ,
 			drillingDepth ,
+			gongSac ,
 			directDrillingDepth ,
 			stDrillingDepth ,
 			sdDrillingDepth ,
@@ -1064,6 +1086,8 @@
 	    		</otherwise>
 	    	</choose>			
 			bigo,
+			machineType,
+			topRpm,
 			sprCol1,
 			constructionIdx,
 		    peOne,
@@ -1095,6 +1119,7 @@
 				A.location , A.pileNo ,
 				A.pileStandard ,
 				A.drillingDepth ,
+				A.gongSac ,
 				A.directDrillingDepth ,
 				A.stDrillingDepth ,
 				A.sdDrillingDepth ,
@@ -1116,6 +1141,8 @@
 				A.isDel, 
 				A.isDuple, 
 				IF(A.bigo = 'null','',A.bigo) as bigo , 
+				IF(A.machineType = 'null','',A.machineType) as machineType , 
+				IF(A.topRpm = 'null','',A.topRpm) as topRpm , 
 				IF(A.sprCol1 = 'null','',A.sprCol1) as sprCol1 , 
      			A.createDate ,
      			<choose>
@@ -1255,6 +1282,7 @@
 			pileNo ,
 			pileStandard ,
 			drillingDepth ,
+			gongSac ,
 			directDrillingDepth ,
 			stDrillingDepth ,
 			sdDrillingDepth ,
@@ -1292,6 +1320,8 @@
 	    		</otherwise>
 	    	</choose>			
 			bigo,
+			machineType,
+			topRpm,
 			sprCol1,
 			constructionIdx,
 		    peOne,
@@ -1318,6 +1348,7 @@
 				A.location , A.pileNo ,
 				A.pileStandard ,
 				A.drillingDepth ,
+				A.gongSac ,
 				A.directDrillingDepth ,
 				A.stDrillingDepth ,
 				A.sdDrillingDepth ,
@@ -1339,6 +1370,8 @@
 				A.isDel, 
 				A.isDuple, 
 				IF(A.bigo = 'null','',A.bigo) as bigo , 
+				IF(A.machineType = 'null','',A.machineType) as machineType , 
+				IF(A.topRpm = 'null','',A.topRpm) as topRpm , 
 				IF(A.sprCol1 = 'null','',A.sprCol1) as sprCol1 , 
      			A.createDate ,
      			<choose>
@@ -1488,6 +1521,8 @@
 			role, 
 			isDel, 
 			bigo,
+			machineType,
+			topRpm,
 			sprCol1,
 			constructionIdx
 		FROM (
@@ -1524,6 +1559,8 @@
 				A.createDate ,
 				C.role ,
 				IF(A.bigo = 'null','',A.bigo) as bigo ,
+				IF(A.machineType = 'null','',A.machineType) as machineType ,
+				IF(A.topRpm = 'null','',A.topRpm) as topRpm ,
 				IF(A.sprCol1 = 'null','',A.sprCol1) as sprCol1 ,
 				case when @grp = date_format(A.createDate, '%Y-%m-%d') then @rownum:=@rownum + 1 else @rownum :=1 end as rownum,
 				(@grp := date_format(A.currentDateTime, '%Y-%m-%d')) as dum ,
@@ -1596,6 +1633,8 @@
 		    AA.role, 
 		    AA.isDel, 
 		    AA.bigo, 
+		    AA.machineType, 
+		    AA.topRpm, 
 		    AA.sprCol1, 
 		    AA.peOne,
 		    AA.peTwo, 
@@ -1650,6 +1689,8 @@
 		    role, 
 		    isDel, 
 		    bigo, 
+		    machineType, 
+		    topRpm, 
 		    sprCol1, 
 		    peOne,
 		    peTwo, 
@@ -1722,6 +1763,8 @@
 					A.createDate,
 		            C.role , 
 		            IF(A.bigo = 'null','',A.bigo) as bigo ,
+		            IF(A.machineType = 'null','',A.machineType) as machineType ,
+		            IF(A.topRpm = 'null','',A.topRpm) as topRpm ,
 		            IF(A.sprCol1 = 'null','',A.sprCol1) as sprCol1 ,
 		            B.constructionIdx 
 				FROM TB_REPORT A , TB_DEVICE B, TB_CONSTRUCTION C 
@@ -1808,6 +1851,8 @@
 		    AA.role, 
 		    AA.isDel, 
 		    AA.bigo, 
+		    AA.machineType, 
+		    AA.topRpm, 
 		    AA.sprCol1, 
 		    AA.peOne,
 		    AA.peTwo, 
@@ -1861,6 +1906,8 @@
 		    role, 
 		    isDel, 
 		    bigo, 
+		    machineType, 
+		    topRpm, 
 		    sprCol1, 
 		    peOne,
 		    peTwo, 
@@ -1930,6 +1977,8 @@
 					A.createDate,
 		            C.role , 
 		            IF(A.bigo = 'null','',A.bigo) as bigo ,
+		            IF(A.machineType = 'null','',A.machineType) as machineType ,
+		            IF(A.topRpm = 'null','',A.topRpm) as topRpm ,
 		            IF(A.sprCol1 = 'null','',A.sprCol1) as sprCol1 ,
 		            B.constructionIdx 
 				FROM TB_REPORT A , TB_DEVICE B, TB_CONSTRUCTION C 
@@ -2013,6 +2062,8 @@
 		    AA.role, 
 		    AA.isDel, 
 		    AA.bigo, 
+		    AA.machineType, 
+		    AA.topRpm, 
 		    AA.sprCol1, 
 		    AA.peOne,
 		    AA.peTwo, 
@@ -2067,6 +2118,8 @@
 		    role, 
 		    isDel, 
 		    bigo, 
+		    machineType, 
+		    topRpm, 
 		    sprCol1, 
 		    peOne,
 		    peTwo, 
@@ -2138,6 +2191,8 @@
 					A.createDate,
 		            C.role , 
 		            IF(A.bigo = 'null','',A.bigo) as bigo ,
+		            IF(A.machineType = 'null','',A.machineType) as machineType ,
+		            IF(A.topRpm = 'null','',A.topRpm) as topRpm ,
 		            IF(A.sprCol1 = 'null','',A.sprCol1) as sprCol1 ,
 		            B.constructionIdx 
 				FROM TB_REPORT A , TB_DEVICE B, TB_CONSTRUCTION C 
@@ -2222,6 +2277,8 @@
 		    AA.role, 
 		    AA.isDel, 
 		    AA.bigo, 
+		    AA.machineType, 
+		    AA.topRpm, 
 		    AA.sprCol1, 
 		    AA.peOne,
 		    AA.peTwo, 
@@ -2270,6 +2327,8 @@
 		    role, 
 		    isDel, 
 		    bigo, 
+		    machineType, 
+		    topRpm, 
 		    sprCol1, 
 		    peOne,
 		    peTwo, 
@@ -2329,6 +2388,8 @@
 					A.createDate,
 		            C.role , 
 		            IF(A.bigo = 'null','',A.bigo) as bigo ,
+		            IF(A.machineType = 'null','',A.machineType) as machineType ,
+		            IF(A.topRpm = 'null','',A.topRpm) as topRpm ,
 		            IF(A.sprCol1 = 'null','',A.sprCol1) as sprCol1 ,
 		            B.constructionIdx 
 				FROM TB_REPORT A , TB_DEVICE B, TB_CONSTRUCTION C 
@@ -2413,6 +2474,8 @@
 		    AA.role, 
 		    AA.isDel, 
 		    AA.bigo, 
+		    AA.machineType, 
+		    AA.topRpm, 
 		    AA.sprCol1, 
 		    AA.peOne,
 		    AA.peTwo, 
@@ -2467,6 +2530,8 @@
 		    role, 
 		    isDel, 
 		    bigo, 
+		    machineType, 
+		    topRpm, 
 		    sprCol1, 
 		    peOne,
 		    peTwo, 
@@ -2538,6 +2603,8 @@
 					A.createDate,
 		            C.role , 
 		            IF(A.bigo = 'null','',A.bigo) as bigo ,
+		            IF(A.machineType = 'null','',A.machineType) as machineType ,
+		            IF(A.topRpm = 'null','',A.topRpm) as topRpm ,
 		            IF(A.sprCol1 = 'null','',A.sprCol1) as sprCol1 ,
 		            B.constructionIdx 
 				FROM TB_REPORT A , TB_DEVICE B, TB_CONSTRUCTION C 
@@ -2623,6 +2690,8 @@
 		    AA.role, 
 		    AA.isDel, 
 		    AA.bigo, 
+		    AA.machineType, 
+		    AA.topRpm, 
 		    AA.sprCol1, 
 		    AA.peOne,
 		    AA.peTwo, 
@@ -2676,6 +2745,8 @@
 		    role, 
 		    isDel, 
 		    bigo, 
+		    machineType, 
+		    topRpm, 
 		    sprCol1, 
 		    peOne,
 		    peTwo, 
@@ -2745,6 +2816,8 @@
 					A.createDate,
 		            C.role , 
 		            IF(A.bigo = 'null','',A.bigo) as bigo ,
+		            IF(A.machineType = 'null','',A.machineType) as machineType ,
+		            IF(A.topRpm = 'null','',A.topRpm) as topRpm ,
 		            IF(A.sprCol1 = 'null','',A.sprCol1) as sprCol1 ,
 		            B.constructionIdx 
 				FROM TB_REPORT A , TB_DEVICE B, TB_CONSTRUCTION C 
@@ -2830,6 +2903,8 @@
 		    AA.role, 
 		    AA.isDel, 
 		    AA.bigo, 
+		    AA.machineType, 
+		    AA.topRpm, 
 		    AA.sprCol1, 
 		    AA.peOne,
 		    AA.peTwo, 
@@ -2879,6 +2954,8 @@
 		    role, 
 		    isDel, 
 		    bigo, 
+		    machineType, 
+		    topRpm, 
 		    sprCol1, 
 		    peOne,
 		    peTwo, 
@@ -2940,6 +3017,8 @@
 					A.createDate,
 		            C.role , 
 		            IF(A.bigo = 'null','',A.bigo) as bigo ,
+		            IF(A.machineType = 'null','',A.machineType) as machineType ,
+		            IF(A.topRpm = 'null','',A.topRpm) as topRpm ,
 		            IF(A.sprCol1 = 'null','',A.sprCol1) as sprCol1 ,
 		            B.constructionIdx 
 				FROM TB_REPORT A , TB_DEVICE B, TB_CONSTRUCTION C 
@@ -3025,6 +3104,8 @@
 		    AA.role, 
 		    AA.isDel, 
 		    AA.bigo, 
+		    AA.machineType, 
+		    AA.topRpm, 
 		    AA.sprCol1, 
 		    AA.peOne,
 		    AA.peTwo, 
@@ -3073,6 +3154,8 @@
 		    role, 
 		    isDel, 
 		    bigo, 
+		    machineType, 
+		    topRpm, 
 		    sprCol1, 
 		    peOne,
 		    peTwo, 
@@ -3132,6 +3215,8 @@
 					A.createDate,
 		            C.role , 
 		            IF(A.bigo = 'null','',A.bigo) as bigo ,
+		            IF(A.machineType = 'null','',A.machineType) as machineType ,
+		            IF(A.topRpm = 'null','',A.topRpm) as topRpm ,
 		            IF(A.sprCol1 = 'null','',A.sprCol1) as sprCol1 ,
 		            B.constructionIdx 
 				FROM TB_REPORT A , TB_DEVICE B, TB_CONSTRUCTION C 
@@ -3184,7 +3269,7 @@
     <insert id="insert" parameterType="Report">
 	    INSERT INTO TB_REPORT
 	    ( 
-	    	deviceIdx,
+	    	topRpm, deviceIdx,
 	    	currentDateTime,
 	    	location,
 	    	pileNo,
@@ -3214,6 +3299,7 @@
 	    	hammaT,
 	    	fallMeter,
 	    	pileType,
+	    	machineType,
 	    	method,
 	    	totalConnectWidth,
 	    	ultimateBearingCapacity,
@@ -3234,7 +3320,7 @@
 	    	, gongSac, `version`, createDate  )
 	     VALUES 
 	     ( 
-	     	#{deviceIdx},
+	     	#{topRpm}, #{deviceIdx},
 	     	#{currentDateTime},
 	     	#{location},
 	     	#{pileNo},
@@ -3263,7 +3349,7 @@
 	     	#{totalPenetrationValue},
 	     	#{hammaT},
 	     	#{fallMeter},
-	     	#{pileType},
+	     	#{pileType}, #{machineType},
 	     	#{method},
 	     	#{totalConnectWidth},
 	     	#{ultimateBearingCapacity},
@@ -3280,7 +3366,7 @@
 	    		, #{sprCol1}  
 	    		</when>
 	    	</choose>
-	      	, #{gongSac}, #{version}, now() )
+	      	, #{storedGongSac}, #{version}, now() )
 	    <selectKey resultType="int" keyProperty="id" order="AFTER">
         SELECT LAST_INSERT_ID()
     	</selectKey>
@@ -3289,7 +3375,7 @@
     <insert id="insertOrigin" parameterType="Report">
 	    INSERT INTO TB_REPORT_ORIGIN
 	    ( 
-	    	id, 
+	    	topRpm, id, 
 	    	deviceIdx, 
 	    	currentDateTime, 
 	    	location, 
@@ -3320,6 +3406,7 @@
 	    	hammaT, 
 	    	fallMeter, 
 	    	pileType, 
+	    	machineType, 
 	    	method, 
 	    	totalConnectWidth, 
 	    	ultimateBearingCapacity, 
@@ -3336,11 +3423,11 @@
 	    		, sprCol1 
 	    		</when>
 	    	</choose>
-	    	, createDate  
+	    	, gongSac, createDate  
 	    )
 	    VALUES 
 	    ( 
-     		#{id}, 
+     		#{topRpm}, #{id}, 
 	     	#{deviceIdx}, 
 	     	#{currentDateTime}, 
 	     	#{location}, 
@@ -3370,7 +3457,7 @@
 	     	#{totalPenetrationValue}, 
 	     	#{hammaT}, 
 	     	#{fallMeter},  
-	     	#{pileType}, 
+	     	#{pileType}, #{machineType}, 
 	     	#{method}, 
 	     	#{totalConnectWidth},  
 	     	#{ultimateBearingCapacity} , 
@@ -3387,13 +3474,13 @@
 	    		, #{sprCol1}  
 	    		</when>
 	    	</choose>
-	     	, now() )
+	     	, #{storedGongSac}, now() )
     </insert>
     
     <insert id="insert2" parameterType="Report">
 	    INSERT INTO TB_REPORT
 	    ( 
-	    	deviceIdx,
+	    	topRpm, deviceIdx,
 	      	currentDateTime,
 	      	location,
 	      	pileNo,
@@ -3423,6 +3510,7 @@
 	      	hammaT,
 	      	fallMeter,
 	      	pileType, 
+	      	machineType, 
 	      	method, 
 	      	totalConnectWidth, 
 	      	ultimateBearingCapacity, 
@@ -3444,7 +3532,7 @@
 	    )
 	    VALUES 
 	    ( 
-	     	#{deviceIdx}, 
+	     	#{topRpm}, #{deviceIdx}, 
 	     	#{currentDateTime}, 
 	     	#{location}, 
 	     	#{pileNo} , 
@@ -3474,6 +3562,7 @@
 	     	#{hammaT}, 
 	     	#{fallMeter},  
 	     	#{pileType}, 
+	     	#{machineType}, 
 	     	#{method}, 
 	     	#{totalConnectWidth},   
 	     	#{ultimateBearingCapacity}, 
@@ -3490,7 +3579,7 @@
 	    		, #{sprCol1}  
 	    		</when>
 	    	</choose>
-	      	, #{gongSac}, #{version}, #{createDate} )
+	      	, #{storedGongSac}, #{version}, #{createDate} )
 	    <selectKey resultType="int" keyProperty="id" order="AFTER">
         	SELECT LAST_INSERT_ID()
     	</selectKey>
@@ -3500,7 +3589,7 @@
      <insert id="insert2Origin" parameterType="Report">
 	    INSERT INTO TB_REPORT_ORIGIN
 	    ( 
-	    	id, 
+	    	topRpm, id, 
 	    	deviceIdx, 
 	    	currentDateTime, 
 	    	location, 
@@ -3531,6 +3620,7 @@
 	    	hammaT, 
 	    	fallMeter, 
 	    	pileType, 
+	    	machineType, 
 	    	method, 
 	    	totalConnectWidth, 
 	    	ultimateBearingCapacity , 
@@ -3547,11 +3637,11 @@
 	    		, sprCol1 
 	    		</when>
 	    	</choose>
-	    	, createDate  
+	    	, gongSac, createDate  
 	    ) 
 	    VALUES 
 	    ( 
-	    	#{id}, 
+	    	#{topRpm}, #{id}, 
 	    	#{deviceIdx}, 
 	    	#{currentDateTime}, 
 	    	#{location}, 
@@ -3582,6 +3672,7 @@
 	    	#{hammaT}, 
 	    	#{fallMeter},  
 	    	#{pileType}, 
+	    	#{machineType}, 
 	    	#{method}, 
 	    	#{totalConnectWidth},   
 	    	#{ultimateBearingCapacity}, 
@@ -3598,7 +3689,7 @@
 	    		, #{sprCol1}  
 	    		</when>
 	    	</choose>
-	     	, #{createDate} )
+	     	, #{storedGongSac}, #{createDate} )
     </insert> 
     
     
@@ -3653,6 +3744,8 @@
 		    , role
 		    , isDel
 		    , bigo
+		    , machineType
+		    , topRpm
 		    , sprCol1
 		    , peOne
 		    , peTwo
@@ -3719,6 +3812,8 @@
                 , A.createDate
                 , C.role 
                 , IF(A.bigo = 'null','',A.bigo) as bigo 
+                , IF(A.machineType = 'null','',A.machineType) as machineType 
+                , IF(A.topRpm = 'null','',A.topRpm) as topRpm 
                 , IF(A.sprCol1 = 'null','',A.sprCol1) as sprCol1 
                 , B.constructionIdx 
 			 FROM TB_REPORT A , TB_DEVICE B, TB_CONSTRUCTION C
@@ -3786,6 +3881,8 @@
 		    , role
 		    , isDel
 		    , bigo
+		    , machineType
+		    , topRpm
 		    , sprCol1
 		    , peOne
 		    , peTwo
@@ -3848,6 +3945,8 @@
                 , A.createDate
                 , C.role 
                 , IF(A.bigo = 'null','',A.bigo) as bigo 
+                , IF(A.machineType = 'null','',A.machineType) as machineType 
+                , IF(A.topRpm = 'null','',A.topRpm) as topRpm 
                 , IF(A.sprCol1 = 'null','',A.sprCol1) as sprCol1 
                 , B.constructionIdx 
 			 FROM TB_REPORT A , TB_DEVICE B, TB_CONSTRUCTION C
@@ -3915,6 +4014,8 @@
 		    , role
 		    , isDel
 		    , bigo
+		    , machineType
+		    , topRpm
 		    , sprCol1
 		    , peOne
 		    , peTwo
@@ -3981,6 +4082,8 @@
                 , A.createDate
                 , C.role 
                 , IF(A.bigo = 'null','',A.bigo) as bigo 
+                , IF(A.machineType = 'null','',A.machineType) as machineType 
+                , IF(A.topRpm = 'null','',A.topRpm) as topRpm 
                 , IF(A.sprCol1 = 'null','',A.sprCol1) as sprCol1 
                 , B.constructionIdx 
 			 FROM TB_REPORT A , TB_DEVICE B, TB_CONSTRUCTION C
@@ -4028,6 +4131,8 @@
 		    , role
 		    , isDel
 		    , bigo
+		    , machineType
+		    , topRpm
 		    , sprCol1
 		    , peOne
 		    , peTwo
@@ -4096,6 +4201,8 @@
                 , A.createDate
                 , C.role 
                 , IF(A.bigo = 'null','',A.bigo) as bigo 
+                , IF(A.machineType = 'null','',A.machineType) as machineType 
+                , IF(A.topRpm = 'null','',A.topRpm) as topRpm 
                 , IF(A.sprCol1 = 'null','',A.sprCol1) as sprCol1 
                 , B.constructionIdx 
 			 FROM TB_REPORT A , TB_DEVICE B, TB_CONSTRUCTION C
@@ -4161,6 +4268,8 @@
 		    , role
 		    , isDel
 		    , bigo
+		    , machineType
+		    , topRpm
 		    , sprCol1
 		    , peOne
 		    , peTwo
@@ -4223,6 +4332,8 @@
                 , A.createDate
                 , C.role 
                 , IF(A.bigo = 'null','',A.bigo) as bigo 
+                , IF(A.machineType = 'null','',A.machineType) as machineType 
+                , IF(A.topRpm = 'null','',A.topRpm) as topRpm 
                 , IF(A.sprCol1 = 'null','',A.sprCol1) as sprCol1 
                 , B.constructionIdx 
 			 FROM TB_REPORT A , TB_DEVICE B, TB_CONSTRUCTION C
@@ -4239,7 +4350,7 @@
     
     <insert id="insertG" parameterType="GReport">
 	    INSERT INTO TB_REPORT
-	    ( deviceIdx, currentDateTime, location, pileNo , pileStandard, drillingDepth , intrusionDepth, balance, connectLength, managedStandard, avgPenetrationValue, totalPenetrationValue, hammaT, fallMeter, pileType, method, totalConnectWidth, ultimateBearingCapacity, crossSection , hammaEfficiency , modulusElasticity 
+	    ( topRpm, deviceIdx, currentDateTime, location, pileNo , pileStandard, drillingDepth , intrusionDepth, balance, connectLength, managedStandard, avgPenetrationValue, totalPenetrationValue, hammaT, fallMeter, pileType, machineType, method, totalConnectWidth, ultimateBearingCapacity, crossSection , hammaEfficiency , modulusElasticity 
 	    	
 	    	<choose>
 	    		<when test="bigo != null and bigo != '' and bigo != null and bigo != ''">
@@ -4249,7 +4360,7 @@
 	    	
 	    	, createDate , gongSac, `version`  )
 	     VALUES 
-	     ( #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo} , #{pileStandard},  #{drillingDepth} , #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter},  #{pileType}, #{method}, #{totalConnectWidth},  #{ultimateBearingCapacity} , #{crossSection} , #{hammaEfficiency} , #{modulusElasticity} 
+	     ( #{topRpm}, #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo} , #{pileStandard},  #{drillingDepth} , #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter},  #{pileType}, #{machineType}, #{method}, #{totalConnectWidth},  #{ultimateBearingCapacity} , #{crossSection} , #{hammaEfficiency} , #{modulusElasticity} 
 	     	
 	     	<choose>
 	    		<when test="bigo != null and bigo != '' and bigo != null and bigo != ''">
@@ -4257,7 +4368,7 @@
 	    		</when>
 	    	</choose>
 	     	
-	      	, now(), #{gongSac}, #{version} )
+	      	, now(), #{storedGongSac}, #{version} )
 	    <selectKey resultType="int" keyProperty="id" order="AFTER">
         SELECT LAST_INSERT_ID()
     	</selectKey>
@@ -4265,7 +4376,7 @@
     
     <insert id="insertGOrigin" parameterType="GReport">
 	    INSERT INTO TB_REPORT_ORIGIN
-	    ( id, deviceIdx, currentDateTime, location, pileNo , pileStandard, drillingDepth , intrusionDepth, balance, connectLength, managedStandard, avgPenetrationValue, totalPenetrationValue, hammaT, fallMeter, pileType, method, totalConnectWidth, ultimateBearingCapacity, crossSection , hammaEfficiency , modulusElasticity 
+	    ( topRpm, id, deviceIdx, currentDateTime, location, pileNo , pileStandard, drillingDepth , intrusionDepth, balance, connectLength, managedStandard, avgPenetrationValue, totalPenetrationValue, hammaT, fallMeter, pileType, machineType, method, totalConnectWidth, ultimateBearingCapacity, crossSection , hammaEfficiency , modulusElasticity 
 	    	
 	    	<choose>
 	    		<when test="bigo != null and bigo != '' and bigo != null and bigo != ''">
@@ -4275,7 +4386,7 @@
 	    	
 	    	, createDate , gongSac  )
 	     VALUES 
-	     ( #{id}, #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo} , #{pileStandard},  #{drillingDepth} , #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter},  #{pileType}, #{method}, #{totalConnectWidth},  #{ultimateBearingCapacity} , #{crossSection} , #{hammaEfficiency} , #{modulusElasticity} 
+	     ( #{topRpm}, #{id}, #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo} , #{pileStandard},  #{drillingDepth} , #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter},  #{pileType}, #{machineType}, #{method}, #{totalConnectWidth},  #{ultimateBearingCapacity} , #{crossSection} , #{hammaEfficiency} , #{modulusElasticity} 
 	     	
 	     	<choose>
 	    		<when test="bigo != null and bigo != '' and bigo != null and bigo != ''">
@@ -4283,12 +4394,12 @@
 	    		</when>
 	    	</choose>
 	     	
-	     	, now(), #{gongSac} )
+	     	, now(), #{storedGongSac} )
     </insert>
     
     <insert id="insertG2" parameterType="GReport">
 	    INSERT INTO TB_REPORT
-	    ( deviceIdx, currentDateTime, location, pileNo , pileStandard, drillingDepth , intrusionDepth, balance, connectLength, managedStandard, avgPenetrationValue, totalPenetrationValue, hammaT, fallMeter, pileType, method, totalConnectWidth, ultimateBearingCapacity , crossSection , hammaEfficiency , modulusElasticity 
+	    ( topRpm, deviceIdx, currentDateTime, location, pileNo , pileStandard, drillingDepth , intrusionDepth, balance, connectLength, managedStandard, avgPenetrationValue, totalPenetrationValue, hammaT, fallMeter, pileType, machineType, method, totalConnectWidth, ultimateBearingCapacity , crossSection , hammaEfficiency , modulusElasticity 
 	    	<choose>
 	    		<when test="bigo != null and bigo != '' and bigo != null and bigo != ''">
 	    		, bigo 
@@ -4296,13 +4407,13 @@
 	    	</choose>
 	     	, createDate , gongSac, `version`  )
 	     VALUES 
-	     ( #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo} , #{pileStandard},  #{drillingDepth} , #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter},  #{pileType}, #{method}, #{totalConnectWidth},   #{ultimateBearingCapacity}, #{crossSection} , #{hammaEfficiency} , #{modulusElasticity} 
+	     ( #{topRpm}, #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo} , #{pileStandard},  #{drillingDepth} , #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter},  #{pileType}, #{machineType}, #{method}, #{totalConnectWidth},   #{ultimateBearingCapacity}, #{crossSection} , #{hammaEfficiency} , #{modulusElasticity} 
 	     	<choose>
 	    		<when test="bigo != null and bigo != '' and bigo != null and bigo != ''">
 	    		,  #{bigo} 
 	    		</when>
 	    	</choose>
-	      	, #{createDate}, #{gongSac}, #{version} )
+	      	, #{createDate}, #{storedGongSac}, #{version} )
 	    <selectKey resultType="int" keyProperty="id" order="AFTER">
         	SELECT LAST_INSERT_ID()
     	</selectKey>
@@ -4311,7 +4422,7 @@
     
      <insert id="insertG2Origin" parameterType="GReport">
 	    INSERT INTO TB_REPORT_ORIGIN
-	    ( id, deviceIdx, currentDateTime, location, pileNo , pileStandard, drillingDepth , intrusionDepth, balance, connectLength, managedStandard, avgPenetrationValue, totalPenetrationValue, hammaT, fallMeter, pileType, method, totalConnectWidth, ultimateBearingCapacity , crossSection , hammaEfficiency , modulusElasticity 
+	    ( topRpm, id, deviceIdx, currentDateTime, location, pileNo , pileStandard, drillingDepth , intrusionDepth, balance, connectLength, managedStandard, avgPenetrationValue, totalPenetrationValue, hammaT, fallMeter, pileType, machineType, method, totalConnectWidth, ultimateBearingCapacity , crossSection , hammaEfficiency , modulusElasticity 
 	    	<choose>
 	    		<when test="bigo != null and bigo != '' and bigo != null and bigo != ''">
 	    		, bigo 
@@ -4319,13 +4430,13 @@
 	    	</choose>
 	    	, createDate , gongSac  )
 	     VALUES 
-	     ( #{id}, #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo} , #{pileStandard},  #{drillingDepth} , #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter},  #{pileType}, #{method}, #{totalConnectWidth},   #{ultimateBearingCapacity}, #{crossSection} , #{hammaEfficiency} , #{modulusElasticity} 
+	     ( #{topRpm}, #{id}, #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo} , #{pileStandard},  #{drillingDepth} , #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter},  #{pileType}, #{machineType}, #{method}, #{totalConnectWidth},   #{ultimateBearingCapacity}, #{crossSection} , #{hammaEfficiency} , #{modulusElasticity} 
 	     	<choose>
 	    		<when test="bigo != null and bigo != '' and bigo != null and bigo != ''">
 	    		,  #{bigo} 
 	    		</when>
 	    	</choose>
-	     	, #{createDate}, #{gongSac} )
+	     	, #{createDate}, #{storedGongSac} )
     </insert> 
        
        
@@ -4348,7 +4459,7 @@
     <insert id="insertCopiedReport" parameterType="net.octacomm.sample.domain.UpdateReport">
 	    INSERT INTO TB_REPORT 
 	    (
-	        deviceIdx, currentDateTime, location, pileNo, pileStandard, 
+	        machineType, topRpm, deviceIdx, currentDateTime, location, pileNo, pileStandard, 
 	        drillingDepth, gongSac, directDrillingDepth, stDrillingDepth, sdDrillingDepth,
 	        intrusionDepth, balance, connectLength, managedStandard, 
 	        avgPenetrationValue, totalPenetrationValue, hammaT, fallMeter, 
@@ -4357,8 +4468,8 @@
 	    )
 	    VALUES 
 	    (
-	        #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo}, #{pileStandard}, 
-	        #{drillingDepth}, #{gongSac}, #{directDrillingDepth}, #{stDrillingDepth}, #{sdDrillingDepth},
+	        #{machineType}, #{topRpm}, #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo}, #{pileStandard}, 
+	        #{drillingDepth}, #{storedGongSac}, #{directDrillingDepth}, #{stDrillingDepth}, #{sdDrillingDepth},
 	        #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, 
 	        #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter}, 
 	        #{pileType}, #{method}, #{totalConnectWidth}, #{ultimateBearingCapacity}, 

@@ -14,6 +14,8 @@
 		H.pileNo,
 		H.pileStandard,
 		H.drillingDepth,
+		H.gongSac,
+		H.`version`,
 		H.directDrillingDepth,
 		H.stDrillingDepth,
 		H.sdDrillingDepth,
@@ -35,6 +37,8 @@
 		H.modulusElasticity,
 		H.bigo,
 		H.isDuple,
+		H.machineType,
+		H.topRpm,
 		H.sprCol1,
 		D.constructionIdx AS constructionIdx,
 		D.machineNumber AS machineNumber,
@@ -57,6 +61,8 @@
 			pileNo,
 			pileStandard,
 			drillingDepth,
+			gongSac,
+			`version`,
 			directDrillingDepth,
 			stDrillingDepth,
 			sdDrillingDepth,
@@ -79,6 +85,8 @@
 			modulusElasticity,
 			bigo,
 			isDuple,
+			machineType,
+			topRpm,
 			sprCol1
 		)
 		SELECT
@@ -92,6 +100,8 @@
 			R.pileNo,
 			R.pileStandard,
 			R.drillingDepth,
+			R.gongSac,
+			R.`version`,
 			R.directDrillingDepth,
 			R.stDrillingDepth,
 			R.sdDrillingDepth,
@@ -114,6 +124,8 @@
 			R.modulusElasticity,
 			R.bigo,
 			R.isDuple,
+			R.machineType,
+			R.topRpm,
 			R.sprCol1
 		FROM TB_REPORT R
 		WHERE R.id = #{reportId}
@@ -246,6 +258,8 @@
 			R.pileNo,
 			R.pileStandard,
 			R.drillingDepth,
+			R.gongSac,
+			R.`version`,
 			R.directDrillingDepth,
 			R.stDrillingDepth,
 			R.sdDrillingDepth,
@@ -267,6 +281,8 @@
 			R.modulusElasticity,
 			R.bigo,
 			R.isDuple,
+			R.machineType,
+			R.topRpm,
 			R.sprCol1,
 			CAST(R.balance AS CHAR) AS balanceSnapshot,
 			(SELECT P.value FROM TB_PENETRATION P WHERE P.reportIdx = R.id ORDER BY P.id LIMIT 0, 1) AS p1,

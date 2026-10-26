@@ -12,6 +12,8 @@ public class UpdateReport implements Domain {
 	private int deviceIdx;
 	//파일종류 2020-05-13 new
 	private String pileType;
+	// 항타기 종류
+	private String machineType;
 	//공법 2020-05-13 new
 	private String method;
 	//파일규격
@@ -83,15 +85,18 @@ public class UpdateReport implements Domain {
     private String bigo;
     
     private String sprCol1;
+	// 상부RPM (기존 sprCol1과 별도 저장)
+	private String topRpm;
     
     private int isDuple;
 	
 	public float getGongSac() {
 		return gongSac;
 	}
-	public void setGongSac(float gongSac) {
+	public void setGongSac(Float gongSac) {
 		this.gongSacProvided = true;
-		this.gongSac = gongSac;
+		this.gongSacNull = gongSac == null;
+		this.gongSac = gongSac == null ? 0.0f : gongSac;
 	}
 
 	public boolean isGongSacProvided() {
@@ -100,6 +105,7 @@ public class UpdateReport implements Domain {
 
 	/* 요청에 gongSac이 없을 때 */
 	public void setExistingGongSac(Float gongSac) {
+		this.gongSacNull = gongSac == null;
 		this.gongSac = gongSac == null ? 0.0f : gongSac;
 	}
 
@@ -305,4 +311,9 @@ public class UpdateReport implements Domain {
 		}
 	}
 
+    // 계산 표시값이나 레거시 NULL을 0으로 바꾸어 저장하지 않는다.
+    @org.codehaus.jackson.annotate.JsonIgnore
+    public Float getStoredGongSac() {
+        return gongSacNull || preserveNullGongSac ? null : Float.valueOf(gongSac);
+    }
 }

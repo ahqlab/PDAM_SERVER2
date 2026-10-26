@@ -732,6 +732,7 @@ public class TrashbinController {
 
 		try {
 			// 기존 기록지 수정 로직 실행 직전 전체 스냅샷 저장
+			preserveGongSac(report);
 			reportHistoryService.saveBeforeChange(report.getId(), ReportHistoryService.STATUS_UPDATE, (String) session.getAttribute("userId"));
 		} catch (Exception e) {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -768,6 +769,7 @@ public class TrashbinController {
 		//원상태값
 		//Report rp = mapper.get(report.getId());
 		// 기존 기록지 수정 로직 실행 직전 전체 스냅샷 저장
+		preserveGongSac(report);
 		reportHistoryService.saveBeforeChange(report.getId(), ReportHistoryService.STATUS_UPDATE, userId);
 		report.setUltimateBearingCapacity(String.valueOf(calDanish(report)));
 		//report.setUltimateBearingCapacity(report.getUltimateBearingCapacity());
@@ -944,5 +946,18 @@ public class TrashbinController {
 		sessionInfo.setShowPdfYn((Boolean) session.getAttribute("showPdfYn"));	
 	    model.addAttribute("sessionInfo", sessionInfo);
 	}
+    // V2 원본 NULL은 유지하고, 공삭을 생략한 요청은 DB 원본값을 사용한다.
+    private void preserveGongSac(UpdateReport report) {
+        Report existing = mapper.get(report.getId());
+        if (existing == null) {
+            throw new IllegalArgumentException("Report does not exist: " + report.getId());
+        }
+        Float originalGongSac = existing.getStoredGongSac();
+        if (!report.isGongSacProvided()) {
+            report.setExistingGongSac(originalGongSac);
+        }
+        report.setPreserveNullGongSac(originalGongSac == null);
+        report.setVersion(report.getStoredGongSac() == null ? "v2" : "v3");
+    }
 }
 

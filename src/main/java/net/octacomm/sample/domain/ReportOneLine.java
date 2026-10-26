@@ -20,6 +20,8 @@ public class ReportOneLine implements Domain {
 	private String currentDateTime;
 	//파일종류 2020-05-13 new
 	private String pileType;
+	// 항타기 종류
+	private String machineType;
 	//공법 2020-05-13 new
 	private String method;
 	//파일규격
@@ -82,6 +84,8 @@ public class ReportOneLine implements Domain {
 	private String bigo;
 	
 	private String sprCol1;
+	// 상부RPM
+	private String topRpm;
 	
 	private int todayConstruction;
 	
@@ -356,4 +360,9 @@ public class ReportOneLine implements Domain {
 	private String groupName;
 	
 	private String constructionName;
+    // 표시용 자동 계산과 분리한 DB 저장 원본값. NULL과 실제 0을 구분한다.
+    @org.codehaus.jackson.annotate.JsonIgnore
+    public Float getStoredGongSac() {
+        return gongSacNull ? null : Float.valueOf(gongSac);
+    }
 }
