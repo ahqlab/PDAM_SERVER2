@@ -1114,6 +1114,9 @@ public class ReportController{
 		try {
 			// 클라이언트가 빈 값을 0으로 보내더라도 DB의 기존 NULL은 유지한다.
 			Float originalGongSac = mapper.getRawGongSac(report.getId());
+			if (!report.isGongSacProvided()) {
+				report.setExistingGongSac(originalGongSac);
+			}
 			report.setVersion(originalGongSac == null ? "v2" : "v3");
 			if (originalGongSac == null) {
 				report.setPreserveNullGongSac(true);
@@ -1207,6 +1210,9 @@ public class ReportController{
 		reportHistoryService.saveBeforeChange(report.getId(), ReportHistoryService.STATUS_UPDATE, userId);
 		// V2에서 전송한 기록지의 NULL 공삭공은 수정 요청으로 0/계산값으로 바꾸지 않음
 		Float originalGongSac = mapper.getRawGongSac(report.getId());
+		if (!report.isGongSacProvided()) {
+			report.setExistingGongSac(originalGongSac);
+		}
 		report.setVersion(originalGongSac == null ? "v2" : "v3");
 		if (originalGongSac == null) {
 			report.setPreserveNullGongSac(true);
@@ -1464,7 +1470,11 @@ public class ReportController{
 	        // 복사 원본이 NULL이면 새 기록지에도 NULL을 그대로 저장
 	        Float sourceGongSac = newReport.getSourceReportId() > 0
 	                ? mapper.getRawGongSac(newReport.getSourceReportId())
-	                : (newReport.isGongSacNull() ? null : newReport.getGongSac());
+	                : (!newReport.isGongSacProvided() || newReport.isGongSacNull()
+	                        ? null : newReport.getGongSac());
+	        if (newReport.getSourceReportId() > 0 && !newReport.isGongSacProvided()) {
+	            newReport.setExistingGongSac(sourceGongSac);
+	        }
 	        newReport.setVersion(sourceGongSac == null ? "v2" : "v3");
 	        if (sourceGongSac == null) {
 	            newReport.setPreserveNullGongSac(true);

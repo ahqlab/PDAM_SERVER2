@@ -138,7 +138,11 @@ public interface ReportMapper extends CRUDMapper<Report, ReportParam, Integer> {
 	
 
 	@Select("        SELECT " + 
-			"			      count(distinct deviceIdx,location, pileNo) " + 
+			"			      count(distinct deviceIdx,location, pileNo, " +
+			"IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx = TB_REPORT.deviceIdx OR (deviceIdx = 0 AND constructionIdx = (SELECT constructionIdx FROM TB_DEVICE WHERE id = TB_REPORT.deviceIdx)) OR (deviceIdx = 0 AND constructionIdx = 0) ORDER BY deviceIdx <> 0 DESC, constructionIdx <> 0 DESC LIMIT 1), pileStandard, ''), " +
+			"IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx = TB_REPORT.deviceIdx OR (deviceIdx = 0 AND constructionIdx = (SELECT constructionIdx FROM TB_DEVICE WHERE id = TB_REPORT.deviceIdx)) OR (deviceIdx = 0 AND constructionIdx = 0) ORDER BY deviceIdx <> 0 DESC, constructionIdx <> 0 DESC LIMIT 1), pileType, ''), " +
+			"IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx = TB_REPORT.deviceIdx OR (deviceIdx = 0 AND constructionIdx = (SELECT constructionIdx FROM TB_DEVICE WHERE id = TB_REPORT.deviceIdx)) OR (deviceIdx = 0 AND constructionIdx = 0) ORDER BY deviceIdx <> 0 DESC, constructionIdx <> 0 DESC LIMIT 1), method, '')" +
+			") " + 
 			"			    FROM " + 
 			"			        TB_REPORT " + 
 			"			    WHERE " + 
