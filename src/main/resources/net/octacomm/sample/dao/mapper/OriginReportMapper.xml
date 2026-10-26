@@ -133,6 +133,7 @@
 			pileNo ,
 			pileStandard ,
 			drillingDepth ,
+			gongSac ,
 			intrusionDepth ,
 			balance ,
 			connectLength ,
@@ -167,6 +168,8 @@
 	    		</otherwise>
 	    	</choose>			
 			bigo,
+			machineType,
+			topRpm,
 			sprCol1
 		FROM (
 	    	SELECT
@@ -180,6 +183,7 @@
 				A.location , A.pileNo ,
 				A.pileStandard ,
 				A.drillingDepth ,
+				A.gongSac ,
 				A.intrusionDepth ,
 				A.balance ,
 				A.connectLength ,
@@ -198,6 +202,8 @@
 				A.isDel, 
 				A.isDuple, 
 				IF(A.bigo = 'null','',A.bigo) as bigo , 
+				IF(A.machineType = 'null','',A.machineType) as machineType , 
+				IF(A.topRpm = 'null','',A.topRpm) as topRpm , 
 				IF(A.sprCol1 = 'null','',A.sprCol1) as sprCol1 , 
      			A.createDate ,
      			<choose>
@@ -293,6 +299,7 @@
 			pileNo ,
 			pileStandard ,
 			drillingDepth ,
+			gongSac ,
 			intrusionDepth ,
 			balance ,
 			connectLength ,
@@ -312,6 +319,8 @@
 			role, 
 			isDel, 
 			bigo,
+			machineType,
+			topRpm,
 			sprCol1
 		FROM (
 	    	SELECT
@@ -324,6 +333,7 @@
 				A.location , A.pileNo ,
 				A.pileStandard ,
 				A.drillingDepth ,
+				A.gongSac ,
 				A.intrusionDepth ,
 				A.balance ,
 				A.connectLength ,
@@ -343,6 +353,8 @@
 				A.createDate ,
 				C.role ,
 				IF(A.bigo = 'null','',A.bigo) as bigo ,
+				IF(A.machineType = 'null','',A.machineType) as machineType ,
+				IF(A.topRpm = 'null','',A.topRpm) as topRpm ,
 				IF(A.sprCol1 = 'null','',A.sprCol1) as sprCol1 ,
 				case when @grp = date_format(A.createDate, '%Y-%m-%d') then @rownum:=@rownum + 1 else @rownum :=1 end as rownum,
 				(@grp := date_format(A.currentDateTime, '%Y-%m-%d')) as dum 
@@ -388,6 +400,7 @@
 			pileNo ,
 			pileStandard ,
 			drillingDepth ,
+			gongSac ,
 			intrusionDepth ,
 			balance ,
 			connectLength ,
@@ -407,6 +420,8 @@
 			role,
 			isDel, 
 			bigo,
+			machineType,
+			topRpm,
 			sprCol1,
 			peOne,
 	        peTwo,
@@ -435,6 +450,7 @@
 				A.location , A.pileNo ,
 				A.pileStandard ,
 				A.drillingDepth ,
+				A.gongSac ,
 				A.intrusionDepth ,
 				A.balance ,
 				A.connectLength ,
@@ -470,6 +486,8 @@
 	            A.createDate,
 	            C.role ,
 				IF(A.bigo = 'null','',A.bigo) as bigo ,
+				IF(A.machineType = 'null','',A.machineType) as machineType ,
+				IF(A.topRpm = 'null','',A.topRpm) as topRpm ,
 				IF(A.sprCol1 = 'null','',A.sprCol1) as sprCol1 ,
 				case when @grp = date_format(A.createDate, '%Y-%m-%d') then @rownum:=@rownum + 1 else @rownum :=1 end as rownum,
 				(@grp := date_format(A.currentDateTime, '%Y-%m-%d')) as dum 
@@ -516,6 +534,7 @@
 			pileNo ,
 			pileStandard ,
 			drillingDepth ,
+			gongSac ,
 			intrusionDepth ,
 			balance ,
 			connectLength ,
@@ -535,6 +554,8 @@
 			role,
 			isDel, 
 			bigo,
+			machineType,
+			topRpm,
 			sprCol1,
 			peOne,
 	        peTwo,
@@ -558,6 +579,7 @@
 				A.location , A.pileNo ,
 				A.pileStandard ,
 				A.drillingDepth ,
+				A.gongSac ,
 				A.intrusionDepth ,
 				A.balance ,
 				A.connectLength ,
@@ -588,6 +610,8 @@
 	            A.createDate,
 	            C.role ,
 				IF(A.bigo = 'null','',A.bigo) as bigo ,
+				IF(A.machineType = 'null','',A.machineType) as machineType ,
+				IF(A.topRpm = 'null','',A.topRpm) as topRpm ,
 				IF(A.sprCol1 = 'null','',A.sprCol1) as sprCol1 ,
 				case when @grp = date_format(A.createDate, '%Y-%m-%d') then @rownum:=@rownum + 1 else @rownum :=1 end as rownum,
 				(@grp := date_format(A.currentDateTime, '%Y-%m-%d')) as dum 
@@ -623,7 +647,7 @@
     
     <insert id="insert" parameterType="Report">
 	    INSERT INTO TB_REPORT_ORIGIN
-	    ( deviceIdx, currentDateTime, location, pileNo , pileStandard, drillingDepth , intrusionDepth, balance, connectLength, managedStandard, avgPenetrationValue, totalPenetrationValue, hammaT, fallMeter, pileType, method, totalConnectWidth, ultimateBearingCapacity, crossSection , hammaEfficiency , modulusElasticity 
+	    ( machineType, topRpm, deviceIdx, currentDateTime, location, pileNo , pileStandard, drillingDepth , intrusionDepth, balance, connectLength, managedStandard, avgPenetrationValue, totalPenetrationValue, hammaT, fallMeter, pileType, method, totalConnectWidth, ultimateBearingCapacity, crossSection , hammaEfficiency , modulusElasticity 
 	    	
 	    	<choose>
 	    		<when test="bigo != null and bigo != '' and bigo != null and bigo != ''">
@@ -631,9 +655,9 @@
 	    		</when>
 	    	</choose>
 	    	
-	    	, createDate  )
+	    	, gongSac, createDate  )
 	     VALUES 
-	     ( #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo} , #{pileStandard},  #{drillingDepth} , #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter},  #{pileType}, #{method}, #{totalConnectWidth},  #{ultimateBearingCapacity} , #{crossSection} , #{hammaEfficiency} , #{modulusElasticity} 
+	     ( #{machineType}, #{topRpm}, #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo} , #{pileStandard},  #{drillingDepth} , #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter},  #{pileType}, #{method}, #{totalConnectWidth},  #{ultimateBearingCapacity} , #{crossSection} , #{hammaEfficiency} , #{modulusElasticity} 
 	     	
 	     	<choose>
 	    		<when test="bigo != null and bigo != '' and bigo != null and bigo != ''">
@@ -641,7 +665,7 @@
 	    		</when>
 	    	</choose>
 	     	
-	     	, now() )
+	     	, #{storedGongSac}, now() )
 	    <selectKey resultType="int" keyProperty="id" order="AFTER">
         SELECT LAST_INSERT_ID()
     	</selectKey>
@@ -649,7 +673,7 @@
     
     <insert id="insertOrigin" parameterType="Report">
 	    INSERT INTO TB_REPORT_ORIGIN
-	    ( id, deviceIdx, currentDateTime, location, pileNo , pileStandard, drillingDepth , intrusionDepth, balance, connectLength, managedStandard, avgPenetrationValue, totalPenetrationValue, hammaT, fallMeter, pileType, method, totalConnectWidth, ultimateBearingCapacity, crossSection , hammaEfficiency , modulusElasticity 
+	    ( machineType, topRpm, id, deviceIdx, currentDateTime, location, pileNo , pileStandard, drillingDepth , intrusionDepth, balance, connectLength, managedStandard, avgPenetrationValue, totalPenetrationValue, hammaT, fallMeter, pileType, method, totalConnectWidth, ultimateBearingCapacity, crossSection , hammaEfficiency , modulusElasticity 
 	    	
 	    	<choose>
 	    		<when test="bigo != null and bigo != '' and bigo != null and bigo != ''">
@@ -657,9 +681,9 @@
 	    		</when>
 	    	</choose>
 	    	
-	    	, createDate  )
+	    	, gongSac, createDate  )
 	     VALUES 
-	     ( #{id}, #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo} , #{pileStandard},  #{drillingDepth} , #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter},  #{pileType}, #{method}, #{totalConnectWidth},  #{ultimateBearingCapacity} , #{crossSection} , #{hammaEfficiency} , #{modulusElasticity} 
+	     ( #{machineType}, #{topRpm}, #{id}, #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo} , #{pileStandard},  #{drillingDepth} , #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter},  #{pileType}, #{method}, #{totalConnectWidth},  #{ultimateBearingCapacity} , #{crossSection} , #{hammaEfficiency} , #{modulusElasticity} 
 	     	
 	     	<choose>
 	    		<when test="bigo != null and bigo != '' and bigo != null and bigo != ''">
@@ -667,26 +691,26 @@
 	    		</when>
 	    	</choose>
 	     	
-	     	, now() )
+	     	, #{storedGongSac}, now() )
     </insert>
     
     <insert id="insert2" parameterType="Report">
 	    INSERT INTO TB_REPORT_ORIGIN
-	    ( deviceIdx, currentDateTime, location, pileNo , pileStandard, drillingDepth , intrusionDepth, balance, connectLength, managedStandard, avgPenetrationValue, totalPenetrationValue, hammaT, fallMeter, pileType, method, totalConnectWidth, ultimateBearingCapacity , crossSection , hammaEfficiency , modulusElasticity 
+	    ( machineType, topRpm, deviceIdx, currentDateTime, location, pileNo , pileStandard, drillingDepth , intrusionDepth, balance, connectLength, managedStandard, avgPenetrationValue, totalPenetrationValue, hammaT, fallMeter, pileType, method, totalConnectWidth, ultimateBearingCapacity , crossSection , hammaEfficiency , modulusElasticity 
 	    	<choose>
 	    		<when test="bigo != null and bigo != '' and bigo != null and bigo != ''">
 	    		, bigo 
 	    		</when>
 	    	</choose>
-	    	, createDate  )
+	    	, gongSac, createDate  )
 	     VALUES 
-	     ( #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo} , #{pileStandard},  #{drillingDepth} , #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter},  #{pileType}, #{method}, #{totalConnectWidth},   #{ultimateBearingCapacity}, #{crossSection} , #{hammaEfficiency} , #{modulusElasticity} 
+	     ( #{machineType}, #{topRpm}, #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo} , #{pileStandard},  #{drillingDepth} , #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter},  #{pileType}, #{method}, #{totalConnectWidth},   #{ultimateBearingCapacity}, #{crossSection} , #{hammaEfficiency} , #{modulusElasticity} 
 	     	<choose>
 	    		<when test="bigo != null and bigo != '' and bigo != null and bigo != ''">
 	    		,  #{bigo} 
 	    		</when>
 	    	</choose>
-	     	, #{createDate} )
+	     	, #{storedGongSac}, #{createDate} )
 	    <selectKey resultType="int" keyProperty="id" order="AFTER">
         	SELECT LAST_INSERT_ID()
     	</selectKey>
@@ -694,21 +718,21 @@
     
      <insert id="insert2Origin" parameterType="Report">
 	    INSERT INTO TB_REPORT_ORIGIN
-	    ( id, deviceIdx, currentDateTime, location, pileNo , pileStandard, drillingDepth , intrusionDepth, balance, connectLength, managedStandard, avgPenetrationValue, totalPenetrationValue, hammaT, fallMeter, pileType, method, totalConnectWidth, ultimateBearingCapacity , crossSection , hammaEfficiency , modulusElasticity 
+	    ( machineType, topRpm, id, deviceIdx, currentDateTime, location, pileNo , pileStandard, drillingDepth , intrusionDepth, balance, connectLength, managedStandard, avgPenetrationValue, totalPenetrationValue, hammaT, fallMeter, pileType, method, totalConnectWidth, ultimateBearingCapacity , crossSection , hammaEfficiency , modulusElasticity 
 	    	<choose>
 	    		<when test="bigo != null and bigo != '' and bigo != null and bigo != ''">
 	    		, bigo 
 	    		</when>
 	    	</choose>
-	    	, createDate  )
+	    	, gongSac, createDate  )
 	     VALUES 
-	     ( #{id}, #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo} , #{pileStandard},  #{drillingDepth} , #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter},  #{pileType}, #{method}, #{totalConnectWidth},   #{ultimateBearingCapacity}, #{crossSection} , #{hammaEfficiency} , #{modulusElasticity} 
+	     ( #{machineType}, #{topRpm}, #{id}, #{deviceIdx}, #{currentDateTime}, #{location}, #{pileNo} , #{pileStandard},  #{drillingDepth} , #{intrusionDepth}, #{balance}, #{connectLength}, #{managedStandard}, #{avgPenetrationValue}, #{totalPenetrationValue}, #{hammaT}, #{fallMeter},  #{pileType}, #{method}, #{totalConnectWidth},   #{ultimateBearingCapacity}, #{crossSection} , #{hammaEfficiency} , #{modulusElasticity} 
 	     	<choose>
 	    		<when test="bigo != null and bigo != '' and bigo != null and bigo != ''">
 	    		,  #{bigo} 
 	    		</when>
 	    	</choose>
-	     	, #{createDate} )
+	     	, #{storedGongSac}, #{createDate} )
     </insert>  
        
 </mapper>
