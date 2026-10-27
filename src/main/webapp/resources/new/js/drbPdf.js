@@ -31,20 +31,22 @@ function drawAutoFitText(doc, text, x, y, maxWidth, options = { align: 'left' },
     doc.setFontSize(originalFontSize);
 }
 
-function drawLegend(doc){
+// 항타기종류/상부RPM 행이 추가된 만큼(extraRowOffset) 범례를 아래로 민다.
+function drawLegend(doc, extraRowOffset){
+	var offset = extraRowOffset || 0;
 	var pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
 	var lectLeftPadding = 15;
 	doc.setFontSize(8);
 	doc.setFillColor(0,173,239);
-	doc.rect(15, 92.8 + 5, 10, 4, 'FD'); //Fill and Border
-    doc.text('관입량', 27 , 95.5 + 5, {align: 'left'});
-    
+	doc.rect(15, 92.8 + 5 + offset, 10, 4, 'FD'); //Fill and Border
+    doc.text('관입량', 27 , 95.5 + 5 + offset, {align: 'left'});
+
     //doc.setFillColor(63,232,108);
     doc.setFillColor(0,153,0);
-	doc.rect(41.5, 92.8 + 5, 10, 4, 'FD'); //Fill and Border
-    doc.text('관입량의 차', 53.5 , 95.5 + 5, {align: 'left'});
-    
-    doc.text('( 단위 / mm )', pageWidth - lectLeftPadding , 96 + 5, {align: 'right'});
+	doc.rect(41.5, 92.8 + 5 + offset, 10, 4, 'FD'); //Fill and Border
+    doc.text('관입량의 차', 53.5 , 95.5 + 5 + offset, {align: 'left'});
+
+    doc.text('( 단위 / mm )', pageWidth - lectLeftPadding , 96 + 5 + offset, {align: 'right'});
 }
 
 function writeValue(penetrations , pointArr, doc, index){
@@ -127,7 +129,8 @@ function drawCompactChart(
 	    currentAvgPenetrationValue,
 	    currentTotalPenetrationValue,
 	    constructionIdx,
-	    signRoomData
+	    signRoomData,
+	    extraRowOffset
 	) {
 
 	    // =========================
@@ -136,7 +139,8 @@ function drawCompactChart(
 	    var lectLeftPadding   = 15;
 	    var lectBottomPadding = 40;
 
-	    var lectTopY     = 134;
+	    // 항타기종류/상부RPM 행이 추가된 만큼(extraRowOffset) 그래프 상단을 아래로 민다.
+	    var lectTopY     = 134 + (extraRowOffset || 0);
 	    var graphBottomY = pageHeight - lectBottomPadding;
 	    var graphHeight  = graphBottomY - lectTopY;
 
@@ -401,15 +405,16 @@ function drawCompactChart(
 
 
 //그래프를 그린다.
-function drawChart(root, index, item, pageWidth, pageHeight, doc, currentAvgPenetrationValue , currentTotalPenetrationValue, constructionIdx, signRoomData){
-	
+function drawChart(root, index, item, pageWidth, pageHeight, doc, currentAvgPenetrationValue , currentTotalPenetrationValue, constructionIdx, signRoomData, extraRowOffset){
+
 	//var mode = 'center';
 	var mode = 'bottom';
-	
+
 	var lectLeftPadding = 15;
 	var lectBottomPadding = 40;
 	var lectStartY = 0;
-	var lectTopY = 100 + 4; //테이블 한줄 추가로 +5처리
+	// 항타기종류/상부RPM 행이 추가된 만큼(extraRowOffset) 그래프 상단을 아래로 민다.
+	var lectTopY = 100 + 4 + (extraRowOffset || 0); //테이블 한줄 추가로 +5처리
 	var lectHarfSize = 80;
 	if(mode == 'center'){
 		lectStartY = 95;
@@ -474,6 +479,8 @@ function drawChart(root, index, item, pageWidth, pageHeight, doc, currentAvgPene
 	}
 	//가로라인 그린다.
 	for(var i = upLevel; i < (mode == 'center' ? lectHarfSize : lectHarfSize * 2); i = i + upLevel){
+		// 격자선이 표/범례 영역(그래프 박스 위) 위로 넘어가면 더 이상 그리지 않는다 (겹침 방지).
+		if ((lectCenterHeight - i) < lectTopY) break;
 		doc.line(lectLeftPadding, lectCenterHeight - i, lectRightX, lectCenterHeight - i);
 		doc.text(k.toString(), lectLeftPadding - 2, (lectCenterHeight - i) + 1, {align: 'right'});
 		var ss = Number(k) +  Number(j);
@@ -526,8 +533,10 @@ function drawChart(root, index, item, pageWidth, pageHeight, doc, currentAvgPene
 		var Rvalue = numberOne * sum;
 		var Hvalue = lectCenterHeight.toFixed();
 		var cal = (Hvalue - Rvalue);
-	
-	
+		// 격자 스케일이 작게 잡히는 경우(평균관입 빈값 등) 선이 그래프 박스 밖(위)으로 튀어나가지 않도록 상단에서 자른다.
+		if (cal < lectTopY) cal = lectTopY;
+
+
 		//점찍기
 		if(i < penetrations.length){
 			//좌표 2단 배열
@@ -919,6 +928,8 @@ function downloadDrivingRecoredBook(root, constructionIdx, machineNumber, curren
 						var currentManagedStandard = item.managedStandard;
 						var currentAvgPenetrationValue = item.avgPenetrationValue;
 						var currentTotalPenetrationValue = item.totalPenetrationValue;
+						var currentMachineType = item.machineType;
+						var currentTopRpm = item.topRpm;
 						
 						var allPiece = '';
 						var allPieceValue = 0;
@@ -980,6 +991,13 @@ function downloadDrivingRecoredBook(root, constructionIdx, machineNumber, curren
 						    row.push({ c1: '파일길이(M)', c2: allPiece.substring(2, allPiece.length).trim()       , c3:'평균관입(mm)', c4:currentAvgPenetrationValue}); 
 						    row.push({ c1: '파일합계(M)', c2: allPieceValue       , c3:'최종관입(mm)', c4:currentTotalPenetrationValue}); 
 						}
+						// 항타기종류/상부RPM은 값이 있을 때만 행을 추가하고, 그만큼 아래 범례/그래프를 내린다.
+						var hasMachineTypeOrTopRpm = (currentMachineType && currentMachineType.trim() != '') || (currentTopRpm && currentTopRpm.trim() != '');
+						var extraRowOffset = 0;
+						if(constructionIdx != '1252' && hasMachineTypeOrTopRpm){
+							row.push({ c1: '항타기종류', c2: currentMachineType || '', c3: '상부RPM', c4: currentTopRpm || '' });
+							extraRowOffset = 7.2;
+						}
 						
 						
 					    
@@ -1030,20 +1048,20 @@ function downloadDrivingRecoredBook(root, constructionIdx, machineNumber, curren
 						doc.setProperties({            
 							title: 'PDF타이틀',        
 						});
-						drawLegend(doc);
-						
+						drawLegend(doc, extraRowOffset);
+
 						if(constructionIdx == 1550){
-							//여기에 넣어줘  <--	
+							//여기에 넣어줘  <--
 						}else{
 							//그 외 모든 현장
 						}
-						
+
 						if(option == 'Y'){
-							drawHitCountLegend(doc, 105);
+							drawHitCountLegend(doc, 105 + extraRowOffset);
 							//금도건설 조풍건설 구형 흑연사업 토건공사
-							drawCompactChart(root, index, item, pageWidth, pageHeight, doc, currentAvgPenetrationValue , currentTotalPenetrationValue, constructionIdx, signRoomData);
+							drawCompactChart(root, index, item, pageWidth, pageHeight, doc, currentAvgPenetrationValue , currentTotalPenetrationValue, constructionIdx, signRoomData, extraRowOffset);
 						}else{
-							drawChart(root, index, item, pageWidth, pageHeight, doc, currentAvgPenetrationValue , currentTotalPenetrationValue, constructionIdx, signRoomData);
+							drawChart(root, index, item, pageWidth, pageHeight, doc, currentAvgPenetrationValue , currentTotalPenetrationValue, constructionIdx, signRoomData, extraRowOffset);
 						}
 						
 						if(constructionIdx == 1508){
@@ -1154,6 +1172,8 @@ function downloadDrivingAllRecoredBook(root, constructionIdx, machineNumber){
 						var currentManagedStandard = item.managedStandard;
 						var currentAvgPenetrationValue = item.avgPenetrationValue;
 						var currentTotalPenetrationValue = item.totalPenetrationValue;
+						var currentMachineType = item.machineType;
+						var currentTopRpm = item.topRpm;
 						var currentGongSac = gongSacFixExp(item.balance, calGongSac(item.totalConnectWidth, item.intrusionDepth, item.drillingDepth, constructionIdx), constructionIdx);
 						
 						
@@ -1194,6 +1214,13 @@ function downloadDrivingAllRecoredBook(root, constructionIdx, machineNumber){
 					    row.push({ c1: '파일번호', c2: currentPileNo       , c3:'낙하높이(M)', c4:currentFallMeter }); 
 					    row.push({ c1: '파일길이(M)', c2: allPiece.substring(2, allPiece.length).trim()      , c3:'평균관입(mm)', c4:currentAvgPenetrationValue}); 
 					    row.push({ c1: '파일합계(M)', c2: allPieceValue       , c3:'최종관입(mm)', c4:currentTotalPenetrationValue}); 
+						// 항타기종류/상부RPM은 값이 있을 때만 행을 추가하고, 그만큼 아래 범례/그래프를 내린다.
+						var hasMachineTypeOrTopRpm = (currentMachineType && currentMachineType.trim() != '') || (currentTopRpm && currentTopRpm.trim() != '');
+						var extraRowOffset = 0;
+						if(hasMachineTypeOrTopRpm){
+							row.push({ c1: '항타기종류', c2: currentMachineType || '', c3: '상부RPM', c4: currentTopRpm || '' });
+							extraRowOffset = 7.2;
+						}
 						
 					    
 				    	var pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
@@ -1243,8 +1270,8 @@ function downloadDrivingAllRecoredBook(root, constructionIdx, machineNumber){
 						doc.setProperties({            
 							title: 'PDF타이틀',        
 						});
-						drawLegend(doc);
-						drawChart(root, index, item, pageWidth, pageHeight, doc, currentAvgPenetrationValue , currentTotalPenetrationValue, constructionIdx, signRoomData);
+						drawLegend(doc, extraRowOffset);
+						drawChart(root, index, item, pageWidth, pageHeight, doc, currentAvgPenetrationValue , currentTotalPenetrationValue, constructionIdx, signRoomData, extraRowOffset);
 						drawPageNumber(doc, index);
 						if(index < data.length - 1){
 							doc.addPage();

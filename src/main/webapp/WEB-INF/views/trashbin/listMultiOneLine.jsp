@@ -2856,7 +2856,7 @@
 			</table>
 		
 	<div id="main" style="width: 100%;height:300px; padding-top: 20px; padding-bottom:20px; background-color: white;"></div>
-    <script src="${pageContext.request.contextPath}/new/js/drbPdfByReportTable.js?123123"></script>
+    <script src="${pageContext.request.contextPath}/new/js/drbPdfByReportTable.js?${applicationScope.buildTime}"></script>
   <%--  	<c:choose>
 		<c:when test="${sessionInfo.role == 0}"> <!-- 슈퍼관리자 -->
 			<div class="tableCArea" style="margin-bottom: 5px; margin-top: 20px;">

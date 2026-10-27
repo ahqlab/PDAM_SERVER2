@@ -107,7 +107,7 @@ public class MobileController {
 		report.setVersion(report.isGongSacNull() ? "v2" : "v3");
 		System.err.println("/regist/report report sTring : "  + report);
 		System.err.println("/regist/report report : " + report.getGongSac() + " balance : " + report.getBalance());
-		applyModulusElasticity(report);
+		//applyModulusElasticity(report);
 		CommonResponse<Boolean> response = new CommonResponse<Boolean>();
 		try{
 			if(report.getCreateDate() != null) {
@@ -116,7 +116,7 @@ public class MobileController {
 				try {
 					reportMapper.insert2Origin(report);
 				}catch (Exception e) {
-					
+					e.printStackTrace();
 				}
 			}else {
 				System.err.println("여기서 입력이지??ㄴㄴㄴ");
@@ -125,8 +125,9 @@ public class MobileController {
 				try {
 					reportMapper.insertOrigin(report);
 				}catch (Exception e) {
+					e.printStackTrace();
 				}
-				
+
 			}
 		}catch (Exception e) {
 			System.err.println("insert  오류");
@@ -174,20 +175,24 @@ public class MobileController {
 		CommonResponse<Boolean> response = new CommonResponse<Boolean>();
 		for (Report report2 : report) {
 			report2.setVersion(report2.isGongSacNull() ? "v2" : "v3");
-			applyModulusElasticity(report2);
+			//applyModulusElasticity(report2);
 			try{
 				if(report2.getCreateDate() != null) {
 					reportMapper.insert2(report2);
 					if (report2.isGongSacNull()) reportMapper.clearGongSac(report2.getId());
 					try {
 						reportMapper.insert2Origin(report2);
-					}catch (Exception e) {}
+					}catch (Exception e) {
+						e.printStackTrace();
+					}
 				}else {
 					reportMapper.insert(report2);
 					if (report2.isGongSacNull()) reportMapper.clearGongSac(report2.getId());
 					try {
 						reportMapper.insertOrigin(report2);
-					}catch (Exception e) {}
+					}catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 			}catch (Exception e) {
 				System.err.println("insert  오류");
@@ -235,7 +240,7 @@ public class MobileController {
 	public CommonResponse<Boolean> registReport3(@RequestBody GReport report, BindingResult result){
 		System.err.println("report : " + report);
 		report.setVersion(report.isGongSacNull() ? "v2" : "v3");
-		applyModulusElasticity(report);
+		//applyModulusElasticity(report);
 		CommonResponse<Boolean> response = new CommonResponse<Boolean>();
 		try{
 			if(report.getCreateDate() != null) {
@@ -299,7 +304,7 @@ public class MobileController {
 		report.setVersion(report.isGongSacNull() ? "v2" : "v3");
 		System.err.println("/regist/report report sTring : "  + report);
 		System.err.println("/regist/report report : " + report.getGongSac() + " balance : " + report.getBalance());
-		applyModulusElasticity(report);
+		//applyModulusElasticity(report);
 		
 		report.setBigo("");
 		report.setDrillingDepth(report.getIntrusionDepth());
@@ -312,7 +317,7 @@ public class MobileController {
 				try {
 					reportWithFallMeterMapper.insert2Origin(report);
 				}catch (Exception e) {
-					
+					e.printStackTrace();
 				}
 			}else {
 				System.err.println("여기서 입력이지??ㄴㄴㄴ");
@@ -321,8 +326,9 @@ public class MobileController {
 				try {
 					reportWithFallMeterMapper.insertOrigin(report);
 				}catch (Exception e) {
+					e.printStackTrace();
 				}
-				
+
 			}
 		}catch (Exception e) {
 			e.printStackTrace();
@@ -386,20 +392,24 @@ public class MobileController {
 		CommonResponse<Boolean> response = new CommonResponse<Boolean>();
 		for (ReportWithFallMeter report2 : report) {
 			report2.setVersion(report2.isGongSacNull() ? "v2" : "v3");
-			applyModulusElasticity(report2);
+			//applyModulusElasticity(report2);
 			try{
 				if(report2.getCreateDate() != null) {
 					reportWithFallMeterMapper.insert2(report2);
 					if (report2.isGongSacNull()) reportMapper.clearGongSac(report2.getId());
 					try {
 						reportWithFallMeterMapper.insert2Origin(report2);
-					}catch (Exception e) {}
+					}catch (Exception e) {
+						e.printStackTrace();
+					}
 				}else {
 					reportWithFallMeterMapper.insert(report2);
 					if (report2.isGongSacNull()) reportMapper.clearGongSac(report2.getId());
 					try {
 						reportWithFallMeterMapper.insertOrigin(report2);
-					}catch (Exception e) {}
+					}catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 			}catch (Exception e) {
 				System.err.println("insert  오류");
@@ -543,26 +553,26 @@ public class MobileController {
 	}
 	
 	
-	private void applyModulusElasticity(Report report) {
-		String modulusElasticity = pileSelectValueMapper.getModulusElasticityByPileType(report.getPileType(), report.getDeviceIdx());
-		if (modulusElasticity != null) {
-			report.setModulusElasticity(modulusElasticity);
-		}
-	}
+	// private void applyModulusElasticity(Report report) {
+	// 	String modulusElasticity = pileSelectValueMapper.getModulusElasticityByPileType(report.getPileType(), report.getDeviceIdx());
+	// 	if (modulusElasticity != null) {
+	// 		report.setModulusElasticity(modulusElasticity);
+	// 	}
+	// }
 
-	private void applyModulusElasticity(GReport report) {
-		String modulusElasticity = pileSelectValueMapper.getModulusElasticityByPileType(report.getPileType(), report.getDeviceIdx());
-		if (modulusElasticity != null) {
-			report.setModulusElasticity(modulusElasticity);
-		}
-	}
+	// private void applyModulusElasticity(GReport report) {
+	// 	String modulusElasticity = pileSelectValueMapper.getModulusElasticityByPileType(report.getPileType(), report.getDeviceIdx());
+	// 	if (modulusElasticity != null) {
+	// 		report.setModulusElasticity(modulusElasticity);
+	// 	}
+	// }
 
-	private void applyModulusElasticity(ReportWithFallMeter report) {
-		String modulusElasticity = pileSelectValueMapper.getModulusElasticityByPileType(report.getPileType(), report.getDeviceIdx());
-		if (modulusElasticity != null) {
-			report.setModulusElasticity(modulusElasticity);
-		}
-	}
+	// private void applyModulusElasticity(ReportWithFallMeter report) {
+	// 	String modulusElasticity = pileSelectValueMapper.getModulusElasticityByPileType(report.getPileType(), report.getDeviceIdx());
+	// 	if (modulusElasticity != null) {
+	// 		report.setModulusElasticity(modulusElasticity);
+	// 	}
+	// }
 	
 	
 	private void copyOfPenetration(int reportIdx) {

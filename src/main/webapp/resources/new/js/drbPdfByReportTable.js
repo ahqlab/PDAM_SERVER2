@@ -24,21 +24,23 @@ function showPdf(rowIndex, userRole, hManager, big, epu){
 //}
 
 
-function drawLegend(doc){
-	
+// 항타기종류/상부RPM 행이 추가된 만큼(extraRowOffset) 범례를 아래로 민다.
+function drawLegend(doc, extraRowOffset){
+
+	var offset = extraRowOffset || 0;
 	var pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
 	var lectLeftPadding = 15;
 	doc.setFontSize(8);
 	doc.setFillColor(0,173,239);
-	doc.rect(15, 92.8 + 5, 10, 4, 'FD'); //Fill and Border
-    doc.text('관입량', 27 , 95.5 + 5, {align: 'left'});
-    
+	doc.rect(15, 92.8 + 5 + offset, 10, 4, 'FD'); //Fill and Border
+    doc.text('관입량', 27 , 95.5 + 5 + offset, {align: 'left'});
+
     //doc.setFillColor(63,232,108);
     doc.setFillColor(0,153,0);
-	doc.rect(41.5, 92.8 + 5, 10, 4, 'FD'); //Fill and Border
-    doc.text('관입량의 차', 53.5 , 95.5 + 5, {align: 'left'});
-    
-    doc.text('( 단위 / mm )', pageWidth - lectLeftPadding , 96 + 5, {align: 'right'});
+	doc.rect(41.5, 92.8 + 5 + offset, 10, 4, 'FD'); //Fill and Border
+    doc.text('관입량의 차', 53.5 , 95.5 + 5 + offset, {align: 'left'});
+
+    doc.text('( 단위 / mm )', pageWidth - lectLeftPadding , 96 + 5 + offset, {align: 'right'});
 }
 
 function writeValue(pointArr, doc, index){
@@ -250,7 +252,8 @@ function drawCompactChart(
 	    doc,
 	    currentAvgPenetrationValue,
 	    currentTotalPenetrationValue,
-	    constructionIdx
+	    constructionIdx,
+	    extraRowOffset
 	) {
 
 	    // =========================
@@ -259,7 +262,8 @@ function drawCompactChart(
 	    var lectLeftPadding   = 15;
 	    var lectBottomPadding = 40;
 
-	    var lectTopY     = 134;
+	    // 항타기종류/상부RPM 행이 추가된 만큼(extraRowOffset) 그래프 상단을 아래로 민다.
+	    var lectTopY     = 134 + (extraRowOffset || 0);
 	    var graphBottomY = pageHeight - lectBottomPadding;
 	    var graphHeight  = graphBottomY - lectTopY;
 
@@ -485,14 +489,15 @@ function drawCompactChart(
 	}
 
 //그래프를 그린다.
-function drawChart(root, index, pageWidth, pageHeight, doc, currentAvgPenetrationValue , currentTotalPenetrationValue, constructionIdx){
+function drawChart(root, index, pageWidth, pageHeight, doc, currentAvgPenetrationValue , currentTotalPenetrationValue, constructionIdx, extraRowOffset){
 	//var mode = 'center';
 	var mode = 'bottom';
-	
+
 	var lectLeftPadding = 15;
 	var lectBottomPadding = 40;
 	var lectStartY = 0;
-	var lectTopY = 100 + 4; //테이블 한줄 추가로 +5처리
+	// 항타기종류/상부RPM 행이 추가된 만큼(extraRowOffset) 그래프 상단을 아래로 민다.
+	var lectTopY = 100 + 4 + (extraRowOffset || 0); //테이블 한줄 추가로 +5처리
 	var lectHarfSize = 80;
 	if(mode == 'center'){
 		lectStartY = 95;
@@ -556,6 +561,8 @@ function drawChart(root, index, pageWidth, pageHeight, doc, currentAvgPenetratio
 	}
 	//가로라인 그린다.
 	for(var i = upLevel; i < (mode == 'center' ? lectHarfSize : lectHarfSize * 2); i = i + upLevel){
+		// 격자선이 표/범례 영역(그래프 박스 위) 위로 넘어가면 더 이상 그리지 않는다 (겹침 방지).
+		if ((lectCenterHeight - i) < lectTopY) break;
 		doc.line(lectLeftPadding, lectCenterHeight - i, lectRightX, lectCenterHeight - i);
 		doc.text(k.toString(), lectLeftPadding - 2, (lectCenterHeight - i) + 1, {align: 'right'});
 		var ss = Number(k) +  Number(j);
@@ -596,6 +603,8 @@ function drawChart(root, index, pageWidth, pageHeight, doc, currentAvgPenetratio
 		var Rvalue = numberOne * sum;
 		var Hvalue = lectCenterHeight.toFixed();
 		var cal = (Hvalue - Rvalue);
+		// 격자 스케일이 작게 잡히는 경우(평균관입 빈값 등) 선이 그래프 박스 밖(위)으로 튀어나가지 않도록 상단에서 자른다.
+		if (cal < lectTopY) cal = lectTopY;
 		//점찍기
 		if(i < penetrations.length){
 			//좌표 2단 배열
@@ -808,6 +817,8 @@ function downloadDrivingOneRecoredBook(option) {
 			
 			var col = [];   
 			var row = [];
+			// 항타기종류 컬럼이 있으면(hasMachineType) 그 뒤의 모든 td:eq() 인덱스가 1칸씩 밀린다.
+			var machineTypeOffset = $('#reportTable tr').eq(index).find('#machineType').length > 0 ? 1 : 0;
 			
 			
 			if(role == 0 || hiddenManager == true ){
@@ -821,10 +832,10 @@ function downloadDrivingOneRecoredBook(option) {
 				currentPileStandard = $('#reportTable tr').eq(index).find('#pileStandard').val().trim();
 				if(extensivePileUsage > 0){
 					
-					currentPileSum = $('#reportTable tr').eq(index).find('td:eq(15)').text().trim();
+					currentPileSum = $('#reportTable tr').eq(index).find('td:eq(' + (15 + machineTypeOffset) + ')').text().trim();
 				}else{
 					
-					currentPileSum = $('#reportTable tr').eq(index).find('td:eq(13)').text().trim();
+					currentPileSum = $('#reportTable tr').eq(index).find('td:eq(' + (13 + machineTypeOffset) + ')').text().trim();
 				}
 				currentDrillingDepth = $('#reportTable tr').eq(index).find('#drillingDepth').val();
 				
@@ -839,42 +850,42 @@ function downloadDrivingOneRecoredBook(option) {
 					var currentSdDrillingDepth = $('#reportTable tr').eq(index).find('#sdDrillingDepth').val();
 					var currentStDrillingDepth = $('#reportTable tr').eq(index).find('#stDrillingDepth').val();
 					
-					currentBalance = $('#reportTable tr').eq(index).find('td:eq(19)').text().trim();
-					currentGongSac = $('#reportTable tr').eq(index).find('td:eq(20)').text().trim();
+					currentBalance = $('#reportTable tr').eq(index).find('td:eq(' + (19 + machineTypeOffset) + ')').text().trim();
+					currentGongSac = $('#reportTable tr').eq(index).find('td:eq(' + (20 + machineTypeOffset) + ')').text().trim();
 					currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
 					currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
 					currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
 					if(isBig){
-						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(34)').text().trim();
-						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(35)').text().trim();
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(' + (34 + machineTypeOffset) + ')').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(' + (35 + machineTypeOffset) + ')').text().trim();
 					}else{
-						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(29)').text().trim();
-						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(30)').text().trim();
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(' + (29 + machineTypeOffset) + ')').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(' + (30 + machineTypeOffset) + ')').text().trim();
 					}
 				}else if(constructionIdx == 1269){
 					
-					currentBalance = $('#reportTable tr').eq(index).find('td:eq(18)').text().trim();
-					currentGongSac = $('#reportTable tr').eq(index).find('td:eq(19)').text().trim();
+					currentBalance = $('#reportTable tr').eq(index).find('td:eq(' + (18 + machineTypeOffset) + ')').text().trim();
+					currentGongSac = $('#reportTable tr').eq(index).find('td:eq(' + (19 + machineTypeOffset) + ')').text().trim();
 					currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
 					currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
 					currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
 					if(isBig){
-						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(33)').text().trim();
-						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(34)').text().trim();
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(' + (33 + machineTypeOffset) + ')').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(' + (34 + machineTypeOffset) + ')').text().trim();
 					}else{
-						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(28)').text().trim();
-						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(29)').text().trim();
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(' + (28 + machineTypeOffset) + ')').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(' + (29 + machineTypeOffset) + ')').text().trim();
 					}
 					
 				}else{
 					
 					if(extensivePileUsage > 0){
-						currentBalance = $('#reportTable tr').eq(index).find('td:eq(19)').text().trim();
-						currentGongSac = $('#reportTable tr').eq(index).find('td:eq(20)').text().trim();
+						currentBalance = $('#reportTable tr').eq(index).find('td:eq(' + (19 + machineTypeOffset) + ')').text().trim();
+						currentGongSac = $('#reportTable tr').eq(index).find('td:eq(' + (20 + machineTypeOffset) + ')').text().trim();
 						
 					}else{
-						currentBalance = $('#reportTable tr').eq(index).find('td:eq(17)').text().trim();
-						currentGongSac = $('#reportTable tr').eq(index).find('td:eq(18)').text().trim();
+						currentBalance = $('#reportTable tr').eq(index).find('td:eq(' + (17 + machineTypeOffset) + ')').text().trim();
+						currentGongSac = $('#reportTable tr').eq(index).find('td:eq(' + (18 + machineTypeOffset) + ')').text().trim();
 						
 					}
 					currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
@@ -883,22 +894,22 @@ function downloadDrivingOneRecoredBook(option) {
 					if(isBig){
 						if(extensivePileUsage > 0){
 							
-							currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(34)').text().trim();
-							currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(35)').text().trim();
+							currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(' + (34 + machineTypeOffset) + ')').text().trim();
+							currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(' + (35 + machineTypeOffset) + ')').text().trim();
 						}else{
-							currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(32)').text().trim();
-							currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(33)').text().trim();
+							currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(' + (32 + machineTypeOffset) + ')').text().trim();
+							currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(' + (33 + machineTypeOffset) + ')').text().trim();
 							
 						}
 					}else{
 						if(extensivePileUsage > 0){
-							currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(29)').text().trim();
-							currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(30)').text().trim();
+							currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(' + (29 + machineTypeOffset) + ')').text().trim();
+							currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(' + (30 + machineTypeOffset) + ')').text().trim();
 							
 						}else{
 							
-							currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(27)').text().trim();
-							currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(28)').text().trim();
+							currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(' + (27 + machineTypeOffset) + ')').text().trim();
+							currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(' + (28 + machineTypeOffset) + ')').text().trim();
 						}
 					}
 				}
@@ -916,9 +927,9 @@ function downloadDrivingOneRecoredBook(option) {
 				currentPileNo = $('#reportTable tr').eq(index).find('#pileNo').val();
 				currentPileStandard = $('#reportTable tr').eq(index).find('#pileStandard').val().trim();
 				if(extensivePileUsage > 0){
-					currentPileSum = $('#reportTable tr').eq(index).find('td:eq(14)').text().trim();
+					currentPileSum = $('#reportTable tr').eq(index).find('td:eq(' + (14 + machineTypeOffset) + ')').text().trim();
 				}else{
-					currentPileSum = $('#reportTable tr').eq(index).find('td:eq(12)').text().trim();
+					currentPileSum = $('#reportTable tr').eq(index).find('td:eq(' + (12 + machineTypeOffset) + ')').text().trim();
 				}
 			
 				currentDrillingDepth = $('#reportTable tr').eq(index).find('#drillingDepth').val();
@@ -931,28 +942,28 @@ function downloadDrivingOneRecoredBook(option) {
 					var currentSdDrillingDepth = $('#reportTable tr').eq(index).find('#sdDrillingDepth').val();
 					var currentStDrillingDepth = $('#reportTable tr').eq(index).find('#stDrillingDepth').val();
 					
-					currentBalance = $('#reportTable tr').eq(index).find('td:eq(18)').text().trim();
-					currentGongSac = $('#reportTable tr').eq(index).find('td:eq(19)').text().trim();
+					currentBalance = $('#reportTable tr').eq(index).find('td:eq(' + (18 + machineTypeOffset) + ')').text().trim();
+					currentGongSac = $('#reportTable tr').eq(index).find('td:eq(' + (19 + machineTypeOffset) + ')').text().trim();
 					currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
 					currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
 					currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
 					
 					if(isBig){
-						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(35)').text().trim();
-						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(36)').text().trim();
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(' + (35 + machineTypeOffset) + ')').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(' + (36 + machineTypeOffset) + ')').text().trim();
 					}else{
-						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(28)').text().trim();
-						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(29)').text().trim();
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(' + (28 + machineTypeOffset) + ')').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(' + (29 + machineTypeOffset) + ')').text().trim();
 					}
 				}else{
 					if(extensivePileUsage > 0){
 						
-						currentBalance = $('#reportTable tr').eq(index).find('td:eq(18)').text().trim();
-						currentGongSac = $('#reportTable tr').eq(index).find('td:eq(19)').text().trim();
+						currentBalance = $('#reportTable tr').eq(index).find('td:eq(' + (18 + machineTypeOffset) + ')').text().trim();
+						currentGongSac = $('#reportTable tr').eq(index).find('td:eq(' + (19 + machineTypeOffset) + ')').text().trim();
 					}else{
 						
-						currentBalance = $('#reportTable tr').eq(index).find('td:eq(16)').text().trim();
-						currentGongSac = $('#reportTable tr').eq(index).find('td:eq(17)').text().trim();
+						currentBalance = $('#reportTable tr').eq(index).find('td:eq(' + (16 + machineTypeOffset) + ')').text().trim();
+						currentGongSac = $('#reportTable tr').eq(index).find('td:eq(' + (17 + machineTypeOffset) + ')').text().trim();
 					}
 					currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
 					currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
@@ -960,19 +971,19 @@ function downloadDrivingOneRecoredBook(option) {
 					
 					if(isBig){
 						if(extensivePileUsage > 0){
-							currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(33)').text().trim();
-							currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(34)').text().trim();
+							currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(' + (33 + machineTypeOffset) + ')').text().trim();
+							currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(' + (34 + machineTypeOffset) + ')').text().trim();
 						}else{
-							currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(31)').text().trim();
-							currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(32)').text().trim();
+							currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(' + (31 + machineTypeOffset) + ')').text().trim();
+							currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(' + (32 + machineTypeOffset) + ')').text().trim();
 						}
 					}else{
 						if(extensivePileUsage > 0){
-							currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(28)').text().trim();
-							currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(29)').text().trim();
+							currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(' + (28 + machineTypeOffset) + ')').text().trim();
+							currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(' + (29 + machineTypeOffset) + ')').text().trim();
 						}else{
-							currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(26)').text().trim();
-							currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(27)').text().trim();
+							currentAvgPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(' + (26 + machineTypeOffset) + ')').text().trim();
+							currentTotalPenetrationValue = $('#reportTable tr').eq(index).find('td:eq(' + (27 + machineTypeOffset) + ')').text().trim();
 						}
 					}
 				}
@@ -992,6 +1003,10 @@ function downloadDrivingOneRecoredBook(option) {
 		    	}
 			}
 		   
+		    var machineTypeEl = $('#reportTable tr').eq(index).find('#machineType');
+		    var topRpmEl = $('#reportTable tr').eq(index).find('#topRpm');
+		    var currentMachineType = machineTypeEl.length ? machineTypeEl.val() : '';
+		    var currentTopRpm = topRpmEl.length ? topRpmEl.val() : '';
 		    if(constructionIdx == '1252'){
 		    	row.push({ c1: '시공장비', c2: machineNumber	     , c3:'해머무게(Ton)', c4:currentHammaT  });        
 			    row.push({ c1: '파일종류', c2: currentPileType 	 , c3:'낙하높이(M)', c4:currentFallMeter}); 
@@ -1014,6 +1029,13 @@ function downloadDrivingOneRecoredBook(option) {
 			    row.push({ c1: '파일번호', c2: currentPileNo       , c3:'낙하높이(M)', c4:currentFallMeter }); 
 			    row.push({ c1: '파일길이(M)', c2: allPiece.substring(2, allPiece.length).trim()       , c3:'평균관입(mm)', c4:currentAvgPenetrationValue}); 
 			    row.push({ c1: '파일합계(M)', c2: allPieceValue       , c3:'최종관입(mm)', c4:currentTotalPenetrationValue}); 
+		    }
+		    // 항타기종류/상부RPM은 값이 있을 때만 행을 추가하고, 그만큼 아래 범례/그래프를 내린다.
+		    var hasMachineTypeOrTopRpm = (currentMachineType && currentMachineType.trim() != '') || (currentTopRpm && currentTopRpm.trim() != '');
+		    var extraRowOffset = 0;
+		    if(constructionIdx != '1252' && hasMachineTypeOrTopRpm){
+		    	row.push({ c1: '항타기종류', c2: currentMachineType || '', c3: '상부RPM', c4: currentTopRpm || '' });
+		    	extraRowOffset = 7.2;
 		    }
 		    
 			
@@ -1071,15 +1093,15 @@ function downloadDrivingOneRecoredBook(option) {
 			doc.setProperties({            
 				title: 'PDF타이틀',        
 			});
-			drawLegend(doc);
-			
+			drawLegend(doc, extraRowOffset);
+
 			if(option == 'Y'){
-				drawHitCountLegend(doc, 105);
+				drawHitCountLegend(doc, 105 + extraRowOffset);
 				//금도건설 조풍건설 구형 흑연사업 토건공사
-				drawCompactChart(root, index, pageWidth, pageHeight, doc, currentAvgPenetrationValue , currentTotalPenetrationValue, constructionIdx);
+				drawCompactChart(root, index, pageWidth, pageHeight, doc, currentAvgPenetrationValue , currentTotalPenetrationValue, constructionIdx, extraRowOffset);
 			}else{
 				//그 외 모든 현장
-				drawChart(root, index, pageWidth, pageHeight, doc, currentAvgPenetrationValue , currentTotalPenetrationValue, constructionIdx);
+				drawChart(root, index, pageWidth, pageHeight, doc, currentAvgPenetrationValue , currentTotalPenetrationValue, constructionIdx, extraRowOffset);
 			}
 			
 			if(constructionIdx == 1508){
