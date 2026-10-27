@@ -844,76 +844,10 @@
 			currentPileStandard = $('#reportTable tr').eq(index).find('#pileStandard').val().trim();
 			
 			
-			currentPileSum = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (16 + machineTypeOffset) + ')' : 'td:eq(' + (14 + machineTypeOffset) + ')').text().trim();
-		
-			currentDrillingDepth = $('#reportTable tr').eq(index).find('#drillingDepth').val();
-			currentIntrusionDepth = $('#reportTable tr').eq(index).find('#intrusionDepth').val();
-			
-			if(constructionIdx == 1082 || conIdx == 1082){
-				
-				var currentSdDrillingDepth = $('#reportTable tr').eq(index).find('#sdDrillingDepth').val();
-				var currentStDrillingDepth = $('#reportTable tr').eq(index).find('#stDrillingDepth').val();
-				
-				currentBalance = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (22 + machineTypeOffset) + ')' : 'td:eq(' + (20 + machineTypeOffset) + ')').text().trim();
-				currentGongSac = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (23 + machineTypeOffset) + ')' : 'td:eq(' + (21 + machineTypeOffset) + ')').text().trim();
-				currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
-				currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
-				currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
-				if(isBig > 0){
-					currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (37 + machineTypeOffset) + ')' : 'td:eq(' + (35 + machineTypeOffset) + ')').text().trim();
-					currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (38 + machineTypeOffset) + ')' : 'td:eq(' + (36 + machineTypeOffset) + ')').text().trim();
-				}else{
-					currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (32 + machineTypeOffset) + ')' : 'td:eq(' + (30 + machineTypeOffset) + ')').text().trim();
-					currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (33 + machineTypeOffset) + ')' : 'td:eq(' + (31 + machineTypeOffset) + ')').text().trim();
-				}
-				
-			}else{
-				
-				if(constructionIdx == 1269 || conIdx == 1269){
-					currentBalance = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (21 + machineTypeOffset) + ')' : 'td:eq(' + (19 + machineTypeOffset) + ')').text().trim();
-					currentGongSac = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (22 + machineTypeOffset) + ')' : 'td:eq(' + (20 + machineTypeOffset) + ')').text().trim();
-					currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
-					currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
-					currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
-					if(isBig > 0){
-						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (36 + machineTypeOffset) + ')' : 'td:eq(' + (34 + machineTypeOffset) + ')').text().trim();
-						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (37 + machineTypeOffset) + ')' : 'td:eq(' + (35 + machineTypeOffset) + ')').text().trim();
-					}else{
-						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (31 + machineTypeOffset) + ')' : 'td:eq(' + (29 + machineTypeOffset) + ')').text().trim();
-						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (32 + machineTypeOffset) + ')' : 'td:eq(' + (30 + machineTypeOffset) + ')').text().trim();
-					}
-					
-				}else{
-					currentBalance = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (20 + machineTypeOffset) + ')' : 'td:eq(' + (18 + machineTypeOffset) + ')').text().trim();
-					currentGongSac = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (21 + machineTypeOffset) + ')' : 'td:eq(' + (19 + machineTypeOffset) + ')').text().trim();
-					currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
-					currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
-					currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
-					if(isBig > 0){
-						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (35 + machineTypeOffset) + ')' : 'td:eq(' + (33 + machineTypeOffset) + ')').text().trim();
-						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (36 + machineTypeOffset) + ')' : 'td:eq(' + (34 + machineTypeOffset) + ')').text().trim();
-					}else{
-						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (30 + machineTypeOffset) + ')' : 'td:eq(' + (28 + machineTypeOffset) + ')').text().trim();
-						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (31 + machineTypeOffset) + ')' : 'td:eq(' + (29 + machineTypeOffset) + ')').text().trim();
-					}
-				}
-			}
-			
-		}else{
-			
-			currentNo = $('#reportTable tr').eq(index).find('td:eq(0)').text().trim();
-			currentDate = $('#reportTable tr').eq(index).find('td:eq(1)').text().trim();
-			currentMachineType = $('#reportTable tr').eq(index).find('#machineType').val();
-			currentPileType = $('#reportTable tr').eq(index).find('#pileType').val();
-			currentMethod = $('#reportTable tr').eq(index).find('#method').val();
-			currentLocation = $('#reportTable tr').eq(index).find('#location').val();
-			currentPileNo = $('#reportTable tr').eq(index).find('#pileNo').val();
-			currentPileStandard = $('#reportTable tr').eq(index).find('#pileStandard').val().trim();
 			currentPileSum = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (15 + machineTypeOffset) + ')' : 'td:eq(' + (13 + machineTypeOffset) + ')').text().trim();
 		
 			currentDrillingDepth = $('#reportTable tr').eq(index).find('#drillingDepth').val();
 			currentIntrusionDepth = $('#reportTable tr').eq(index).find('#intrusionDepth').val();
-			
 			
 			if(constructionIdx == 1082 || conIdx == 1082){
 				
@@ -925,7 +859,6 @@
 				currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
 				currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
 				currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
-				
 				if(isBig > 0){
 					currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (36 + machineTypeOffset) + ')' : 'td:eq(' + (34 + machineTypeOffset) + ')').text().trim();
 					currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (37 + machineTypeOffset) + ')' : 'td:eq(' + (35 + machineTypeOffset) + ')').text().trim();
@@ -942,7 +875,6 @@
 					currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
 					currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
 					currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
-					
 					if(isBig > 0){
 						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (35 + machineTypeOffset) + ')' : 'td:eq(' + (33 + machineTypeOffset) + ')').text().trim();
 						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (36 + machineTypeOffset) + ')' : 'td:eq(' + (34 + machineTypeOffset) + ')').text().trim();
@@ -950,7 +882,61 @@
 						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (30 + machineTypeOffset) + ')' : 'td:eq(' + (28 + machineTypeOffset) + ')').text().trim();
 						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (31 + machineTypeOffset) + ')' : 'td:eq(' + (29 + machineTypeOffset) + ')').text().trim();
 					}
+					
 				}else{
+					currentBalance = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (19 + machineTypeOffset) + ')' : 'td:eq(' + (17 + machineTypeOffset) + ')').text().trim();
+					currentGongSac = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (20 + machineTypeOffset) + ')' : 'td:eq(' + (18 + machineTypeOffset) + ')').text().trim();
+					currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
+					currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
+					currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
+					if(isBig > 0){
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (34 + machineTypeOffset) + ')' : 'td:eq(' + (32 + machineTypeOffset) + ')').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (35 + machineTypeOffset) + ')' : 'td:eq(' + (33 + machineTypeOffset) + ')').text().trim();
+					}else{
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (29 + machineTypeOffset) + ')' : 'td:eq(' + (27 + machineTypeOffset) + ')').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (30 + machineTypeOffset) + ')' : 'td:eq(' + (28 + machineTypeOffset) + ')').text().trim();
+					}
+				}
+			}
+			
+		}else{
+			
+			currentNo = $('#reportTable tr').eq(index).find('td:eq(0)').text().trim();
+			currentDate = $('#reportTable tr').eq(index).find('td:eq(1)').text().trim();
+			currentMachineType = $('#reportTable tr').eq(index).find('#machineType').val();
+			currentPileType = $('#reportTable tr').eq(index).find('#pileType').val();
+			currentMethod = $('#reportTable tr').eq(index).find('#method').val();
+			currentLocation = $('#reportTable tr').eq(index).find('#location').val();
+			currentPileNo = $('#reportTable tr').eq(index).find('#pileNo').val();
+			currentPileStandard = $('#reportTable tr').eq(index).find('#pileStandard').val().trim();
+			currentPileSum = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (14 + machineTypeOffset) + ')' : 'td:eq(' + (12 + machineTypeOffset) + ')').text().trim();
+		
+			currentDrillingDepth = $('#reportTable tr').eq(index).find('#drillingDepth').val();
+			currentIntrusionDepth = $('#reportTable tr').eq(index).find('#intrusionDepth').val();
+			
+			
+			if(constructionIdx == 1082 || conIdx == 1082){
+				
+				var currentSdDrillingDepth = $('#reportTable tr').eq(index).find('#sdDrillingDepth').val();
+				var currentStDrillingDepth = $('#reportTable tr').eq(index).find('#stDrillingDepth').val();
+				
+				currentBalance = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (20 + machineTypeOffset) + ')' : 'td:eq(' + (18 + machineTypeOffset) + ')').text().trim();
+				currentGongSac = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (21 + machineTypeOffset) + ')' : 'td:eq(' + (19 + machineTypeOffset) + ')').text().trim();
+				currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
+				currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
+				currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
+				
+				if(isBig > 0){
+					currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (35 + machineTypeOffset) + ')' : 'td:eq(' + (33 + machineTypeOffset) + ')').text().trim();
+					currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (36 + machineTypeOffset) + ')' : 'td:eq(' + (34 + machineTypeOffset) + ')').text().trim();
+				}else{
+					currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (30 + machineTypeOffset) + ')' : 'td:eq(' + (28 + machineTypeOffset) + ')').text().trim();
+					currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (31 + machineTypeOffset) + ')' : 'td:eq(' + (29 + machineTypeOffset) + ')').text().trim();
+				}
+				
+			}else{
+				
+				if(constructionIdx == 1269 || conIdx == 1269){
 					currentBalance = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (19 + machineTypeOffset) + ')' : 'td:eq(' + (17 + machineTypeOffset) + ')').text().trim();
 					currentGongSac = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (20 + machineTypeOffset) + ')' : 'td:eq(' + (18 + machineTypeOffset) + ')').text().trim();
 					currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
@@ -963,6 +949,20 @@
 					}else{
 						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (29 + machineTypeOffset) + ')' : 'td:eq(' + (27 + machineTypeOffset) + ')').text().trim();
 						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (30 + machineTypeOffset) + ')' : 'td:eq(' + (28 + machineTypeOffset) + ')').text().trim();
+					}
+				}else{
+					currentBalance = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (18 + machineTypeOffset) + ')' : 'td:eq(' + (16 + machineTypeOffset) + ')').text().trim();
+					currentGongSac = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (19 + machineTypeOffset) + ')' : 'td:eq(' + (17 + machineTypeOffset) + ')').text().trim();
+					currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
+					currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
+					currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
+					
+					if(isBig > 0){
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (33 + machineTypeOffset) + ')' : 'td:eq(' + (31 + machineTypeOffset) + ')').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (34 + machineTypeOffset) + ')' : 'td:eq(' + (32 + machineTypeOffset) + ')').text().trim();
+					}else{
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (28 + machineTypeOffset) + ')' : 'td:eq(' + (26 + machineTypeOffset) + ')').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (29 + machineTypeOffset) + ')' : 'td:eq(' + (27 + machineTypeOffset) + ')').text().trim();
 					}
 				}
 			}
