@@ -1550,7 +1550,7 @@ function changeSpareDevice(targetId, changeId, constructionIdx){
 			</div>
 			<div class="inputArea02 mb-20">
 				<p class="inputTxt02">블루투스 No</p>
-				<input type="text" autocomplete="off"  class="Input02" name="bluetoothNo" id="bluetoothNo" placeholder="블루투스 No를 입력하세요.">
+				<input type="text" autocomplete="off"  class="Input02" name="bluetoothNo" id="bluetoothNo" oninput="this.value = this.value.replace(/\s/g, '');" placeholder="블루투스 No를 입력하세요.">
 			</div>
 			<div class="inputArea02 mb-20">
 				<p class="inputTxt02">측정기 S/N</p>
