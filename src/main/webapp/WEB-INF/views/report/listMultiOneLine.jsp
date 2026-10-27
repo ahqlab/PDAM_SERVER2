@@ -828,10 +828,12 @@
 		var currentManagedStandard;
 		var currentAvgPenetrationValue;
 		var currentTotalPenetrationValue;
-		
-		
+
+		// 항타기종류 컬럼이 있으면(hasMachineType) 그 뒤의 모든 td:eq() 인덱스가 1칸씩 밀린다.
+		var machineTypeOffset = $('#reportTable tr').eq(index).find('#machineType').length > 0 ? 1 : 0;
+
 		if(role == 0 || role == 3 || hiddenManager == true){
-			
+
 			currentNo = $('#reportTable tr').eq(index).find('td:eq(1)').text().trim();
 			currentDate = $('#reportTable tr').eq(index).find('td:eq(2)').text().trim();
 			currentMachineType = $('#reportTable tr').eq(index).find('#machineType').val();
@@ -842,7 +844,7 @@
 			currentPileStandard = $('#reportTable tr').eq(index).find('#pileStandard').val().trim();
 			
 			
-			currentPileSum = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(16)' : 'td:eq(14)').text().trim();
+			currentPileSum = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (16 + machineTypeOffset) + ')' : 'td:eq(' + (14 + machineTypeOffset) + ')').text().trim();
 		
 			currentDrillingDepth = $('#reportTable tr').eq(index).find('#drillingDepth').val();
 			currentIntrusionDepth = $('#reportTable tr').eq(index).find('#intrusionDepth').val();
@@ -852,47 +854,47 @@
 				var currentSdDrillingDepth = $('#reportTable tr').eq(index).find('#sdDrillingDepth').val();
 				var currentStDrillingDepth = $('#reportTable tr').eq(index).find('#stDrillingDepth').val();
 				
-				currentBalance = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(22)' : 'td:eq(20)').text().trim();
-				currentGongSac = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(23)' : 'td:eq(21)').text().trim();
+				currentBalance = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (22 + machineTypeOffset) + ')' : 'td:eq(' + (20 + machineTypeOffset) + ')').text().trim();
+				currentGongSac = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (23 + machineTypeOffset) + ')' : 'td:eq(' + (21 + machineTypeOffset) + ')').text().trim();
 				currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
 				currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
 				currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
 				if(isBig > 0){
-					currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(37)' : 'td:eq(35)').text().trim();
-					currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(38)' : 'td:eq(36)').text().trim();
+					currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (37 + machineTypeOffset) + ')' : 'td:eq(' + (35 + machineTypeOffset) + ')').text().trim();
+					currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (38 + machineTypeOffset) + ')' : 'td:eq(' + (36 + machineTypeOffset) + ')').text().trim();
 				}else{
-					currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(32)' : 'td:eq(30)').text().trim();
-					currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(33)' : 'td:eq(31)').text().trim();
+					currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (32 + machineTypeOffset) + ')' : 'td:eq(' + (30 + machineTypeOffset) + ')').text().trim();
+					currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (33 + machineTypeOffset) + ')' : 'td:eq(' + (31 + machineTypeOffset) + ')').text().trim();
 				}
 				
 			}else{
 				
 				if(constructionIdx == 1269 || conIdx == 1269){
-					currentBalance = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(21)' : 'td:eq(19)').text().trim();
-					currentGongSac = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(22)' : 'td:eq(20)').text().trim();
+					currentBalance = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (21 + machineTypeOffset) + ')' : 'td:eq(' + (19 + machineTypeOffset) + ')').text().trim();
+					currentGongSac = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (22 + machineTypeOffset) + ')' : 'td:eq(' + (20 + machineTypeOffset) + ')').text().trim();
 					currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
 					currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
 					currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
 					if(isBig > 0){
-						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(36)' : 'td:eq(34)').text().trim();
-						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(37)' : 'td:eq(35)').text().trim();
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (36 + machineTypeOffset) + ')' : 'td:eq(' + (34 + machineTypeOffset) + ')').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (37 + machineTypeOffset) + ')' : 'td:eq(' + (35 + machineTypeOffset) + ')').text().trim();
 					}else{
-						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(31)' : 'td:eq(29)').text().trim();
-						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(32)' : 'td:eq(30)').text().trim();
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (31 + machineTypeOffset) + ')' : 'td:eq(' + (29 + machineTypeOffset) + ')').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (32 + machineTypeOffset) + ')' : 'td:eq(' + (30 + machineTypeOffset) + ')').text().trim();
 					}
 					
 				}else{
-					currentBalance = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(20)' : 'td:eq(18)').text().trim();
-					currentGongSac = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(21)' : 'td:eq(19)').text().trim();
+					currentBalance = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (20 + machineTypeOffset) + ')' : 'td:eq(' + (18 + machineTypeOffset) + ')').text().trim();
+					currentGongSac = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (21 + machineTypeOffset) + ')' : 'td:eq(' + (19 + machineTypeOffset) + ')').text().trim();
 					currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
 					currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
 					currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
 					if(isBig > 0){
-						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(35)' : 'td:eq(33)').text().trim();
-						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(36)' : 'td:eq(34)').text().trim();
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (35 + machineTypeOffset) + ')' : 'td:eq(' + (33 + machineTypeOffset) + ')').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (36 + machineTypeOffset) + ')' : 'td:eq(' + (34 + machineTypeOffset) + ')').text().trim();
 					}else{
-						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(30)' : 'td:eq(28)').text().trim();
-						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(31)' : 'td:eq(29)').text().trim();
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (30 + machineTypeOffset) + ')' : 'td:eq(' + (28 + machineTypeOffset) + ')').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (31 + machineTypeOffset) + ')' : 'td:eq(' + (29 + machineTypeOffset) + ')').text().trim();
 					}
 				}
 			}
@@ -907,7 +909,7 @@
 			currentLocation = $('#reportTable tr').eq(index).find('#location').val();
 			currentPileNo = $('#reportTable tr').eq(index).find('#pileNo').val();
 			currentPileStandard = $('#reportTable tr').eq(index).find('#pileStandard').val().trim();
-			currentPileSum = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(15)' : 'td:eq(13)').text().trim();
+			currentPileSum = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (15 + machineTypeOffset) + ')' : 'td:eq(' + (13 + machineTypeOffset) + ')').text().trim();
 		
 			currentDrillingDepth = $('#reportTable tr').eq(index).find('#drillingDepth').val();
 			currentIntrusionDepth = $('#reportTable tr').eq(index).find('#intrusionDepth').val();
@@ -918,49 +920,49 @@
 				var currentSdDrillingDepth = $('#reportTable tr').eq(index).find('#sdDrillingDepth').val();
 				var currentStDrillingDepth = $('#reportTable tr').eq(index).find('#stDrillingDepth').val();
 				
-				currentBalance = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(21)' : 'td:eq(19)').text().trim();
-				currentGongSac = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(22)' : 'td:eq(20)').text().trim();
+				currentBalance = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (21 + machineTypeOffset) + ')' : 'td:eq(' + (19 + machineTypeOffset) + ')').text().trim();
+				currentGongSac = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (22 + machineTypeOffset) + ')' : 'td:eq(' + (20 + machineTypeOffset) + ')').text().trim();
 				currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
 				currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
 				currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
 				
 				if(isBig > 0){
-					currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(36)' : 'td:eq(34)').text().trim();
-					currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(37)' : 'td:eq(35)').text().trim();
+					currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (36 + machineTypeOffset) + ')' : 'td:eq(' + (34 + machineTypeOffset) + ')').text().trim();
+					currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (37 + machineTypeOffset) + ')' : 'td:eq(' + (35 + machineTypeOffset) + ')').text().trim();
 				}else{
-					currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(31)' : 'td:eq(29)').text().trim();
-					currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(32)' : 'td:eq(30)').text().trim();
+					currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (31 + machineTypeOffset) + ')' : 'td:eq(' + (29 + machineTypeOffset) + ')').text().trim();
+					currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (32 + machineTypeOffset) + ')' : 'td:eq(' + (30 + machineTypeOffset) + ')').text().trim();
 				}
 				
 			}else{
 				
 				if(constructionIdx == 1269 || conIdx == 1269){
-					currentBalance = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(20)' : 'td:eq(18)').text().trim();
-					currentGongSac = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(21)' : 'td:eq(19)').text().trim();
+					currentBalance = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (20 + machineTypeOffset) + ')' : 'td:eq(' + (18 + machineTypeOffset) + ')').text().trim();
+					currentGongSac = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (21 + machineTypeOffset) + ')' : 'td:eq(' + (19 + machineTypeOffset) + ')').text().trim();
 					currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
 					currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
 					currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
 					
 					if(isBig > 0){
-						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(35)' : 'td:eq(33)').text().trim();
-						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(36)' : 'td:eq(34)').text().trim();
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (35 + machineTypeOffset) + ')' : 'td:eq(' + (33 + machineTypeOffset) + ')').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (36 + machineTypeOffset) + ')' : 'td:eq(' + (34 + machineTypeOffset) + ')').text().trim();
 					}else{
-						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(30)' : 'td:eq(28)').text().trim();
-						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(31)' : 'td:eq(29)').text().trim();
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (30 + machineTypeOffset) + ')' : 'td:eq(' + (28 + machineTypeOffset) + ')').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (31 + machineTypeOffset) + ')' : 'td:eq(' + (29 + machineTypeOffset) + ')').text().trim();
 					}
 				}else{
-					currentBalance = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(19)' : 'td:eq(17)').text().trim();
-					currentGongSac = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(20)' : 'td:eq(18)').text().trim();
+					currentBalance = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (19 + machineTypeOffset) + ')' : 'td:eq(' + (17 + machineTypeOffset) + ')').text().trim();
+					currentGongSac = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (20 + machineTypeOffset) + ')' : 'td:eq(' + (18 + machineTypeOffset) + ')').text().trim();
 					currentHammaT =  $('#reportTable tr').eq(index).find('#hammaT').val();
 					currentFallMeter =  $('#reportTable tr').eq(index).find('#fallMeter').val();
 					currentManagedStandard =  $('#reportTable tr').eq(index).find('#managedStandard').val();
 					
 					if(isBig > 0){
-						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(34)' : 'td:eq(32)').text().trim();
-						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(35)' : 'td:eq(33)').text().trim();
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (34 + machineTypeOffset) + ')' : 'td:eq(' + (32 + machineTypeOffset) + ')').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (35 + machineTypeOffset) + ')' : 'td:eq(' + (33 + machineTypeOffset) + ')').text().trim();
 					}else{
-						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(29)' : 'td:eq(27)').text().trim();
-						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(30)' : 'td:eq(28)').text().trim();
+						currentAvgPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (29 + machineTypeOffset) + ')' : 'td:eq(' + (27 + machineTypeOffset) + ')').text().trim();
+						currentTotalPenetrationValue = $('#reportTable tr').eq(index).find(extensivePileUsage > 0 ? 'td:eq(' + (30 + machineTypeOffset) + ')' : 'td:eq(' + (28 + machineTypeOffset) + ')').text().trim();
 					}
 				}
 			}
@@ -1477,7 +1479,7 @@
 					$('[onclick*="onClickReportUpdate"]').prop('disabled', false).css('pointer-events', '').css('opacity', '');
 				},
 				error : function(xhr, status, error) {
-					alert('기록지 수정 중 오류가 발생했습니다. 입력한 내용은 유지됩니다.');
+					alert('기록지 수정 중 오류가 발생했습니다. 입력한 내용은 유지됩니다.' + error);
 				}
 			});
 			return;
@@ -1573,8 +1575,8 @@
 		if (hammaEfficiency[index]) hammaEfficiency[index].disabled = true;
 		if (modulusElasticity[index]) modulusElasticity[index].disabled = true;
 		bigo[index].disabled = true;
-		topRpm[index].disabled = true;
-		machineType[index].disabled = true;
+		if (topRpm[index]) topRpm[index].disabled = true;
+		if (machineType[index]) machineType[index].disabled = true;
 		sprCol1.prop('disabled', true);
 			
 		
@@ -1671,8 +1673,8 @@
 		if (hammaEfficiency[index]) hammaEfficiency[index].disabled = false;
 		if (modulusElasticity[index]) modulusElasticity[index].disabled = false;
 		bigo[index].disabled = false;
-		topRpm[index].disabled = false;
-		machineType[index].disabled = false;
+		if (topRpm[index]) topRpm[index].disabled = false;
+		if (machineType[index]) machineType[index].disabled = false;
 		sprCol1.prop('disabled', false);
 		
 	}
@@ -1781,8 +1783,8 @@
 			if (hammaEfficiency[index]) hammaEfficiency[index].disabled = false;
 			if (modulusElasticity[index]) modulusElasticity[index].disabled = false;
 			bigo[index].disabled = false;
-			topRpm[index].disabled = false;
-			machineType[index].disabled = false;
+			if (topRpm[index]) topRpm[index].disabled = false;
+			if (machineType[index]) machineType[index].disabled = false;
 			sprCol1.prop('disabled', false);
 			
 		}else{
@@ -1841,8 +1843,8 @@
 			if (hammaEfficiency[index]) hammaEfficiency[index].disabled = true;
 			if (modulusElasticity[index]) modulusElasticity[index].disabled = true;
 			bigo[index].disabled = true;
-			topRpm[index].disabled = true;
-			machineType[index].disabled = true;
+			if (topRpm[index]) topRpm[index].disabled = true;
+			if (machineType[index]) machineType[index].disabled = true;
 			sprCol1.prop('disabled', true);
 			
 		}
@@ -3192,7 +3194,7 @@
 							</c:otherwise>
 						</c:choose>
 						<td rowspan="2" style="width: 100px;">시공일</td>
-						<td rowspan="2">항타기종류</td>
+						<c:if test="${hasMachineType}"><td rowspan="2">항타기종류</td></c:if>
 						<td rowspan="2">파일종류</td>
 						<td rowspan="2">시공공법</td>
 						<td rowspan="2">시공위치</td>
@@ -3303,7 +3305,7 @@
 								<td rowspan="2">해머효율(%)</td>
 								<td rowspan="2">탄성계수(t/cm2)</td>
 								<td rowspan="2">파일단면적(cm2)</td>
-								<td rowspan="2">상부RPM</td>
+								<c:if test="${hasTopRpm}"><td rowspan="2">상부RPM</td></c:if>
 								<td rowspan="2">비고</td>
 								<td rowspan="2">메모</td>
 							</c:when>
@@ -3333,11 +3335,11 @@
 												</c:otherwise>
 											</c:choose>
 										</td>
-										<td rowspan="2">상부RPM</td>
+										<c:if test="${hasTopRpm}"><td rowspan="2">상부RPM</td></c:if>
 										<td rowspan="2">비고</td>
 									</c:when>
 									<c:otherwise>
-										<td rowspan="2">상부RPM</td>
+										<c:if test="${hasTopRpm}"><td rowspan="2">상부RPM</td></c:if>
 										<td rowspan="2">비고</td>
 										<c:choose>
 											<c:when test="${param.constructionIdx == 492}">
@@ -3348,7 +3350,7 @@
 								</c:choose>	
 							</c:when>
 							<c:when test="${sessionInfo.role == 2}">
-								<td rowspan="2">상부RPM</td>
+								<c:if test="${hasTopRpm}"><td rowspan="2">상부RPM</td></c:if>
 								<td rowspan="2">비고</td>
 							</c:when>
 							<c:when test="${sessionInfo.role == 3}">
@@ -3358,11 +3360,11 @@
 										<td rowspan="2">해머효율(%)</td>
 										<td rowspan="2">탄성계수(t/cm2)</td>
 										<td rowspan="2">파일단면적(cm2)</td>
-										<td rowspan="2">상부RPM</td>
+										<c:if test="${hasTopRpm}"><td rowspan="2">상부RPM</td></c:if>
 										<td rowspan="2">비고</td>
 									</c:when>
 									<c:otherwise>
-										<td rowspan="2">상부RPM</td>
+										<c:if test="${hasTopRpm}"><td rowspan="2">상부RPM</td></c:if>
 										<td rowspan="2">비고</td>
 									</c:otherwise>
 								</c:choose>
@@ -3382,7 +3384,7 @@
 							<td rowspan="2">비고</td>
 							<c:choose>
 								<c:when test="${param.constructionIdx == 492}">
-									<td rowspan="2">상부RPM</td>
+									<c:if test="${hasTopRpm}"><td rowspan="2">상부RPM</td></c:if>
 								</c:when>
 							</c:choose>
 						</c:when>
@@ -3393,7 +3395,7 @@
 								<td rowspan="2">탄성계수(t/cm2)</td>
 								<td rowspan="2">파일단면적(cm2)</td>
 								<td rowspan="2">비고</td>
-								<td rowspan="2">상부RPM</td>
+								<c:if test="${hasTopRpm}"><td rowspan="2">상부RPM</td></c:if>
 							</c:when>
 						</c:choose> --%>
 					</tr>	
@@ -3648,9 +3650,11 @@
 									</c:when>
 							</c:choose>
 							</td>	
+							<c:if test="${hasMachineType}">
 							<td>
 								<input type="text" id="machineType" name="machineType" disabled="disabled" class="tdInput" maxlength="50" value="${fn:escapeXml(domain.machineType)}" />
 							</td>
+							</c:if>
 							<td>
 						 		<input type="text" id="pileType" name="pileType" disabled="disabled" class="tdInput" value="${domain.pileType}">
 						 	</td>
@@ -4157,7 +4161,7 @@
 									<td><input type="text" id="hammaEfficiency" name="hammaEfficiency"  disabled="disabled"  class="tdInput" value="${domain.hammaEfficiency}"/></td> 
 									<td><input type="text" id="modulusElasticity" name="modulusElasticity"  disabled="disabled"  class="tdInput" value="${domain.modulusElasticity}"/></td> 
 									<td><input type="text" id="crossSection" name="crossSection"  disabled="disabled" class="tdInput"  value="${domain.crossSection}"/></td> 
-									<td><input type="text" id="topRpm" name="topRpm" disabled="disabled" class="tdInput" maxlength="50" value="${fn:escapeXml(domain.topRpm)}"/></td>
+									<c:if test="${hasTopRpm}"><td><input type="text" id="topRpm" name="topRpm" disabled="disabled" class="tdInput" maxlength="50" value="${fn:escapeXml(domain.topRpm)}"/></td></c:if>
 									<td><input type="text" id="bigo" name="bigo"  disabled="disabled" class="tdInput" value="${domain.bigo}"/></td>
 									<td><input type="text" id="sprCol1" name="sprCol1"  disabled="disabled" class="tdInput" maxlength="50" value="${domain.sprCol1}"/></td>
 								</c:when>
@@ -4169,7 +4173,7 @@
 											<td><input type="text" id="hammaEfficiency" name="hammaEfficiency"  disabled="disabled"  class="tdInput" value="${domain.hammaEfficiency}"/></td> 
 											<td><input type="text" id="modulusElasticity" name="modulusElasticity"  disabled="disabled"  class="tdInput" value="${domain.modulusElasticity}"/></td> 
 											<td><input type="text" id="crossSection" name="crossSection"  disabled="disabled" class="tdInput"  value="${domain.crossSection}"/></td> 
-											<td><input type="text" id="topRpm" name="topRpm" disabled="disabled" class="tdInput" maxlength="50" value="${fn:escapeXml(domain.topRpm)}"/></td>
+											<c:if test="${hasTopRpm}"><td><input type="text" id="topRpm" name="topRpm" disabled="disabled" class="tdInput" maxlength="50" value="${fn:escapeXml(domain.topRpm)}"/></td></c:if>
 											<td><input type="text" id="bigo" name="bigo"  disabled="disabled" class="tdInput" value="${domain.bigo}"/></td>
 											<input type="hidden" id="sprCol1" name="sprCol1"   class="tdInput" disabled="disabled"  maxlength="50" value="${domain.sprCol1}"/>
 										</c:when>
@@ -4178,7 +4182,7 @@
 											<input type="hidden" class="tdInput" id="hammaEfficiency" name="hammaEfficiency"  disabled="disabled"  maxlength="10"  value="${domain.hammaEfficiency}"/>
 											<input type="hidden" class="tdInput" id="modulusElasticity" name="modulusElasticity"  disabled="disabled"  maxlength="10"  value="${domain.modulusElasticity}"/>
 											<input type="hidden" class="tdInput" id="crossSection" name="crossSection"  disabled="disabled" maxlength="10" value="${domain.crossSection}"/>
-											<td><input type="text" id="topRpm" name="topRpm" disabled="disabled" class="tdInput" maxlength="50" value="${fn:escapeXml(domain.topRpm)}"/></td>
+											<c:if test="${hasTopRpm}"><td><input type="text" id="topRpm" name="topRpm" disabled="disabled" class="tdInput" maxlength="50" value="${fn:escapeXml(domain.topRpm)}"/></td></c:if>
 											<td><input type="text" id="bigo" name="bigo"  disabled="disabled" class="tdInput" value="${domain.bigo}"/></td>
 											<c:choose>
 												<c:when test="${param.constructionIdx == 492}">
@@ -4191,7 +4195,7 @@
 									</c:choose>	
 								</c:when>
 								<c:when test="${sessionInfo.role == 2}">
-									<td><input type="text" id="topRpm" name="topRpm" disabled="disabled" class="tdInput" maxlength="50" value="${fn:escapeXml(domain.topRpm)}"/></td>
+									<c:if test="${hasTopRpm}"><td><input type="text" id="topRpm" name="topRpm" disabled="disabled" class="tdInput" maxlength="50" value="${fn:escapeXml(domain.topRpm)}"/></td></c:if>
 									<td><input type="text" id="bigo" name="bigo"  disabled="disabled" class="tdInput" value="${domain.bigo}"/></td>
 								</c:when>
 								<c:when test="${sessionInfo.role == 3}">
@@ -4201,7 +4205,7 @@
 											<td><input type="text" id="hammaEfficiency" name="hammaEfficiency"  disabled="disabled"  class="tdInput" value="${domain.hammaEfficiency}"/></td> 
 											<td><input type="text" id="modulusElasticity" name="modulusElasticity"  disabled="disabled"  class="tdInput" value="${domain.modulusElasticity}"/></td> 
 											<td><input type="text" id="crossSection" name="crossSection"  disabled="disabled" class="tdInput"  value="${domain.crossSection}"/></td> 
-											<td><input type="text" id="topRpm" name="topRpm" disabled="disabled" class="tdInput" maxlength="50" value="${fn:escapeXml(domain.topRpm)}"/></td>
+											<c:if test="${hasTopRpm}"><td><input type="text" id="topRpm" name="topRpm" disabled="disabled" class="tdInput" maxlength="50" value="${fn:escapeXml(domain.topRpm)}"/></td></c:if>
 											<td><input type="text" id="bigo" name="bigo"  disabled="disabled" class="tdInput" value="${domain.bigo}"/></td>
 											<input type="hidden" id="sprCol1" name="sprCol1"   class="tdInput" disabled="disabled"  maxlength="50" value="${domain.sprCol1}"/>
 										</c:when>
@@ -4209,7 +4213,7 @@
 											<input type="hidden" class="tdInput" id="hammaEfficiency" name="hammaEfficiency"  disabled="disabled"  maxlength="10"  value="${domain.hammaEfficiency}"/>
 											<input type="hidden" class="tdInput" id="modulusElasticity" name="modulusElasticity"  disabled="disabled"  maxlength="10"  value="${domain.modulusElasticity}"/>
 											<input type="hidden" class="tdInput" id="crossSection" name="crossSection"  disabled="disabled" maxlength="10" value="${domain.crossSection}"/>
-											<td><input type="text" id="topRpm" name="topRpm" disabled="disabled" class="tdInput" maxlength="50" value="${fn:escapeXml(domain.topRpm)}"/></td>
+											<c:if test="${hasTopRpm}"><td><input type="text" id="topRpm" name="topRpm" disabled="disabled" class="tdInput" maxlength="50" value="${fn:escapeXml(domain.topRpm)}"/></td></c:if>
 											<td><input type="text" id="bigo" name="bigo"  disabled="disabled" class="tdInput" value="${domain.bigo}"/></td>
 											<input type="hidden" id="sprCol1" name="sprCol1"   class="tdInput" disabled="disabled"  maxlength="50" value="${domain.sprCol1}"/>
 										</c:otherwise>
@@ -4511,7 +4515,7 @@
 			</table>
 		
 	<div id="main" style="width: 100%;height:300px; padding-top: 20px; padding-bottom:20px; background-color: white;"></div>
-    <script src="${pageContext.request.contextPath}/new/js/drbPdfByReportTable.js?123123"></script>
+    <script src="${pageContext.request.contextPath}/new/js/drbPdfByReportTable.js?${applicationScope.buildTime}"></script>
   <%--  	<c:choose>
 		<c:when test="${sessionInfo.role == 0}"> <!-- 슈퍼관리자 -->
 			<div class="tableCArea" style="margin-bottom: 5px; margin-top: 20px;">

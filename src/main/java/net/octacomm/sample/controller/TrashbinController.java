@@ -437,6 +437,7 @@ public class TrashbinController {
 			}else {
 				domainList = new ArrayList<ReportOneLine>();
 			}
+			addOptionalColumnFlags(model, domainList);
 			try {
 				if((int) session.getAttribute("role") == 3) {
 					model.addAttribute("longCalYn", targetCon.getLongCalYn());
@@ -479,6 +480,7 @@ public class TrashbinController {
 		}else {
 			domainList = new ArrayList<ReportOneLine>();
 		}
+		addOptionalColumnFlags(model, domainList);
 		try {
 			if((int) session.getAttribute("role") == 3) {
 				model.addAttribute("longCalYn", targetCon.getLongCalYn());
@@ -580,6 +582,7 @@ public class TrashbinController {
 			}else {
 				domainList = new ArrayList<ReportOneLine>();
 			}
+			addOptionalColumnFlags(model, domainList);
 			try {
 				if((int) session.getAttribute("role") == 3) {
 					model.addAttribute("longCalYn", targetCon.getLongCalYn());
@@ -623,6 +626,7 @@ public class TrashbinController {
 		}else {
 			domainList = new ArrayList<ReportOneLine>();
 		}
+		addOptionalColumnFlags(model, domainList);
 		try {
 			if((int) session.getAttribute("role") == 3) {
 				model.addAttribute("longCalYn", targetCon.getLongCalYn());
@@ -959,5 +963,27 @@ public class TrashbinController {
         report.setPreserveNullGongSac(originalGongSac == null);
         report.setVersion(report.getStoredGongSac() == null ? "v2" : "v3");
     }
+
+	/**
+	 * 항타기종류/상부RPM은 신규 앱(V2 이상)만 보내는 항목이라, 엑셀 대상 리스트 전체에
+	 * 값이 하나도 없으면 엑셀에서 해당 컬럼 자체를 숨기기 위한 플래그를 계산해서 모델에 추가한다.
+	 */
+	private void addOptionalColumnFlags(Model model, List<ReportOneLine> domainList) {
+		boolean hasMachineType = false;
+		boolean hasTopRpm = false;
+		for (ReportOneLine domain : domainList) {
+			if (!hasMachineType && domain.getMachineType() != null && !domain.getMachineType().trim().isEmpty()) {
+				hasMachineType = true;
+			}
+			if (!hasTopRpm && domain.getTopRpm() != null && !domain.getTopRpm().trim().isEmpty()) {
+				hasTopRpm = true;
+			}
+			if (hasMachineType && hasTopRpm) {
+				break;
+			}
+		}
+		model.addAttribute("hasMachineType", hasMachineType);
+		model.addAttribute("hasTopRpm", hasTopRpm);
+	}
 }
 

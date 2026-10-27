@@ -1,6 +1,8 @@
 package net.octacomm.sample.view;
 
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -50,6 +52,8 @@ public class ReportTenAll extends AbstractExcelView
   private List<ExcelSignroom> signRoomList;
   private String constructionName;
   private int extensivePileUsage;
+  private boolean hasMachineType;
+  private boolean hasTopRpm;
   
   
   protected void buildExcelDocument(Map<String, Object> model, HSSFWorkbook workbook, HttpServletRequest req, HttpServletResponse res)
@@ -73,6 +77,14 @@ public class ReportTenAll extends AbstractExcelView
     signRoomList = (List<ExcelSignroom>) model.get("signRoomList");
     constructionName = (String) model.get("constructionName");
     extensivePileUsage = (int) model.get("extensivePileUsage");
+    hasMachineType = Boolean.TRUE.equals(model.get("hasMachineType"));
+    hasTopRpm = Boolean.TRUE.equals(model.get("hasTopRpm"));
+    // 항타기종류/상부RPM 삽입은 "기본" 포맷(부영 944/1136 전용 레이아웃 제외)에서만 지원한다.
+    // 그 외 특수현장은 헤더 라벨을 그대로 두기 때문에, 여기서 끄지 않으면 결재방/숨김 위치만 밀려서 어긋난다.
+    if (constructionIdx == 944 || constructionIdx == 1136) {
+    	hasMachineType = false;
+    	hasTopRpm = false;
+    }
     
     
     
@@ -492,12 +504,9 @@ public class ReportTenAll extends AbstractExcelView
     		        ((ReportOneLine)reportList.get(i)).getUltimateBearingCapacity(),
     		        ((ReportOneLine)reportList.get(i)).getHammaEfficiency(),
     		        ((ReportOneLine)reportList.get(i)).getModulusElasticity(),
-    		        ((ReportOneLine)reportList.get(i)).getCrossSection(),
-    		        ((ReportOneLine)reportList.get(i)).getBigo(),
-    		        ((ReportOneLine)reportList.get(i)).getSprCol1(),
-    		        String.valueOf(((ReportOneLine)reportList.get(i)).getDuplicated()),
-    		        String.valueOf(((ReportOneLine)reportList.get(i)).getTotalDuplicated())
+    		        ((ReportOneLine)reportList.get(i)).getCrossSection()
     		        };
+    	  strings = appendOptionalColumns(strings, (ReportOneLine) reportList.get(i));
       }else {
     	  
     	  
@@ -545,14 +554,11 @@ public class ReportTenAll extends AbstractExcelView
     		        ((ReportOneLine)reportList.get(i)).getPeNine(),
     		        ((ReportOneLine)reportList.get(i)).getPeTen(),
     		        ((ReportOneLine)reportList.get(i)).getAvgPenetrationValue(), 
-    		        ((ReportOneLine)reportList.get(i)).getTotalPenetrationValue(),
-    		        ((ReportOneLine)reportList.get(i)).getBigo(),
-    		        ((ReportOneLine)reportList.get(i)).getSprCol1(),
-    		        String.valueOf(((ReportOneLine)reportList.get(i)).getDuplicated()),
-    		        String.valueOf(((ReportOneLine)reportList.get(i)).getTotalDuplicated())
+    		        ((ReportOneLine)reportList.get(i)).getTotalPenetrationValue()
     		        };
+    	  strings = appendOptionalColumns(strings, (ReportOneLine) reportList.get(i));
       }
-      
+
       setColumn(workbook, row1, strings, style, redStyle, blueStyle , pupleStyle, orangeStyle, yellowStyle);
       hideColumn(sheet, piOneSum, piTwoSum, piThreeSum, piFourSum, piFiveSum, connectLengthSum, gongSacSum);
       
@@ -570,13 +576,31 @@ public class ReportTenAll extends AbstractExcelView
 		sheet.setColumnHidden(18, (double) gongSacSum == 0.0 ? true : false);
 		
 		//비고를 지운다.
+		int optionalOffset = (hasMachineType ? 1 : 0) + (hasTopRpm ? 1 : 0);
 		if (ubcYn > 0) {
-			sheet.setColumnHidden(34 + 5, true);
+			sheet.setColumnHidden(34 + 5 + optionalOffset, true);
 		}else {
-			sheet.setColumnHidden(30 + 5, true);
+			sheet.setColumnHidden(30 + 5 + optionalOffset, true);
 		}
 	}
   
+	// beforeBigo(비고 앞까지의 값들)에 항타기종류/상부RPM(있을 때만)을 끼워넣고,
+	// 그 뒤에 비고/메모/중복판정용 꼬리값(duplicated, totalDuplicated)을 붙인다.
+	private String[] appendOptionalColumns(String[] beforeBigo, ReportOneLine domain) {
+		List<String> list = new ArrayList<String>(Arrays.asList(beforeBigo));
+		if (hasMachineType) {
+			list.add(domain.getMachineType());
+		}
+		if (hasTopRpm) {
+			list.add(domain.getTopRpm());
+		}
+		list.add(domain.getBigo());
+		list.add(domain.getSprCol1());
+		list.add(String.valueOf(domain.getDuplicated()));
+		list.add(String.valueOf(domain.getTotalDuplicated()));
+		return list.toArray(new String[0]);
+	}
+
 	private void setColumn(HSSFWorkbook workbook, HSSFRow row1, String[] strings, CellStyle style, CellStyle redStyle,
 			CellStyle blueStyle, CellStyle pupleStyle, CellStyle orangeStyle, CellStyle yellowStyle) {
 
@@ -645,49 +669,51 @@ public class ReportTenAll extends AbstractExcelView
 	private void setExcelSignroomLayoutSetting(HSSFSheet sheet, HSSFWorkbook workbook, List<ExcelSignroom> signRoomList) {
 		createExcelSignroom(sheet, workbook, signRoomList);
 		ExcelTitleUtil.addFifthApprover(sheet, signRoomList);
-		
+
+		int optionalOffset = (hasMachineType ? 1 : 0) + (hasTopRpm ? 1 : 0);
+
 		if (ubcYn > 0) { // 현장명
 
 			if (getSignRoomApproverName(0, signRoomList) != "") {
-				sheet.addMergedRegion(new CellRangeAddress(0, 0, 31 + 5, 33 + 5));
-				sheet.addMergedRegion(new CellRangeAddress(1, 1, 31 + 5, 33 + 5));
+				sheet.addMergedRegion(new CellRangeAddress(0, 0, 31 + 5 + optionalOffset, 33 + 5 + optionalOffset));
+				sheet.addMergedRegion(new CellRangeAddress(1, 1, 31 + 5 + optionalOffset, 33 + 5 + optionalOffset));
 			}
 
 			if (getSignRoomApproverName(1, signRoomList) != "") {
-				sheet.addMergedRegion(new CellRangeAddress(0, 0, 28 + 5, 30 + 5));
-				sheet.addMergedRegion(new CellRangeAddress(1, 1, 28 + 5, 30 + 5));
+				sheet.addMergedRegion(new CellRangeAddress(0, 0, 28 + 5 + optionalOffset, 30 + 5 + optionalOffset));
+				sheet.addMergedRegion(new CellRangeAddress(1, 1, 28 + 5 + optionalOffset, 30 + 5 + optionalOffset));
 			}
 
 			if (getSignRoomApproverName(2, signRoomList) != "") {
-				sheet.addMergedRegion(new CellRangeAddress(0, 0, 25 + 5, 27 + 5));
-				sheet.addMergedRegion(new CellRangeAddress(1, 1, 25 + 5, 27 + 5));
+				sheet.addMergedRegion(new CellRangeAddress(0, 0, 25 + 5 + optionalOffset, 27 + 5 + optionalOffset));
+				sheet.addMergedRegion(new CellRangeAddress(1, 1, 25 + 5 + optionalOffset, 27 + 5 + optionalOffset));
 			}
 
 			if (getSignRoomApproverName(3, signRoomList) != "") {
-				sheet.addMergedRegion(new CellRangeAddress(0, 0, 22 + 5, 24 + 5));
-				sheet.addMergedRegion(new CellRangeAddress(1, 1, 22 + 5, 24 + 5));
+				sheet.addMergedRegion(new CellRangeAddress(0, 0, 22 + 5 + optionalOffset, 24 + 5 + optionalOffset));
+				sheet.addMergedRegion(new CellRangeAddress(1, 1, 22 + 5 + optionalOffset, 24 + 5 + optionalOffset));
 			}
 
 		} else { // 현장명
 
 			if (getSignRoomApproverName(0, signRoomList) != "") {
-				sheet.addMergedRegion(new CellRangeAddress(0, 0, 27 + 5, 29 + 5));
-				sheet.addMergedRegion(new CellRangeAddress(1, 1, 27 + 5, 29 + 5));
+				sheet.addMergedRegion(new CellRangeAddress(0, 0, 27 + 5 + optionalOffset, 29 + 5 + optionalOffset));
+				sheet.addMergedRegion(new CellRangeAddress(1, 1, 27 + 5 + optionalOffset, 29 + 5 + optionalOffset));
 			}
 
 			if (getSignRoomApproverName(1, signRoomList) != "") {
-				sheet.addMergedRegion(new CellRangeAddress(0, 0, 24 + 5, 26 + 5));
-				sheet.addMergedRegion(new CellRangeAddress(1, 1, 24 + 5, 26 + 5));
+				sheet.addMergedRegion(new CellRangeAddress(0, 0, 24 + 5 + optionalOffset, 26 + 5 + optionalOffset));
+				sheet.addMergedRegion(new CellRangeAddress(1, 1, 24 + 5 + optionalOffset, 26 + 5 + optionalOffset));
 			}
 
 			if (getSignRoomApproverName(2, signRoomList) != "") {
-				sheet.addMergedRegion(new CellRangeAddress(0, 0, 21 + 5, 23 + 5));
-				sheet.addMergedRegion(new CellRangeAddress(1, 1, 21 + 5, 23 + 5));
+				sheet.addMergedRegion(new CellRangeAddress(0, 0, 21 + 5 + optionalOffset, 23 + 5 + optionalOffset));
+				sheet.addMergedRegion(new CellRangeAddress(1, 1, 21 + 5 + optionalOffset, 23 + 5 + optionalOffset));
 			}
 
 			if (getSignRoomApproverName(3, signRoomList) != "") {
-				sheet.addMergedRegion(new CellRangeAddress(0, 0, 18 + 5, 20 + 5));
-				sheet.addMergedRegion(new CellRangeAddress(1, 1, 18 + 5, 20 + 5));
+				sheet.addMergedRegion(new CellRangeAddress(0, 0, 18 + 5 + optionalOffset, 20 + 5 + optionalOffset));
+				sheet.addMergedRegion(new CellRangeAddress(1, 1, 18 + 5 + optionalOffset, 20 + 5 + optionalOffset));
 			}
 		}
 	}
@@ -697,76 +723,26 @@ public class ReportTenAll extends AbstractExcelView
 		 HSSFRow secondRow = sheet.getRow(0);
 		 HSSFRow thirdRow = sheet.createRow(1);
 		 
-		 if(ubcYn > 0) {
-			 setSignRoomHeader(workbook, secondRow, new String[] { 
-	    			"","","","","","","","","","",
-	    			"","","","","","","","","","",
-	    			"","","","","","",""
-	    			, getSignRoomApproverName(3, signRoomList)
-	    			, getSignRoomApproverName(3, signRoomList)
-	    			, getSignRoomApproverName(3, signRoomList)
-	    			, getSignRoomApproverName(2, signRoomList)
-	    			, getSignRoomApproverName(2, signRoomList)
-	    			, getSignRoomApproverName(2, signRoomList)
-	    			, getSignRoomApproverName(1, signRoomList)
-	    			, getSignRoomApproverName(1, signRoomList)
-	    			, getSignRoomApproverName(1, signRoomList)
-	    			, getSignRoomApproverName(0, signRoomList)
-	    			, getSignRoomApproverName(0, signRoomList)
-	    			, getSignRoomApproverName(0, signRoomList)
-			});
-			 setSignThirdrowRoomHeader(workbook, thirdRow, new String[] { 
-					 "","","","","","","","","","",
-					 "","","","","","","","","","",
-					 "","","","","","",""
-					 , getSignRoomApproverName(3, signRoomList)
-					 , getSignRoomApproverName(3, signRoomList)
-					 , getSignRoomApproverName(3, signRoomList)
-					 , getSignRoomApproverName(2, signRoomList)
-					 , getSignRoomApproverName(2, signRoomList)
-					 , getSignRoomApproverName(2, signRoomList)
-					 , getSignRoomApproverName(1, signRoomList)
-					 , getSignRoomApproverName(1, signRoomList)
-					 , getSignRoomApproverName(1, signRoomList)  
-					 , getSignRoomApproverName(0, signRoomList)
-					 , getSignRoomApproverName(0, signRoomList)
-					 , getSignRoomApproverName(0, signRoomList)
-			 });
-	    }else {
-	    	 setSignRoomHeader(workbook, secondRow, new String[] { 
-	    			"","","","","","","","","","",
-	    			"","","","","","","","","","","","",""
-	    			, getSignRoomApproverName(3, signRoomList)
-	    			, getSignRoomApproverName(3, signRoomList)
-	    			, getSignRoomApproverName(3, signRoomList)
-	    			, getSignRoomApproverName(2, signRoomList)
-	    			, getSignRoomApproverName(2, signRoomList)
-	    			, getSignRoomApproverName(2, signRoomList)
-	    			, getSignRoomApproverName(1, signRoomList)
-	    			, getSignRoomApproverName(1, signRoomList)
-	    			, getSignRoomApproverName(1, signRoomList)
-	    			, getSignRoomApproverName(0, signRoomList)
-	    			, getSignRoomApproverName(0, signRoomList)
-	    			, getSignRoomApproverName(0, signRoomList)
-		    });
-	    	 setSignThirdrowRoomHeader(workbook, thirdRow, new String[] { 
-	    			 "","","","","","","","","","",
-	    			 "","","","","","","","","","","","",""
-	    			 , getSignRoomApproverName(3, signRoomList)
-	    			 , getSignRoomApproverName(3, signRoomList)
-	    			 , getSignRoomApproverName(3, signRoomList)
-	    			 , getSignRoomApproverName(2, signRoomList)
-	    			 , getSignRoomApproverName(2, signRoomList)
-	    			 , getSignRoomApproverName(2, signRoomList)
-	    			 , getSignRoomApproverName(1, signRoomList)
-	    			 , getSignRoomApproverName(1, signRoomList)
-	    			 , getSignRoomApproverName(1, signRoomList)
-	    			 , getSignRoomApproverName(0, signRoomList)
-	    			 , getSignRoomApproverName(0, signRoomList)
-	    			 , getSignRoomApproverName(0, signRoomList)
-	    	 });
-	    }
+		 int baseEmptyCount = (ubcYn > 0) ? 27 : 23;
+		 String[] signRoomRow = buildSignRoomHeaderValues(baseEmptyCount, signRoomList);
+		 setSignRoomHeader(workbook, secondRow, signRoomRow);
+		 setSignThirdrowRoomHeader(workbook, thirdRow, signRoomRow);
 	}
+
+	 // 데이터 컬럼 개수(항타기종류/상부RPM 포함 여부)에 맞춰 결재란 앞 빈칸 개수를 동적으로 계산한다.
+	 private String[] buildSignRoomHeaderValues(int baseEmptyCount, List<ExcelSignroom> signRoomList) {
+		 int emptyCount = baseEmptyCount + (hasMachineType ? 1 : 0) + (hasTopRpm ? 1 : 0);
+		 List<String> values = new ArrayList<String>();
+		 for (int i = 0; i < emptyCount; i++) {
+			 values.add("");
+		 }
+		 for (int approverIndex = 3; approverIndex >= 0; approverIndex--) {
+			 for (int repeat = 0; repeat < 3; repeat++) {
+				 values.add(getSignRoomApproverName(approverIndex, signRoomList));
+			 }
+		 }
+		 return values.toArray(new String[0]);
+	 }
 
 	private String getSignRoomApproverName(int index, List<ExcelSignroom> signRoomList) {
 		String returnValue = "";
@@ -917,22 +893,22 @@ public class ReportTenAll extends AbstractExcelView
 	  
     HSSFRow row1 = sheet.createRow(tableLabelStartIndex);
     if(ubcYn > 0) {
-    	setColumnLabels(workbook, row1, ExcelTitleUtil.TEN_TOP_UBC);
+    	setColumnLabelsWithOptionalFields(workbook, row1, ExcelTitleUtil.TEN_TOP_UBC);
 	}else if(constructionIdx == 944 || constructionIdx == 1136) {
 		setColumnLabels(workbook, row1, ExcelTitleUtilForBooyoung.TEN_TOP);
     }else {
-    	setColumnLabels(workbook, row1, ExcelTitleUtil.TEN_TOP);
+    	setColumnLabelsWithOptionalFields(workbook, row1, ExcelTitleUtil.TEN_TOP);
     }
-    
+
     //추가
     HSSFRow row2 = sheet.createRow(tableLabelEndIndex);
 
     if(ubcYn > 0) {
-    	setColumnLabels(workbook, row2, ExcelTitleUtil.TEN_BOTTOM_UBC);
+    	setColumnLabelsWithOptionalFields(workbook, row2, ExcelTitleUtil.TEN_BOTTOM_UBC);
 	}else if(constructionIdx == 944 || constructionIdx == 1136) {
 		setColumnLabels(workbook, row2, ExcelTitleUtilForBooyoung.TEN_BOTTOM);
     } else {
-    	setColumnLabels(workbook, row2, ExcelTitleUtil.TEN_BOTTOM);
+    	setColumnLabelsWithOptionalFields(workbook, row2, ExcelTitleUtil.TEN_BOTTOM);
     }
   }
 
@@ -1052,48 +1028,39 @@ public class ReportTenAll extends AbstractExcelView
       22, 
       33));
     
-    sheet.addMergedRegion(new CellRangeAddress(
-      tableLabelStartIndex, 
-      tableLabelEndIndex, 
-      //추가   
-      
-      34,    
-      34));  
-    sheet.addMergedRegion(new CellRangeAddress(
-      tableLabelStartIndex, 
-      tableLabelEndIndex, 
-      //추가   
-      
-      35,    
-      35));  
-    
-    
     if(ubcYn > 0) {
-    	sheet.addMergedRegion(new CellRangeAddress(
-		      tableLabelStartIndex, 
-		      tableLabelEndIndex, 
-		      //추가   
-		      36,    
-		      36));  
-	    sheet.addMergedRegion(new CellRangeAddress(
-		      tableLabelStartIndex, 
-		      tableLabelEndIndex, 
-		      //추가   
-		      37,    
-		      37)); 
-	    sheet.addMergedRegion(new CellRangeAddress(
-		      tableLabelStartIndex, 
-		      tableLabelEndIndex, 
-		      //추가   
-		      38,    
-		      38)); 
-	    sheet.addMergedRegion(new CellRangeAddress(
-		      tableLabelStartIndex, 
-		      tableLabelEndIndex, 
-		      //추가   
-		      39,    
-		      39)); 
-	  
+    	// 극한지지력/해머효율/탄성계수/파일단면적(34~37)은 항상 그대로.
+    	sheet.addMergedRegion(new CellRangeAddress(tableLabelStartIndex, tableLabelEndIndex, 34, 34));
+    	sheet.addMergedRegion(new CellRangeAddress(tableLabelStartIndex, tableLabelEndIndex, 35, 35));
+    	sheet.addMergedRegion(new CellRangeAddress(tableLabelStartIndex, tableLabelEndIndex, 36, 36));
+    	sheet.addMergedRegion(new CellRangeAddress(tableLabelStartIndex, tableLabelEndIndex, 37, 37));
+    	// 비고/메모 자리(원래 38,39)는 항타기종류/상부RPM이 끼어든 만큼 뒤로 민다.
+    	int ubcTailIdx = 38;
+    	if (hasMachineType) {
+    		sheet.addMergedRegion(new CellRangeAddress(tableLabelStartIndex, tableLabelEndIndex, ubcTailIdx, ubcTailIdx));
+    		ubcTailIdx++;
+    	}
+    	if (hasTopRpm) {
+    		sheet.addMergedRegion(new CellRangeAddress(tableLabelStartIndex, tableLabelEndIndex, ubcTailIdx, ubcTailIdx));
+    		ubcTailIdx++;
+    	}
+    	sheet.addMergedRegion(new CellRangeAddress(tableLabelStartIndex, tableLabelEndIndex, ubcTailIdx, ubcTailIdx)); // 비고
+    	ubcTailIdx++;
+    	sheet.addMergedRegion(new CellRangeAddress(tableLabelStartIndex, tableLabelEndIndex, ubcTailIdx, ubcTailIdx)); // 메모
+    }else {
+    	// ubcYn<=0 분기는 34,35가 곧 비고/메모 자리였다 — 항타기종류/상부RPM을 그 앞에 끼워넣는다.
+    	int elseTailIdx = 34;
+    	if (hasMachineType) {
+    		sheet.addMergedRegion(new CellRangeAddress(tableLabelStartIndex, tableLabelEndIndex, elseTailIdx, elseTailIdx));
+    		elseTailIdx++;
+    	}
+    	if (hasTopRpm) {
+    		sheet.addMergedRegion(new CellRangeAddress(tableLabelStartIndex, tableLabelEndIndex, elseTailIdx, elseTailIdx));
+    		elseTailIdx++;
+    	}
+    	sheet.addMergedRegion(new CellRangeAddress(tableLabelStartIndex, tableLabelEndIndex, elseTailIdx, elseTailIdx)); // 비고
+    	elseTailIdx++;
+    	sheet.addMergedRegion(new CellRangeAddress(tableLabelStartIndex, tableLabelEndIndex, elseTailIdx, elseTailIdx)); // 메모
     }
   }
 
@@ -1122,8 +1089,54 @@ public class ReportTenAll extends AbstractExcelView
       cell.setCellStyle(style);
     }
   }
-  
-  
+
+  // 비고/메모 바로 앞에 항타기종류/상부RPM을 조건부로 끼워넣는다 (있을 때만 노출).
+  // columnLabels는 손대지 않고(다른 엑셀뷰와 공유되는 상수라서), 마지막 2개(비고,메모)만 뒤로 밀어서 쓴다.
+  private void setColumnLabelsWithOptionalFields(HSSFWorkbook workbook, HSSFRow rows, String[] columnLabels)
+  {
+    CellStyle style = workbook.createCellStyle();
+    style.setWrapText(true);
+    style.setAlignment((short)2);
+    style.setVerticalAlignment((short)1);
+    style.setLocked(true);
+
+    HSSFFont font = workbook.createFont();
+
+    style.setFont(font);
+    style.setBorderRight((short)1);
+    style.setBorderLeft((short)1);
+    style.setBorderTop((short)1);
+    style.setBorderBottom((short)1);
+    font.setBoldweight((short)700);
+
+    int idx = 0;
+    for (int i = 0; i < columnLabels.length - 2; i++) {
+      HSSFCell cell = rows.createCell(idx++);
+      rows.setHeight((short)480);
+      cell.setCellValue(columnLabels[i]);
+      cell.setCellStyle(style);
+    }
+    if (hasMachineType) {
+      HSSFCell cell = rows.createCell(idx++);
+      rows.setHeight((short)480);
+      cell.setCellValue("항타기종류");
+      cell.setCellStyle(style);
+    }
+    if (hasTopRpm) {
+      HSSFCell cell = rows.createCell(idx++);
+      rows.setHeight((short)480);
+      cell.setCellValue("상부RPM");
+      cell.setCellStyle(style);
+    }
+    for (int i = columnLabels.length - 2; i < columnLabels.length; i++) {
+      HSSFCell cell = rows.createCell(idx++);
+      rows.setHeight((short)480);
+      cell.setCellValue(columnLabels[i]);
+      cell.setCellStyle(style);
+    }
+  }
+
+
   private String setDinamicDate(int role, boolean isHiddenManager, int longCalYn, String currentDateTime, String createDate) {
 	  if(role == 0) {
 		  return createDate;
