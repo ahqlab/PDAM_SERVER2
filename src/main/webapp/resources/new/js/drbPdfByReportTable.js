@@ -787,6 +787,16 @@ function downloadDrivingOneRecoredBook(option) {
 		    if(constructionIdx == '815'){
 		    	constructionName = constructionName.replace("두산에너빌리티 선일산업", "").trim();
 		    }
+
+// listMultiOneLine.jsp의 공삭공은 td 텍스트가 아니라 input value로 렌더링 됨
+// 기존 현장별 td 인덱스 조건은 유지하고 input 값을 우선 매핑
+function getGongSacFromReportRow($row, fallbackIndex) {
+	var $input = $row.find('input[name="gongSac"]');
+	if($input.length > 0){
+		return ($input.first().val() || '').trim();
+	}
+	return $row.find('td:eq(' + fallbackIndex + ')').text().trim();
+}
 		    
 			var machineNumber = $('#machineNumber').val();
 			
@@ -992,6 +1002,11 @@ function downloadDrivingOneRecoredBook(option) {
 				
 			}
 			   
+		    var reportRowGongSac = getGongSacFromReportRow($('#reportTable tr').eq(index), -1);
+		    if(reportRowGongSac !== ''){
+			    currentGongSac = reportRowGongSac;
+		    }
+
 		    var allPiece = '';
 		    var allPieceValue = 0;
 		    var piece = document.getElementsByName("piece[" + index + "]");
