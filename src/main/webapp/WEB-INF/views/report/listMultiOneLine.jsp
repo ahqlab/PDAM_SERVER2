@@ -3305,7 +3305,7 @@
 								<td rowspan="2">해머효율(%)</td>
 								<td rowspan="2">탄성계수(t/cm2)</td>
 								<td rowspan="2">파일단면적(cm2)</td>
-								<c:if test="${hasTopRpm}"><td rowspan="2">상부RPM</td></c:if>
+								<c:if test="${hasTopRpm}"><td rowspan="2">상부전류치</td></c:if>
 								<td rowspan="2">비고</td>
 								<td rowspan="2">메모</td>
 							</c:when>
@@ -3335,11 +3335,11 @@
 												</c:otherwise>
 											</c:choose>
 										</td>
-										<c:if test="${hasTopRpm}"><td rowspan="2">상부RPM</td></c:if>
+										<c:if test="${hasTopRpm}"><td rowspan="2">상부전류치</td></c:if>
 										<td rowspan="2">비고</td>
 									</c:when>
 									<c:otherwise>
-										<c:if test="${hasTopRpm}"><td rowspan="2">상부RPM</td></c:if>
+										<c:if test="${hasTopRpm}"><td rowspan="2">상부전류치</td></c:if>
 										<td rowspan="2">비고</td>
 										<c:choose>
 											<c:when test="${param.constructionIdx == 492}">
@@ -3350,7 +3350,7 @@
 								</c:choose>	
 							</c:when>
 							<c:when test="${sessionInfo.role == 2}">
-								<c:if test="${hasTopRpm}"><td rowspan="2">상부RPM</td></c:if>
+								<c:if test="${hasTopRpm}"><td rowspan="2">상부전류치</td></c:if>
 								<td rowspan="2">비고</td>
 							</c:when>
 							<c:when test="${sessionInfo.role == 3}">
@@ -3360,11 +3360,11 @@
 										<td rowspan="2">해머효율(%)</td>
 										<td rowspan="2">탄성계수(t/cm2)</td>
 										<td rowspan="2">파일단면적(cm2)</td>
-										<c:if test="${hasTopRpm}"><td rowspan="2">상부RPM</td></c:if>
+										<c:if test="${hasTopRpm}"><td rowspan="2">상부전류치</td></c:if>
 										<td rowspan="2">비고</td>
 									</c:when>
 									<c:otherwise>
-										<c:if test="${hasTopRpm}"><td rowspan="2">상부RPM</td></c:if>
+										<c:if test="${hasTopRpm}"><td rowspan="2">상부전류치</td></c:if>
 										<td rowspan="2">비고</td>
 									</c:otherwise>
 								</c:choose>
@@ -3384,7 +3384,7 @@
 							<td rowspan="2">비고</td>
 							<c:choose>
 								<c:when test="${param.constructionIdx == 492}">
-									<c:if test="${hasTopRpm}"><td rowspan="2">상부RPM</td></c:if>
+									<c:if test="${hasTopRpm}"><td rowspan="2">상부전류치</td></c:if>
 								</c:when>
 							</c:choose>
 						</c:when>
@@ -3395,7 +3395,7 @@
 								<td rowspan="2">탄성계수(t/cm2)</td>
 								<td rowspan="2">파일단면적(cm2)</td>
 								<td rowspan="2">비고</td>
-								<c:if test="${hasTopRpm}"><td rowspan="2">상부RPM</td></c:if>
+								<c:if test="${hasTopRpm}"><td rowspan="2">상부전류치</td></c:if>
 							</c:when>
 						</c:choose> --%>
 					</tr>	
@@ -4909,7 +4909,7 @@
 	                <td class="viewTh">메모</td><td colspan="6"><input type="text" class="tdInput copy-input" id="copy_sprCol1" name="sprCol1" /></td>
 	            </tr>
 	            <tr>
-	                <td class="viewTh">상부RPM</td><td colspan="6"><input type="text" class="tdInput copy-input" id="copy_topRpm" name="topRpm" maxlength="50" /></td>
+	                <td class="viewTh">상부전류치</td><td colspan="6"><input type="text" class="tdInput copy-input" id="copy_topRpm" name="topRpm" maxlength="50" /></td>
 	            </tr>
 	            <tr>
 	                <td class="viewTh">비고</td><td colspan="6"><input type="text" class="tdInput copy-input" id="copy_bigo" name="bigo" /></td>

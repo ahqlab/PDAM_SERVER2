@@ -182,7 +182,7 @@ function doDelete(idx){
 						</c:choose>
 						<td>${domain.createDate}</td>
 						<td><a href="${pageContext.request.contextPath}/device/list?constructionIdx=${domain.id}">${domain.name}</a></td>
-						<td>${domain.location}</td>
+						<td><span class="${domain.v3DataYn == 1 ? 'v3DataYn' : ''}">${domain.location}</span></td>
 						<td>${domain.address}</td>
 						<td>${domain.manager}</td>
 						<td>${domain.contact}</td>

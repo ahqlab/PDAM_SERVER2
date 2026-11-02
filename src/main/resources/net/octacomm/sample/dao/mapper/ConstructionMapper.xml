@@ -146,6 +146,7 @@
                 ORDER BY C.CONTRACT_IDX DESC
                 LIMIT 1
             ), 0) AS latestContractSignedYn
+			, IF(EXISTS (SELECT 1 FROM TB_REPORT R INNER JOIN TB_DEVICE D ON D.id = R.deviceIdx WHERE D.constructionIdx = A.id AND R.isDel = 0 AND R.gongSac IS NOT NULL), 1, 0) AS v3DataYn
 			, B.groupName
     	FROM TB_CONSTRUCTION A, TB_GROUP B
     	<include refid="condition"/>
@@ -177,6 +178,7 @@
 			, A.ubcYn
 			, A.originDataYn 
 			, A.showPdfYn 
+			, IF(EXISTS (SELECT 1 FROM TB_REPORT R INNER JOIN TB_DEVICE D ON D.id = R.deviceIdx WHERE D.constructionIdx = A.id AND R.isDel = 0 AND R.gongSac IS NOT NULL), 1, 0) AS v3DataYn
     	FROM TB_CONSTRUCTION A, TB_GROUP B
     	<include refid="conditionByVim"/>
     	ORDER BY (case when A.id = 1482 then 10000 else (case when A.id = 587 then 9999 else 0 end) end ) desc , A.conduct ASC, A.id DESC
