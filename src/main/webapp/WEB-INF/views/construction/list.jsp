@@ -669,10 +669,10 @@ function setGroupName(){
 									<a class="ccard-name" href="${pageContext.request.contextPath}/device/list?constructionIdx=${domain.id}">
 										<c:choose>
 											<c:when test="${sessionInfo.userId eq 'ji2177'}">
-																<span class="${domain.v3DataYn == 1 ? 'v3DataYn' : ''}">${domain.location}</span>
+												<span class="${domain.v3DataYn == 1 ? 'v3DataYn' : ''}">${domain.location}</span>
 											</c:when>
 											<c:otherwise>
-																[${domain.name}] <span class="${domain.v3DataYn == 1 ? 'v3DataYn' : ''}">${domain.location}</span>
+												[${domain.name}] <span class="${domain.v3DataYn == 1 ? 'v3DataYn' : ''}">${domain.location}</span>
 											</c:otherwise>
 										</c:choose>
 									</a>
@@ -820,7 +820,7 @@ function setGroupName(){
 									</p>
 									<p class="addr" style="font-size: 20px; color: #999999; margin-top: 0px;" >
 										<a  class="name" href="${pageContext.request.contextPath}/device/list?constructionIdx=${domain.id}" >
-																 <span class="${domain.v3DataYn == 1 ? 'v3DataYn' : ''}">${domain.location}</span>
+											<span class="${domain.v3DataYn == 1 ? 'v3DataYn' : ''}">${domain.location}</span>
 										</a>
 									</p>
 									<p class="addr">
@@ -835,10 +835,10 @@ function setGroupName(){
 								<a  class="name" href="${pageContext.request.contextPath}/device/list?constructionIdx=${domain.id}" >
 									<c:choose>
 										<c:when test="${sessionInfo.userId eq 'ji2177'}">
-																		<span class="${domain.v3DataYn == 1 ? 'v3DataYn' : ''}">${domain.location}</span>
+											<span class="${domain.v3DataYn == 1 ? 'v3DataYn' : ''}">${domain.location}</span>
 										</c:when>
 										<c:otherwise>
-																		[${domain.name}] <span class="${domain.v3DataYn == 1 ? 'v3DataYn' : ''}">${domain.location}</span>
+											[${domain.name}] <span class="${domain.v3DataYn == 1 ? 'v3DataYn' : ''}">${domain.location}</span>
 										</c:otherwise>
 									</c:choose>
 								</a>
