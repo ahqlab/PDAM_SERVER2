@@ -863,6 +863,20 @@ function gongSacForDailyPdf(item, balance, constructionIdx){
 	return gongSacFixExp(balance, calGongSac(item.totalConnectWidth, item.intrusionDepth, item.drillingDepth, constructionIdx), constructionIdx);
 }
 
+// 현장별 기존 조건을 먼저 적용 후나머지 현장은 저장된 gongSac을 PDF에 매핑
+function gongSacForPdf(item, constructionIdx){
+	if(constructionIdx == 783){
+		return gongSacFixExp(item.balance, calGongSac(item.totalConnectWidth, item.intrusionDepth, item.drillingDepth, constructionIdx), constructionIdx);
+	}
+	if(constructionIdx == 1082){
+		return gongSacFixExp1082(balanceFixExp1082(getBalance1082(item)));
+	}
+	if(item.gongSac !== null && item.gongSac !== undefined && String(item.gongSac).trim() !== ''){
+		return item.gongSac;
+	}
+	return gongSacFixExp(item.balance, calGongSac(item.totalConnectWidth, item.intrusionDepth, item.drillingDepth, constructionIdx), constructionIdx);
+}
+
 function downloadDrivingRecoredBook(root, constructionIdx, machineNumber, currentDateTime, option){
 	
 	if(confirm("일일 기록지를 출력하시겠습니까?")){
@@ -1174,7 +1188,8 @@ function downloadDrivingAllRecoredBook(root, constructionIdx, machineNumber){
 						var currentTotalPenetrationValue = item.totalPenetrationValue;
 						var currentMachineType = item.machineType;
 						var currentTopRpm = item.topRpm;
-						var currentGongSac = gongSacFixExp(item.balance, calGongSac(item.totalConnectWidth, item.intrusionDepth, item.drillingDepth, constructionIdx), constructionIdx);
+						/* var currentGongSac = gongSacFixExp(item.balance, calGongSac(item.totalConnectWidth, item.intrusionDepth, item.drillingDepth, constructionIdx), constructionIdx); */
+						var currentGongSac = gongSacForPdf(item, constructionIdx);
 						
 						
 						

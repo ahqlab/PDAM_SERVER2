@@ -61,6 +61,9 @@ public class Construction implements Domain{
 
 	// 최신 계약서 서명 여부: 1=서명됨, 0=그 외
     private int latestContractSignedYn;
+
+	// 공삭공 데이터가 저장된 현장 여부(공삭공 데이터가 있으면 v3 현장)
+	private int v3DataYn;
 }
 
 
