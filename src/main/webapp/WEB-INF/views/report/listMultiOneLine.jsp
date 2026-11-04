@@ -228,53 +228,56 @@
 		width: 100%;
 	}
 
-	.report-history-popup {
+	.popUp07 {
 		display: none;
-		position: fixed;
+		position: fixed !important;
 		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		width: 640px;
-		max-width: 94vw;
-		max-height: 88vh;
+	    left: 50%;
+	    transform: translate(-50%, -50%);
+		width: 90%;
+	    max-width: 800px;
 		z-index: 10001;
 		background: #fff;
-		border-radius: 8px;
-		box-shadow: 0 8px 30px rgba(0, 0, 0, 0.32);
-		overflow: hidden;
-		flex-direction: column;
+	    flex-direction: column;
+	    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 	}
 
-	.report-history-header {
+	.popUp07 .popTit {
+		position: relative;
+		top: auto;
+		left: auto;
+		width: auto;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
 		height: 56px;
+		line-height: normal;
 		padding: 0 20px;
 		background: #0783a5;
 		color: #fff;
 		box-sizing: border-box;
+		flex: 0 0 56px;
 	}
 
-	.report-history-header h2 {
-		margin: 0;
-		font-size: 20px;
-		font-weight: 500;
-	}
-
-	.report-history-close {
-		border: 0;
-		background: transparent;
+	.report-history-download {
+		display: block;
+		margin: 0 0 12px auto;
+		padding: 7px 11px;
+		border: 1px solid #0783a5;
+		border-radius: 4px;
+		background: #0783a5;
 		color: #fff;
-		font-size: 26px;
-		line-height: 1;
+		font-size: 12px;
 		cursor: pointer;
-		padding: 4px;
 	}
 
-	.report-history-body {
-		padding: 34px 18px 16px;
+	.popUp07 .popCont {
+		padding: 18px 18px 16px;
 		box-sizing: border-box;
+		max-height: none;
+		min-height: 0;
+		overflow: auto;
+		flex: 1 1 auto;
 	}
 
 	.report-history-table {
@@ -466,11 +469,26 @@
 	    line-height: 1;
 	}
 	
+	@media screen and (max-width: 1023px) {
+		.report-sticky-scrollbar { display: none !important; }
+		.min485 .tableArea,
+		.min485 .viewTable {
+			height: auto !important;
+			max-height: none !important;
+			overflow-y: visible !important;
+		}
+		.min485 .tableScroll {
+			height: auto !important;
+			max-height: none !important;
+			overflow-y: visible !important;
+		}
+	}
+
 	@media screen and (max-width: 767px) {
 		.report-actions-stack { width: 305px; }
 		.report-actions-stack-basic { width: 130px; }
-		.report-history-popup { width: 96vw; }
-		.report-history-body { padding: 18px 10px 12px; }
+		.popUp07 { width: 96vw; }
+		.popUp07 .popCont { padding: 18px 10px 12px; }
 		.report-history-table { font-size: 11px; }
 		.report-history-table th, .report-history-table td { padding: 5px 2px; }
 		.report-history-change-row { grid-template-columns: 82px 1fr 28px 1fr; }
@@ -543,6 +561,10 @@
 		var pointerOverSticky = false;
 
 		function updateStickyScrollbar(updateWidth) {
+			if (window.matchMedia && window.matchMedia('(max-width: 1023px)').matches) {
+				stickyScrollbar.style.display = 'none';
+				return;
+			}
 			if (updateWidth) needsSizing = true;
 			var areaRect = tableArea.getBoundingClientRect();
 			var visible = areaRect.bottom > 0 && areaRect.top < window.innerHeight;
@@ -2712,16 +2734,24 @@
 	}
 
 	function openReportHistory(page) {
-		$('#reportHistoryPopup').css('display', 'flex');
+		$('.popUp07').css('display', 'flex');
 		$('.popLayer').show();
 		$('body').css('overflow', 'hidden');
 		loadReportHistoryPage(page || 1);
 	}
 
 	function closeReportHistory() {
-		$('#reportHistoryPopup').hide();
+		$('.popUp07').hide();
 		$('.popLayer').hide();
 		$('body').css('overflow', 'auto');
+	}
+
+	function downloadReportHistoryExcel() {
+		var query = $.param({
+			deviceIdx: Number('${param.id}'),
+			workDate: '${param.date}'
+		});
+		location.href = '${pageContext.request.contextPath}/report/history/download/excel?' + query;
 	}
 
 	function loadReportHistoryPage(page) {
@@ -3090,7 +3120,7 @@
 								<c:when test="${sessionInfo.role == 0 || sessionInfo.hiddenManager == true || sessionInfo.role == 3}">
 									<c:if test="${useExcel}"><div class="btnType02 bg02" onclick="javascript:downloadExcel();">엑셀 출력</div></c:if>
 									<div class="btnType01" onclick="javascript:onClickReportUpdate();">기록지 수정</div>
-									<div class="btnType01 reportHistoryBtn" onclick="javascript:openReportHistory(1);">수정 이력</div>
+									<c:if test="${sessionInfo.hiddenManager != true && (sessionScope.isSystemAdmin == true || sessionInfo.role == 0)}"><div class="btnType01 reportHistoryBtn" onclick="javascript:openReportHistory(1);">수정 이력</div></c:if>
 								</c:when>
 								<c:otherwise>
 									<c:if test="${useExcel}"><div class="btnType02 bg02" onclick="javascript:downloadExcel();">엑셀 출력</div></c:if>
@@ -3157,7 +3187,7 @@
 								<c:when test="${sessionInfo.role == 0 || sessionInfo.hiddenManager == true || sessionInfo.role == 3}">
 									<c:if test="${useExcel}"><div class="btnType02 bg02" onclick="javascript:downloadExcel();">엑셀 출력</div></c:if>
 									<div class="btnType01" onclick="javascript:onClickReportUpdate();">기록지 수정</div>
-									<div class="btnType01 reportHistoryBtn" onclick="javascript:openReportHistory(1);">수정 이력</div>
+									<c:if test="${sessionInfo.hiddenManager != true && (sessionScope.isSystemAdmin == true || sessionInfo.role == 0)}"><div class="btnType01 reportHistoryBtn" onclick="javascript:openReportHistory(1);">수정 이력</div></c:if>
 								</c:when>
 								<c:otherwise>
 									<c:if test="${useExcel}"><div class="btnType02 bg02" onclick="javascript:downloadExcel();" style="float: right;">엑셀 출력</div></c:if>
@@ -4982,12 +5012,13 @@
 		</div>
 	</div>
 
-	<div id="reportHistoryPopup" class="report-history-popup" role="dialog" aria-modal="true" aria-labelledby="reportHistoryTitle">
-		<div class="report-history-header">
-			<h2 id="reportHistoryTitle">수정이력</h2>
-			<button type="button" class="report-history-close" onclick="closeReportHistory();" aria-label="닫기">×</button>
+	<div class="popUp popUp07">
+		<div class="popTit">
+			<p>수정이력</p>
+			<img class="popClose" src="${pageContext.request.contextPath}/new/img/popclose.png" onclick="closeReportHistory();" style="cursor:pointer;" />
 		</div>
-		<div class="report-history-body">
+		<div class="popCont">
+			<button type="button" class="report-history-download" onclick="downloadReportHistoryExcel();">엑셀 다운로드</button>
 			<table class="report-history-table">
 				<colgroup>
 					<col width="20%">
@@ -5055,7 +5086,7 @@
 	$('.popUp').hide();
 	$('.popLayer').hide();
 	$('.popLayer').on('click.reportHistory', function() {
-		if ($('#reportHistoryPopup').is(':visible')) {
+		if ($('.popUp07').is(':visible')) {
 			closeReportHistory();
 		}
 	});
