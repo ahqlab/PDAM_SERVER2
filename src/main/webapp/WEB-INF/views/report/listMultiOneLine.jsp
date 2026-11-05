@@ -3120,7 +3120,7 @@
 								<c:when test="${sessionInfo.role == 0 || sessionInfo.hiddenManager == true || sessionInfo.role == 3}">
 									<c:if test="${useExcel}"><div class="btnType02 bg02" onclick="javascript:downloadExcel();">엑셀 출력</div></c:if>
 									<div class="btnType01" onclick="javascript:onClickReportUpdate();">기록지 수정</div>
-									<c:if test="${sessionInfo.hiddenManager != true && (sessionScope.isSystemAdmin == true || sessionInfo.role == 0)}"><div class="btnType01 reportHistoryBtn" onclick="javascript:openReportHistory(1);">수정 이력</div></c:if>
+									<c:if test="${sessionInfo.role == 0}"><div class="btnType01 reportHistoryBtn" onclick="javascript:openReportHistory(1);">수정 이력</div></c:if>
 								</c:when>
 								<c:otherwise>
 									<c:if test="${useExcel}"><div class="btnType02 bg02" onclick="javascript:downloadExcel();">엑셀 출력</div></c:if>
@@ -3187,7 +3187,7 @@
 								<c:when test="${sessionInfo.role == 0 || sessionInfo.hiddenManager == true || sessionInfo.role == 3}">
 									<c:if test="${useExcel}"><div class="btnType02 bg02" onclick="javascript:downloadExcel();">엑셀 출력</div></c:if>
 									<div class="btnType01" onclick="javascript:onClickReportUpdate();">기록지 수정</div>
-									<c:if test="${sessionInfo.hiddenManager != true && (sessionScope.isSystemAdmin == true || sessionInfo.role == 0)}"><div class="btnType01 reportHistoryBtn" onclick="javascript:openReportHistory(1);">수정 이력</div></c:if>
+									<c:if test="${sessionInfo.role == 0}"><div class="btnType01 reportHistoryBtn" onclick="javascript:openReportHistory(1);">수정 이력</div></c:if>
 								</c:when>
 								<c:otherwise>
 									<c:if test="${useExcel}"><div class="btnType02 bg02" onclick="javascript:downloadExcel();" style="float: right;">엑셀 출력</div></c:if>
