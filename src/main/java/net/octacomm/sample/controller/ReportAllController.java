@@ -407,6 +407,7 @@ public class ReportAllController{
 			}else {
 				domainList = new ArrayList<ReportOneLine>();
 			}
+			enablePreciseGongSacForTargetDevice(domainList, param.getConstructionIdx());
 			addOptionalColumnFlags(model, domainList);
 
 			try {
@@ -451,6 +452,7 @@ public class ReportAllController{
 		}else {
 			domainList = new ArrayList<ReportOneLine>();
 		}
+		enablePreciseGongSacForTargetDevice(domainList, param.getConstructionIdx());
 		addOptionalColumnFlags(model, domainList);
 
 		try {
@@ -555,6 +557,7 @@ public class ReportAllController{
 			}else {
 				domainList = new ArrayList<ReportOneLine>();
 			}
+			enablePreciseGongSacForTargetDevice(domainList, param.getConstructionIdx());
 			addOptionalColumnFlags(model, domainList);
 
 			try {
@@ -600,6 +603,7 @@ public class ReportAllController{
 		}else {
 			domainList = new ArrayList<ReportOneLine>();
 		}
+		enablePreciseGongSacForTargetDevice(domainList, param.getConstructionIdx());
 		addOptionalColumnFlags(model, domainList);
 
 		try {
@@ -959,5 +963,16 @@ public class ReportAllController{
 		}
 		model.addAttribute("hasMachineType", hasMachineType);
 		model.addAttribute("hasTopRpm", hasTopRpm);
+	}
+
+	private void enablePreciseGongSacForTargetDevice(List<ReportOneLine> domainList, int constructionIdx) {
+		if (constructionIdx != 2047 || domainList == null) {
+			return;
+		}
+		for (ReportOneLine domain : domainList) {
+			if (domain.getDeviceIdx() == 3484) {
+				domain.setPreciseStoredGongSac(true);
+			}
+		}
 	}
 }

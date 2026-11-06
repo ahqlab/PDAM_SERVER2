@@ -3,6 +3,7 @@ package net.octacomm.sample.view;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -59,6 +60,7 @@ public class ReportTenAllFor1338 extends AbstractExcelView
   protected void buildExcelDocument(Map<String, Object> model, HSSFWorkbook workbook, HttpServletRequest req, HttpServletResponse res)
     throws Exception
   {
+    Map<Short, CellStyle> gongSacStyleCache = new HashMap<Short, CellStyle>();
     String userAgent = req.getHeader("User-Agent");
     String fileName = "PDAM_REPORT_" + DateUtil.getCurrentDatetime() + ".xls";
 
@@ -135,7 +137,7 @@ public class ReportTenAllFor1338 extends AbstractExcelView
    
     System.err.println("reportList :  " + reportList.size());
 
-    createColunm(sheet, workbook, reportList);
+    createColunm(sheet, workbook, reportList, gongSacStyleCache);
     createSumColunm(sheet, workbook, reportList);
     
   }
@@ -398,7 +400,8 @@ public class ReportTenAllFor1338 extends AbstractExcelView
 	}
   
   
-  private void createColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<ReportOneLine> reportList) {
+  private void createColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<ReportOneLine> reportList,
+      Map<Short, CellStyle> gongSacStyleCache) {
 	  
 	  CellStyle style = styleOfBasicCellStyle(workbook);
       //공삭공
@@ -488,7 +491,7 @@ public class ReportTenAllFor1338 extends AbstractExcelView
     		        ((ReportOneLine)reportList.get(i)).getDrillingDepth(), 
     		        ((ReportOneLine)reportList.get(i)).getIntrusionDepth(), 
     		        String.valueOf(((ReportOneLine)reportList.get(i)).getBalance()), 
-    		        String.valueOf(((ReportOneLine)reportList.get(i)).getGongSac()), 
+    		        ((ReportOneLine)reportList.get(i)).formatGongSacForExcel(((ReportOneLine)reportList.get(i)).getGongSac()),
     		        ((ReportOneLine)reportList.get(i)).getHammaT(), 
     		        ((ReportOneLine)reportList.get(i)).getFallMeter(), 
     		        ((ReportOneLine)reportList.get(i)).getManagedStandard(), 
@@ -546,7 +549,7 @@ public class ReportTenAllFor1338 extends AbstractExcelView
     		        ((ReportOneLine)reportList.get(i)).getDrillingDepth(), 
     		        ((ReportOneLine)reportList.get(i)).getIntrusionDepth(), 
     		        String.valueOf(((ReportOneLine)reportList.get(i)).getBalance()), 
-    		        String.valueOf(((ReportOneLine)reportList.get(i)).getGongSac()), 
+    		        ((ReportOneLine)reportList.get(i)).formatGongSacForExcel(((ReportOneLine)reportList.get(i)).getGongSac()),
     		        ((ReportOneLine)reportList.get(i)).getHammaT(), 
     		        ((ReportOneLine)reportList.get(i)).getFallMeter(), 
     		        ((ReportOneLine)reportList.get(i)).getManagedStandard(), 
@@ -566,7 +569,8 @@ public class ReportTenAllFor1338 extends AbstractExcelView
     	  strings = appendOptionalColumns(strings, (ReportOneLine) reportList.get(i));
       }
 
-      setColumn(workbook, row1, strings, style, redStyle, blueStyle , pupleStyle, orangeStyle, yellowStyle);
+      setColumn(workbook, row1, strings, style, redStyle, blueStyle , pupleStyle, orangeStyle, yellowStyle,
+      ((ReportOneLine) reportList.get(i)).isPreciseStoredGongSac(), gongSacStyleCache);
       hideColumn(sheet, piOneSum, piTwoSum, piThreeSum, piFourSum, piFiveSum, piSixSum, piSevenSum, connectLengthSum, gongSacSum);
       
     }
@@ -611,7 +615,8 @@ public class ReportTenAllFor1338 extends AbstractExcelView
 	}
 
 	private void setColumn(HSSFWorkbook workbook, HSSFRow row1, String[] strings, CellStyle style, CellStyle redStyle,
-			CellStyle blueStyle, CellStyle pupleStyle, CellStyle orangeStyle, CellStyle yellowStyle) {
+			CellStyle blueStyle, CellStyle pupleStyle, CellStyle orangeStyle, CellStyle yellowStyle,
+			boolean preciseGongSac, Map<Short, CellStyle> gongSacStyleCache) {
 
 		for (int i = 0; i < strings.length - 2; i++) {
 			HSSFCell cell = null;
@@ -651,6 +656,17 @@ public class ReportTenAllFor1338 extends AbstractExcelView
 				} else {
 					cell.setCellStyle(redStyle);
 				}*/
+			}
+			if (preciseGongSac && i == 20) {
+				CellStyle currentStyle = cell.getCellStyle();
+				CellStyle gongSacStyle = gongSacStyleCache.get(currentStyle.getIndex());
+				if (gongSacStyle == null) {
+					gongSacStyle = workbook.createCellStyle();
+					gongSacStyle.cloneStyleFrom(currentStyle);
+					gongSacStyle.setDataFormat(workbook.createDataFormat().getFormat("0.000"));
+					gongSacStyleCache.put(currentStyle.getIndex(), gongSacStyle);
+				}
+				cell.setCellStyle(gongSacStyle);
 			}
 		}
 	}

@@ -2188,10 +2188,25 @@
 		var tdElement = $tr.find('input#id').closest('td')[0];
 		openDateUpdatePopup(tdElement);
 	}
+
+	function isThreeDecimalGongSacTarget() {
+		var constructionIdx = Number('${param.constructionIdx}') || Number('${sessionInfo.constructionIdx}');
+		var deviceIdx = Number('${param.id}') || Number($('input[name="deviceIdx"]').first().val() || 0);
+		return constructionIdx === 2047 && deviceIdx === 3484;
+	}
+
+	function prepareCopyGongSacInput() {
+		if (isThreeDecimalGongSacTarget()) {
+			$('#copy_gongSac').attr('inputmode', 'decimal').attr('title', '소수점 이하 3자리까지 입력할 수 있습니다.');
+		} else {
+			$('#copy_gongSac').removeAttr('inputmode title');
+		}
+	}
 	
 	function openNewReportPopup() {
 	    $('.copy-input').val(""); 
 	    $('#copy_gongSac').removeData('sourceReportId');
+	    prepareCopyGongSacInput();
 	    $('#copy_intrusionDepth').data('intrusionDepthEdited', false);
 	    $('#copy_rownum').val("신규");
 	    recalculateNewReportDepths();
@@ -2221,6 +2236,7 @@
 	function copyAndInsertReport(element) {
 	    var $tr = $(element).closest('tr');
 	    $('#copy_gongSac').data('sourceReportId', Number($tr.find('#id').val() || 0));
+	    prepareCopyGongSacInput();
 	    
 	    $('.copy-input').each(function() {
 	        var name = $(this).attr('name'); 
@@ -2301,7 +2317,11 @@
 	    var $hammaTd = $tr.find('input[name="hammaT"]').closest('td');
 	    if($hammaTd.length > 0) {
 	        var storedGongSac = getStoredReportGongSac($tr);
-	        $('#copy_gongSac').val(storedGongSac === null ? '' : storedGongSac);
+	        var copyGongSac = storedGongSac === null ? '' : storedGongSac;
+	        if (isThreeDecimalGongSacTarget() && copyGongSac !== '' && isFinite(Number(copyGongSac))) {
+	            copyGongSac = Number(copyGongSac).toFixed(3);
+	        }
+	        $('#copy_gongSac').val(copyGongSac);
 	        $('#copy_balance').val($tr.find('.balance-value').text().trim() || "0");
 	    }
 
@@ -2430,6 +2450,11 @@
 
 		var sourceReportId = Number($('#copy_gongSac').data('sourceReportId') || 0);
 		var gongSacInput = ($('#copy_gongSac').val() || '').trim();
+		if (isThreeDecimalGongSacTarget() && gongSacInput !== '' && !/^-?\d+(?:\.\d{1,3})?$/.test(gongSacInput)) {
+			alert('공삭공은 소수점 이하 3자리까지 입력할 수 있습니다.');
+			$('#copy_gongSac').focus();
+			return;
+		}
 		var data = {
 			deviceIdx: Number($('input[name="deviceIdx"]').first().val() || 0), 
 			currentDateTime: currentDateTimeVal,
@@ -3851,7 +3876,22 @@
 												</c:choose>
 											</c:when>
 											<c:otherwise>
-												<input type="text" id="gongSac" name="gongSac" disabled="disabled" class="tdInput" value="${domain.gongSac}" <c:if test="${domain.gongSacNull}">readonly="readonly" title="기존 기록의 공삭은 자동 계산합니다."</c:if> />
+												<c:choose>
+													<c:when test="${(sessionInfo.constructionIdx == 2047 or param.constructionIdx == 2047) and domain.deviceIdx == 3484}">
+														<c:choose>
+															<c:when test="${domain.storedGongSac != null}">
+																<fmt:formatNumber value="${domain.storedGongSac}" pattern="0.000" var="gongSacDisplay" />
+															</c:when>
+															<c:otherwise>
+																<fmt:formatNumber value="${domain.gongSac}" pattern="0.000" var="gongSacDisplay" />
+															</c:otherwise>
+														</c:choose>
+														<input type="text" id="gongSac" name="gongSac" disabled="disabled" class="tdInput" value="${gongSacDisplay}" <c:if test="${domain.gongSacNull}">readonly="readonly" title="기존 기록의 공삭은 자동 계산합니다."</c:if> />
+													</c:when>
+													<c:otherwise>
+														<input type="text" id="gongSac" name="gongSac" disabled="disabled" class="tdInput" value="${domain.gongSac}" <c:if test="${domain.gongSacNull}">readonly="readonly" title="기존 기록의 공삭은 자동 계산합니다."</c:if> />
+													</c:otherwise>
+												</c:choose>
 											</c:otherwise>
 										</c:choose>
 									</c:otherwise>

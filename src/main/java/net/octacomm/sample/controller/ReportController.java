@@ -419,6 +419,17 @@ public class ReportController{
 		model.addAttribute("hasTopRpm", hasTopRpm);
 	}
 
+	private void enablePreciseGongSacForTargetDevice(List<ReportOneLine> domainList, int constructionIdx) {
+		if (constructionIdx != 2047 || domainList == null) {
+			return;
+		}
+		for (ReportOneLine domain : domainList) {
+			if (domain.getDeviceIdx() == 3484) {
+				domain.setPreciseStoredGongSac(true);
+			}
+		}
+	}
+
 	/**
 	 * settingRequired 현장은 옛 TB_CONSTRUCTION 플래그(longCalYn/ubcYn/originDataYn/showPdfYn) 대신
 	 * 권한 설정(관리자=보안코드 useAdmin*, 게스트=일반 useGuest*)을 따르도록 모델값을 덮어쓴다.
@@ -702,6 +713,7 @@ public class ReportController{
 			}else {
 				domainList = new ArrayList<ReportOneLine>();
 			}
+			enablePreciseGongSacForTargetDevice(domainList, param.getConstructionIdx());
 			addOptionalColumnFlags(model, domainList);
 			try {
 				if((int) session.getAttribute("role") == 3) {
@@ -760,6 +772,7 @@ public class ReportController{
 		}else {
 			domainList = new ArrayList<ReportOneLine>();
 		}
+		enablePreciseGongSacForTargetDevice(domainList, param.getConstructionIdx());
 		addOptionalColumnFlags(model, domainList);
 		try {
 			if((int) session.getAttribute("role") == 3) {
@@ -895,6 +908,7 @@ public class ReportController{
 			}else {
 				domainList = new ArrayList<ReportOneLine>();
 			}
+			enablePreciseGongSacForTargetDevice(domainList, param.getConstructionIdx());
 			addOptionalColumnFlags(model, domainList);
 			try {
 				if((int) session.getAttribute("role") == 3) {
@@ -956,6 +970,7 @@ public class ReportController{
 		}else {
 			domainList = new ArrayList<ReportOneLine>();
 		}
+		enablePreciseGongSacForTargetDevice(domainList, param.getConstructionIdx());
 		addOptionalColumnFlags(model, domainList);
 		try {
 			if((int) session.getAttribute("role") == 3) {

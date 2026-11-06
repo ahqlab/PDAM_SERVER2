@@ -3,6 +3,7 @@ package net.octacomm.sample.view;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -56,6 +57,7 @@ public class ReportFiveAll extends AbstractExcelView
 
   protected void buildExcelDocument(Map<String, Object> model, HSSFWorkbook workbook, HttpServletRequest req, HttpServletResponse res) throws Exception
   {
+    Map<Short, CellStyle> gongSacStyleCache = new HashMap<Short, CellStyle>();
     String userAgent = req.getHeader("User-Agent");
     String fileName = "PDAM_REPORT_" + DateUtil.getCurrentDatetime() + ".xls";
 
@@ -151,7 +153,7 @@ public class ReportFiveAll extends AbstractExcelView
     
     System.err.println("reportList :  " + reportList.size());
 
-    createColunm(sheet, workbook, reportList);
+    createColunm(sheet, workbook, reportList, gongSacStyleCache);
     createSumColunm(sheet, workbook, reportList);
     
   }
@@ -402,7 +404,8 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
 		return style;
 	}
  
-  private void createColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<ReportOneLine> reportList) {
+  private void createColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<ReportOneLine> reportList,
+      Map<Short, CellStyle> gongSacStyleCache) {
 	  
 	  CellStyle style = styleOfBasicCellStyle(workbook);
       //공삭공
@@ -484,7 +487,7 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
     		        ((ReportOneLine)reportList.get(i)).getDrillingDepth(), 
     		        ((ReportOneLine)reportList.get(i)).getIntrusionDepth(), 
     		        String.valueOf(((ReportOneLine)reportList.get(i)).getBalance()), 
-    		        String.valueOf( gongSacFixExp(((ReportOneLine)reportList.get(i)).getBalance(), ((ReportOneLine)reportList.get(i)).getGongSac(), param.getConstructionIdx())), 
+    		        ((ReportOneLine)reportList.get(i)).formatGongSacForExcel(gongSacFixExp(((ReportOneLine)reportList.get(i)).getBalance(), ((ReportOneLine)reportList.get(i)).getGongSac(), param.getConstructionIdx())),
     		        ((ReportOneLine)reportList.get(i)).getHammaT(), 
     		        ((ReportOneLine)reportList.get(i)).getFallMeter(), 
     		        ((ReportOneLine)reportList.get(i)).getManagedStandard(), 
@@ -532,7 +535,7 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
 	        ((ReportOneLine)reportList.get(i)).getDrillingDepth(), 
 	        ((ReportOneLine)reportList.get(i)).getIntrusionDepth(), 
 	        String.valueOf(((ReportOneLine)reportList.get(i)).getBalance()), 
-	        String.valueOf( gongSacFixExp(((ReportOneLine)reportList.get(i)).getBalance(), ((ReportOneLine)reportList.get(i)).getGongSac(), param.getConstructionIdx())), 
+	        ((ReportOneLine)reportList.get(i)).formatGongSacForExcel(gongSacFixExp(((ReportOneLine)reportList.get(i)).getBalance(), ((ReportOneLine)reportList.get(i)).getGongSac(), param.getConstructionIdx())),
 	        ((ReportOneLine)reportList.get(i)).getHammaT(), 
 	        ((ReportOneLine)reportList.get(i)).getFallMeter(), 
 	        ((ReportOneLine)reportList.get(i)).getManagedStandard(), 
@@ -546,7 +549,8 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
 	        };
     	  strings = appendOptionalColumns(strings, (ReportOneLine) reportList.get(i));
       }
-      setColumn(workbook, row1, strings, style, redStyle, blueStyle , pupleStyle, orangeStyle, yellowStyle);
+      setColumn(workbook, row1, strings, style, redStyle, blueStyle , pupleStyle, orangeStyle, yellowStyle,
+      ((ReportOneLine) reportList.get(i)).isPreciseStoredGongSac(), gongSacStyleCache);
       hideColumn(sheet, piOneSum, piTwoSum, piThreeSum, piFourSum, piFiveSum, connectLengthSum, gongSacSum);
     }
   }
@@ -879,7 +883,8 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
 	}
 
 	private void setColumn(HSSFWorkbook workbook, HSSFRow row1, String[] strings, CellStyle style, CellStyle redStyle,
-			CellStyle blueStyle, CellStyle pupleStyle, CellStyle orangeStyle, CellStyle yellowStyle) {
+			CellStyle blueStyle, CellStyle pupleStyle, CellStyle orangeStyle, CellStyle yellowStyle,
+			boolean preciseGongSac, Map<Short, CellStyle> gongSacStyleCache) {
 
 		for (int i = 0; i < strings.length - 2; i++) {
 			HSSFCell cell = row1.createCell(i);
@@ -919,6 +924,17 @@ private void createSumColunm(HSSFSheet sheet, HSSFWorkbook workbook, List<Report
 
 			if ((i == 27) && (Float.parseFloat(strings[21]) < Float.parseFloat(strings[27])))
 				cell.setCellStyle(redStyle);
+			if (preciseGongSac && i == 18) {
+				CellStyle currentStyle = cell.getCellStyle();
+				CellStyle gongSacStyle = gongSacStyleCache.get(currentStyle.getIndex());
+				if (gongSacStyle == null) {
+					gongSacStyle = workbook.createCellStyle();
+					gongSacStyle.cloneStyleFrom(currentStyle);
+					gongSacStyle.setDataFormat(workbook.createDataFormat().getFormat("0.000"));
+					gongSacStyleCache.put(currentStyle.getIndex(), gongSacStyle);
+				}
+				cell.setCellStyle(gongSacStyle);
+			}
 				/*if (Integer.parseInt(strings[strings.length - 2]) > 1) {
 					cell.setCellStyle(blueStyle);
 				} else {
