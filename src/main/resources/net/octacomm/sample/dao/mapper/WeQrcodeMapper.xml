@@ -8,7 +8,7 @@
         <where>
         	qrSaveFilename IS NOT NULL
 	       	<if test="param.searchField != null and param.searchField != '' and param.searchWord != null and param.searchWord != ''">
-       			and ${param.searchField} like '%${param.searchWord}%'
+       			AND ${param.searchField} LIKE CONCAT('%', #{param.searchWord}, '%')
        		</if>
        </where>
 	</sql>

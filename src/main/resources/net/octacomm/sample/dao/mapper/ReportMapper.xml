@@ -78,10 +78,10 @@
        			and date(AA.currentDateTime) <![CDATA[>=]]> #{param.startDate} and date(AA.currentDateTime) <![CDATA[<=]]> #{param.endDate} 
        		</if>
        		<if test="param.pileNo != null and param.pileNo != ''">
-       			and AA.pileNo = #{param.pileNo} 
+			and TRIM(AA.pileNo) = #{param.pileNo}
        		</if>
        		<if test="param.location != null and param.location != ''">
-       			and AA.location = #{param.location} 
+			and TRIM(AA.location) = #{param.location}
        		</if>
        		<if test="param.date != null and param.date != ''">
        			<choose>
@@ -169,7 +169,7 @@
 	    	</choose>
     </select>
    
-    <select id="getListByParam" resultType="Report">
+    <select id="getListByParam" resultType="Report" useCache="false">
     	SELECT 
 			BB.cnt as duplicated,
 		    IFNULL(CC.cnt, 0) as totalDuplicated,
@@ -354,51 +354,51 @@
 			ORDER BY A.createDate DESC ) as TB) AA LEFT OUTER JOIN
 				 (SELECT COUNT(*) as cnt,
 						 deviceIdx,
-                         pileNo,
-                         location,
-                         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey,
-                         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileType, '')) as pileTypeKey,
-                         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), method, '')) as methodKey
+                         TRIM(pileNo) as pileNo,
+                         TRIM(location) as location,
+                         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), '')) as pileStdKey,
+                         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), '')) as pileTypeKey,
+                         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) as methodKey
                     FROM TB_REPORT
 				   WHERE deviceIdx = ${param.id}
 					 AND isDel = 0
-				GROUP BY deviceIdx, pileNo, location,
-                    IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, ''),
-                    IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileType, ''),
-                    IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), method, '')) BB
+				GROUP BY deviceIdx, TRIM(pileNo), TRIM(location),
+	                    IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), ''),
+	                    IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), ''),
+	                    IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) BB
 		              ON AA.deviceIdx  = BB.deviceIdx
-					 AND AA.pileNo  = BB.pileNo
-					 AND AA.location  = BB.location
-					 AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = BB.pileStdKey
-					 AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileType, '') = BB.pileTypeKey
-					 AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.method, '') = BB.methodKey
+					 AND TRIM(AA.pileNo) = BB.pileNo
+					 AND TRIM(AA.location) = BB.location
+					 AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileStandard), '') = BB.pileStdKey
+					 AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileType), '') = BB.pileTypeKey
+					 AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.method), '') = BB.methodKey
 				LEFT OUTER JOIN
 				 (SELECT COUNT(*) as cnt,
-						 pileNo,
-                         location,
-                         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey,
-                         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileType, '')) as pileTypeKey,
-                         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), method, '')) as methodKey
+						 TRIM(pileNo) as pileNo,
+                         TRIM(location) as location,
+                         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), '')) as pileStdKey,
+                         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), '')) as pileTypeKey,
+                         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) as methodKey
                     FROM TB_REPORT
 				   WHERE deviceIdx IN (SELECT TD.ID FROM TB_DEVICE TD WHERE TD.constructionIdx = (
 							SELECT constructionIdx FROM TB_DEVICE WHERE ID IN (SELECT deviceIdx FROM TB_REPORT WHERE deviceIdx = ${param.id}) GROUP BY constructionIdx)
                         )
 					 AND isDel = 0
-				GROUP BY pileNo, location,
-                    IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, ''),
-                    IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileType, ''),
-                    IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), method, '')) CC
-		              ON AA.pileNo  = CC.pileNo
-					 AND AA.location  = CC.location
-					 AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = CC.pileStdKey
-					 AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileType, '') = CC.pileTypeKey
-					 AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.method, '') = CC.methodKey
+				GROUP BY TRIM(pileNo), TRIM(location),
+	                    IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), ''),
+	                    IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), ''),
+	                    IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) CC
+					  ON TRIM(AA.pileNo) = CC.pileNo
+					 AND TRIM(AA.location) = CC.location
+					 AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileStandard), '') = CC.pileStdKey
+					 AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileType), '') = CC.pileTypeKey
+					 AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.method), '') = CC.methodKey
 		   WHERE 1=1
 		    ORDER BY AA.createDate DESC
            LIMIT #{pageSize} OFFSET #{startRow}
     </select> 
     
-    <select id="getReportOneLineListByParam" resultType="ReportOneLine">
+    <select id="getReportOneLineListByParam" resultType="ReportOneLine" useCache="false">
     	SELECT 
 			BB.cnt as duplicated,
 		    IFNULL(CC.cnt, 0) as totalDuplicated,
@@ -648,51 +648,51 @@
 			ORDER BY A.createDate DESC ) as TB) AA LEFT OUTER JOIN
 				 (SELECT COUNT(*) as cnt,
 						 deviceIdx,
-                         pileNo,
-                         location,
-                         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey,
-                         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileType, '')) as pileTypeKey,
-                         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), method, '')) as methodKey
+                         TRIM(pileNo) as pileNo,
+                         TRIM(location) as location,
+                         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), '')) as pileStdKey,
+                         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), '')) as pileTypeKey,
+                         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) as methodKey
                     FROM TB_REPORT
 				   WHERE deviceIdx = ${param.id}
 					 AND isDel = 0
-				GROUP BY deviceIdx, pileNo, location,
-                    IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, ''),
-                    IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileType, ''),
-                    IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), method, '')) BB
+				GROUP BY deviceIdx, TRIM(pileNo), TRIM(location),
+                    IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), ''),
+                    IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), ''),
+                    IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) BB
 		              ON AA.deviceIdx  = BB.deviceIdx
-					 AND AA.pileNo  = BB.pileNo
-					 AND AA.location  = BB.location
-					 AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = BB.pileStdKey
-					 AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileType, '') = BB.pileTypeKey
-					 AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.method, '') = BB.methodKey
+					 AND TRIM(AA.pileNo) = BB.pileNo
+					 AND TRIM(AA.location) = BB.location
+					 AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileStandard), '') = BB.pileStdKey
+					 AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileType), '') = BB.pileTypeKey
+					 AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.method), '') = BB.methodKey
 				LEFT OUTER JOIN
 				 (SELECT COUNT(*) as cnt,
-						 pileNo,
-                         location,
-                         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey,
-                         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileType, '')) as pileTypeKey,
-                         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), method, '')) as methodKey
+						 TRIM(pileNo) as pileNo,
+                         TRIM(location) as location,
+                         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), '')) as pileStdKey,
+                         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), '')) as pileTypeKey,
+                         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) as methodKey
                     FROM TB_REPORT
 				   WHERE deviceIdx IN (SELECT TD.ID FROM TB_DEVICE TD WHERE TD.constructionIdx = (
 							SELECT constructionIdx FROM TB_DEVICE WHERE ID IN (SELECT deviceIdx FROM TB_REPORT WHERE deviceIdx = ${param.id}) GROUP BY constructionIdx)
                         )
 					 AND isDel = 0
-				GROUP BY pileNo, location,
-                    IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, ''),
-                    IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileType, ''),
-                    IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), method, '')) CC
-		              ON AA.pileNo  = CC.pileNo
-					 AND AA.location  = CC.location
-					 AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = CC.pileStdKey
-					 AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileType, '') = CC.pileTypeKey
-					 AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.method, '') = CC.methodKey
+				GROUP BY TRIM(pileNo), TRIM(location),
+                    IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), ''),
+                    IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), ''),
+                    IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) CC
+		              ON TRIM(AA.pileNo) = CC.pileNo
+					 AND TRIM(AA.location) = CC.location
+					 AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileStandard), '') = CC.pileStdKey
+					 AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileType), '') = CC.pileTypeKey
+					 AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.method), '') = CC.methodKey
 		   WHERE 1=1
 		    ORDER BY AA.createDate DESC
            LIMIT #{pageSize} OFFSET #{startRow}
     </select>
 
-    <select id="getReportOneLineExtensivePileUsageListByParam" resultType="ReportOneLine">
+    <select id="getReportOneLineExtensivePileUsageListByParam" resultType="ReportOneLine" useCache="false">
     	SELECT 
 			BB.cnt as duplicated,
 		    IFNULL(CC.cnt, 0) as totalDuplicated,
@@ -948,45 +948,45 @@
 			ORDER BY A.createDate DESC ) as TB) AA LEFT OUTER JOIN
 				 (SELECT COUNT(*) as cnt,
 						 deviceIdx,
-                         pileNo,
-                         location,
-                         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey,
-                         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileType, '')) as pileTypeKey,
-                         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), method, '')) as methodKey
+                         TRIM(pileNo) as pileNo,
+                         TRIM(location) as location,
+                         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), '')) as pileStdKey,
+                         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), '')) as pileTypeKey,
+                         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) as methodKey
                     FROM TB_REPORT
 				   WHERE deviceIdx = ${param.id}
 					 AND isDel = 0
-				GROUP BY deviceIdx, pileNo, location,
-                    IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, ''),
-                    IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileType, ''),
-                    IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), method, '')) BB
+				GROUP BY deviceIdx, TRIM(pileNo), TRIM(location),
+                    IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), ''),
+                    IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), ''),
+                    IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) BB
 		              ON AA.deviceIdx  = BB.deviceIdx
-					 AND AA.pileNo  = BB.pileNo
-					 AND AA.location  = BB.location
-					 AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = BB.pileStdKey
-					 AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileType, '') = BB.pileTypeKey
-					 AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.method, '') = BB.methodKey
+					 AND TRIM(AA.pileNo) = BB.pileNo
+					 AND TRIM(AA.location) = BB.location
+					 AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileStandard), '') = BB.pileStdKey
+					 AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileType), '') = BB.pileTypeKey
+					 AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.method), '') = BB.methodKey
 				LEFT OUTER JOIN
 				 (SELECT COUNT(*) as cnt,
-						 pileNo,
-                         location,
-                         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey,
-                         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileType, '')) as pileTypeKey,
-                         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), method, '')) as methodKey
+						 TRIM(pileNo) as pileNo,
+                         TRIM(location) as location,
+                         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), '')) as pileStdKey,
+                         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), '')) as pileTypeKey,
+                         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) as methodKey
                     FROM TB_REPORT
 				   WHERE deviceIdx IN (SELECT TD.ID FROM TB_DEVICE TD WHERE TD.constructionIdx = (
 							SELECT constructionIdx FROM TB_DEVICE WHERE ID IN (SELECT deviceIdx FROM TB_REPORT WHERE deviceIdx = ${param.id}) GROUP BY constructionIdx)
                         )
 					 AND isDel = 0
-				GROUP BY pileNo, location,
-                    IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, ''),
-                    IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileType, ''),
-                    IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), method, '')) CC
-		              ON AA.pileNo  = CC.pileNo
-					 AND AA.location  = CC.location
-					 AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = CC.pileStdKey
-					 AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileType, '') = CC.pileTypeKey
-					 AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.method, '') = CC.methodKey
+				GROUP BY TRIM(pileNo), TRIM(location),
+                    IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), ''),
+                    IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), ''),
+                    IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) CC
+		              ON TRIM(AA.pileNo) = CC.pileNo
+					 AND TRIM(AA.location) = CC.location
+					 AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileStandard), '') = CC.pileStdKey
+					 AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileType), '') = CC.pileTypeKey
+					 AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=${param.id} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=${param.id})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.method), '') = CC.methodKey
 		   WHERE 1=1
 		    ORDER BY AA.createDate DESC
            LIMIT #{pageSize} OFFSET #{startRow}
@@ -1773,40 +1773,40 @@
 		         and C.id = #{param.constructionIdx} 
 		         and A.isdel = 0 
 			ORDER BY A.createDate asc ) as TB) AA LEFT OUTER JOIN
-				 (select count(*) as cnt, deviceIdx, pileNo, location,
-				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey,
-				         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileType, '')) as pileTypeKey,
-				         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), method, '')) as methodKey
+				 (select count(*) as cnt, deviceIdx, TRIM(pileNo) as pileNo, TRIM(location) as location,
+				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), '')) as pileStdKey,
+				         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), '')) as pileTypeKey,
+				         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) as methodKey
 				  from TB_REPORT
 					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} )
 					   and isDel = 0
-				     group by deviceIdx, pileNo, location,
-                     IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, ''),
-                     IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileType, ''),
-                     IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), method, '')) BB
+				     group by deviceIdx, TRIM(pileNo), TRIM(location),
+                     IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), ''),
+                     IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), ''),
+                     IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) BB
 		             ON AA.deviceIdx  = BB.deviceIdx
-					AND	AA.pileNo  = BB.pileNo
-					AND	AA.location  = BB.location
-					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = BB.pileStdKey
-					AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileType, '') = BB.pileTypeKey
-					AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.method, '') = BB.methodKey
+					AND	TRIM(AA.pileNo) = BB.pileNo
+					AND	TRIM(AA.location) = BB.location
+					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileStandard), '') = BB.pileStdKey
+					AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileType), '') = BB.pileTypeKey
+					AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.method), '') = BB.methodKey
 				LEFT OUTER JOIN
-				 (select count(*) as cnt, pileNo, location,
-				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey,
-				         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileType, '')) as pileTypeKey,
-				         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), method, '')) as methodKey
+				 (select count(*) as cnt, TRIM(pileNo) as pileNo, TRIM(location) as location,
+				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), '')) as pileStdKey,
+				         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), '')) as pileTypeKey,
+				         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) as methodKey
 				  from TB_REPORT
 					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} AND isDel = 0 AND conduct = 0 )
 					   and isDel = 0
-				     group by pileNo, location,
-                     IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileStandard, ''),
-                     IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileType, ''),
-                     IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), method, '')) CC
-		             ON AA.pileNo  = CC.pileNo
-					AND	AA.location  = CC.location
-					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = CC.pileStdKey
-					AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), AA.pileType, '') = CC.pileTypeKey
-					AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), AA.method, '') = CC.methodKey
+				     group by TRIM(pileNo), TRIM(location),
+                     IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), ''),
+                     IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), ''),
+                     IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) CC
+		             ON TRIM(AA.pileNo) = CC.pileNo
+					AND	TRIM(AA.location) = CC.location
+					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileStandard), '') = CC.pileStdKey
+					AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileType), '') = CC.pileTypeKey
+					AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(AA.method), '') = CC.methodKey
 		    <include refid="allExcelCondition"/>
 		    ORDER BY AA.machineNumber , AA.createDate ASC
     </select> 
@@ -1987,40 +1987,40 @@
 		         and C.id = #{param.constructionIdx} 
 		         and A.isdel = 0 
 			ORDER BY A.createDate asc ) as TB) AA LEFT OUTER JOIN
-				 (select count(*) as cnt, deviceIdx, pileNo, location,
-				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey,
-				         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileType, '')) as pileTypeKey,
-				         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), method, '')) as methodKey
+				 (select count(*) as cnt, deviceIdx, TRIM(pileNo) as pileNo, TRIM(location) as location,
+				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), '')) as pileStdKey,
+				         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), '')) as pileTypeKey,
+				         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) as methodKey
 				  from TB_REPORT
 					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} )
 					   and isDel = 0
-				     group by deviceIdx, pileNo, location,
-                     IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, ''),
-                     IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileType, ''),
-                     IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), method, '')) BB
+				     group by deviceIdx, TRIM(pileNo), TRIM(location),
+                     IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), ''),
+                     IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), ''),
+                     IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) BB
 		             ON AA.deviceIdx  = BB.deviceIdx
-					AND	AA.pileNo  = BB.pileNo
-					AND	AA.location  = BB.location
-					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = BB.pileStdKey
-					AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileType, '') = BB.pileTypeKey
-					AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.method, '') = BB.methodKey
+					AND	TRIM(AA.pileNo) = BB.pileNo
+					AND	TRIM(AA.location) = BB.location
+					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileStandard), '') = BB.pileStdKey
+					AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileType), '') = BB.pileTypeKey
+					AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.method), '') = BB.methodKey
 				LEFT OUTER JOIN
-				 (select count(*) as cnt, pileNo, location,
-				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey,
-				         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileType, '')) as pileTypeKey,
-				         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), method, '')) as methodKey
+				 (select count(*) as cnt, TRIM(pileNo) as pileNo, TRIM(location) as location,
+				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), '')) as pileStdKey,
+				         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), '')) as pileTypeKey,
+				         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) as methodKey
 				  from TB_REPORT
 					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} AND isDel = 0 AND conduct = 0 )
 					   and isDel = 0
-				     group by pileNo, location,
-                     IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileStandard, ''),
-                     IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileType, ''),
-                     IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), method, '')) CC
-		             ON AA.pileNo  = CC.pileNo
-					AND	AA.location  = CC.location
-					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = CC.pileStdKey
-					AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), AA.pileType, '') = CC.pileTypeKey
-					AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), AA.method, '') = CC.methodKey
+				     group by TRIM(pileNo), TRIM(location),
+                     IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), ''),
+                     IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), ''),
+                     IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) CC
+		             ON TRIM(AA.pileNo) = CC.pileNo
+					AND	TRIM(AA.location) = CC.location
+					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileStandard), '') = CC.pileStdKey
+					AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileType), '') = CC.pileTypeKey
+					AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(AA.method), '') = CC.methodKey
 		    <include refid="allExcelCondition"/>
 		    ORDER BY AA.machineNumber , AA.createDate ASC
     </select> 
@@ -2201,40 +2201,40 @@
 		         and C.id = #{param.constructionIdx} 
 		         and A.isdel = 0 
 			ORDER BY A.createDate asc ) as TB) AA LEFT OUTER JOIN
-				 (select count(*) as cnt, deviceIdx, pileNo, location,
-				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey,
-				         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileType, '')) as pileTypeKey,
-				         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), method, '')) as methodKey
+				 (select count(*) as cnt, deviceIdx, TRIM(pileNo) as pileNo, TRIM(location) as location,
+				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), '')) as pileStdKey,
+				         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), '')) as pileTypeKey,
+				         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) as methodKey
 				  from TB_REPORT
 					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} )
 					   and isDel = 0
-				     group by deviceIdx, pileNo, location,
-                     IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, ''),
-                     IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileType, ''),
-                     IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), method, '')) BB
+				     group by deviceIdx, TRIM(pileNo), TRIM(location),
+                     IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), ''),
+                     IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), ''),
+                     IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) BB
 		             ON AA.deviceIdx  = BB.deviceIdx
-					AND	AA.pileNo  = BB.pileNo
-					AND	AA.location  = BB.location
-					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = BB.pileStdKey
-					AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileType, '') = BB.pileTypeKey
-					AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.method, '') = BB.methodKey
+					AND	TRIM(AA.pileNo) = BB.pileNo
+					AND	TRIM(AA.location) = BB.location
+					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileStandard), '') = BB.pileStdKey
+					AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileType), '') = BB.pileTypeKey
+					AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.method), '') = BB.methodKey
 				LEFT OUTER JOIN
-				 (select count(*) as cnt, pileNo, location,
-				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey,
-				         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileType, '')) as pileTypeKey,
-				         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), method, '')) as methodKey
+				 (select count(*) as cnt, TRIM(pileNo) as pileNo, TRIM(location) as location,
+				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), '')) as pileStdKey,
+				         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), '')) as pileTypeKey,
+				         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) as methodKey
 				  from TB_REPORT
 					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} AND isDel = 0 AND conduct = 0 )
 					   and isDel = 0
-				     group by pileNo, location,
-                     IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileStandard, ''),
-                     IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileType, ''),
-                     IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), method, '')) CC
-		             ON AA.pileNo  = CC.pileNo
-					AND	AA.location  = CC.location
-					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = CC.pileStdKey
-					AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), AA.pileType, '') = CC.pileTypeKey
-					AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), AA.method, '') = CC.methodKey
+				     group by TRIM(pileNo), TRIM(location),
+                     IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), ''),
+                     IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), ''),
+                     IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) CC
+		             ON TRIM(AA.pileNo) = CC.pileNo
+					AND	TRIM(AA.location) = CC.location
+					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileStandard), '') = CC.pileStdKey
+					AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileType), '') = CC.pileTypeKey
+					AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(AA.method), '') = CC.methodKey
 		    <include refid="allExcelCondition"/>
 		    ORDER BY AA.machineNumber , AA.createDate ASC
     </select> 
@@ -2398,40 +2398,40 @@
 		         and C.id = #{param.constructionIdx} 
 		         and A.isdel = 0 
 			ORDER BY A.createDate asc ) as TB) AA LEFT OUTER JOIN
-				 (select count(*) as cnt, deviceIdx, pileNo, location,
-				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey,
-				         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileType, '')) as pileTypeKey,
-				         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), method, '')) as methodKey
+				 (select count(*) as cnt, deviceIdx, TRIM(pileNo) as pileNo, TRIM(location) as location,
+				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), '')) as pileStdKey,
+				         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), '')) as pileTypeKey,
+				         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) as methodKey
 				  from TB_REPORT
 					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} )
 					   and isDel = 0
-				     group by deviceIdx, pileNo, location,
-                     IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, ''),
-                     IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileType, ''),
-                     IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), method, '')) BB
+				     group by deviceIdx, TRIM(pileNo), TRIM(location),
+                     IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), ''),
+                     IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), ''),
+                     IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) BB
 		             ON AA.deviceIdx  = BB.deviceIdx
-					AND	AA.pileNo  = BB.pileNo
-					AND	AA.location  = BB.location
-					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = BB.pileStdKey
-					AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileType, '') = BB.pileTypeKey
-					AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.method, '') = BB.methodKey
+					AND	TRIM(AA.pileNo) = BB.pileNo
+					AND	TRIM(AA.location) = BB.location
+					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileStandard), '') = BB.pileStdKey
+					AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileType), '') = BB.pileTypeKey
+					AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.method), '') = BB.methodKey
 				LEFT OUTER JOIN
-				 (select count(*) as cnt, pileNo, location,
-				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey,
-				         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileType, '')) as pileTypeKey,
-				         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), method, '')) as methodKey
+				 (select count(*) as cnt, TRIM(pileNo) as pileNo, TRIM(location) as location,
+				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), '')) as pileStdKey,
+				         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), '')) as pileTypeKey,
+				         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) as methodKey
 				  from TB_REPORT
 					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} AND isDel = 0 AND conduct = 0 )
 					   and isDel = 0
-				     group by pileNo, location,
-                     IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileStandard, ''),
-                     IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileType, ''),
-                     IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), method, '')) CC
-		             ON AA.pileNo  = CC.pileNo
-					AND	AA.location  = CC.location
-					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = CC.pileStdKey
-					AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), AA.pileType, '') = CC.pileTypeKey
-					AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), AA.method, '') = CC.methodKey
+				     group by TRIM(pileNo), TRIM(location),
+                     IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), ''),
+                     IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), ''),
+                     IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) CC
+		             ON TRIM(AA.pileNo) = CC.pileNo
+					AND	TRIM(AA.location) = CC.location
+					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileStandard), '') = CC.pileStdKey
+					AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileType), '') = CC.pileTypeKey
+					AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(AA.method), '') = CC.methodKey
 		    <include refid="allExcelCondition"/>
 		    ORDER BY AA.machineNumber , AA.createDate ASC
     </select> 
@@ -2613,40 +2613,40 @@
 		         and C.id = #{param.constructionIdx} 
 		         and A.isdel = 0 
 		ORDER BY A.createDate asc ) as TB) AA LEFT OUTER JOIN
-				 (select count(*) as cnt, deviceIdx, pileNo, location,
-				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey,
-				         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileType, '')) as pileTypeKey,
-				         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), method, '')) as methodKey
+				 (select count(*) as cnt, deviceIdx, TRIM(pileNo) as pileNo, TRIM(location) as location,
+				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), '')) as pileStdKey,
+				         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), '')) as pileTypeKey,
+				         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) as methodKey
 				  from TB_REPORT
 					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} )
 					   and isDel = 0
-				     group by deviceIdx, pileNo, location,
-                     IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, ''),
-                     IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileType, ''),
-                     IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), method, '')) BB
+				     group by deviceIdx, TRIM(pileNo), TRIM(location),
+                     IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), ''),
+                     IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), ''),
+                     IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) BB
 		             ON AA.deviceIdx  = BB.deviceIdx
-					AND	AA.pileNo  = BB.pileNo
-					AND	AA.location  = BB.location
-					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = BB.pileStdKey
-					AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileType, '') = BB.pileTypeKey
-					AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.method, '') = BB.methodKey
+					AND	TRIM(AA.pileNo) = BB.pileNo
+					AND	TRIM(AA.location) = BB.location
+					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileStandard), '') = BB.pileStdKey
+					AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileType), '') = BB.pileTypeKey
+					AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.method), '') = BB.methodKey
 				LEFT OUTER JOIN
-				 (select count(*) as cnt, pileNo, location,
-				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey,
-				         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileType, '')) as pileTypeKey,
-				         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), method, '')) as methodKey
+				 (select count(*) as cnt, TRIM(pileNo) as pileNo, TRIM(location) as location,
+				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), '')) as pileStdKey,
+				         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), '')) as pileTypeKey,
+				         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) as methodKey
 				  from TB_REPORT
 					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} AND isDel = 0 AND conduct = 0 )
 					   and isDel = 0
-				     group by pileNo, location,
-                     IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileStandard, ''),
-                     IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileType, ''),
-                     IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), method, '')) CC
-		             ON AA.pileNo  = CC.pileNo
-					AND	AA.location  = CC.location
-					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = CC.pileStdKey
-					AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), AA.pileType, '') = CC.pileTypeKey
-					AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), AA.method, '') = CC.methodKey
+				     group by TRIM(pileNo), TRIM(location),
+                     IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), ''),
+                     IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), ''),
+                     IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) CC
+		             ON TRIM(AA.pileNo) = CC.pileNo
+					AND	TRIM(AA.location) = CC.location
+					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileStandard), '') = CC.pileStdKey
+					AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileType), '') = CC.pileTypeKey
+					AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(AA.method), '') = CC.methodKey
 		    <include refid="allExcelCondition"/>
 		    	AND AA.deviceIdx = ${param.id}
 		    ORDER BY AA.machineNumber , AA.createDate ASC
@@ -2826,40 +2826,40 @@
 		         and C.id = #{param.constructionIdx} 
 		         and A.isdel = 0 
 		ORDER BY A.createDate asc ) as TB) AA LEFT OUTER JOIN
-				 (select count(*) as cnt, deviceIdx, pileNo, location,
-				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey,
-				         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileType, '')) as pileTypeKey,
-				         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), method, '')) as methodKey
+				 (select count(*) as cnt, deviceIdx, TRIM(pileNo) as pileNo, TRIM(location) as location,
+				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), '')) as pileStdKey,
+				         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), '')) as pileTypeKey,
+				         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) as methodKey
 				  from TB_REPORT
 					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} )
 					   and isDel = 0
-				     group by deviceIdx, pileNo, location,
-                     IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, ''),
-                     IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileType, ''),
-                     IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), method, '')) BB
+				     group by deviceIdx, TRIM(pileNo), TRIM(location),
+                     IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), ''),
+                     IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), ''),
+                     IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) BB
 		             ON AA.deviceIdx  = BB.deviceIdx
-					AND	AA.pileNo  = BB.pileNo
-					AND	AA.location  = BB.location
-					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = BB.pileStdKey
-					AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileType, '') = BB.pileTypeKey
-					AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.method, '') = BB.methodKey
+					AND	TRIM(AA.pileNo) = BB.pileNo
+					AND	TRIM(AA.location) = BB.location
+					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileStandard), '') = BB.pileStdKey
+					AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileType), '') = BB.pileTypeKey
+					AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.method), '') = BB.methodKey
 				LEFT OUTER JOIN
-				 (select count(*) as cnt, pileNo, location,
-				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey,
-				         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileType, '')) as pileTypeKey,
-				         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), method, '')) as methodKey
+				 (select count(*) as cnt, TRIM(pileNo) as pileNo, TRIM(location) as location,
+				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), '')) as pileStdKey,
+				         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), '')) as pileTypeKey,
+				         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) as methodKey
 				  from TB_REPORT
 					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} AND isDel = 0 AND conduct = 0 )
 					   and isDel = 0
-				     group by pileNo, location,
-                     IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileStandard, ''),
-                     IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileType, ''),
-                     IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), method, '')) CC
-		             ON AA.pileNo  = CC.pileNo
-					AND	AA.location  = CC.location
-					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = CC.pileStdKey
-					AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), AA.pileType, '') = CC.pileTypeKey
-					AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), AA.method, '') = CC.methodKey
+				     group by TRIM(pileNo), TRIM(location),
+                     IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), ''),
+                     IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), ''),
+                     IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) CC
+		             ON TRIM(AA.pileNo) = CC.pileNo
+					AND	TRIM(AA.location) = CC.location
+					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileStandard), '') = CC.pileStdKey
+					AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileType), '') = CC.pileTypeKey
+					AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(AA.method), '') = CC.methodKey
 		    <include refid="allExcelCondition"/>
 		    	AND AA.deviceIdx = ${param.id}
 		    ORDER BY AA.machineNumber , AA.createDate ASC
@@ -3027,40 +3027,40 @@
 		         and C.id = #{param.constructionIdx} 
 		         and A.isdel = 0 
 			ORDER BY A.createDate asc ) as TB) AA LEFT OUTER JOIN
-					 (select count(*) as cnt, deviceIdx, pileNo, location,
-				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey,
-				         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileType, '')) as pileTypeKey,
-				         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), method, '')) as methodKey
+					 (select count(*) as cnt, deviceIdx, TRIM(pileNo) as pileNo, TRIM(location) as location,
+				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), '')) as pileStdKey,
+				         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), '')) as pileTypeKey,
+				         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) as methodKey
 				  from TB_REPORT
 					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} )
 					   and isDel = 0
-				     group by deviceIdx, pileNo, location,
-                     IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, ''),
-                     IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileType, ''),
-                     IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), method, '')) BB
+				     group by deviceIdx, TRIM(pileNo), TRIM(location),
+                     IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), ''),
+                     IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), ''),
+                     IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) BB
 		             ON AA.deviceIdx  = BB.deviceIdx
-					AND	AA.pileNo  = BB.pileNo
-					AND	AA.location  = BB.location
-					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = BB.pileStdKey
-					AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileType, '') = BB.pileTypeKey
-					AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.method, '') = BB.methodKey
+					AND	TRIM(AA.pileNo) = BB.pileNo
+					AND	TRIM(AA.location) = BB.location
+					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileStandard), '') = BB.pileStdKey
+					AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileType), '') = BB.pileTypeKey
+					AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.method), '') = BB.methodKey
 				LEFT OUTER JOIN
-				 (select count(*) as cnt, pileNo, location,
-				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey,
-				         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileType, '')) as pileTypeKey,
-				         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), method, '')) as methodKey
+				 (select count(*) as cnt, TRIM(pileNo) as pileNo, TRIM(location) as location,
+				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), '')) as pileStdKey,
+				         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), '')) as pileTypeKey,
+				         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) as methodKey
 				  from TB_REPORT
 					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} AND isDel = 0 AND conduct = 0 )
 					   and isDel = 0
-				     group by pileNo, location,
-                     IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileStandard, ''),
-                     IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileType, ''),
-                     IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), method, '')) CC
-		             ON AA.pileNo  = CC.pileNo
-					AND	AA.location  = CC.location
-					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = CC.pileStdKey
-					AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), AA.pileType, '') = CC.pileTypeKey
-					AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), AA.method, '') = CC.methodKey
+				     group by TRIM(pileNo), TRIM(location),
+                     IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), ''),
+                     IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), ''),
+                     IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) CC
+		             ON TRIM(AA.pileNo) = CC.pileNo
+					AND	TRIM(AA.location) = CC.location
+					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileStandard), '') = CC.pileStdKey
+					AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileType), '') = CC.pileTypeKey
+					AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(AA.method), '') = CC.methodKey
 		    <include refid="allExcelCondition"/>
 		    	AND AA.deviceIdx = ${param.id}
 		    ORDER BY AA.machineNumber , AA.createDate ASC
@@ -3225,40 +3225,40 @@
 		         and C.id = #{param.constructionIdx} 
 		         and A.isdel = 0 
 			ORDER BY A.createDate asc ) as TB) AA LEFT OUTER JOIN
-					 (select count(*) as cnt, deviceIdx, pileNo, location,
-				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey,
-				         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileType, '')) as pileTypeKey,
-				         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), method, '')) as methodKey
+					 (select count(*) as cnt, deviceIdx, TRIM(pileNo) as pileNo, TRIM(location) as location,
+				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), '')) as pileStdKey,
+				         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), '')) as pileTypeKey,
+				         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) as methodKey
 				  from TB_REPORT
 					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} )
 					   and isDel = 0
-				     group by deviceIdx, pileNo, location,
-                     IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, ''),
-                     IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileType, ''),
-                     IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), method, '')) BB
+				     group by deviceIdx, TRIM(pileNo), TRIM(location),
+                     IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), ''),
+                     IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), ''),
+                     IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=TB_REPORT.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) BB
 		             ON AA.deviceIdx  = BB.deviceIdx
-					AND	AA.pileNo  = BB.pileNo
-					AND	AA.location  = BB.location
-					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = BB.pileStdKey
-					AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.pileType, '') = BB.pileTypeKey
-					AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), AA.method, '') = BB.methodKey
+					AND	TRIM(AA.pileNo) = BB.pileNo
+					AND	TRIM(AA.location) = BB.location
+					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileStandard), '') = BB.pileStdKey
+					AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileType), '') = BB.pileTypeKey
+					AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=AA.deviceIdx OR (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(AA.method), '') = BB.methodKey
 				LEFT OUTER JOIN
-				 (select count(*) as cnt, pileNo, location,
-				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileStandard, '')) as pileStdKey,
-				         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileType, '')) as pileTypeKey,
-				         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), method, '')) as methodKey
+				 (select count(*) as cnt, TRIM(pileNo) as pileNo, TRIM(location) as location,
+				         ANY_VALUE(IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), '')) as pileStdKey,
+				         ANY_VALUE(IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), '')) as pileTypeKey,
+				         ANY_VALUE(IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) as methodKey
 				  from TB_REPORT
 					 where deviceIdx in (select id from TB_DEVICE where constructionIdx = #{param.constructionIdx} AND isDel = 0 AND conduct = 0 )
 					   and isDel = 0
-				     group by pileNo, location,
-                     IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileStandard, ''),
-                     IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), pileType, ''),
-                     IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), method, '')) CC
-		             ON AA.pileNo  = CC.pileNo
-					AND	AA.location  = CC.location
-					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), AA.pileStandard, '') = CC.pileStdKey
-					AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), AA.pileType, '') = CC.pileTypeKey
-					AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), AA.method, '') = CC.methodKey
+				     group by TRIM(pileNo), TRIM(location),
+                     IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), ''),
+                     IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), ''),
+                     IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) CC
+		             ON TRIM(AA.pileNo) = CC.pileNo
+					AND	TRIM(AA.location) = CC.location
+					AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileStandard), '') = CC.pileStdKey
+					AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(AA.pileType), '') = CC.pileTypeKey
+					AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE (deviceIdx=0 AND constructionIdx=#{param.constructionIdx}) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY constructionIdx!=0 DESC LIMIT 1), TRIM(AA.method), '') = CC.methodKey
 		    <include refid="allExcelCondition"/>
 		    	AND AA.deviceIdx = ${param.id}
 		    ORDER BY AA.machineNumber , AA.createDate ASC

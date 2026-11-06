@@ -68,7 +68,7 @@ public class QRController {
 	    List<WeQrcode> domainList = weQrcodeMapper.getListByParam(page.getStartRow(), page.getPageSize(), param);
 
 	    // 저장 경로 설정
-	    String uploadPath = RELEASE_TO_SERVER ? request.getServletContext().getRealPath("/uploads") : "D:/PDGM/uploads";
+	    String uploadPath = getUploadPath(request);
 	    File uploadDir = new File(uploadPath);
 	    if (!uploadDir.exists()) uploadDir.mkdirs();
 
@@ -88,7 +88,7 @@ public class QRController {
 	        if (needGenerate) {
 	            try {
 	                // QR 스캔 시 연결할 URL 생성
-	                String qrUrl = RELEASE_TO_SERVER ? "https://www.we8104.com/qr/view/" + domain.getId() : "http://localhost:8080/web-template-mybatis/qr/view/" + domain.getId();
+	                String qrUrl = getQrPayload(domain, request);
 
 	                // QR 이미지 파일 생성
 	                BufferedImage qrImage = createQRImage(qrUrl);
@@ -114,11 +114,12 @@ public class QRController {
 	
 
 	@RequestMapping(value = "/view/{id}", method = RequestMethod.GET)
-	public String viewQR(@PathVariable("id") int id, Model model) throws Exception {
+	public String viewQR(@PathVariable("id") int id, HttpServletRequest request) throws Exception {
 
 	    WeQrcode code = weQrcodeMapper.get(id);
 
-	    if (code != null && code.getQrfilename() != null) {
+	    if (code != null && "file".equalsIgnoreCase(code.getQrtype()) && code.getQrfilename() != null
+	            && !"file".equals(code.getQrfilename())) {
 	        // 파일명을 UTF-8로 URL 인코딩
 	        String encodedFileName = URLEncoder.encode(code.getQrfilename(), StandardCharsets.UTF_8.toString());
 	        // +를 %20으로 변환 (공백 안전 처리)
@@ -126,11 +127,7 @@ public class QRController {
 	        
 	        String fileUrl;
 	        
-	        if(RELEASE_TO_SERVER) {
-	        	 fileUrl = "https://we8104.com/uploads/" + encodedFileName;
-	        }else {
-	        	 fileUrl = "http://localhost:8080/web-template-mybatis/uploads/" + encodedFileName;
-	        }
+	        fileUrl = getBaseUrl(request) + "/uploads/" + encodedFileName;
 	        return "redirect:" + fileUrl;
 	    } else {
 	        return "redirect:/error";
@@ -140,16 +137,16 @@ public class QRController {
 	
 	@RequestMapping(value = "/download", method = RequestMethod.GET)
 	public void download(@RequestParam("id") int id, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        try {
-        	WeQrcode domain = weQrcodeMapper.get(id);
+	    try {
+	        WeQrcode domain = weQrcodeMapper.get(id);
+	        if (domain == null || domain.getQrSaveFilename() == null) {
+	            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+	            return;
+	        }
         	
         	String path;
         	
-        	if(RELEASE_TO_SERVER) {
-        		path = request.getServletContext().getRealPath("/uploads") + "/" + domain.getQrSaveFilename();
-        	}else {
-        		path = "D:/PDGM/uploads/" + domain.getQrSaveFilename();
-        	}
+	        path = new File(getUploadPath(request), domain.getQrSaveFilename()).getPath();
         	
         	File file = new File(path);
         	String filename = URLEncoder.encode(file.getName(), "UTF-8");
@@ -215,38 +212,37 @@ public class QRController {
 		    qrFilename = uploadFileName;
 		    code = new WeQrcode(title, qrType, qrText, uploadFileName);
 		    int result = weQrcodeMapper.insert(code);
-			if(result > 0) {
-				if(RELEASE_TO_SERVER) {
-					qrText = "https://www.we8104.com/qr/view/" + code.getId();
-				} else {
-					qrText = "http://localhost:8080/web-template-mybatis/qr/view/" + code.getId();
-				}
-				
-			}   
+			if (result <= 0) throw new IllegalStateException("QR 정보를 저장하지 못했습니다.");
+			qrText = getBaseUrl(request) + "/qr/view/" + code.getId();
 		} else if (link != null && !link.isEmpty()) {
 		    qrText = link;
 		    qrType = "link";
 		    qrFilename = "link";
 		    code = new WeQrcode(title, qrType, qrText, qrFilename);
-		    weQrcodeMapper.insert(code);
+		    if (weQrcodeMapper.insert(code) <= 0) throw new IllegalStateException("QR 정보를 저장하지 못했습니다.");
 		} else if (text != null && !text.isEmpty()) {
 		    qrText = text;
 		    qrType = "text";
 		    qrFilename = "text";
 		    code = new WeQrcode(title, qrType, qrText, qrFilename);
-		    weQrcodeMapper.insert(code);
+		    if (weQrcodeMapper.insert(code) <= 0) throw new IllegalStateException("QR 정보를 저장하지 못했습니다.");
 		} else {
 		    qrText = "";  // 또는 기본값
 		    qrType = "";
 		    qrFilename = "text";
 		    code = new WeQrcode(title, qrType, qrText, qrFilename);
-		    weQrcodeMapper.insert(code);
+		    throw new IllegalArgumentException("텍스트, 링크 또는 파일을 입력하세요.");
 		}
 	
 	    ByteArrayOutputStream out = new ByteArrayOutputStream();
 	    // ZXing 등을 사용해서 QR 코드 생성
 	    BufferedImage qrImage = createQRImage(qrText);
 	    ImageIO.write(qrImage, "png", out);
+	    String imageFilename = UUID.randomUUID().toString().replace("-", "") + ".png";
+	    File uploadDir = new File(getUploadPath(request));
+	    if (!uploadDir.exists()) uploadDir.mkdirs();
+	    ImageIO.write(qrImage, "png", new File(uploadDir, imageFilename));
+	    weQrcodeMapper.updateQrCode(String.valueOf(code.getId()), imageFilename);
 
 	    String base64 = Base64.getEncoder().encodeToString(out.toByteArray());
 
@@ -279,6 +275,25 @@ public class QRController {
         graphics.dispose();
         return image;
     }
+
+	private String getUploadPath(HttpServletRequest request) {
+		return RELEASE_TO_SERVER ? request.getServletContext().getRealPath("/uploads") : "D:/PDGM/uploads";
+	}
+
+	private String getBaseUrl(HttpServletRequest request) {
+		String scheme = request.getScheme();
+		int port = request.getServerPort();
+		boolean standardPort = ("http".equalsIgnoreCase(scheme) && port == 80)
+				|| ("https".equalsIgnoreCase(scheme) && port == 443);
+		return scheme + "://" + request.getServerName() + (standardPort ? "" : ":" + port) + request.getContextPath();
+	}
+
+	private String getQrPayload(WeQrcode code, HttpServletRequest request) {
+		if ("file".equalsIgnoreCase(code.getQrtype())) {
+			return getBaseUrl(request) + "/qr/view/" + code.getId();
+		}
+		return code.getQrtext() == null ? "" : code.getQrtext();
+	}
     
     
     private String localUploadFile(MultipartFile file, HttpServletRequest request) throws IOException {
@@ -372,16 +387,11 @@ public class QRController {
 	        // DB 행 삭제 전에 실제 업로드 파일도 함께 제거하여 orphan 파일을 방지
 	        WeQrcode domain = weQrcodeMapper.get(id);
 	        int result = weQrcodeMapper.delete(id);
-	        if (result > 0 && domain != null && domain.getQrSaveFilename() != null) {
-	            String path;
-	            if (RELEASE_TO_SERVER) {
-	                path = request.getServletContext().getRealPath("/uploads") + "/" + domain.getQrSaveFilename();
-	            } else {
-	                path = "D:/PDGM/uploads/" + domain.getQrSaveFilename();
-	            }
-	            File file = new File(path);
-	            if (file.exists()) {
-	                file.delete();
+	        if (result > 0 && domain != null) {
+	            if (domain.getQrSaveFilename() != null) new File(getUploadPath(request), domain.getQrSaveFilename()).delete();
+	            if ("file".equalsIgnoreCase(domain.getQrtype()) && domain.getQrfilename() != null
+	                    && !"file".equals(domain.getQrfilename())) {
+	                new File(getUploadPath(request), domain.getQrfilename()).delete();
 	            }
 	        }
 	        return result > 0;

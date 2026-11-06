@@ -2,6 +2,7 @@ package net.octacomm.sample.domain;
 
 import java.util.List;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import lombok.Data;
 
 @Data
@@ -80,6 +81,8 @@ public class ReportOneLine implements Domain {
 	private float calculatedGongSac;
 	
 	private boolean gongSacNull = true;
+	// 엑셀에서 공삭공 셀에 쓸 서식을 재사용하는 임시 저장소
+	private boolean preciseStoredGongSac;
 	
 	private String bigo;
 	
@@ -221,6 +224,10 @@ public class ReportOneLine implements Domain {
 	} **/
 
 	public float getGongSac() {
+	    if (preciseStoredGongSac && !gongSacNull) {
+	        return gongSac;
+	    }
+
 	    if ("isoo".equals(getSprCol1())) {
 	        try {
 	            float drilling = Float.parseFloat(
@@ -247,6 +254,15 @@ public class ReportOneLine implements Domain {
 	    }
 
 	    return Math.round(gongSac * 10.0f) / 10.0f;
+	}
+
+	public String formatGongSacForExcel(float value) {
+	    if (preciseStoredGongSac && !gongSacNull) {
+	        return new BigDecimal(Float.toString(gongSac))
+	                .setScale(3, RoundingMode.DOWN)
+	                .toPlainString();
+	    }
+	    return String.valueOf(value);
 	}
 
 	private float calculateV2GongSac() {

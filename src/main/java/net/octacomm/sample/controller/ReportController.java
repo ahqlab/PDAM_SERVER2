@@ -1,6 +1,7 @@
 package net.octacomm.sample.controller;
 
 import java.io.UnsupportedEncodingException;
+import java.io.IOException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -26,6 +28,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.support.SessionStatus;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import net.octacomm.sample.dao.mapper.ConstructionMapper;
 import net.octacomm.sample.dao.mapper.DeviceMapper;
@@ -243,6 +249,81 @@ public class ReportController{
 		return response;
 	}
 
+	@RequestMapping(value = "/history/download/excel", method = RequestMethod.GET)
+	public void downloadHistoryExcel(
+			@RequestParam("deviceIdx") int deviceIdx,
+			@RequestParam(value = "workDate", required = false) String workDate,
+			HttpSession session,
+			HttpServletResponse response) throws IOException {
+		Device device = deviceMapper.get(deviceIdx);
+		if (device == null || !isDeviceAccessible(device, session)) {
+			response.sendError(HttpServletResponse.SC_FORBIDDEN);
+			return;
+		}
+
+		int totalCount = reportHistoryService.countByDeviceAndDate(deviceIdx, workDate);
+		final int pageSize = 500;
+		List<ReportHistory> histories = new ArrayList<ReportHistory>();
+		for (int startRow = 0; startRow < totalCount; startRow += pageSize) {
+			histories.addAll(reportHistoryService.findPageByDeviceAndDate(
+					deviceIdx, workDate, startRow, pageSize));
+		}
+
+		String fileName = "수정이력_" + device.getMachineNumber() + ".xlsx";
+		String encodedFileName = URLEncoder.encode(fileName, "UTF-8").replace("+", "%20");
+		response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+		response.setHeader("Content-Disposition", "attachment; filename=history.xlsx; filename*=UTF-8''" + encodedFileName);
+
+		Workbook workbook = new XSSFWorkbook();
+		try {
+			Sheet sheet = workbook.createSheet("수정이력");
+			String[] headers = {"변경일시", "작업유형", "파일번호", "수정자", "변경항목", "변경 전", "변경 후"};
+			Row header = sheet.createRow(0);
+			for (int i = 0; i < headers.length; i++) {
+				header.createCell(i).setCellValue(headers[i]);
+			}
+			sheet.createFreezePane(0, 1);
+
+			int rowIndex = 1;
+			for (ReportHistory history : histories) {
+				List<Map<String, String>> changes = new ArrayList<Map<String, String>>();
+				for (Map<String, String> change : reportHistoryService.findChanges(history.getId())) {
+					if (!"true".equals(change.get("automatic"))
+							&& !isHistoryExcelExcludedField(change.get("fieldName"))) {
+						changes.add(change);
+					}
+				}
+				if (changes.isEmpty()) {
+					continue;
+				}
+				for (Map<String, String> change : changes) {
+					Row row = sheet.createRow(rowIndex++);
+					row.createCell(0).setCellValue(history.getModifiedAt() == null ? "" : history.getModifiedAt());
+					row.createCell(1).setCellValue(historyStatusLabel(history.getStatus()));
+					row.createCell(2).setCellValue(history.getPileNo() == null ? "" : history.getPileNo());
+					row.createCell(3).setCellValue(historyModifierLabel(history.getUserId()));
+					row.createCell(4).setCellValue(change.get("fieldName") == null ? "" : change.get("fieldName"));
+					row.createCell(5).setCellValue(change.get("beforeValue") == null ? "" : change.get("beforeValue"));
+					row.createCell(6).setCellValue(change.get("afterValue") == null ? "" : change.get("afterValue"));
+				}
+			}
+			for (int i = 0; i < headers.length; i++) {
+				sheet.autoSizeColumn(i);
+				sheet.setColumnWidth(i, Math.min(sheet.getColumnWidth(i) + 512, 12000));
+			}
+			workbook.write(response.getOutputStream());
+		} finally {
+			workbook.close();
+		}
+	}
+
+	private boolean isHistoryExcelExcludedField(String fieldName) {
+		return "직타깊이".equals(fieldName)
+				|| "전석층천공".equals(fieldName)
+				|| "토사천공".equals(fieldName)
+				|| "극한지지력".equals(fieldName);
+	}
+
 	@RequestMapping(value = "/history/detail", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> historyDetail(
@@ -336,6 +417,17 @@ public class ReportController{
 		}
 		model.addAttribute("hasMachineType", hasMachineType);
 		model.addAttribute("hasTopRpm", hasTopRpm);
+	}
+
+	private void enablePreciseGongSacForTargetDevice(List<ReportOneLine> domainList, int constructionIdx) {
+		if (constructionIdx != 2047 || domainList == null) {
+			return;
+		}
+		for (ReportOneLine domain : domainList) {
+			if (domain.getDeviceIdx() == 3484) {
+				domain.setPreciseStoredGongSac(true);
+			}
+		}
 	}
 
 	/**
@@ -621,6 +713,7 @@ public class ReportController{
 			}else {
 				domainList = new ArrayList<ReportOneLine>();
 			}
+			enablePreciseGongSacForTargetDevice(domainList, param.getConstructionIdx());
 			addOptionalColumnFlags(model, domainList);
 			try {
 				if((int) session.getAttribute("role") == 3) {
@@ -679,6 +772,7 @@ public class ReportController{
 		}else {
 			domainList = new ArrayList<ReportOneLine>();
 		}
+		enablePreciseGongSacForTargetDevice(domainList, param.getConstructionIdx());
 		addOptionalColumnFlags(model, domainList);
 		try {
 			if((int) session.getAttribute("role") == 3) {
@@ -814,6 +908,7 @@ public class ReportController{
 			}else {
 				domainList = new ArrayList<ReportOneLine>();
 			}
+			enablePreciseGongSacForTargetDevice(domainList, param.getConstructionIdx());
 			addOptionalColumnFlags(model, domainList);
 			try {
 				if((int) session.getAttribute("role") == 3) {
@@ -875,6 +970,7 @@ public class ReportController{
 		}else {
 			domainList = new ArrayList<ReportOneLine>();
 		}
+		enablePreciseGongSacForTargetDevice(domainList, param.getConstructionIdx());
 		addOptionalColumnFlags(model, domainList);
 		try {
 			if((int) session.getAttribute("role") == 3) {
