@@ -44,7 +44,7 @@
 		        </form>
 		
 		        <div class="qr-result">
-		            <p>생성된 QR코드 미리보기</p>
+			            <p id="qrResultMessage">생성된 QR코드 미리보기</p>
 		            <img id="qrImage" alt="QR코드" style="display:none;">
 		            <div class="btn-area">
 		                <input type="hidden" id="qrId" name="qrId">
@@ -226,6 +226,16 @@ function generateQR() {
 	document.getElementById('saveQRBtn').style.display = 'inline-block';
 	document.getElementById('downloadQRBtn').style.display = 'inline-block';
 }
+
+$('#qrForm').on('reset', function() {
+    setTimeout(function() {
+        $('#qrId').val('');
+        $('#qrImage').hide().attr('src', '');
+        $('#downloadQRBtn, #saveQRBtn').hide();
+        $('#qrForm button[type="button"]').first().text('QR 생성');
+        $('#qrResultMessage').text('생성된 QR코드 미리보기');
+    }, 0);
+});
 </script>
 <style>
     /* 전체 컨테이너 */

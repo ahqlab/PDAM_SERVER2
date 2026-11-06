@@ -1,6 +1,8 @@
 package net.octacomm.sample.config;
 
+import java.io.File;
 import net.octacomm.logger.LoggerBeanPostProcessor;
+import net.octacomm.sample.controller.QRController;
 import net.octacomm.sample.interceptor.ContractInterceptor;
 import net.octacomm.sample.interceptor.LogInterceptor;
 import net.octacomm.sample.interceptor.LoginInterceptor;
@@ -41,6 +43,7 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.document.AbstractExcelView;
 import org.springframework.web.servlet.view.tiles2.TilesConfigurer;
 import org.springframework.web.servlet.view.tiles2.TilesViewResolver;
+import javax.servlet.ServletContext;
 
 @Configuration
 @EnableWebMvc
@@ -52,6 +55,9 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 
 	@org.springframework.beans.factory.annotation.Autowired
 	private ContractInterceptor contractInterceptor;
+
+	@org.springframework.beans.factory.annotation.Autowired
+	private ServletContext servletContext;
 
 
 	@Bean
@@ -200,8 +206,17 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		
-		registry.addResourceHandler("/uploads/**").addResourceLocations("file:///D:/PDGM/uploads/");
+		String uploadPath = QRController.RELEASE_TO_SERVER
+				? servletContext.getRealPath("/uploads")
+				: "D:/PDGM/uploads";
+		if (uploadPath == null) {
+			registry.addResourceHandler("/uploads/**").addResourceLocations("/uploads/");
+		} else {
+			File uploadDirectory = new File(uploadPath);
+			if (!uploadDirectory.exists()) uploadDirectory.mkdirs();
+			registry.addResourceHandler("/uploads/**")
+					.addResourceLocations(uploadDirectory.toURI().toString());
+		}
 		
 		registry.addResourceHandler("/**").addResourceLocations("/resources/");
 	}

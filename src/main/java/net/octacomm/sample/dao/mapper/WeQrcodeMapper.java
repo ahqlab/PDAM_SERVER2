@@ -37,7 +37,7 @@ public interface WeQrcodeMapper extends CRUDMapper<WeQrcode, WeQrcodeParam, Inte
 
 	
 	@Update("UPDATE TB_WE_QRCODE SET qrSaveFilename = #{qrSaveFilename} WHERE id = #{qrId}")
-	int updateQrCode(@Param("qrId") String prId , @Param("qrSaveFilename") String qrSaveFilename);
+	int updateQrCode(@Param("qrId") String qrId , @Param("qrSaveFilename") String qrSaveFilename);
 	
 	@Delete("DELETE FROM TB_WE_QRCODE WHERE id = #{id}")
 	int delete(@Param("id") int id);
