@@ -201,7 +201,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 						.excludePathPatterns("/mobile/**")
 						.excludePathPatterns("/api/get/report/list")
 						.excludePathPatterns("/api/get/auth/check")
-						.excludePathPatterns("/qr/**");
+						.excludePathPatterns("/qr/view/**"); // QR 스캔(비로그인)만 허용. 목록/생성/업로드/다운로드는 로그인 필요
 	}
 
 	@Override

@@ -30,7 +30,7 @@
 		            </div>
 		            <div class="form-row">
 		                <label for="file">파일 업로드 (PDF 등)</label>
-		                <input type="file" id="file" name="file">
+		                <input type="file" id="file" name="file" accept=".pdf,.jpg,.jpeg,.png,.gif,.bmp,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.hwp,.hwpx,.txt">
 		            </div>
 		            <div class="form-row">
 		                <label for="link">링크 입력</label>
@@ -194,6 +194,17 @@ function generateQR() {
     } else if (filledCount > 1) {
         alert('텍스트, 파일, 링크 중 하나만 입력할 수 있습니다.');
         return;
+    }
+
+    // 🔸 3. 파일은 허용된 형식만 (서버에서도 동일하게 검사)
+    if (file) {
+        const ext = file.split('.').pop().toLowerCase();
+        const allowed = ['pdf','jpg','jpeg','png','gif','bmp','doc','docx','xls','xlsx','ppt','pptx','hwp','hwpx','txt'];
+        if (file.indexOf('.') < 0 || allowed.indexOf(ext) < 0) {
+            alert('업로드할 수 없는 파일 형식입니다.
+허용: ' + allowed.join(', '));
+            return;
+        }
     }
 	
 	const form = $('#qrForm')[0];

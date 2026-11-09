@@ -296,6 +296,21 @@ public class QRController {
 	}
     
     
+    // 업로드 허용 확장자 (문서/이미지). 업로드 폴더가 웹 루트 안에 있으므로 jsp/html/svg 등은 절대 추가하지 말 것
+    private static final java.util.Set<String> ALLOWED_UPLOAD_EXTENSIONS = new java.util.HashSet<String>(java.util.Arrays.asList(
+            "pdf", "jpg", "jpeg", "png", "gif", "bmp",
+            "doc", "docx", "xls", "xlsx", "ppt", "pptx", "hwp", "hwpx", "txt"));
+
+    private String getAllowedExtension(MultipartFile file) {
+        String originalFilename = file.getOriginalFilename();
+        int dotIndex = originalFilename == null ? -1 : originalFilename.lastIndexOf('.');
+        String ext = dotIndex > 0 ? originalFilename.substring(dotIndex + 1).trim().toLowerCase(java.util.Locale.ROOT) : "";
+        if (!ALLOWED_UPLOAD_EXTENSIONS.contains(ext)) {
+            throw new IllegalArgumentException("허용되지 않는 파일 형식입니다: " + originalFilename);
+        }
+        return "." + ext;
+    }
+
     private String localUploadFile(MultipartFile file, HttpServletRequest request) throws IOException {
         String savedFileName = null;
 
@@ -306,13 +321,8 @@ public class QRController {
             File uploadDir = new File(uploadPath);
             if (!uploadDir.exists()) uploadDir.mkdirs();
 
-            // 원본 파일 확장자 추출
-            String originalFilename = file.getOriginalFilename();
-            String ext = "";
-            int dotIndex = originalFilename.lastIndexOf('.');
-            if (dotIndex > 0) {
-                ext = originalFilename.substring(dotIndex); // .pptx 등
-            }
+            // 허용된 확장자만 저장 (.jsp 등 실행 가능한 파일 차단)
+            String ext = getAllowedExtension(file);
 
             // 안전한 저장용 파일명 생성 (UUID + 확장자)
             savedFileName = UUID.randomUUID().toString().replaceAll("-", "") + ext;
@@ -345,13 +355,8 @@ public class QRController {
 	        File uploadDir = new File(path);
 	        if (!uploadDir.exists()) uploadDir.mkdirs();
 	
-	        // 원본 파일 확장자 추출
-	        String originalFilename = file.getOriginalFilename();
-	        String ext = "";
-	        int dotIndex = originalFilename.lastIndexOf('.');
-	        if (dotIndex > 0) {
-	            ext = originalFilename.substring(dotIndex); // .pptx 등
-	        }
+	        // 허용된 확장자만 저장 (.jsp 등 실행 가능한 파일 차단)
+	        String ext = getAllowedExtension(file);
 	
 	        // 안전한 저장용 파일명 생성 (UUID + 확장자)
 	        savedFileName = UUID.randomUUID().toString().replaceAll("-", "") + ext;
