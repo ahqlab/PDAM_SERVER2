@@ -47,7 +47,7 @@ public interface OriginReportMapper extends CRUDMapper<Report, ReportParam, Inte
 			+ "modulusElasticity = #{modulusElasticity} , "
 			+ "avgPenetrationValue = #{avgPenetrationValue} ,"
 			+ "totalPenetrationValue = #{totalPenetrationValue} , "
-			+ "isDuple = (select * from (select IF(count(*) > 1, 1, 0) from TB_REPORT_ORIGIN where deviceIdx = #{deviceIdx} and TRIM(pileNo) = TRIM(#{pileNo}) and TRIM(location) = TRIM(#{location}) AND isDel = 0 AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=#{deviceIdx} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=#{deviceIdx})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx<>0 DESC,constructionIdx<>0 DESC LIMIT 1), TRIM(pileStandard) = TRIM(#{pileStandard}), 1) = 1 AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=#{deviceIdx} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=#{deviceIdx})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx<>0 DESC,constructionIdx<>0 DESC LIMIT 1), TRIM(pileType) = TRIM(#{pileType}), 1) = 1 AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=#{deviceIdx} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=#{deviceIdx})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx<>0 DESC,constructionIdx<>0 DESC LIMIT 1), TRIM(method) = TRIM(#{method}), 1) = 1 )  as a ) , "
+			+ "isDuple = (select * from (select IF(count(*) > 1, 1, 0) from TB_REPORT_ORIGIN where deviceIdx = #{deviceIdx} and pileNo = TRIM(#{pileNo}) and location = TRIM(#{location}) AND isDel = 0 AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=#{deviceIdx} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=#{deviceIdx})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx<>0 DESC,constructionIdx<>0 DESC LIMIT 1), pileStandard = TRIM(#{pileStandard}), 1) = 1 AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=#{deviceIdx} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=#{deviceIdx})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx<>0 DESC,constructionIdx<>0 DESC LIMIT 1), pileType = TRIM(#{pileType}), 1) = 1 AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=#{deviceIdx} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=#{deviceIdx})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx<>0 DESC,constructionIdx<>0 DESC LIMIT 1), method = TRIM(#{method}), 1) = 1 )  as a ) , "
 			+ "bigo = #{bigo} , "
 			+ "`version` = COALESCE(#{version}, `version`) , "
 			+ "machineType = COALESCE(#{machineType}, machineType) , "
@@ -143,7 +143,7 @@ public interface OriginReportMapper extends CRUDMapper<Report, ReportParam, Inte
 	int isBigAllReports(@Param("constructionIdx") int constructionIdx);
 
 	
-	@Select("SELECT COUNT(*) FROM TB_REPORT_ORIGIN WHERE deviceIdx = #{deviceIdx} AND TRIM(location) = TRIM(#{location}) AND TRIM(pileNo) = TRIM(#{pileNo}) AND isDel = 0 AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=#{deviceIdx} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=#{deviceIdx})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx<>0 DESC,constructionIdx<>0 DESC LIMIT 1), TRIM(pileStandard) = TRIM(#{pileStandard}), 1) = 1 AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=#{deviceIdx} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=#{deviceIdx})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx<>0 DESC,constructionIdx<>0 DESC LIMIT 1), TRIM(pileType) = TRIM(#{pileType}), 1) = 1 AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=#{deviceIdx} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=#{deviceIdx})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx<>0 DESC,constructionIdx<>0 DESC LIMIT 1), TRIM(method) = TRIM(#{method}), 1) = 1")
+	@Select("SELECT COUNT(*) FROM TB_REPORT_ORIGIN WHERE deviceIdx = #{deviceIdx} AND location = TRIM(#{location}) AND pileNo = TRIM(#{pileNo}) AND isDel = 0 AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=#{deviceIdx} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=#{deviceIdx})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx<>0 DESC,constructionIdx<>0 DESC LIMIT 1), pileStandard = TRIM(#{pileStandard}), 1) = 1 AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=#{deviceIdx} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=#{deviceIdx})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx<>0 DESC,constructionIdx<>0 DESC LIMIT 1), pileType = TRIM(#{pileType}), 1) = 1 AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=#{deviceIdx} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=#{deviceIdx})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx<>0 DESC,constructionIdx<>0 DESC LIMIT 1), method = TRIM(#{method}), 1) = 1")
 	int isDuplication(Report report2);
 	
 	
@@ -159,24 +159,24 @@ public interface OriginReportMapper extends CRUDMapper<Report, ReportParam, Inte
 	//@Update("UPDATE " + TABLE_NAME + " SET isDuple = 0 where id = #{id}")
 	//void updateDupl2(UpdateReport report2);
 
-	@Select("select count(*) from TB_REPORT_ORIGIN WHERE TB_REPORT_ORIGIN.deviceIdx = TB.deviceIdx and TRIM(TB_REPORT_ORIGIN.pileNo) = TRIM(TB.pileNo) and TRIM(TB_REPORT_ORIGIN.location) = TRIM(TB.location) and TB_REPORT_ORIGIN.isDel = 0" )
+	@Select("select count(*) from TB_REPORT_ORIGIN WHERE TB_REPORT_ORIGIN.deviceIdx = TB.deviceIdx and TB_REPORT_ORIGIN.pileNo = TB.pileNo and TB_REPORT_ORIGIN.location = TB.location and TB_REPORT_ORIGIN.isDel = 0" )
 	int getIsDuple(Report rp);
 	
-	//@Select("select count(*) from TB_REPORT_ORIGIN WHERE TB_REPORT_ORIGIN.deviceIdx = TB.deviceIdx and TRIM(TB_REPORT_ORIGIN.pileNo) = TRIM(TB.pileNo) and TRIM(TB_REPORT_ORIGIN.location) = TRIM(TB.location) and TB_REPORT_ORIGIN.isDel = 0" )
+	//@Select("select count(*) from TB_REPORT_ORIGIN WHERE TB_REPORT_ORIGIN.deviceIdx = TB.deviceIdx and TB_REPORT_ORIGIN.pileNo = TB.pileNo and TB_REPORT_ORIGIN.location = TB.location and TB_REPORT_ORIGIN.isDel = 0" )
 	//int getIsDuple(UpdateReport rp);
 	
-	@Select("SELECT * FROM TB_REPORT_ORIGIN WHERE deviceIdx = #{deviceIdx} AND TRIM(location) = TRIM(#{location}) AND TRIM(pileNo) = TRIM(#{pileNo}) AND isDel = 0 AND id <> #{id} LIMIT 1")
+	@Select("SELECT * FROM TB_REPORT_ORIGIN WHERE deviceIdx = #{deviceIdx} AND location = TRIM(#{location}) AND pileNo = TRIM(#{pileNo}) AND isDel = 0 AND id <> #{id} LIMIT 1")
 	Report getDuplicationRepots(Report report);
 
-	@Select("SELECT COUNT(*) FROM TB_REPORT_ORIGIN WHERE deviceIdx = #{deviceIdx} AND TRIM(location) = TRIM(#{location}) AND TRIM(pileNo) = TRIM(#{pileNo}) AND isDel = 0  AND id <> #{id} ")
+	@Select("SELECT COUNT(*) FROM TB_REPORT_ORIGIN WHERE deviceIdx = #{deviceIdx} AND location = TRIM(#{location}) AND pileNo = TRIM(#{pileNo}) AND isDel = 0  AND id <> #{id} ")
 	int isDuplication2(Report rp);
 
 	
-	@Select("SELECT * FROM TB_REPORT_ORIGIN WHERE deviceIdx = #{deviceIdx} AND TRIM(location) = TRIM(#{location}) AND TRIM(pileNo) = TRIM(#{pileNo}) AND isDel = 0 AND id <> #{id}")
+	@Select("SELECT * FROM TB_REPORT_ORIGIN WHERE deviceIdx = #{deviceIdx} AND location = TRIM(#{location}) AND pileNo = TRIM(#{pileNo}) AND isDel = 0 AND id <> #{id}")
 	List<Report> getDuplicationRepotsAll(Report rp);
 	
 	
-	@Select("SELECT * FROM TB_REPORT_ORIGIN WHERE deviceIdx = #{deviceIdx} AND TRIM(location) = TRIM(#{location}) AND TRIM(pileNo) = TRIM(#{pileNo}) order by isDuple asc")
+	@Select("SELECT * FROM TB_REPORT_ORIGIN WHERE deviceIdx = #{deviceIdx} AND location = TRIM(#{location}) AND pileNo = TRIM(#{pileNo}) order by isDuple asc")
 	List<Report> getDuplicationRepotsAllReport(UpdateReport rp);
 	
 }

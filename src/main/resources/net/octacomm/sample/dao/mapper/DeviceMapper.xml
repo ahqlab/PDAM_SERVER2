@@ -93,7 +93,7 @@
             LEFT OUTER JOIN 
                 (select 
                  getZoneNameForSamsung3(TRIM(p.pileNo), p.deviceIdx) as zone 
-                 , count(distinct p.deviceIdx, TRIM(p.location), TRIM(p.pileNo)) as dis_count 
+                 , count(distinct p.deviceIdx, p.location, p.pileNo) as dis_count 
                from TB_REPORT p
               where p.deviceIdx in (SELECT dvs.id FROM TB_DEVICE dvs WHERE dvs.constructionIdx = ${param.constructionIdx})
                 and p.isDel = 0
@@ -103,7 +103,7 @@
                 (  select 
                  getZoneNameForSamsung3(TRIM(p.pileNo), p.deviceIdx) as zone 
                  , p.deviceIdx
-                 , count(distinct p.deviceIdx, TRIM(p.location), TRIM(p.pileNo)) as dis_count 
+                 , count(distinct p.deviceIdx, p.location, p.pileNo) as dis_count 
                from TB_REPORT p
               where p.deviceIdx in (SELECT dvs.id FROM TB_DEVICE dvs WHERE dvs.constructionIdx = ${param.constructionIdx})
                 and p.isDel = 0
@@ -113,7 +113,7 @@
                 (  select 
                  getZoneNameForSamsung3(TRIM(p.pileNo), p.deviceIdx) as zone 
                  , p.deviceIdx
-                 , count(distinct p.deviceIdx, TRIM(p.location), TRIM(p.pileNo)) as dis_count 
+                 , count(distinct p.deviceIdx, p.location, p.pileNo) as dis_count 
                from TB_REPORT p
               where p.deviceIdx in (SELECT dvs.id FROM TB_DEVICE dvs WHERE dvs.constructionIdx = ${param.constructionIdx})
                 and p.isDel = 0
@@ -124,7 +124,7 @@
                 (  select 
                  getZoneNameForSamsung3(TRIM(p.pileNo), p.deviceIdx) as zone 
                  , p.deviceIdx
-                 , count(distinct p.deviceIdx, TRIM(p.location), TRIM(p.pileNo)) as dis_count 
+                 , count(distinct p.deviceIdx, p.location, p.pileNo) as dis_count 
                from TB_REPORT p
               where p.deviceIdx in (SELECT dvs.id FROM TB_DEVICE dvs WHERE dvs.constructionIdx = ${param.constructionIdx})
                 and p.isDel = 0
@@ -137,7 +137,7 @@
                CASE WHEN A.id IN (3046, 3047) THEN 'CDC외' ELSE '' END AS zone  -- 여기 수정
                 , A.machineNumber
                 , IFNULL((
-			        SELECT count(distinct p.deviceIdx, TRIM(p.location), TRIM(p.pileNo))
+			        SELECT count(distinct p.deviceIdx, p.location, p.pileNo)
 			        FROM TB_REPORT p
 			        WHERE p.deviceIdx IN (SELECT dvs.id FROM TB_DEVICE dvs WHERE dvs.constructionIdx = ${param.constructionIdx})
 			          AND p.isDel = 0
@@ -238,7 +238,7 @@
 					LEFT OUTER JOIN 
 						(select 
 						 getZoneNameForSamsung(TRIM(p.pileNo)) as zone 
-						 , count(distinct p.deviceIdx, TRIM(p.location), TRIM(p.pileNo)) as dis_count 
+						 , count(distinct p.deviceIdx, p.location, p.pileNo) as dis_count 
 					   from TB_REPORT p
 					  where p.deviceIdx in (SELECT dvs.id FROM TB_DEVICE dvs WHERE dvs.constructionIdx = ${param.constructionIdx})
 						and p.isDel = 0
@@ -248,7 +248,7 @@
 						(  select 
 						 getZoneNameForSamsung(TRIM(p.pileNo)) as zone 
 						 , p.deviceIdx
-						 , count(distinct p.deviceIdx, TRIM(p.location), TRIM(p.pileNo)) as dis_count 
+						 , count(distinct p.deviceIdx, p.location, p.pileNo) as dis_count 
 					   from TB_REPORT p
 					  where p.deviceIdx in (SELECT dvs.id FROM TB_DEVICE dvs WHERE dvs.constructionIdx = ${param.constructionIdx})
 						and p.isDel = 0
@@ -258,7 +258,7 @@
 						(  select 
 						 getZoneNameForSamsung(TRIM(p.pileNo)) as zone 
 						 , p.deviceIdx
-						 , count(distinct p.deviceIdx, TRIM(p.location), TRIM(p.pileNo)) as dis_count 
+						 , count(distinct p.deviceIdx, p.location, p.pileNo) as dis_count 
 					   from TB_REPORT p
 					  where p.deviceIdx in (SELECT dvs.id FROM TB_DEVICE dvs WHERE dvs.constructionIdx = ${param.constructionIdx})
 						and p.isDel = 0
@@ -269,7 +269,7 @@
 						(  select 
 						 getZoneNameForSamsung(TRIM(p.pileNo)) as zone 
 						 , p.deviceIdx
-						 , count(distinct p.deviceIdx, TRIM(p.location), TRIM(p.pileNo)) as dis_count 
+						 , count(distinct p.deviceIdx, p.location, p.pileNo) as dis_count 
 					   from TB_REPORT p
 					  where p.deviceIdx in (SELECT dvs.id FROM TB_DEVICE dvs WHERE dvs.constructionIdx = ${param.constructionIdx})
 						and p.isDel = 0
@@ -335,9 +335,9 @@
     		A.conduct ,
     		date_format(A.startDate, '%Y-%m-%d') as startDate , 
     		date_format(A.endDate, '%Y-%m-%d') as endDate,
-    		(select count(distinct deviceIdx, TRIM(location), TRIM(pileNo), IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=A.id OR (deviceIdx=0 AND constructionIdx=A.constructionIdx) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), ''), IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=A.id OR (deviceIdx=0 AND constructionIdx=A.constructionIdx) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), ''), IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=A.id OR (deviceIdx=0 AND constructionIdx=A.constructionIdx) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) as dis_count from TB_REPORT where TB_REPORT.deviceIdx = A.id and TB_REPORT.isDel = 0) as totalCnt,
-    		(select count(distinct deviceIdx, TRIM(location), TRIM(pileNo), IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=A.id OR (deviceIdx=0 AND constructionIdx=A.constructionIdx) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), ''), IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=A.id OR (deviceIdx=0 AND constructionIdx=A.constructionIdx) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), ''), IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=A.id OR (deviceIdx=0 AND constructionIdx=A.constructionIdx) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) as dis_count from TB_REPORT where TB_REPORT.deviceIdx = A.id and TB_REPORT.isDel = 0 and TB_REPORT.currentDateTime = DATE_FORMAT(NOW() , '%Y-%m-%d')) as todayCnt,
-       		(select count(distinct deviceIdx, TRIM(location), TRIM(pileNo), IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=A.id OR (deviceIdx=0 AND constructionIdx=A.constructionIdx) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileStandard), ''), IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=A.id OR (deviceIdx=0 AND constructionIdx=A.constructionIdx) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(pileType), ''), IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=A.id OR (deviceIdx=0 AND constructionIdx=A.constructionIdx) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), TRIM(method), '')) as dis_count from TB_REPORT where TB_REPORT.deviceIdx = A.id and TB_REPORT.isDel = 0 and TB_REPORT.currentDateTime = DATE_FORMAT(date_add(NOW(), interval -1 day) , '%Y-%m-%d')) as yesterdayCnt
+    		(select count(distinct deviceIdx, location, pileNo, IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=A.id OR (deviceIdx=0 AND constructionIdx=A.constructionIdx) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, ''), IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=A.id OR (deviceIdx=0 AND constructionIdx=A.constructionIdx) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileType, ''), IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=A.id OR (deviceIdx=0 AND constructionIdx=A.constructionIdx) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), method, '')) as dis_count from TB_REPORT where TB_REPORT.deviceIdx = A.id and TB_REPORT.isDel = 0) as totalCnt,
+    		(select count(distinct deviceIdx, location, pileNo, IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=A.id OR (deviceIdx=0 AND constructionIdx=A.constructionIdx) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, ''), IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=A.id OR (deviceIdx=0 AND constructionIdx=A.constructionIdx) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileType, ''), IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=A.id OR (deviceIdx=0 AND constructionIdx=A.constructionIdx) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), method, '')) as dis_count from TB_REPORT where TB_REPORT.deviceIdx = A.id and TB_REPORT.isDel = 0 and TB_REPORT.currentDateTime = DATE_FORMAT(NOW() , '%Y-%m-%d')) as todayCnt,
+       		(select count(distinct deviceIdx, location, pileNo, IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=A.id OR (deviceIdx=0 AND constructionIdx=A.constructionIdx) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileStandard, ''), IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=A.id OR (deviceIdx=0 AND constructionIdx=A.constructionIdx) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), pileType, ''), IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=A.id OR (deviceIdx=0 AND constructionIdx=A.constructionIdx) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx!=0 DESC,constructionIdx!=0 DESC LIMIT 1), method, '')) as dis_count from TB_REPORT where TB_REPORT.deviceIdx = A.id and TB_REPORT.isDel = 0 and TB_REPORT.currentDateTime = DATE_FORMAT(date_add(NOW(), interval -1 day) , '%Y-%m-%d')) as yesterdayCnt
     	FROM TB_DEVICE A, TB_CONSTRUCTION B
     	<include refid="condition"/>
     	ORDER BY machineNumber asc
@@ -386,7 +386,7 @@
 		    LEFT OUTER JOIN (
 		        SELECT
 		            getZoneNameForSamsung3(TRIM(p.pileNo), p.deviceIdx) as zone,
-		            count(distinct p.deviceIdx, TRIM(p.location), TRIM(p.pileNo)) as dis_count
+		            count(distinct p.deviceIdx, p.location, p.pileNo) as dis_count
 		        FROM TB_REPORT p
 		        WHERE p.deviceIdx IN (SELECT dvs.id FROM TB_DEVICE dvs WHERE dvs.constructionIdx = ${param.constructionIdx})
 		          AND p.isDel = 0
@@ -396,7 +396,7 @@
 		        SELECT
 		            getZoneNameForSamsung3(TRIM(p.pileNo), p.deviceIdx) as zone,
 		            p.deviceIdx,
-		            count(distinct p.deviceIdx, TRIM(p.location), TRIM(p.pileNo)) as dis_count
+		            count(distinct p.deviceIdx, p.location, p.pileNo) as dis_count
 		        FROM TB_REPORT p
 		        WHERE p.deviceIdx IN (SELECT dvs.id FROM TB_DEVICE dvs WHERE dvs.constructionIdx = ${param.constructionIdx})
 		          AND p.isDel = 0
@@ -406,7 +406,7 @@
 		        SELECT
 		            getZoneNameForSamsung3(TRIM(p.pileNo), p.deviceIdx) as zone,
 		            p.deviceIdx,
-		            count(distinct p.deviceIdx, TRIM(p.location), TRIM(p.pileNo)) as dis_count
+		            count(distinct p.deviceIdx, p.location, p.pileNo) as dis_count
 		        FROM TB_REPORT p
 		        WHERE p.deviceIdx IN (SELECT dvs.id FROM TB_DEVICE dvs WHERE dvs.constructionIdx = ${param.constructionIdx})
 		          AND p.isDel = 0
@@ -417,7 +417,7 @@
 		        SELECT
 		            getZoneNameForSamsung3(TRIM(p.pileNo), p.deviceIdx) as zone,
 		            p.deviceIdx,
-		            count(distinct p.deviceIdx, TRIM(p.location), TRIM(p.pileNo)) as dis_count
+		            count(distinct p.deviceIdx, p.location, p.pileNo) as dis_count
 		        FROM TB_REPORT p
 		        WHERE p.deviceIdx IN (SELECT dvs.id FROM TB_DEVICE dvs WHERE dvs.constructionIdx = ${param.constructionIdx})
 		          AND p.isDel = 0
@@ -432,7 +432,7 @@
 		        CASE WHEN A.id IN (3046, 3047) THEN 'CDC외' ELSE '' END AS zone  -- 여기 수정
 		        , A.machineNumber
 		        , IFNULL((
-			        SELECT count(distinct p.deviceIdx, TRIM(p.location), TRIM(p.pileNo))
+			        SELECT count(distinct p.deviceIdx, p.location, p.pileNo)
 			        FROM TB_REPORT p
 			        WHERE p.deviceIdx IN (SELECT dvs.id FROM TB_DEVICE dvs WHERE dvs.constructionIdx = ${param.constructionIdx})
 			          AND p.isDel = 0
@@ -559,7 +559,7 @@
 					LEFT OUTER JOIN 
 						(select 
 						 getZoneNameForSamsung(TRIM(p.pileNo)) as zone 
-						 , count(distinct p.deviceIdx, TRIM(p.location), TRIM(p.pileNo)) as dis_count 
+						 , count(distinct p.deviceIdx, p.location, p.pileNo) as dis_count 
 					   from TB_REPORT p
 					  where p.deviceIdx in (SELECT dvs.id FROM TB_DEVICE dvs WHERE dvs.constructionIdx = ${param.constructionIdx})
 						and p.isDel = 0
@@ -569,7 +569,7 @@
 						(  select 
 						 getZoneNameForSamsung(TRIM(p.pileNo)) as zone 
 						 , p.deviceIdx
-						 , count(distinct p.deviceIdx, TRIM(p.location), TRIM(p.pileNo)) as dis_count 
+						 , count(distinct p.deviceIdx, p.location, p.pileNo) as dis_count 
 					   from TB_REPORT p
 					  where p.deviceIdx in (SELECT dvs.id FROM TB_DEVICE dvs WHERE dvs.constructionIdx = ${param.constructionIdx})
 						and p.isDel = 0
@@ -579,7 +579,7 @@
 						(  select 
 						 getZoneNameForSamsung(TRIM(p.pileNo)) as zone 
 						 , p.deviceIdx
-						 , count(distinct p.deviceIdx, TRIM(p.location), TRIM(p.pileNo)) as dis_count 
+						 , count(distinct p.deviceIdx, p.location, p.pileNo) as dis_count 
 					   from TB_REPORT p
 					  where p.deviceIdx in (SELECT dvs.id FROM TB_DEVICE dvs WHERE dvs.constructionIdx = ${param.constructionIdx})
 						and p.isDel = 0
@@ -590,7 +590,7 @@
 						(  select 
 						 getZoneNameForSamsung(TRIM(p.pileNo)) as zone 
 						 , p.deviceIdx
-						 , count(distinct p.deviceIdx, TRIM(p.location), TRIM(p.pileNo)) as dis_count 
+						 , count(distinct p.deviceIdx, p.location, p.pileNo) as dis_count 
 					   from TB_REPORT p
 					  where p.deviceIdx in (SELECT dvs.id FROM TB_DEVICE dvs WHERE dvs.constructionIdx = ${param.constructionIdx})
 						and p.isDel = 0
