@@ -189,18 +189,18 @@ public interface ReportMapper extends CRUDMapper<Report, ReportParam, Integer> {
 	@Select("select count(*) from TB_REPORT WHERE TB_REPORT.deviceIdx = TB.deviceIdx and TB_REPORT.pileNo = TB.pileNo and TB_REPORT.location = TB.location and TB_REPORT.isDel = 0" )
 	int getIsDuple(Report rp);
 	
-	@Select("SELECT * FROM TB_REPORT WHERE deviceIdx = #{deviceIdx} AND location =  #{location} AND pileNo = #{pileNo} AND isDel = 0 AND id <> #{id} LIMIT 1")
+	@Select("SELECT * FROM TB_REPORT WHERE deviceIdx = #{deviceIdx} AND location =  TRIM(#{location}) AND pileNo = TRIM(#{pileNo}) AND isDel = 0 AND id <> #{id} LIMIT 1")
 	Report getDuplicationRepots(Report report);
 
-	@Select("SELECT COUNT(*) FROM TB_REPORT WHERE deviceIdx = #{deviceIdx} AND location =  #{location} AND pileNo = #{pileNo} AND isDel = 0  AND id <> #{id} AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=#{deviceIdx} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=#{deviceIdx})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx<>0 DESC,constructionIdx<>0 DESC LIMIT 1), pileStandard = TRIM(#{pileStandard}), 1) = 1 AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=#{deviceIdx} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=#{deviceIdx})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx<>0 DESC,constructionIdx<>0 DESC LIMIT 1), pileType = TRIM(#{pileType}), 1) = 1 AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=#{deviceIdx} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=#{deviceIdx})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx<>0 DESC,constructionIdx<>0 DESC LIMIT 1), method = TRIM(#{method}), 1) = 1")
+	@Select("SELECT COUNT(*) FROM TB_REPORT WHERE deviceIdx = #{deviceIdx} AND location =  TRIM(#{location}) AND pileNo = TRIM(#{pileNo}) AND isDel = 0  AND id <> #{id} AND IF((SELECT usePileStandard FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=#{deviceIdx} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=#{deviceIdx})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx<>0 DESC,constructionIdx<>0 DESC LIMIT 1), pileStandard = TRIM(#{pileStandard}), 1) = 1 AND IF((SELECT usePileType FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=#{deviceIdx} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=#{deviceIdx})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx<>0 DESC,constructionIdx<>0 DESC LIMIT 1), pileType = TRIM(#{pileType}), 1) = 1 AND IF((SELECT useMethod FROM TB_DUPLICATE_CHECK_CONFIG WHERE deviceIdx=#{deviceIdx} OR (deviceIdx=0 AND constructionIdx=(SELECT constructionIdx FROM TB_DEVICE WHERE id=#{deviceIdx})) OR (deviceIdx=0 AND constructionIdx=0) ORDER BY deviceIdx<>0 DESC,constructionIdx<>0 DESC LIMIT 1), method = TRIM(#{method}), 1) = 1")
 	int isDuplication2(Report rp);
 
 	
-	@Select("SELECT * FROM TB_REPORT WHERE deviceIdx = #{deviceIdx} AND location =  #{location} AND pileNo = #{pileNo} AND isDel = 0 AND id <> #{id}")
+	@Select("SELECT * FROM TB_REPORT WHERE deviceIdx = #{deviceIdx} AND location =  TRIM(#{location}) AND pileNo = TRIM(#{pileNo}) AND isDel = 0 AND id <> #{id}")
 	List<Report> getDuplicationRepotsAll(Report rp);
 	
 	
-	@Select("SELECT * FROM TB_REPORT WHERE deviceIdx = #{deviceIdx} AND location =  #{location} AND pileNo = #{pileNo} order by isDuple asc")
+	@Select("SELECT * FROM TB_REPORT WHERE deviceIdx = #{deviceIdx} AND location =  TRIM(#{location}) AND pileNo = TRIM(#{pileNo}) order by isDuple asc")
 	List<Report> getDuplicationRepotsAllReport(UpdateReport rp);
 
 	List<ReportOneLine> getTodayListByPdf(@Param("constructionIdx") int constructionIdx, @Param("machineNumber") String machineNumber, @Param("currentDateTime") String currentDateTime);
