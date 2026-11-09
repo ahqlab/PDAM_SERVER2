@@ -406,12 +406,18 @@ public class QRController {
 		SessionInfo sessionInfo = new SessionInfo();
 		sessionInfo.setUserId((String) session.getAttribute("userId"));
 		sessionInfo.setUserName((String) session.getAttribute("userName"));
-		sessionInfo.setRole((Integer) session.getAttribute("role"));
-		sessionInfo.setConstructionIdx((Integer) session.getAttribute("constructionIdx"));
-		sessionInfo.setHiddenManager((Boolean) session.getAttribute("isHiddenManager"));
-		sessionInfo.setGroupIdx((Integer) session.getAttribute("groupIdx"));	
-		sessionInfo.setFcIdx((Integer) session.getAttribute("fcIdx"));	
-		sessionInfo.setShowPdfYn((Boolean) session.getAttribute("showPdfYn"));	
+		Object role = session.getAttribute("role");
+		if (role instanceof Number) sessionInfo.setRole(((Number) role).intValue());
+		Object constructionIdx = session.getAttribute("constructionIdx");
+		if (constructionIdx instanceof Number) sessionInfo.setConstructionIdx(((Number) constructionIdx).intValue());
+		Object hiddenManager = session.getAttribute("isHiddenManager");
+		if (hiddenManager instanceof Boolean) sessionInfo.setHiddenManager((Boolean) hiddenManager);
+		Object groupIdx = session.getAttribute("groupIdx");
+		if (groupIdx instanceof Number) sessionInfo.setGroupIdx(((Number) groupIdx).intValue());
+		Object fcIdx = session.getAttribute("fcIdx");
+		if (fcIdx instanceof Number) sessionInfo.setFcIdx(((Number) fcIdx).intValue());
+		Object showPdfYn = session.getAttribute("showPdfYn");
+		if (showPdfYn instanceof Boolean) sessionInfo.setShowPdfYn((Boolean) showPdfYn);
 	    model.addAttribute("sessionInfo", sessionInfo);
 	}
 	
