@@ -201,8 +201,7 @@ function generateQR() {
         const ext = file.split('.').pop().toLowerCase();
         const allowed = ['pdf','jpg','jpeg','png','gif','bmp','doc','docx','xls','xlsx','ppt','pptx','hwp','hwpx','txt'];
         if (file.indexOf('.') < 0 || allowed.indexOf(ext) < 0) {
-            alert('업로드할 수 없는 파일 형식입니다.
-허용: ' + allowed.join(', '));
+        	alert("업로드할 수 없는 파일 형식입니다.\n허용 형식: " + allowed.join(", "));
             return;
         }
     }

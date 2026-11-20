@@ -366,7 +366,7 @@ function setGroupName(){
 /* 3. 메모 상세 내용 박스 */
 .memo-detail { 
 	display: block; 
-	padding: 15px; 
+	padding: 10px; 
 	background: #fdfdfd; 
 	border: 1px solid #eee; 
 	margin-top: 8px; 
@@ -376,6 +376,82 @@ function setGroupName(){
 	max-height: 250px;     /* 내용이 너무 길면 자체 스크롤 생성 */
 	overflow-y: auto;
 	cursor: pointer;       /* 마우스 올리면 손가락(클릭 가능) 모양으로 변경 */
+}
+
+/* 메모/첨부자료 목록: 좌측 분류, 우측 내용 */
+.memo-resource-layout { display:flex; min-height:390px; border:1px solid #e2e7eb; border-radius:6px; overflow:hidden; }
+.memo-resource-nav { position:relative; width:145px; flex:0 0 145px; background:#f6f8fa; border-right:1px solid #e2e7eb; padding:12px 0; }
+.memo-resource-title { padding:8px 16px 13px; color:#6b7781; font-size:18px; font-weight:bold; }
+.memo-resource-nav button { width:100%; border:0; background:transparent; padding:13px 16px; text-align:left; cursor:pointer; font-size:14px; color:#555; }
+.memo-resource-nav button.active { background:#fff; color:#077b9c; font-weight:bold; border-left:4px solid #077b9c; padding-left:12px; }
+.memo-resource-nav .resource-count { float:right; color:#74808b; font-size:13px; }
+.memo-resource-nav button.active .resource-count { color:#077b9c; }
+.memo-resource-content { flex:1; min-width:0; padding:16px; height:520px; box-sizing:border-box; overflow-y:auto; }
+.memo-resource-panel { display:none; }
+.memo-resource-panel.active { display:block; }
+.memo-attachment-toolbar, .memo-list-toolbar { display:grid; grid-template-columns:1fr auto; align-items:center; min-height:52px; box-sizing:border-box; margin-bottom:15px; padding:10px 6px; border-bottom:1px solid #e2e7eb; color:#74808b; font-size:13px; }
+.memo-list-toolbar-left, .memo-attachment-toolbar-left { display:flex; align-items:center; }
+.memo-list-toolbar > div:last-child, .memo-attachment-toolbar > .memo-add-btn { justify-self:end; }
+.memo-select-label { display:flex; align-items:center; margin-right:15px; cursor:pointer; }
+.memo-select-label input { width:16px; height:16px; margin:0; cursor:pointer; }
+.memo-delete-btn { background:#d9534f; color:#fff; border:none; padding:6px 15px; border-radius:4px; cursor:pointer; font-weight:bold; margin-left:14px; }
+.memo-add-btn { width:auto; min-width:104px; height:36px; display:inline-flex; align-items:center; justify-content:center; box-sizing:border-box; padding:8px 15px; border:0; border-radius:4px; background:#FFE699; color:#333; font-weight:bold; cursor:pointer; white-space:nowrap; }
+.memo-add-btn img { width:14px; height:14px; margin-right:5px; }
+.memo-image-grid { display:block; }
+.memo-image-card { display:flex; align-items:center; gap:14px; min-height:120px; padding:10px 6px; border-bottom:1px solid #e2e7eb; background:#fff; }
+.memo-image-card > input { width:16px; height:16px; flex:0 0 auto; }
+.memo-image-card img { display:block; width:192px; height:108px; object-fit:cover; border-radius:5px; background:#f4f4f4; }
+.memo-image-card .memo-image-info { min-width:0; flex:1; }
+.memo-image-card p { margin:5px 0; font-size:13px; color:#74808b; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.memo-image-card p:first-child { font-size:16px; font-weight:bold; color:#263746; }
+.memo-image-card .memo-image-example { color:#077b9c; font-size:12px; }
+.popUp04 #memoListContent { padding: 0; margin: 0; width: 100%; max-width: none; }
+.popUp04 #memoListContainer { width: 100%; margin: 0; padding: 0; }
+.popUp04 .memo-resource-layout { width: 100%; margin: 0; box-sizing: border-box; }
+@media (max-width: 600px) {
+    .memo-resource-layout { min-height:0; width:100%; }
+    .memo-resource-nav { width:96px; flex-basis:96px; padding:8px 0; }
+    .memo-resource-title { padding:5px 7px; font-size:15px; white-space:nowrap; }
+    .memo-resource-nav button { padding:12px 7px; font-size:12px; white-space:nowrap; }
+    .memo-resource-nav button.active { padding-left:4px; }
+    .memo-resource-nav .resource-count { font-size:11px; }
+    .memo-resource-content { padding:8px; height:calc(100vh - 190px); min-height:360px; }
+    .memo-add-btn { min-width:92px; height:32px; padding:5px 6px; font-size:12px; }
+    .memo-delete-btn { width:auto; min-width:0; height:auto; padding:6px 15px; font-size:12px; }
+    .memo-attachment-toolbar, .memo-list-toolbar { height:48px; min-height:48px; margin-bottom:15px; padding:6px 2px !important; overflow:hidden; }
+    .memo-add-btn { line-height:1; }
+    .memo-image-card { min-height:86px; gap:7px; padding:8px 2px; }
+    .memo-image-card img { width:92px; height:68px; }
+    .memo-image-card p { margin:3px 0; font-size:11px; }
+    .memo-image-card p:first-child { font-size:13px; }
+    .memo-detail { font-size:13px; padding:8px; }
+    .memo-list-item { padding:10px 2px; }
+}
+@media (max-width: 400px) {
+    .memo-resource-nav { width:78px; flex-basis:78px; }
+    .memo-resource-title { padding:5px 4px; font-size:13px; }
+    .memo-resource-nav button { font-size:11px; padding:11px 4px; }
+    .memo-resource-nav button.active { padding-left:2px; }
+    .memo-resource-nav .resource-count { display:inline; font-size:10px; }
+    .memo-resource-content { padding:6px; height:calc(100vh - 165px); min-height:300px; }
+    .memo-add-btn { min-width:78px; height:28px; padding:4px 5px; font-size:11px; }
+    .memo-delete-btn { width:auto; min-width:0; height:auto; padding:5px 10px; font-size:11px; }
+    .memo-attachment-toolbar, .memo-list-toolbar { height:44px; min-height:44px; margin-bottom:12px; padding:5px 0 !important; }
+    .memo-image-card { min-height:70px; gap:5px; padding:6px 0; }
+    .memo-image-card img { width:70px; height:54px; }
+    .memo-image-card > input { width:14px; height:14px; }
+    .memo-image-card p { font-size:10px; }
+    .memo-image-card p:first-child { font-size:12px; }
+}
+@media (max-width: 600px) {
+    .popUp04 { position:fixed !important; top:5vh !important; left:50% !important; right:auto !important; transform:translateX(-50%) !important; width:calc(100vw - 20px) !important; max-width:none !important; margin:0 !important; box-sizing:border-box; }
+    .popUp04 .popTit { min-height:52px; box-sizing:border-box; }
+    .popUp04, .popUp04 .popTit, .popUp04 .popCont { min-width:0 !important; }
+    .popUp04 .popCont { width:100%; max-width:none; box-sizing:border-box; }
+    .popUp04 #memoListContent { overflow-x:hidden; }
+    .memo-resource-layout { min-width:0; }
+    .memo-resource-content { min-width:0; overflow-x:hidden; }
+    .memo-image-info { overflow:hidden; }
 }
 
 
@@ -413,7 +489,10 @@ function setGroupName(){
 }
 
 .popUp04 .popCont {
-        padding-top: 15px; 
+        padding: 15px 20px 20px;
+        box-sizing: border-box;
+        width: 100%;
+        min-width: 500px;
     }
 
 .filterArea {
@@ -685,9 +764,9 @@ function setGroupName(){
 									<div name="memoArea"></div>
 								</div> --%>
 								<div style="display:flex; align-items:center; margin-top:10px; margin-left: auto;">
-									<button type="button" class="actionBtn c-memo" style="width:130px; border:none; display:none;" onclick="openMemoListModal('${domain.id}', '${domain.userId}')">
+					<button type="button" class="actionBtn c-memo" style="width:130px; border:none;" onclick="openMemoListModal('${domain.id}', '${domain.userId}')">
 										<img src="${pageContext.request.contextPath}/new/img/memo_icon.png" style="width:16px;"/>
-										메모 보기 <span class="memo-badge" data-id="${domain.id}" style="display:none;">0</span>
+										현장 자료 <span class="memo-badge" data-id="${domain.id}" style="display:none;">0</span>
 									</button>
 								</div>
 							</div>
@@ -858,9 +937,9 @@ function setGroupName(){
 									</div>
 								</div> --%>
 								<div style="display:flex; align-items:center; margin-top:10px; margin-left:20px;">
-								    <button type="button" class="actionBtn c-memo" style="width:130px; font-weight:bold; border:none; display:none;" onclick="openMemoListModal('${domain.id}', '${domain.userId}')">
+							    <button type="button" class="actionBtn c-memo" style="width:130px; font-weight:bold; border:none;" onclick="openMemoListModal('${domain.id}', '${domain.userId}')">
 								        <img src="${pageContext.request.contextPath}/new/img/memo_icon.png" style="width:16px;"/>
-								       	 메모 보기 <span class="memo-badge" data-id="${domain.id}" style="display:none;">0</span>
+								       	 현장 자료 <span class="memo-badge" data-id="${domain.id}" style="display:none;">0</span>
 								    </button>
 								</div>
 							</c:when>
@@ -1341,7 +1420,7 @@ function setGroupName(){
 			        <span onclick="goBackToMemoList()" style="position: absolute; left: 20px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 15px; font-weight: bold; display: flex; align-items: center; color: #fff;">
 			            <span style="font-size: 20px; margin-right: 5px;">&#8592;</span>
 			        </span>
-					<p style="padding-left: 20px;">메모장</p>
+					<p id="memoPopupTitle" style="padding-left: 20px;">현장 자료</p>
 					<img class="popClose" src="${pageContext.request.contextPath}/new/img/popclose.png" />
 				</div>
 				<div class="popCont">
@@ -1355,25 +1434,26 @@ function setGroupName(){
 						<input type="hidden" id="memoConstructionIdx" name="memoConstructionIdx" />
 						<input type="hidden" id="memoUserId" name="memoUserId" />
 						<input type="hidden" id="memoIndex" name="memoIndex" />
+						<input type="hidden" id="memoAttachmentWriteType" value="" />
 						<textarea name="memoContent" id="memoContent" rows="10"  cols="10" style="width: 100%; border:1px #c2c2c2 solid;" ></textarea>
+					</div>
+					<div class="inputArea02 mb-20" id="memoCardUploadArea" style="display:none;">
+						<p class="inputTxt02">현장 명함 이미지</p>
+						<input type="file" id="memoCardFiles" accept="image/*" multiple />
+					</div>
+					<div class="inputArea02 mb-20" id="memoPhotoUploadArea" style="display:none;">
+						<p class="inputTxt02">현장 사진 이미지</p>
+						<input type="file" id="memoPhotoFiles" accept="image/*" multiple />
 					</div>
 					<c:choose>
 						<c:when test="${sessionInfo.role == 0 or sessionInfo.role == 3}">
-							<div class="popAdd" onclick="javascript:saveMemo();">저장</div>
+							<div class="popAdd" id="memoSaveButton" onclick="javascript:saveMemo();">저장</div>
 						</c:when>
 					</c:choose>
 				</div>
-			</div>
-			
-			<div class="popUp popUp05">
-			    <div class="popTit">
-			        <p>메모 목록</p>
-			        <img class="popClose" src="${pageContext.request.contextPath}/new/img/popclose.png" />
-			    </div>
-			    <div class="popCont" style=" overflow-y: auto; padding: 20px;">
-			        <div id="memoListContainer">
-			            </div>
-			    </div>
+				<div id="memoListContent" class="popCont" style="overflow-y:auto; display:none;">
+					<div id="memoListContainer"></div>
+				</div>
 			</div>
 			
 			
@@ -1384,6 +1464,28 @@ var mode = null;
 
 $('.popUp').hide();
 $('.popLayer').hide();
+
+$(function() {
+    $('.popUp04 .popCont').first().attr('id', 'memoEditorContainer');
+});
+
+function showUnifiedMemoList() {
+    $('#memoEditorContainer').hide();
+    $('#memoListContent').show();
+    $('#memoListContainer').show();
+    $('.popUp04').show();
+    $('.popLayer').show();
+    $('body').css('overflow', 'hidden');
+}
+
+function showUnifiedMemoEditor() {
+    $('#memoListContent').hide();
+    $('#memoListContainer').hide();
+    $('#memoEditorContainer').show();
+    $('.popUp04').show();
+    $('.popLayer').show();
+    $('body').css('overflow', 'hidden');
+}
 
 $('.popBtn01').on('click', function(e){
 	$('.popUp01').show();
@@ -1551,7 +1653,7 @@ function getMemo(){
 	
 	$(".memo-badge").each(function() {
         var badge = $(this);
-        var memoBtn = badge.closest("button");   // 메모 보기 버튼
+        var memoBtn = badge.closest("button");   // 현장 자료 버튼
         var constructionIdx = badge.attr("data-id");
         jQuery.ajax({
             type : "GET",
@@ -1560,13 +1662,11 @@ function getMemo(){
             dataType : "JSON",
             success : function(data) {
                 badge.text(data.length);
-                // 메모가 있을 때만 '메모 보기' 버튼과 배지를 노출
+                // 버튼은 항상 노출하고, 자료가 있을 때만 건수 배지를 표시
                 if(data.length > 0) {
                     badge.show();
-                    memoBtn.show();
                 } else {
                     badge.hide();
-                    memoBtn.hide();
                 }
             }
         });
@@ -1655,6 +1755,17 @@ function saveMemo(){
 	var memoId = $("#memoId").val();
 	var userId = $("#memoUserId").val();
 	var constructionIdx = $("#memoConstructionIdx").val();
+	var attachmentWriteType = $("#memoAttachmentWriteType").val();
+	var hasCardFile = $('#memoCardFiles')[0] && $('#memoCardFiles')[0].files.length > 0;
+	var hasPhotoFile = $('#memoPhotoFiles')[0] && $('#memoPhotoFiles')[0].files.length > 0;
+	if (attachmentWriteType || hasCardFile || hasPhotoFile) {
+		uploadMemoAttachments(constructionIdx, userId, function() {
+			$('#memoAttachmentWriteType, #memoCardFiles, #memoPhotoFiles').val('');
+			$('.popUp04').hide();
+			openMemoListModal(constructionIdx, userId);
+		});
+		return;
+	}
 	
 	var myObject = new Object(); 
 	myObject.id = new Number(memoId == "" ? 0 : memoId);
@@ -1674,13 +1785,51 @@ function saveMemo(){
 		data: JSON.stringify(myObject),
 		success : function(data) {	
 			if(data == 1){
-				$('.popUp04').hide(); // 작성 팝업 닫기
-				$("#memoContent").val("");
-				setMemoToday();
-				getMemo(); // 뱃지 업데이트
-				openMemoListModal(constructionIdx, userId); // 리스트 다시 열기
+				uploadMemoAttachments(constructionIdx, userId, function() {
+					$('.popUp04').hide(); // 작성 팝업 닫기
+					$("#memoContent").val("");
+					$("#memoCardFiles, #memoPhotoFiles").val("");
+					setMemoToday();
+					getMemo(); // 뱃지 업데이트
+					openMemoListModal(constructionIdx, userId); // 리스트 다시 열기
+				});
 			}
 		}
+	});
+}
+
+function uploadMemoAttachments(constructionIdx, userId, done) {
+	var uploads = [];
+	var writeType = $('#memoAttachmentWriteType').val();
+	if (!writeType || writeType === 'CARD') {
+		$.each($('#memoCardFiles')[0].files, function(_, file) { uploads.push({ type: 'CARD', file: file }); });
+	}
+	if (!writeType || writeType === 'PHOTO') {
+		$.each($('#memoPhotoFiles')[0].files, function(_, file) { uploads.push({ type: 'PHOTO', file: file }); });
+	}
+	if (!uploads.length) { done(); return; }
+
+	var remaining = uploads.length;
+	var failed = false;
+	$.each(uploads, function(_, upload) {
+		var formData = new FormData();
+		formData.append('constructionIdx', constructionIdx);
+		formData.append('userId', userId || '');
+		formData.append('attachmentType', upload.type);
+		formData.append('file', upload.file);
+		$.ajax({
+			url: '${pageContext.request.contextPath}/memo/attachment/upload', type: 'POST', data: formData,
+			processData: false, contentType: false
+		}).fail(function(xhr) {
+			failed = true;
+			alert(xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : '이미지 업로드에 실패했습니다.');
+		}).always(function() {
+			remaining--;
+			if (remaining === 0) {
+				if (failed) console.warn('일부 메모 첨부 이미지 업로드에 실패했습니다.');
+				done();
+			}
+		});
 	});
 }
 
@@ -1699,17 +1848,18 @@ function showUpdateMemoPop(id, constructionIdx,  memoDate, content){
 	$("#memoConstructionIdx").val(constructionIdx);
 	$("#memoDate").val(memoDate);
 	$("#memoContent").val(content);
-	$('.popUp05').hide(); // 리스트 팝업 숨김
-	$('.popUp04').show(); // 작성 팝업 열기
-	$('.popLayer').show();
-	$('body').css('overflow', 'hidden');
+	showUnifiedMemoEditor();
 }
 
 function showMemoPop(constructionIdx, userId, index){
+	$("#memoAttachmentWriteType").val("");
+	$('#memoSaveButton').attr('onclick', 'javascript:saveMemo();');
+	$("#memoPopupTitle").text("메모장");
+	$("#memoContent, #memoDate").closest(".inputArea02").show();
+	$("#memoCardUploadArea, #memoPhotoUploadArea").hide();
+	$("#memoCardFiles, #memoPhotoFiles").val("");
 	
-	$('.popUp04').show();
-	$('.popLayer').show();
-	$('body').css('overflow', 'hidden');
+	showUnifiedMemoEditor();
 	
 	$("#memoId").val("");
 	$("#memoConstructionIdx").val(constructionIdx);
@@ -1723,9 +1873,7 @@ function openMemoListModal(constructionIdx, userId) {
     $('#memoListContainer').data('constructionIdx', constructionIdx);
     $('#memoListContainer').data('userId', userId);
     loadMemoList(constructionIdx);
-    $('.popUp05').show();
-    $('.popLayer').show();
-    $('body').css('overflow', 'hidden');
+    showUnifiedMemoList();
 }
 
 //1. [수정] 버튼 클릭 시 입력창으로 변환
@@ -1885,24 +2033,24 @@ function loadMemoList(constructionIdx) {
             
             container.data('constructionIdx', constructionIdx);
 
-            var topBarHtml = '<div style="display: flex; padding-top: 50px; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #ddd;">';
+            var topBarHtml = '<div class="memo-list-toolbar">';
             
             if (role == 0 || role == 3) {
                 topBarHtml += 
-                    '<div style="display: flex; align-items: center;">' +
-                        '<label style="cursor:pointer; display:flex; align-items:center; margin-right:15px; font-size:13px; font-weight:bold;">' +
-                            '<input type="checkbox" id="checkAllMemos" style="width:16px; height:16px; margin-right:5px; cursor:pointer;" onclick="toggleAllMemos(this)">' +
+                    '<div class="memo-list-toolbar-left">' +
+                        '<label class="memo-select-label">' +
+                            '<input type="checkbox" id="checkAllMemos" onclick="toggleAllMemos(this)">' +
                         '</label>' +
-                        '<button type="button" onclick="deleteSelectedMemos(\'' + constructionIdx + '\')" style="background:#d9534f; color:#fff; border:none; padding:6px 15px; border-radius:4px; cursor:pointer; font-weight:bold;">삭제</button>' +
+                        '<button type="button" class="memo-delete-btn" onclick="deleteSelectedMemos(\'' + constructionIdx + '\')">삭제</button>' +
                     '</div>';
             } else {
                 topBarHtml += '<div></div>'; 
             }
 
             topBarHtml += 
-                '<div style="text-align: right;">' +
-                    '<button type="button" class="actionBtn c-memo" style="width: auto; display: inline-flex; padding: 8px 15px; border: none;" onclick="triggerMemoRegist()">' +
-                        '<img src="${pageContext.request.contextPath}/new/img/memo_icon.png" style="width:14px; margin-right:5px;"/> 메모 작성' +
+                '<div>' +
+                    '<button type="button" class="memo-add-btn" onclick="triggerMemoRegist()">' +
+                        '<img src="${pageContext.request.contextPath}/new/img/memo_icon.png"/> 메모 작성' +
                     '</button>' +
                 '</div>' +
             '</div>';
@@ -1921,7 +2069,7 @@ function loadMemoList(constructionIdx) {
                     
                     if (role == 0 || role == 3) {
                         checkboxHtml = '<input type="checkbox" class="memo-checkbox" value="' + item.id + '" style="margin-right:10px; cursor:pointer; width:16px; height:16px;">';
-                        editBtn = '<a href="javascript:void(0);" onclick="enableInlineEdit(\'' + item.id + '\');" style="color:#337ab7;">[수정]</a>';
+                        editBtn = '<a href="javascript:void(0);" onclick="openMemoEditPopup(\'' + item.id + '\', \'' + item.constructionIdx + '\', \'' + item.memoDate + '\');" style="color:#337ab7;">[수정]</a>';
                     }
                     
                     listHtml += 
@@ -1952,14 +2100,151 @@ function loadMemoList(constructionIdx) {
             
             listHtml += '</div>';
             container.append(listHtml);
+
+            $.getJSON('${pageContext.request.contextPath}/memo/attachments', { constructionIdx: constructionIdx }, function(attachments) {
+                var memoHtml = container.html();
+                var cards = [], photos = [];
+                $.each(attachments || [], function(_, attachment) {
+                    if (attachment.attachmentType === 'CARD') cards.push(attachment);
+                    else if (attachment.attachmentType === 'PHOTO') photos.push(attachment);
+                });
+                container.html(buildResourceLayout(memoHtml, cards, photos, data.length, role));
+            });
         }
     });
+}
+
+function escapeResourceHtml(value) {
+    return $('<div/>').text(value || '').html();
+}
+
+function resourceImageList(items, emptyMessage, role, addType, addLabel) {
+    var group = items.length && items[0].attachmentType === 'PHOTO' ? 'PHOTO' : (addType || 'CARD');
+    var canManageAttachments = role == 0 || role == 3;
+    var managementControls = canManageAttachments
+        ? '<label class="memo-select-label"><input type="checkbox" onclick="toggleAttachmentGroup(\'' + group + '\', this)"></label>' +
+          '<button type="button" class="memo-delete-btn" onclick="deleteSelectedAttachments(\'' + group + '\')">삭제</button>'
+        : '';
+    var addButton = canManageAttachments
+        ? '<button type="button" class="memo-add-btn" onclick="openAttachmentWrite(\'' + addType + '\')"><img src="${pageContext.request.contextPath}/new/img/memo_icon.png"/>' + addLabel + '</button>'
+        : '';
+    var html = '<div class="memo-attachment-toolbar"><div class="memo-attachment-toolbar-left">' + managementControls +
+        '</div>' + addButton + '</div><div class="memo-image-grid">';
+    if (!items.length) return html + '<p style="text-align:center; padding:45px 10px; color:#888;">' + emptyMessage + '</p></div>';
+    $.each(items, function(_, item) {
+        var imageUrl = '${pageContext.request.contextPath}/uploads/' + encodeURIComponent(item.storedFilename);
+        html += '<div class="memo-image-card">' +
+            (canManageAttachments ? '<input type="checkbox" class="memo-attachment-checkbox" data-group="' + group + '" value="' + item.id + '">' : '') +
+            '<a href="' + imageUrl + '" target="_blank" title="원본 이미지 보기"><img src="' + imageUrl + '" alt="' + escapeResourceHtml(item.originalFilename) + '"></a>' +
+            '<div class="memo-image-info"><p>' + (item.attachmentType === 'PHOTO' ? '현장 사진' : '현장 명함') + '</p>' +
+            '<p title="' + escapeResourceHtml(item.originalFilename) + '">' + escapeResourceHtml(item.originalFilename) + '</p>' +
+            '<p>' + escapeResourceHtml(item.createDate) + '</p><p class="memo-image-example">' +
+            '</p>' +
+            '</div></div>';
+    });
+    return html + '</div>';
+}
+
+function toggleAttachmentGroup(group, source) {
+    $('.memo-attachment-checkbox[data-group="' + group + '"]').prop('checked', source.checked);
+}
+
+function deleteSelectedAttachments(group) {
+    var ids = [];
+    $('.memo-attachment-checkbox[data-group="' + group + '"]:checked').each(function() { ids.push($(this).val()); });
+    if (!ids.length) { alert('삭제할 항목을 선택하세요.'); return; }
+    if (!confirm('선택한 ' + ids.length + '개 항목을 삭제하시겠습니까?')) return;
+    var pending = ids.length;
+    $.each(ids, function(_, id) {
+        $.post('${pageContext.request.contextPath}/memo/attachment/delete', { id: id }).always(function() {
+            pending--;
+            if (!pending) openMemoListModal($('#memoListContainer').data('constructionIdx'), $('#memoListContainer').data('userId'));
+        });
+    });
+}
+
+function buildResourceLayout(memoHtml, cards, photos, memoCount, role) {
+    return '<div class="memo-resource-layout">' +
+        '<div class="memo-resource-nav">' +
+            '<div class="memo-resource-title">자료 분류</div>' +
+            '<button type="button" onclick="showMemoResource(\'CARD\', this)">현장 명함 <span class="resource-count">' + cards.length + '</span></button>' +
+            '<button type="button" onclick="showMemoResource(\'PHOTO\', this)">현장 사진 <span class="resource-count">' + photos.length + '</span></button>' +
+            '<button type="button" class="active" onclick="showMemoResource(\'MEMO\', this)">메모 <span style="float:right;">' + memoCount + '</span></button>' +
+        '</div>' +
+        '<div class="memo-resource-content">' +
+            '<div class="memo-resource-panel" data-resource="CARD">' + resourceImageList(cards, '등록된 현장 명함이 없습니다.', role, 'CARD', '명함 등록') + '</div>' +
+            '<div class="memo-resource-panel" data-resource="PHOTO">' + resourceImageList(photos, '등록된 현장 사진이 없습니다.', role, 'PHOTO', '사진 등록') + '</div>' +
+            '<div class="memo-resource-panel active" data-resource="MEMO">' + memoHtml + '</div>' +
+        '</div>' +
+    '</div>';
+}
+
+function showMemoResource(resource, button) {
+    var layout = $(button).closest('.memo-resource-layout');
+    layout.find('.memo-resource-nav button').removeClass('active');
+    $(button).addClass('active');
+    layout.find('.memo-resource-panel').removeClass('active');
+    layout.find('.memo-resource-panel[data-resource="' + resource + '"]').addClass('active');
+}
+
+function openAttachmentWrite(type) {
+    var constructionIdx = $('#memoListContainer').data('constructionIdx');
+    var userId = $('#memoListContainer').data('userId');
+    $('#memoAttachmentWriteType').val(type);
+    $('#memoPopupTitle').text(type === 'CARD' ? '현장 명함 등록' : '현장 사진 등록');
+    $('#memoContent').closest('.inputArea02').hide();
+    $('#memoDate').closest('.inputArea02').hide();
+    $('#memoCardUploadArea').toggle(type === 'CARD');
+    $('#memoPhotoUploadArea').toggle(type === 'PHOTO');
+    $('#memoSaveButton').attr('onclick', 'javascript:saveAttachmentOnly();');
+    $('#memoConstructionIdx').val(constructionIdx);
+    $('#memoUserId').val(userId);
+    showUnifiedMemoEditor();
+}
+
+function saveAttachmentOnly() {
+    var constructionIdx = $('#memoConstructionIdx').val();
+    var userId = $('#memoUserId').val();
+    var type = $('#memoAttachmentWriteType').val();
+    var fileInput = type === 'PHOTO' ? $('#memoPhotoFiles')[0] : $('#memoCardFiles')[0];
+    if (!type || !fileInput || !fileInput.files.length) {
+        alert(type === 'PHOTO' ? '현장 사진을 선택하세요.' : '현장 명함 이미지를 선택하세요.');
+        return;
+    }
+    uploadMemoAttachments(constructionIdx, userId, function() {
+        $('#memoAttachmentWriteType, #memoCardFiles, #memoPhotoFiles').val('');
+        $('.popUp04').hide();
+        openMemoListModal(constructionIdx, userId);
+    });
+}
+
+function deleteMemoAttachment(id) {
+    if (!confirm('이 이미지를 삭제하시겠습니까?')) return;
+    $.post('${pageContext.request.contextPath}/memo/attachment/delete', { id: id }, function(success) {
+        if (success) openMemoListModal($('#memoListContainer').data('constructionIdx'), $('#memoListContainer').data('userId'));
+        else alert('이미지 삭제에 실패했습니다.');
+    });
+}
+
+function openMemoEditPopup(id, constructionIdx, memoDate) {
+    var content = $('#memo-detail-' + id).text();
+    $('#memoAttachmentWriteType').val('');
+    $('#memoSaveButton').attr('onclick', 'javascript:saveMemo();');
+    $('#memoPopupTitle').text('메모 수정');
+    $('#memoContent, #memoDate').closest('.inputArea02').show();
+    $('#memoCardUploadArea, #memoPhotoUploadArea').hide();
+    $('#memoCardFiles, #memoPhotoFiles').val('');
+    $('#memoId').val(id);
+    $('#memoConstructionIdx').val(constructionIdx);
+    $('#memoDate').val(memoDate);
+    $('#memoContent').val(content);
+    showUnifiedMemoEditor();
 }
 // 팝업 내 메모 작성 버튼 클릭
 function triggerMemoRegist() {
     var cIdx = $('#memoListContainer').data('constructionIdx');
     var uId = $('#memoListContainer').data('userId');
-    $('.popUp05').hide();
+    $('.popUp04').hide();
     showMemoPop(cIdx, uId, 0); 
 }
 
