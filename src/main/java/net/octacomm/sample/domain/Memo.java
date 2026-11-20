@@ -18,5 +18,15 @@ public class Memo implements Domain{
 	private String createDate;
 	
 	private String modifyDate;
+	
+	private String attachmentType;
+	
+	private String originalFilename;
+	
+	private String storedFilename;
+	
+	private String contentType;
+	
+	private Long fileSize;
 
 }

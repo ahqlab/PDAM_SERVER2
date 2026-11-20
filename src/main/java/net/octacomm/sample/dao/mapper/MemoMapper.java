@@ -23,8 +23,15 @@ public interface MemoMapper {
 	@Insert("INSERT INTO " + TABLE_NAME + " " + INSERT_FIELDS + " VALUES " + INSERT_VALUES)
 	int insert(Memo memo);
 	
-	@Select("SELECT * FROM TB_MEMO WHERE constructionIdx = #{constructionIdx}  order by createDate desc")
+	@Select("SELECT * FROM TB_MEMO WHERE constructionIdx = #{constructionIdx} AND attachmentType IS NULL AND content IS NOT NULL AND content <> '' AND content NOT LIKE '[[ATTACHMENT|%' order by createDate desc")
 	List<Memo> findByConstructionIdx(@Param("constructionIdx") int constructionIdx);
+
+	@Select("SELECT * FROM TB_MEMO WHERE constructionIdx = #{constructionIdx} AND attachmentType IS NOT NULL ORDER BY createDate DESC")
+	List<Memo> findAttachmentsByConstructionIdx(@Param("constructionIdx") int constructionIdx);
+
+	@Insert("INSERT INTO TB_MEMO (constructionIdx, userId, content, memoDate, attachmentType, originalFilename, storedFilename, contentType, fileSize, createDate, modifyDate) "
+			+ "VALUES (#{constructionIdx}, #{userId}, '', #{memoDate}, #{attachmentType}, #{originalFilename}, #{storedFilename}, #{contentType}, #{fileSize}, NOW(), NOW())")
+	int insertAttachment(Memo memo);
 
 	@Update("UPDATE  " + TABLE_NAME + " SET memoDate = #{memoDate} , content = #{content} , modifyDate = now() WHERE id = #{id}")
 	int update(Memo memo);
