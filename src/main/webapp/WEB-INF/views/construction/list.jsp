@@ -1119,12 +1119,12 @@ function setGroupName(){
 						</div>
 					    </c:when>
 					</c:choose>
-					<div class="inputArea02 mb-20" id="legacyMemoCardUploadArea" style="display:none;">
+					<div class="inputArea02 mb-20">
 						<p class="inputTxt02">시공사</p>
 						<input type="text"  autocomplete="off" class="Input02" id="groupName" name="groupName" placeholder="시공사를 선택하세요." onclick="javascript:openPop();">
 						<input type="hidden" id="groupIdx" name="groupIdx" class="Input02"/>
 					</div>
-					<div class="inputArea02 mb-20" id="legacyMemoPhotoUploadArea" style="display:none;">
+					<div class="inputArea02 mb-20">
 						<p class="inputTxt02">협력사명</p>
 						<input type="text" autocomplete="off" class="Input02" id="name" name="name"  placeholder="협력사명을 입력하세요.">
 						
