@@ -45,6 +45,14 @@
 	  padding: 2px 4px;
 	  margin: 0;
 	}
+
+	.duplicate-device-search { display: flex; align-items: flex-start; justify-content: flex-end; gap: 9px; margin: 0 0 10px; }
+	.duplicate-device-search > label { font-weight: 700; white-space: nowrap; padding-top: 6px; }
+	.duplicate-device-checkboxes { display: flex; flex-wrap: wrap; gap: 6px 12px; max-width: 75%; }
+	.duplicate-device-checkboxes label { padding: 5px 8px; border: 1px solid #ccc; background: #fff; cursor: pointer; font-size: 12px; }
+	.duplicate-device-checkboxes input { margin-right: 4px; vertical-align: middle; }
+	.report-filter-check { margin: 0 5px 0 0; vertical-align: middle; }
+	@media screen and (max-width: 767px) { .duplicate-device-search { justify-content: flex-start; flex-wrap: wrap; } .duplicate-device-checkboxes { max-width: 100%; } }
 	
 	.popUp04 {
 	    display: none;
@@ -674,6 +682,13 @@
 			error : function(xhr, status, error) {
 			}
 		}); 
+	}
+
+	function filterReportRows() {
+		var selected = $('.report-filter-check:checked').map(function() { return $(this).data('class'); }).get();
+		var query = '?id=${param.id}&type=all&constructionIdx=${param.constructionIdx}';
+		if (selected.length) query += '&duplicateFilter=' + encodeURIComponent(selected.join(','));
+		goUrl('${pageContext.request.contextPath}/report/list' + query);
 	}
 	
 	function goUrl(url){
@@ -3119,7 +3134,7 @@
 					<td class="f_td">
 						<img src="${pageContext.request.contextPath}/new/img/light-b.png">
 					</td>
-					<td class="s_td" >&nbsp;호기별 중복(시공위치, 파일번호, 파일규격, 파일종류, 시공공법)</td>
+					<td class="s_td" ><label><c:if test="${sessionInfo.role == 0 or sessionInfo.hiddenManager == true}"><input type="checkbox" class="report-filter-check" data-class="lampOn-b" onchange="filterReportRows();"></c:if>호기별 중복(시공위치, 파일번호, 파일규격, 파일종류, 시공공법)</label></td>
 					<td class="t_td" rowspan="4" >
 						<c:if test="${sessionScope.isSystemAdmin}">
 							<div class="tableCArea" style="display: flex; flex-wrap: wrap; gap: 5px; justify-content: flex-end; margin-bottom: 10px;">
@@ -3158,33 +3173,33 @@
 				</tr>
 				<tr>
 					<td><img src="${pageContext.request.contextPath}/new/img/light-p.png"></td>
-					<td>&nbsp;전체 중복(시공위치, 파일번호, 파일규격, 파일종류, 시공공법)</td>
+					<td><label><c:if test="${sessionInfo.role == 0 or sessionInfo.hiddenManager == true}"><input type="checkbox" class="report-filter-check" data-class="lampOn-p" onchange="filterReportRows();"></c:if>전체 중복(시공위치, 파일번호, 파일규격, 파일종류, 시공공법)</label></td>
 				</tr>
 				<tr>
 					<td><img src="${pageContext.request.contextPath}/new/img/light-o.png"></td>
-					<td>&nbsp;관리기준 초과/또는 NG</td>
+					<td><label><c:if test="${sessionInfo.role == 0 or sessionInfo.hiddenManager == true}"><input type="checkbox" class="report-filter-check" data-class="lampOn-o" onchange="filterReportRows();"></c:if>관리기준 초과/또는 NG</label></td>
 				</tr>
 				<tr>
 					<td><img src="${pageContext.request.contextPath}/new/img/light-l.png"></td>
-					<td>&nbsp;미관입/또는 NG</td>
+					<td><label><c:if test="${sessionInfo.role == 0 or sessionInfo.hiddenManager == true}"><input type="checkbox" class="report-filter-check" data-class="lampOn-l" onchange="filterReportRows();"></c:if>미관입/또는 NG</label></td>
 				</tr>
 			</table>
 			<table class="mobileReportTypeDashboard">
 				<tr>
 					<td class="f_td"><img src="${pageContext.request.contextPath}/new/img/light-b.png"></td>
-					<td class="s_td">&nbsp;호기별 중복(시공위치, 파일번호, 파일규격, 파일종류, 시공공법)</td>
+					<td class="s_td"><label><c:if test="${sessionInfo.role == 0 or sessionInfo.hiddenManager == true}"><input type="checkbox" class="report-filter-check" data-class="lampOn-b" onchange="filterReportRows();"></c:if>호기별 중복(시공위치, 파일번호, 파일규격, 파일종류, 시공공법)</label></td>
 				</tr>
 				<tr >
 					<td class="f_td"><img src="${pageContext.request.contextPath}/new/img/light-p.png"></td>
-					<td class="s_td">&nbsp;전체 중복(시공위치, 파일번호, 파일규격, 파일종류, 시공공법)</td>
+					<td class="s_td"><label><c:if test="${sessionInfo.role == 0 or sessionInfo.hiddenManager == true}"><input type="checkbox" class="report-filter-check" data-class="lampOn-p" onchange="filterReportRows();"></c:if>전체 중복(시공위치, 파일번호, 파일규격, 파일종류, 시공공법)</label></td>
 				</tr>
 				<tr>
 					<td class="f_td"><img src="${pageContext.request.contextPath}/new/img/light-o.png"></td>
-					<td class="s_td">&nbsp;관리기준 초과/또는 NG</td>
+					<td class="s_td"><label><c:if test="${sessionInfo.role == 0 or sessionInfo.hiddenManager == true}"><input type="checkbox" class="report-filter-check" data-class="lampOn-o" onchange="filterReportRows();"></c:if>관리기준 초과/또는 NG</label></td>
 				</tr>
 				<tr>
 					<td class="f_td"><img src="${pageContext.request.contextPath}/new/img/light-l.png"></td>
-					<td class="s_td">&nbsp;미관입/또는 NG</td>
+					<td class="s_td"><label><c:if test="${sessionInfo.role == 0 or sessionInfo.hiddenManager == true}"><input type="checkbox" class="report-filter-check" data-class="lampOn-l" onchange="filterReportRows();"></c:if>미관입/또는 NG</label></td>
 				</tr>
 				<tr>
 					<td colspan="2">

@@ -143,6 +143,24 @@ public class ReportController{
 		totalConstruction = mapper.getCount(param);
 		
 		List<ReportOneLine> domainList = extensivePileUsage == 0 ? mapper.getReportOneLineListByParam(page.getStartRow(), page.getPageSize(), param) : mapper.getReportOneLineExtensivePileUsageListByParam(page.getStartRow(), page.getPageSize(), param);
+		if (param.getDuplicateFilter() != null && !param.getDuplicateFilter().trim().isEmpty()) {
+			List<ReportOneLine> allReports = extensivePileUsage == 0
+					? mapper.getReportOneLineListByParam(0, Integer.MAX_VALUE, param)
+					: mapper.getReportOneLineExtensivePileUsageListByParam(0, Integer.MAX_VALUE, param);
+			String[] filters = param.getDuplicateFilter().split(",");
+			List<ReportOneLine> filtered = new ArrayList<ReportOneLine>();
+			for (ReportOneLine report : allReports) {
+				if (report.getDeviceIdx() != param.getId()) continue;
+				for (String filter : filters) {
+					if (("lampOn-b".equals(filter) && report.getDuplicated() > 1) || ("lampOn-p".equals(filter) && report.getTotalDuplicated() > 1 && report.getDuplicated() <= 1) || ("lampOn-o".equals(filter) && isManagedStandardExceeded(report)) || ("lampOn-l".equals(filter) && isNotPenetrated(report, isBig > 0))) { filtered.add(report); break; }
+				}
+			}
+			totalCount = filtered.size();
+			page = new ReportPagination(totalCount, param.getCurrentPage());
+			int from = Math.min(page.getStartRow(), filtered.size());
+			int to = Math.min(from + page.getPageSize(), filtered.size());
+			domainList = filtered.subList(from, to);
+		}
 		
 		int rownum = (totalCount + 1) - page.getStartRow();
 		
@@ -195,6 +213,18 @@ public class ReportController{
 		addOptionalColumnFlags(model, domainList);
 		
 		return "report/listMultiOneLine";
+	}
+
+	private boolean isManagedStandardExceeded(ReportOneLine report) {
+		try { return Double.parseDouble(report.getManagedStandard()) < Double.parseDouble(report.getAvgPenetrationValue()); } catch (Exception e) { return false; }
+	}
+
+	private boolean isNotPenetrated(ReportOneLine report, boolean bigReport) {
+		String[] values = bigReport
+				? new String[] { report.getPeOne(), report.getPeTwo(), report.getPeThree(), report.getPeFour(), report.getPeFive(), report.getPeSix(), report.getPeSeven(), report.getPeEight(), report.getPeNine(), report.getPeTen() }
+				: new String[] { report.getPeOne(), report.getPeTwo(), report.getPeThree(), report.getPeFour(), report.getPeFive() };
+		for (String value : values) { if (value != null && !value.trim().isEmpty() && !"0".equals(value) && !"0.0".equals(value) && !"null".equalsIgnoreCase(value)) return false; }
+		return true;
 	}
 
 	@RequestMapping(value = "/history/list", method = RequestMethod.GET)
