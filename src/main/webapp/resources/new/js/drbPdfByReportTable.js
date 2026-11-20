@@ -24,6 +24,48 @@ function showPdf(rowIndex, userRole, hManager, big, epu){
 //}
 
 
+// autoTable willDrawCell 훅: 낙하높이 행의 오른쪽 두 칸(라벨/값)을 각각 반으로 쪼개
+// [낙하높이(M) | 값 | 관리기준(mm) | 값] 으로 직접 그린다. (drbPdf.js 에도 동일 함수 있음)
+function drawFallMeterWithManagedStandard(data, managedStandard){
+	if(data.section !== 'body' || !data.row.raw || data.row.raw.c3 !== '낙하높이(M)') return;
+
+	var cell = data.cell;
+	// 값 칸(4번째)은 폭을 그대로 두고 관리기준 값만 넣는다 → 세로선이 위아래 행과 일치한다.
+	if(data.column.index === 3){
+		cell.text = [(managedStandard === undefined || managedStandard === null) ? '' : String(managedStandard)];
+		return;
+	}
+	if(data.column.index !== 2) return;
+
+	// 라벨 칸(3번째)을 [낙하높이(M) | 값 | 관리기준(mm)] 셋으로 나눈다. 낙하높이 값은 #.# 정도라 좁게 잡는다.
+	var doc = data.doc;
+	var parts = [
+		{ text: '낙하높이(M)', ratio: 0.38 },
+		{ text: data.row.raw.c4, ratio: 0.22 },
+		{ text: '관리기준(mm)', ratio: 0.40 }
+	];
+	var padding = cell.padding('left') + cell.padding('right');
+	var originalFontSize = doc.getFontSize();
+	var x = cell.x;
+
+	for(var i = 0; i < parts.length; i++){
+		var width = cell.width * parts[i].ratio;
+		var text = (parts[i].text === undefined || parts[i].text === null) ? '' : String(parts[i].text);
+		doc.rect(x, cell.y, width, cell.height, 'S');
+
+		// 칸에 안 들어가면 폰트를 줄여서 맞춘다.
+		var maxTextWidth = width - padding;
+		var textWidth = doc.getTextWidth(text);
+		if(textWidth > maxTextWidth){
+			doc.setFontSize(originalFontSize * maxTextWidth / textWidth);
+		}
+		doc.autoTableText(text, x + width / 2, cell.y + cell.height / 2, { halign: 'center', valign: 'middle' });
+		doc.setFontSize(originalFontSize);
+		x += width;
+	}
+	return false; // 기본 셀 그리기 생략
+}
+
 // 항타기종류/상부RPM 행이 추가된 만큼(extraRowOffset) 범례를 아래로 민다.
 function drawLegend(doc, extraRowOffset){
 
@@ -1085,7 +1127,9 @@ function getGongSacFromReportRow($row, fallbackIndex) {
 		    
 		    doc.autoTable(null, row, {
 		    	
-		    	startX: 15, 
+		    	startX: 15,
+		    	// 낙하높이 행을 반으로 쪼개 관리기준 출력
+		    	willDrawCell: function(data){ return drawFallMeterWithManagedStandard(data, currentManagedStandard); },
 	    	    startY: 35,           
 		    	theme: 'grid',    
 		    	//새로추가
