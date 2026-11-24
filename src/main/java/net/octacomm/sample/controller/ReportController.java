@@ -109,6 +109,7 @@ public class ReportController{
 		
 		int extensivePileUsage = 0;
 		
+		final int requestConstructionIdx = param.getConstructionIdx();
 		isBig = mapper.isBigAllReports(param, (int) param.getConstructionIdx());
 		
 		ExtensivePileUsage usage = extensivePileUsageMapper.findByConstructionIdx((int) param.getConstructionIdx());
@@ -122,7 +123,7 @@ public class ReportController{
 		
 		param.setConstructionIdx((int) session.getAttribute("constructionIdx"));
 		
-		Construction targetCon = constructionMapper.get((int) param.getConstructionIdx());
+		Construction targetCon = constructionMapper.get(requestConstructionIdx);
 		
 		Construction con = constructionMapper.get((int) session.getAttribute("constructionIdx"));
 		
@@ -223,8 +224,12 @@ public class ReportController{
 		String[] values = bigReport
 				? new String[] { report.getPeOne(), report.getPeTwo(), report.getPeThree(), report.getPeFour(), report.getPeFive(), report.getPeSix(), report.getPeSeven(), report.getPeEight(), report.getPeNine(), report.getPeTen() }
 				: new String[] { report.getPeOne(), report.getPeTwo(), report.getPeThree(), report.getPeFour(), report.getPeFive() };
-		for (String value : values) { if (value != null && !value.trim().isEmpty() && !"0".equals(value) && !"0.0".equals(value) && !"null".equalsIgnoreCase(value)) return false; }
-		return true;
+		for (String value : values) {
+			if (value == null || value.trim().isEmpty() || "0".equals(value.trim()) || "0.0".equals(value.trim()) || "null".equalsIgnoreCase(value.trim())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@RequestMapping(value = "/history/list", method = RequestMethod.GET)

@@ -549,6 +549,11 @@
 	    getExcelSignInfo();
 	    calcIntrusionFromSprCol1();
 	    initReportStickyScrollbar();
+
+	    var activeFilters = '<c:out value="${param.duplicateFilter}"/>'.split(',');
+	    $('.report-filter-check').each(function() {
+	        if (activeFilters.indexOf($(this).data('class')) !== -1) this.checked = true;
+	    });
 	});
 
 	// 표 가로 스크롤과 보조 바를 연결하고, 보조 바를 표 하단 경계에서 멈춤
@@ -684,8 +689,15 @@
 		}); 
 	}
 
-	function filterReportRows() {
-		var selected = $('.report-filter-check:checked').map(function() { return $(this).data('class'); }).get();
+	function filterReportRows(el) {
+		if (el) {
+			$('.report-filter-check[data-class="' + $(el).data('class') + '"]').prop('checked', el.checked);
+		}
+		var selected = [];
+		$('.report-filter-check:checked').each(function() {
+			var c = $(this).data('class');
+			if (selected.indexOf(c) === -1) selected.push(c);
+		});
 		var query = '?id=${param.id}&type=all&constructionIdx=${param.constructionIdx}';
 		if (selected.length) query += '&duplicateFilter=' + encodeURIComponent(selected.join(','));
 		goUrl('${pageContext.request.contextPath}/report/list' + query);
@@ -3134,7 +3146,7 @@
 					<td class="f_td">
 						<img src="${pageContext.request.contextPath}/new/img/light-b.png">
 					</td>
-					<td class="s_td" ><label><c:if test="${sessionInfo.role == 0 or sessionInfo.hiddenManager == true}"><input type="checkbox" class="report-filter-check" data-class="lampOn-b" onchange="filterReportRows();"></c:if>호기별 중복(시공위치, 파일번호, 파일규격, 파일종류, 시공공법)</label></td>
+					<td class="s_td" ><label><c:if test="${sessionInfo.role == 0 or sessionInfo.hiddenManager == true}"><input type="checkbox" class="report-filter-check" data-class="lampOn-b" onchange="filterReportRows(this);"></c:if>호기별 중복(시공위치, 파일번호, 파일규격, 파일종류, 시공공법)</label></td>
 					<td class="t_td" rowspan="4" >
 						<c:if test="${sessionScope.isSystemAdmin}">
 							<div class="tableCArea" style="display: flex; flex-wrap: wrap; gap: 5px; justify-content: flex-end; margin-bottom: 10px;">
@@ -3173,33 +3185,33 @@
 				</tr>
 				<tr>
 					<td><img src="${pageContext.request.contextPath}/new/img/light-p.png"></td>
-					<td><label><c:if test="${sessionInfo.role == 0 or sessionInfo.hiddenManager == true}"><input type="checkbox" class="report-filter-check" data-class="lampOn-p" onchange="filterReportRows();"></c:if>전체 중복(시공위치, 파일번호, 파일규격, 파일종류, 시공공법)</label></td>
+					<td><label><c:if test="${sessionInfo.role == 0 or sessionInfo.hiddenManager == true}"><input type="checkbox" class="report-filter-check" data-class="lampOn-p" onchange="filterReportRows(this);"></c:if>전체 중복(시공위치, 파일번호, 파일규격, 파일종류, 시공공법)</label></td>
 				</tr>
 				<tr>
 					<td><img src="${pageContext.request.contextPath}/new/img/light-o.png"></td>
-					<td><label><c:if test="${sessionInfo.role == 0 or sessionInfo.hiddenManager == true}"><input type="checkbox" class="report-filter-check" data-class="lampOn-o" onchange="filterReportRows();"></c:if>관리기준 초과/또는 NG</label></td>
+					<td><label><c:if test="${sessionInfo.role == 0 or sessionInfo.hiddenManager == true}"><input type="checkbox" class="report-filter-check" data-class="lampOn-o" onchange="filterReportRows(this);"></c:if>관리기준 초과/또는 NG</label></td>
 				</tr>
 				<tr>
 					<td><img src="${pageContext.request.contextPath}/new/img/light-l.png"></td>
-					<td><label><c:if test="${sessionInfo.role == 0 or sessionInfo.hiddenManager == true}"><input type="checkbox" class="report-filter-check" data-class="lampOn-l" onchange="filterReportRows();"></c:if>미관입/또는 NG</label></td>
+					<td><label><c:if test="${sessionInfo.role == 0 or sessionInfo.hiddenManager == true}"><input type="checkbox" class="report-filter-check" data-class="lampOn-l" onchange="filterReportRows(this);"></c:if>미관입/또는 NG</label></td>
 				</tr>
 			</table>
 			<table class="mobileReportTypeDashboard">
 				<tr>
 					<td class="f_td"><img src="${pageContext.request.contextPath}/new/img/light-b.png"></td>
-					<td class="s_td"><label><c:if test="${sessionInfo.role == 0 or sessionInfo.hiddenManager == true}"><input type="checkbox" class="report-filter-check" data-class="lampOn-b" onchange="filterReportRows();"></c:if>호기별 중복(시공위치, 파일번호, 파일규격, 파일종류, 시공공법)</label></td>
+					<td class="s_td"><label><c:if test="${sessionInfo.role == 0 or sessionInfo.hiddenManager == true}"><input type="checkbox" class="report-filter-check" data-class="lampOn-b" onchange="filterReportRows(this);"></c:if>호기별 중복(시공위치, 파일번호, 파일규격, 파일종류, 시공공법)</label></td>
 				</tr>
 				<tr >
 					<td class="f_td"><img src="${pageContext.request.contextPath}/new/img/light-p.png"></td>
-					<td class="s_td"><label><c:if test="${sessionInfo.role == 0 or sessionInfo.hiddenManager == true}"><input type="checkbox" class="report-filter-check" data-class="lampOn-p" onchange="filterReportRows();"></c:if>전체 중복(시공위치, 파일번호, 파일규격, 파일종류, 시공공법)</label></td>
+					<td class="s_td"><label><c:if test="${sessionInfo.role == 0 or sessionInfo.hiddenManager == true}"><input type="checkbox" class="report-filter-check" data-class="lampOn-p" onchange="filterReportRows(this);"></c:if>전체 중복(시공위치, 파일번호, 파일규격, 파일종류, 시공공법)</label></td>
 				</tr>
 				<tr>
 					<td class="f_td"><img src="${pageContext.request.contextPath}/new/img/light-o.png"></td>
-					<td class="s_td"><label><c:if test="${sessionInfo.role == 0 or sessionInfo.hiddenManager == true}"><input type="checkbox" class="report-filter-check" data-class="lampOn-o" onchange="filterReportRows();"></c:if>관리기준 초과/또는 NG</label></td>
+					<td class="s_td"><label><c:if test="${sessionInfo.role == 0 or sessionInfo.hiddenManager == true}"><input type="checkbox" class="report-filter-check" data-class="lampOn-o" onchange="filterReportRows(this);"></c:if>관리기준 초과/또는 NG</label></td>
 				</tr>
 				<tr>
 					<td class="f_td"><img src="${pageContext.request.contextPath}/new/img/light-l.png"></td>
-					<td class="s_td"><label><c:if test="${sessionInfo.role == 0 or sessionInfo.hiddenManager == true}"><input type="checkbox" class="report-filter-check" data-class="lampOn-l" onchange="filterReportRows();"></c:if>미관입/또는 NG</label></td>
+					<td class="s_td"><label><c:if test="${sessionInfo.role == 0 or sessionInfo.hiddenManager == true}"><input type="checkbox" class="report-filter-check" data-class="lampOn-l" onchange="filterReportRows(this);"></c:if>미관입/또는 NG</label></td>
 				</tr>
 				<tr>
 					<td colspan="2">
