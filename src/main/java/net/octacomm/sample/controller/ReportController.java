@@ -109,6 +109,7 @@ public class ReportController{
 		
 		int extensivePileUsage = 0;
 		
+		final int requestConstructionIdx = param.getConstructionIdx();
 		isBig = mapper.isBigAllReports(param, (int) param.getConstructionIdx());
 		
 		ExtensivePileUsage usage = extensivePileUsageMapper.findByConstructionIdx((int) param.getConstructionIdx());
@@ -122,7 +123,7 @@ public class ReportController{
 		
 		param.setConstructionIdx((int) session.getAttribute("constructionIdx"));
 		
-		Construction targetCon = constructionMapper.get((int) param.getConstructionIdx());
+		Construction targetCon = constructionMapper.get(requestConstructionIdx);
 		
 		Construction con = constructionMapper.get((int) session.getAttribute("constructionIdx"));
 		
@@ -143,6 +144,24 @@ public class ReportController{
 		totalConstruction = mapper.getCount(param);
 		
 		List<ReportOneLine> domainList = extensivePileUsage == 0 ? mapper.getReportOneLineListByParam(page.getStartRow(), page.getPageSize(), param) : mapper.getReportOneLineExtensivePileUsageListByParam(page.getStartRow(), page.getPageSize(), param);
+		if (param.getDuplicateFilter() != null && !param.getDuplicateFilter().trim().isEmpty()) {
+			List<ReportOneLine> allReports = extensivePileUsage == 0
+					? mapper.getReportOneLineListByParam(0, Integer.MAX_VALUE, param)
+					: mapper.getReportOneLineExtensivePileUsageListByParam(0, Integer.MAX_VALUE, param);
+			String[] filters = param.getDuplicateFilter().split(",");
+			List<ReportOneLine> filtered = new ArrayList<ReportOneLine>();
+			for (ReportOneLine report : allReports) {
+				if (report.getDeviceIdx() != param.getId()) continue;
+				for (String filter : filters) {
+					if (("lampOn-b".equals(filter) && report.getDuplicated() > 1) || ("lampOn-p".equals(filter) && report.getTotalDuplicated() > 1 && report.getDuplicated() <= 1) || ("lampOn-o".equals(filter) && isManagedStandardExceeded(report)) || ("lampOn-l".equals(filter) && isNotPenetrated(report, isBig > 0))) { filtered.add(report); break; }
+				}
+			}
+			totalCount = filtered.size();
+			page = new ReportPagination(totalCount, param.getCurrentPage());
+			int from = Math.min(page.getStartRow(), filtered.size());
+			int to = Math.min(from + page.getPageSize(), filtered.size());
+			domainList = filtered.subList(from, to);
+		}
 		
 		int rownum = (totalCount + 1) - page.getStartRow();
 		
@@ -195,6 +214,22 @@ public class ReportController{
 		addOptionalColumnFlags(model, domainList);
 		
 		return "report/listMultiOneLine";
+	}
+
+	private boolean isManagedStandardExceeded(ReportOneLine report) {
+		try { return Double.parseDouble(report.getManagedStandard()) < Double.parseDouble(report.getAvgPenetrationValue()); } catch (Exception e) { return false; }
+	}
+
+	private boolean isNotPenetrated(ReportOneLine report, boolean bigReport) {
+		String[] values = bigReport
+				? new String[] { report.getPeOne(), report.getPeTwo(), report.getPeThree(), report.getPeFour(), report.getPeFive(), report.getPeSix(), report.getPeSeven(), report.getPeEight(), report.getPeNine(), report.getPeTen() }
+				: new String[] { report.getPeOne(), report.getPeTwo(), report.getPeThree(), report.getPeFour(), report.getPeFive() };
+		for (String value : values) {
+			if (value == null || value.trim().isEmpty() || "0".equals(value.trim()) || "0.0".equals(value.trim()) || "null".equalsIgnoreCase(value.trim())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@RequestMapping(value = "/history/list", method = RequestMethod.GET)
@@ -1262,6 +1297,9 @@ public class ReportController{
 			return false;
 		}
 		applyDepthCalculations(report);
+		if (Boolean.TRUE.equals(session.getAttribute("isRoleFive"))) {
+			preservePenetrationValues(report);
+		}
 		report.setUltimateBearingCapacity(String.valueOf(calDanish(report)));
 		int result = mapper.update(report);
 		if (result > 0 && report.isPreserveNullGongSac()) {
@@ -1281,7 +1319,7 @@ public class ReportController{
 			}
 			
 			
-			if(report.getPenetrations() != null) {
+			if (!Boolean.TRUE.equals(session.getAttribute("isRoleFive")) && report.getPenetrations() != null) {
 				for (Penetration penetration : report.getPenetrations()) {
 					if(penetrationMapper.get(penetration.getId()) != null) {
 						penetrationMapper.update(penetration);
@@ -1317,7 +1355,7 @@ public class ReportController{
 		}
 
 		for (UpdateReport report : reports) {
-			if (!updateReportOne(report, (String) session.getAttribute("userId"))) {
+			if (!updateReportOne(report, (String) session.getAttribute("userId"), !Boolean.TRUE.equals(session.getAttribute("isRoleFive")))) {
 				throw new IllegalStateException("기록지 수정 중 오류가 발생했습니다.");
 			}
 		}
@@ -1326,7 +1364,10 @@ public class ReportController{
 	
 	
 	@Transactional
-	public boolean updateReportOne(UpdateReport report, String userId) {
+	public boolean updateReportOne(UpdateReport report, String userId, boolean canEditPenetration) {
+		if (!canEditPenetration) {
+			preservePenetrationValues(report);
+		}
 		
 		int extensivePileUsage = 0;
 		
@@ -1392,7 +1433,7 @@ public class ReportController{
 		}
 
 	    // 5. penetration 처리
-	    if(report.getPenetrations() != null) {
+	    if(canEditPenetration && report.getPenetrations() != null) {
 			for (Penetration penetration : report.getPenetrations()) {
 				if(penetrationMapper.get(penetration.getId()) != null) {
 					penetrationMapper.update(penetration);
@@ -1403,6 +1444,16 @@ public class ReportController{
 		}
 
 	    return true;
+	}
+
+	private void preservePenetrationValues(UpdateReport report) {
+		Report original = mapper.get(report.getId());
+		if (original == null) {
+			return;
+		}
+		report.setIntrusionDepth(original.getIntrusionDepth());
+		report.setAvgPenetrationValue(original.getAvgPenetrationValue());
+		report.setTotalPenetrationValue(original.getTotalPenetrationValue());
 	}
 	
 	/**@Transactional

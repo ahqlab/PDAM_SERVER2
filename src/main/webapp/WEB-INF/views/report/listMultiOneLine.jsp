@@ -45,6 +45,14 @@
 	  padding: 2px 4px;
 	  margin: 0;
 	}
+
+	.duplicate-device-search { display: flex; align-items: flex-start; justify-content: flex-end; gap: 9px; margin: 0 0 10px; }
+	.duplicate-device-search > label { font-weight: 700; white-space: nowrap; padding-top: 6px; }
+	.duplicate-device-checkboxes { display: flex; flex-wrap: wrap; gap: 6px 12px; max-width: 75%; }
+	.duplicate-device-checkboxes label { padding: 5px 8px; border: 1px solid #ccc; background: #fff; cursor: pointer; font-size: 12px; }
+	.duplicate-device-checkboxes input { margin-right: 4px; vertical-align: middle; }
+	.report-filter-check { margin: 0 5px 0 0; vertical-align: middle; }
+	@media screen and (max-width: 767px) { .duplicate-device-search { justify-content: flex-start; flex-wrap: wrap; } .duplicate-device-checkboxes { max-width: 100%; } }
 	
 	.popUp04 {
 	    display: none;
@@ -541,6 +549,11 @@
 	    getExcelSignInfo();
 	    calcIntrusionFromSprCol1();
 	    initReportStickyScrollbar();
+
+	    var activeFilters = '<c:out value="${param.duplicateFilter}"/>'.split(',');
+	    $('.report-filter-check').each(function() {
+	        if (activeFilters.indexOf($(this).data('class')) !== -1) this.checked = true;
+	    });
 	});
 
 	// 표 가로 스크롤과 보조 바를 연결하고, 보조 바를 표 하단 경계에서 멈춤
@@ -674,6 +687,20 @@
 			error : function(xhr, status, error) {
 			}
 		}); 
+	}
+
+	function filterReportRows(el) {
+		if (el) {
+			$('.report-filter-check[data-class="' + $(el).data('class') + '"]').prop('checked', el.checked);
+		}
+		var selected = [];
+		$('.report-filter-check:checked').each(function() {
+			var c = $(this).data('class');
+			if (selected.indexOf(c) === -1) selected.push(c);
+		});
+		var query = '?id=${param.id}&type=all&constructionIdx=${param.constructionIdx}';
+		if (selected.length) query += '&duplicateFilter=' + encodeURIComponent(selected.join(','));
+		goUrl('${pageContext.request.contextPath}/report/list' + query);
 	}
 	
 	function goUrl(url){
@@ -1336,6 +1363,7 @@
 		
 		var reports = [];
 		var role = ${sessionInfo.role};
+		var isRoleFive = ${sessionScope.isRoleFive};
 		
 		for (var i = 0; i < $('#reportTable tr').length; i++) {
 			//삭제여부
@@ -1356,7 +1384,10 @@
 			//var pieceId = document.getElementsByName("pieceId[" + i + "]");
 			//var pieceName = document.getElementsByName("pieceName[" + i + "]");
 			
-			if(role == 0){
+			var penetrations = [];
+			var penetrationsId = [];
+			var penetrationsName = [];
+			if(role == 0 && !isRoleFive){
 				//var penetrations = document.getElementsByName("penetrations[" + i + "]");
 				//var penetrationsId = document.getElementsByName("penetrationsId[" + i + "]");
 				//var penetrationsName = document.getElementsByName("penetrationsName[" + i + "]");
@@ -1382,7 +1413,7 @@
 			
 			//alert('pieces length : '  + JSON.stringify(pieces));
 			
-			if(role == 0){
+			if(role == 0 && !isRoleFive){
 				
 				var penetrationss = [];
 				var tenMeasurementMode = Number('${isBig}') > 0;
@@ -1404,7 +1435,7 @@
 			
 			
 			var gongSacPayload = getReportGongSacPayload($('#reportTable tr').eq(i));
-			 if(role == 0){
+			 if(role == 0 || isRoleFive){
 				var data = {
 						id: Number($('#reportTable tr').eq(i).find('#id').val()), 
 						deviceIdx: Number($('#reportTable tr').eq(i).find('#deviceIdx').val()), 
@@ -3119,7 +3150,7 @@
 					<td class="f_td">
 						<img src="${pageContext.request.contextPath}/new/img/light-b.png">
 					</td>
-					<td class="s_td" >&nbsp;호기별 중복(시공위치, 파일번호, 파일규격, 파일종류, 시공공법)</td>
+					<td class="s_td" ><label><c:if test="${sessionInfo.role == 0 or sessionInfo.hiddenManager == true}"><input type="checkbox" class="report-filter-check" data-class="lampOn-b" onchange="filterReportRows(this);"></c:if>호기별 중복(시공위치, 파일번호, 파일규격, 파일종류, 시공공법)</label></td>
 					<td class="t_td" rowspan="4" >
 						<c:if test="${sessionScope.isSystemAdmin}">
 							<div class="tableCArea" style="display: flex; flex-wrap: wrap; gap: 5px; justify-content: flex-end; margin-bottom: 10px;">
@@ -3132,7 +3163,7 @@
 						<div class="report-actions-stack${sessionInfo.role == 0 || sessionInfo.hiddenManager == true || sessionInfo.role == 3 ? '' : ' report-actions-stack-basic'}">
 						<div class="tableCArea report-approval-row">
 							<c:choose>
-								<c:when test="${sessionInfo.role == 0 || sessionInfo.hiddenManager == true || sessionInfo.role == 3}">
+								<c:when test="${sessionInfo.role == 0 || sessionInfo.hiddenManager == true || sessionInfo.role == 3 || sessionScope.isRoleFive}">
 									<c:if test="${useExcel}"><div class="btnType02 bg02 report-excel-setting" onclick="javascript:onClickExcelSignRoom();" style="background: #FFD400; color:#000000; border: 1px solid #258348;">EXCEL 결재방 설정</div></c:if>
 								</c:when>
 								<c:otherwise>
@@ -3142,7 +3173,7 @@
 						</div>
 						<div class="tableCArea">
 							<c:choose>												 
-								<c:when test="${sessionInfo.role == 0 || sessionInfo.hiddenManager == true || sessionInfo.role == 3}">
+								<c:when test="${sessionInfo.role == 0 || sessionInfo.hiddenManager == true || sessionInfo.role == 3 || sessionScope.isRoleFive}">
 									<c:if test="${useExcel}"><div class="btnType02 bg02" onclick="javascript:downloadExcel();">엑셀 출력</div></c:if>
 									<div class="btnType01" onclick="javascript:onClickReportUpdate();">기록지 수정</div>
 									<c:if test="${sessionInfo.role == 0}"><div class="btnType01 reportHistoryBtn" onclick="javascript:openReportHistory(1);">수정 이력</div></c:if>
@@ -3158,33 +3189,33 @@
 				</tr>
 				<tr>
 					<td><img src="${pageContext.request.contextPath}/new/img/light-p.png"></td>
-					<td>&nbsp;전체 중복(시공위치, 파일번호, 파일규격, 파일종류, 시공공법)</td>
+					<td><label><c:if test="${sessionInfo.role == 0 or sessionInfo.hiddenManager == true}"><input type="checkbox" class="report-filter-check" data-class="lampOn-p" onchange="filterReportRows(this);"></c:if>전체 중복(시공위치, 파일번호, 파일규격, 파일종류, 시공공법)</label></td>
 				</tr>
 				<tr>
 					<td><img src="${pageContext.request.contextPath}/new/img/light-o.png"></td>
-					<td>&nbsp;관리기준 초과/또는 NG</td>
+					<td><label><c:if test="${sessionInfo.role == 0 or sessionInfo.hiddenManager == true}"><input type="checkbox" class="report-filter-check" data-class="lampOn-o" onchange="filterReportRows(this);"></c:if>관리기준 초과/또는 NG</label></td>
 				</tr>
 				<tr>
 					<td><img src="${pageContext.request.contextPath}/new/img/light-l.png"></td>
-					<td>&nbsp;미관입/또는 NG</td>
+					<td><label><c:if test="${sessionInfo.role == 0 or sessionInfo.hiddenManager == true}"><input type="checkbox" class="report-filter-check" data-class="lampOn-l" onchange="filterReportRows(this);"></c:if>미관입/또는 NG</label></td>
 				</tr>
 			</table>
 			<table class="mobileReportTypeDashboard">
 				<tr>
 					<td class="f_td"><img src="${pageContext.request.contextPath}/new/img/light-b.png"></td>
-					<td class="s_td">&nbsp;호기별 중복(시공위치, 파일번호, 파일규격, 파일종류, 시공공법)</td>
+					<td class="s_td"><label><c:if test="${sessionInfo.role == 0 or sessionInfo.hiddenManager == true}"><input type="checkbox" class="report-filter-check" data-class="lampOn-b" onchange="filterReportRows(this);"></c:if>호기별 중복(시공위치, 파일번호, 파일규격, 파일종류, 시공공법)</label></td>
 				</tr>
 				<tr >
 					<td class="f_td"><img src="${pageContext.request.contextPath}/new/img/light-p.png"></td>
-					<td class="s_td">&nbsp;전체 중복(시공위치, 파일번호, 파일규격, 파일종류, 시공공법)</td>
+					<td class="s_td"><label><c:if test="${sessionInfo.role == 0 or sessionInfo.hiddenManager == true}"><input type="checkbox" class="report-filter-check" data-class="lampOn-p" onchange="filterReportRows(this);"></c:if>전체 중복(시공위치, 파일번호, 파일규격, 파일종류, 시공공법)</label></td>
 				</tr>
 				<tr>
 					<td class="f_td"><img src="${pageContext.request.contextPath}/new/img/light-o.png"></td>
-					<td class="s_td">&nbsp;관리기준 초과/또는 NG</td>
+					<td class="s_td"><label><c:if test="${sessionInfo.role == 0 or sessionInfo.hiddenManager == true}"><input type="checkbox" class="report-filter-check" data-class="lampOn-o" onchange="filterReportRows(this);"></c:if>관리기준 초과/또는 NG</label></td>
 				</tr>
 				<tr>
 					<td class="f_td"><img src="${pageContext.request.contextPath}/new/img/light-l.png"></td>
-					<td class="s_td">&nbsp;미관입/또는 NG</td>
+					<td class="s_td"><label><c:if test="${sessionInfo.role == 0 or sessionInfo.hiddenManager == true}"><input type="checkbox" class="report-filter-check" data-class="lampOn-l" onchange="filterReportRows(this);"></c:if>미관입/또는 NG</label></td>
 				</tr>
 				<tr>
 					<td colspan="2">
@@ -3209,7 +3240,7 @@
 						</div>
 						<div class="tableCArea">
 							<c:choose>												 
-								<c:when test="${sessionInfo.role == 0 || sessionInfo.hiddenManager == true || sessionInfo.role == 3}">
+								<c:when test="${sessionInfo.role == 0 || sessionInfo.hiddenManager == true || sessionInfo.role == 3 || sessionScope.isRoleFive}">
 									<c:if test="${useExcel}"><div class="btnType02 bg02" onclick="javascript:downloadExcel();">엑셀 출력</div></c:if>
 									<div class="btnType01" onclick="javascript:onClickReportUpdate();">기록지 수정</div>
 									<c:if test="${sessionInfo.role == 0}"><div class="btnType01 reportHistoryBtn" onclick="javascript:openReportHistory(1);">수정 이력</div></c:if>
@@ -3233,7 +3264,7 @@
 				<table class="viewTh" style="table-layout: fixed;">
 					<tr>
 						<c:choose>
-							<c:when test="${sessionInfo.role == 0  || sessionInfo.hiddenManager == true  || sessionInfo.role == 3}">
+							<c:when test="${sessionInfo.role == 0  || sessionInfo.hiddenManager == true  || sessionInfo.role == 3 || sessionScope.isRoleFive}">
 								<td rowspan="2">
 									<input type="checkbox" id="chkAll" name="chkAll" onclick="javascript:onClickChkAll();">
 								</td>
@@ -3601,7 +3632,7 @@
 								</c:otherwise>
 							</c:choose>
 							<c:choose>
-								<c:when test="${sessionInfo.role == 0  || sessionInfo.hiddenManager == true  || sessionInfo.role == 3}">
+								<c:when test="${sessionInfo.role == 0  || sessionInfo.hiddenManager == true  || sessionInfo.role == 3 || sessionScope.isRoleFive}">
 									<td>
 										<input type="checkbox" id="selectOne" name="selectOne" onclick="doOpenCheck(this, this.parentNode.parentNode.rowIndex);">
 									</td>
@@ -3905,7 +3936,7 @@
 							<td><input type="text" id="managedStandard" name="managedStandard"  disabled="disabled" class="tdInput" value="${domain.managedStandard}"/></td>
 							
 							<c:choose>
-								<c:when test="${sessionInfo.role == 0}">
+								<c:when test="${sessionInfo.role == 0 and not sessionScope.isRoleFive}">
 									<c:choose>
 										<c:when test="${isBig > 0}">
 											<c:choose>

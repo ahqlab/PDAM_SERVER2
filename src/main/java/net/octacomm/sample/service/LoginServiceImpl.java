@@ -19,6 +19,10 @@ public class LoginServiceImpl implements LoginService{
 	// UserMapper의 유니온 쿼리가 TB_SYSTEM_ADMIN.id에 더하는 offset과 동일한 값이어야 한다.
 	private static final int SYSTEM_ADMIN_ID_OFFSET = 90000000;
 
+	private static int sessionRole(int role) {
+		return role == 5 ? 0 : role;
+	}
+
 	@Autowired
 	UserMapper userMapper;
 
@@ -39,7 +43,9 @@ public class LoginServiceImpl implements LoginService{
 			session.setAttribute("userId", result1.getUserId());
 			session.setAttribute("userName", result1.getName());
 			session.setAttribute("constructionIdx", result1.getId());
-			session.setAttribute("role", result1.getRole());
+			session.setAttribute("originalRole", result1.getRole());
+			session.setAttribute("role", sessionRole(result1.getRole()));
+			session.setAttribute("isRoleFive", result1.getRole() == 5);
 			session.setAttribute("isHiddenManager", false);
 			// TB_SYSTEM_ADMIN 계정(현장에 종속되지 않는 독립 로그인)인지 id offset으로 판별
 			session.setAttribute("isSystemAdmin", result1.getId() >= SYSTEM_ADMIN_ID_OFFSET);
@@ -64,7 +70,9 @@ public class LoginServiceImpl implements LoginService{
 			session.setAttribute("userId", result2.getUserId());
 			session.setAttribute("userName", result2.getName());
 			session.setAttribute("constructionIdx", result2.getId());
-			session.setAttribute("role", result2.getRole());
+			session.setAttribute("originalRole", result2.getRole());
+			session.setAttribute("role", sessionRole(result2.getRole()));
+			session.setAttribute("isRoleFive", result2.getRole() == 5);
 			session.setAttribute("isHiddenManager", true);
 			// 보안코드 로그인은 TB_CONSTRUCTION 전용 경로라 시스템관리자일 수 없음
 			session.setAttribute("isSystemAdmin", false);

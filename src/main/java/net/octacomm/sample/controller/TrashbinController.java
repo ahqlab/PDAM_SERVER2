@@ -718,7 +718,7 @@ public class TrashbinController {
 	public boolean updateReportMulti(@RequestBody List<UpdateReport> report, HttpSession session) {
 		try {
 			for (UpdateReport updateReport : report) {
-				updateReportOne(updateReport, (String) session.getAttribute("userId"));
+				updateReportOne(updateReport, (String) session.getAttribute("userId"), !Boolean.TRUE.equals(session.getAttribute("isRoleFive")));
 			}
 		}catch (Exception e) {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -733,6 +733,9 @@ public class TrashbinController {
 	@Transactional
 	@RequestMapping(value = "/update/report", method = RequestMethod.POST)
 	public boolean updateReport(@RequestBody UpdateReport report, HttpSession session) {
+		if (Boolean.TRUE.equals(session.getAttribute("isRoleFive"))) {
+			preservePenetrationValues(report);
+		}
 
 		try {
 			// 기존 기록지 수정 로직 실행 직전 전체 스냅샷 저장
@@ -755,7 +758,7 @@ public class TrashbinController {
 			}
 			
 			
-			if(report.getPenetrations() != null) {
+			if (!Boolean.TRUE.equals(session.getAttribute("isRoleFive")) && report.getPenetrations() != null) {
 				for (Penetration penetration : report.getPenetrations()) {
 					if(penetrationMapper.get(penetration.getId()) != null) {
 						penetrationMapper.update(penetration);
@@ -769,7 +772,10 @@ public class TrashbinController {
 	}
 	
 	
-	public boolean updateReportOne(UpdateReport report, String userId) {
+	public boolean updateReportOne(UpdateReport report, String userId, boolean canEditPenetration) {
+		if (!canEditPenetration) {
+			preservePenetrationValues(report);
+		}
 		//원상태값
 		//Report rp = mapper.get(report.getId());
 		// 기존 기록지 수정 로직 실행 직전 전체 스냅샷 저장
@@ -799,7 +805,7 @@ public class TrashbinController {
 				}
 			}
 			
-			if(report.getPenetrations() != null) {
+			if(canEditPenetration && report.getPenetrations() != null) {
 				for (Penetration penetration : report.getPenetrations()) {
 					if(penetrationMapper.get(penetration.getId()) != null) {
 						penetrationMapper.update(penetration);
@@ -810,6 +816,16 @@ public class TrashbinController {
 			}
 		}
 		return true;
+	}
+
+	private void preservePenetrationValues(UpdateReport report) {
+		Report original = mapper.get(report.getId());
+		if (original == null) {
+			return;
+		}
+		report.setIntrusionDepth(original.getIntrusionDepth());
+		report.setAvgPenetrationValue(original.getAvgPenetrationValue());
+		report.setTotalPenetrationValue(original.getTotalPenetrationValue());
 	}
 	
 	

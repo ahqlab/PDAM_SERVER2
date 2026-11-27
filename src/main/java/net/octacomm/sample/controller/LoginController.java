@@ -199,7 +199,7 @@ public class LoginController {
 					}
 				}
 				
-				if(result.getRole() == 0) {
+				if(result.getRole() == 0 || result.getRole() == 5) {
 					return "redirect:" + DEFAULT_ADMIN_TARGET_URL;
 				}else if(result.getRole() == 2) {
 					Group group = groupMapper.selectByUserId(result.getUserId());
@@ -294,7 +294,7 @@ public class LoginController {
 
 			Construction result = loginService.login(construction, session);
 			if(result != null) {
-				if(result.getRole() == 0) {
+				if(result.getRole() == 0 || result.getRole() == 5) {
 					return "redirect:" + DEFAULT_ADMIN_TARGET_URL;
 				}else if(result.getRole() == 2) {
 					Group group = groupMapper.selectByUserId(result.getUserId());
@@ -319,7 +319,7 @@ public class LoginController {
 
 			Construction result = loginService.login(construction, session);
 			if(result != null) {
-				if(result.getRole() == 0) {
+				if(result.getRole() == 0 || result.getRole() == 5) {
 					return "redirect:" + DEFAULT_ADMIN_TARGET_URL;
 				}else if(result.getRole() == 2) {
 					Group group = groupMapper.selectByUserId(result.getUserId());

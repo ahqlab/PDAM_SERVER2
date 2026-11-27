@@ -815,7 +815,7 @@ function onClickReportUpdate(){
 					 <!-- 5회 -->
 					<c:forEach var="i" begin="0" end="${4}">
 						<c:choose>
-							<c:when test="${sessionInfo.role == 0}">
+							<c:when test="${sessionInfo.role == 0 and not sessionScope.isRoleFive}">
 								<td style="width: 3%;">
 									<input type="text" id="penetrations[${status.index}]" name="penetrations[${status.index}]" disabled="disabled" style="width: 30px;" value="${domain.penetrations[i].value}">
 									<input type="hidden" id="penetrationsId[${status.index}]" name="penetrationsId[${status.index}]" value="${domain.penetrations[i].id}">

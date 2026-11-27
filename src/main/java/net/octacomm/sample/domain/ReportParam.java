@@ -37,4 +37,6 @@ public class ReportParam extends DomainParam {
 	
 	private String method;
 	
+	private String duplicateFilter;
+
 }

@@ -104,6 +104,7 @@ function doDelete(){
 function onClickReportUpdate(){
 	
 	var role = ${sessionInfo.role};
+	var canEditPenetration = role == 0 && ${not sessionScope.isRoleFive};
 	var index = getCheckdCheckboxIndex();
 	
 	if(index != null){
@@ -145,7 +146,7 @@ function onClickReportUpdate(){
 	var pieceId = document.getElementsByName("pieceId[" + index + "]");
 	var pieceName = document.getElementsByName("pieceName[" + index + "]");
 	
-	if(role == 0){
+	if(canEditPenetration){
 		var penetrations = document.getElementsByName("penetrations[" + index + "]");
 		var penetrationsId = document.getElementsByName("penetrationsId[" + index + "]");
 		var penetrationsName = document.getElementsByName("penetrationsName[" + index + "]");
@@ -165,7 +166,7 @@ function onClickReportUpdate(){
 			};
 			pieces.push(onePiece);	
 		}
-		if(role == 0){
+		if(canEditPenetration){
 			var penetrationss = [];
 			for(var i=0; i<penetrations.length; i++){
 				if(penetrations[i].value != ""){
@@ -181,7 +182,7 @@ function onClickReportUpdate(){
 		}
 		
 		
-		if(role == 0){
+		if(canEditPenetration){
 			var data = {
 					id: Number(id[index].value), 
 					pileType: pileType[index].value != "" ? pileType[index].value : "null", 
@@ -331,7 +332,7 @@ function onClickReportUpdate(){
 				pie[k].disabled = true;
 			}
 			
-			if(role == 0){
+			if(canEditPenetration){
 				var pntrs = document.getElementsByName("penetrations[" + j + "]");
 				for (var l = 0; l < pntrs.length; l++) {
 					pntrs[l].disabled = true;
@@ -361,7 +362,7 @@ function onClickReportUpdate(){
 
 		var piece = document.getElementsByName("piece[" + index + "]");
 		
-		if(role == 0){
+		if(canEditPenetration){
 			var pntrs = document.getElementsByName("penetrations[" + index + "]");	
 		}
 		
@@ -374,7 +375,7 @@ function onClickReportUpdate(){
 				for (var y = 0; y < piece.length; y++) {
 					piece[y].disabled = false;
 				}
-				if(role == 0){
+				if(canEditPenetration){
 					for (var l = 0; l < pntrs.length; l++) {
 						pntrs[l].disabled = false;
 					}
@@ -401,7 +402,7 @@ function onClickReportUpdate(){
 			for (var y = 0; y < piece.length; y++) {
 				piece[y].disabled = true;
 			}
-			if(role == 0){
+			if(canEditPenetration){
 				for (var y = 0; y < pntrs.length; y++) {
 					pntrs[y].disabled = true;
 				}

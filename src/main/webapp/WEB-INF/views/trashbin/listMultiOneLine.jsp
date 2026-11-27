@@ -32,6 +32,7 @@
 </style>
 
 <script>
+	var canEditPenetration = ${sessionInfo.role} == 0 && ${not sessionScope.isRoleFive};
 
 	var initIndex = 0;
 	
@@ -95,6 +96,7 @@
 
 	function getConstructionName(){
 		var role = ${sessionInfo.role};
+		var canEditPenetration = role == 0 && ${not sessionScope.isRoleFive};
 		var idx = ${param.constructionIdx};
 		jQuery.ajax({
 			type : "POST",
@@ -708,7 +710,7 @@
 			//var pieceId = document.getElementsByName("pieceId[" + i + "]");
 			//var pieceName = document.getElementsByName("pieceName[" + i + "]");
 			
-			if(role == 0){
+			if(canEditPenetration){
 				//var penetrations = document.getElementsByName("penetrations[" + i + "]");
 				//var penetrationsId = document.getElementsByName("penetrationsId[" + i + "]");
 				//var penetrationsName = document.getElementsByName("penetrationsName[" + i + "]");
@@ -734,7 +736,7 @@
 			
 			//alert('pieces length : '  + JSON.stringify(pieces));
 			
-			if(role == 0){
+			if(canEditPenetration){
 				
 				var penetrationss = [];
 				
@@ -752,7 +754,7 @@
 			}
 			
 			
-			 if(role == 0){
+			 if(canEditPenetration){
 				var data = {
 						id: Number($('#reportTable tr').eq(i).find('#id').val()), 
 						deviceIdx: Number($('#reportTable tr').eq(i).find('#deviceIdx').val()), 
@@ -884,14 +886,14 @@
 		
 		var piece = document.getElementsByName("piece[" + index + "]");
 		
-		if(role == 0){
+		if(canEditPenetration){
 			var pntrs = document.getElementsByName("penetrations[" + index + "]");	
 		}
 		
 		for (var y = 0; y < piece.length; y++) {
 			piece[y].disabled = true;
 		}
-		if(role == 0){
+		if(canEditPenetration){
 			for (var l = 0; l < pntrs.length; l++) {
 				pntrs[l].disabled = true;
 			}
@@ -975,14 +977,14 @@
 		
 		var piece = document.getElementsByName("piece[" + index + "]");
 		
-		if(role == 0){
+		if(canEditPenetration){
 			var pntrs = document.getElementsByName("penetrations[" + index + "]");	
 		}
 		
 		for (var y = 0; y < piece.length; y++) {
 			piece[y].disabled = false;
 		}
-		if(role == 0){
+		if(canEditPenetration){
 			for (var l = 0; l < pntrs.length; l++) {
 				pntrs[l].disabled = false;
 			}
@@ -1080,14 +1082,14 @@
 			
 			var piece = document.getElementsByName("piece[" + index + "]");
 			
-			if(role == 0){
+			if(canEditPenetration){
 				var pntrs = document.getElementsByName("penetrations[" + index + "]");	
 			}
 			
 			for (var y = 0; y < piece.length; y++) {
 				piece[y].disabled = false;
 			}
-			if(role == 0){
+			if(canEditPenetration){
 				for (var l = 0; l < pntrs.length; l++) {
 					pntrs[l].disabled = false;
 				}
@@ -1133,14 +1135,14 @@
 			
 			var piece = document.getElementsByName("piece[" + index + "]");
 			
-			if(role == 0){
+			if(canEditPenetration){
 				var pntrs = document.getElementsByName("penetrations[" + index + "]");	
 			}
 			
 			for (var y = 0; y < piece.length; y++) {
 				piece[y].disabled = true;
 			}
-			if(role == 0){
+			if(canEditPenetration){
 				for (var l = 0; l < pntrs.length; l++) {
 					pntrs[l].disabled = true;
 				}
