@@ -13,6 +13,11 @@
 	    <c:when test="${sessionScope.isResearchAdmin}">
 	        <font color="blue">연구소</font> 계정으로 로그인하셨습니다.
 	    </c:when>	
+	    
+	    <%-- role == 5 : 전체 권한이지만 관입량 수정 불가능한 계정 --%>
+	    <c:when test="${sessionScope.isRoleFive}">
+	        <font color="blue">${sessionInfo.userName}</font> 계정으로 로그인하셨습니다.
+	    </c:when>
 	 	
         <%-- role == 0 : 슈퍼관리자 --%>
         <c:when test="${sessionInfo.role eq 0}">

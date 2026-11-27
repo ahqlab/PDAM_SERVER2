@@ -1297,6 +1297,9 @@ public class ReportController{
 			return false;
 		}
 		applyDepthCalculations(report);
+		if (Boolean.TRUE.equals(session.getAttribute("isRoleFive"))) {
+			preservePenetrationValues(report);
+		}
 		report.setUltimateBearingCapacity(String.valueOf(calDanish(report)));
 		int result = mapper.update(report);
 		if (result > 0 && report.isPreserveNullGongSac()) {
@@ -1316,7 +1319,7 @@ public class ReportController{
 			}
 			
 			
-			if(report.getPenetrations() != null) {
+			if (!Boolean.TRUE.equals(session.getAttribute("isRoleFive")) && report.getPenetrations() != null) {
 				for (Penetration penetration : report.getPenetrations()) {
 					if(penetrationMapper.get(penetration.getId()) != null) {
 						penetrationMapper.update(penetration);
@@ -1352,7 +1355,7 @@ public class ReportController{
 		}
 
 		for (UpdateReport report : reports) {
-			if (!updateReportOne(report, (String) session.getAttribute("userId"))) {
+			if (!updateReportOne(report, (String) session.getAttribute("userId"), !Boolean.TRUE.equals(session.getAttribute("isRoleFive")))) {
 				throw new IllegalStateException("기록지 수정 중 오류가 발생했습니다.");
 			}
 		}
@@ -1361,7 +1364,10 @@ public class ReportController{
 	
 	
 	@Transactional
-	public boolean updateReportOne(UpdateReport report, String userId) {
+	public boolean updateReportOne(UpdateReport report, String userId, boolean canEditPenetration) {
+		if (!canEditPenetration) {
+			preservePenetrationValues(report);
+		}
 		
 		int extensivePileUsage = 0;
 		
@@ -1427,7 +1433,7 @@ public class ReportController{
 		}
 
 	    // 5. penetration 처리
-	    if(report.getPenetrations() != null) {
+	    if(canEditPenetration && report.getPenetrations() != null) {
 			for (Penetration penetration : report.getPenetrations()) {
 				if(penetrationMapper.get(penetration.getId()) != null) {
 					penetrationMapper.update(penetration);
@@ -1438,6 +1444,16 @@ public class ReportController{
 		}
 
 	    return true;
+	}
+
+	private void preservePenetrationValues(UpdateReport report) {
+		Report original = mapper.get(report.getId());
+		if (original == null) {
+			return;
+		}
+		report.setIntrusionDepth(original.getIntrusionDepth());
+		report.setAvgPenetrationValue(original.getAvgPenetrationValue());
+		report.setTotalPenetrationValue(original.getTotalPenetrationValue());
 	}
 	
 	/**@Transactional

@@ -135,6 +135,7 @@ function checkDuplicateGroupName(){
 			
 			<!--검색된 리스트 10개씩 노출-->
 			<div class="listArea">
+			<c:if test="${sessionInfo.role == 0 and not sessionScope.isRoleFive}">
 				<div class="flex">
 					<p class="listCount">협력사  <span>${constructionCount}</span> / 본사 운영장비 <span>${deviceCount}</span> / 가맹 운영장비 <span>${devicePrenchCount}</span> / 예비용 장비 <span>${spareDeviceCount}</span></p>
 					<!-- <div class="buildDown">시행 협력사 정보</div> -->
@@ -164,6 +165,7 @@ function checkDuplicateGroupName(){
 						</tbody>
 					</table>
 				</div>
+			</c:if>
 
 				<ul id="groupList" class="listUl cross"></ul>
 			</div>
@@ -175,6 +177,7 @@ function checkDuplicateGroupName(){
 		</div>
 		<!--//컨텐츠-->
 
+	<c:if test="${sessionInfo.role == 0 and not sessionScope.isRoleFive}">
 		<!-- 운영 장비 추이 팝업 -->
 		<div id="operationTrendLayer" class="operationTrendLayer" aria-hidden="true">
 			<div class="operationTrendModal" role="dialog" aria-modal="true" aria-labelledby="operationTrendTitle">
@@ -197,6 +200,7 @@ function checkDuplicateGroupName(){
 			</div>
 		</div>
 		<!-- //운영 장비 추이 팝업 -->
+	</c:if>
 
 
 		<!--시공사 등록 팝업-->

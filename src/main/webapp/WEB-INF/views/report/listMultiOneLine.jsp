@@ -1363,6 +1363,7 @@
 		
 		var reports = [];
 		var role = ${sessionInfo.role};
+		var isRoleFive = ${sessionScope.isRoleFive};
 		
 		for (var i = 0; i < $('#reportTable tr').length; i++) {
 			//삭제여부
@@ -1383,7 +1384,10 @@
 			//var pieceId = document.getElementsByName("pieceId[" + i + "]");
 			//var pieceName = document.getElementsByName("pieceName[" + i + "]");
 			
-			if(role == 0){
+			var penetrations = [];
+			var penetrationsId = [];
+			var penetrationsName = [];
+			if(role == 0 && !isRoleFive){
 				//var penetrations = document.getElementsByName("penetrations[" + i + "]");
 				//var penetrationsId = document.getElementsByName("penetrationsId[" + i + "]");
 				//var penetrationsName = document.getElementsByName("penetrationsName[" + i + "]");
@@ -1409,7 +1413,7 @@
 			
 			//alert('pieces length : '  + JSON.stringify(pieces));
 			
-			if(role == 0){
+			if(role == 0 && !isRoleFive){
 				
 				var penetrationss = [];
 				var tenMeasurementMode = Number('${isBig}') > 0;
@@ -1431,7 +1435,7 @@
 			
 			
 			var gongSacPayload = getReportGongSacPayload($('#reportTable tr').eq(i));
-			 if(role == 0){
+			 if(role == 0 || isRoleFive){
 				var data = {
 						id: Number($('#reportTable tr').eq(i).find('#id').val()), 
 						deviceIdx: Number($('#reportTable tr').eq(i).find('#deviceIdx').val()), 
@@ -3159,7 +3163,7 @@
 						<div class="report-actions-stack${sessionInfo.role == 0 || sessionInfo.hiddenManager == true || sessionInfo.role == 3 ? '' : ' report-actions-stack-basic'}">
 						<div class="tableCArea report-approval-row">
 							<c:choose>
-								<c:when test="${sessionInfo.role == 0 || sessionInfo.hiddenManager == true || sessionInfo.role == 3}">
+								<c:when test="${sessionInfo.role == 0 || sessionInfo.hiddenManager == true || sessionInfo.role == 3 || sessionScope.isRoleFive}">
 									<c:if test="${useExcel}"><div class="btnType02 bg02 report-excel-setting" onclick="javascript:onClickExcelSignRoom();" style="background: #FFD400; color:#000000; border: 1px solid #258348;">EXCEL 결재방 설정</div></c:if>
 								</c:when>
 								<c:otherwise>
@@ -3169,7 +3173,7 @@
 						</div>
 						<div class="tableCArea">
 							<c:choose>												 
-								<c:when test="${sessionInfo.role == 0 || sessionInfo.hiddenManager == true || sessionInfo.role == 3}">
+								<c:when test="${sessionInfo.role == 0 || sessionInfo.hiddenManager == true || sessionInfo.role == 3 || sessionScope.isRoleFive}">
 									<c:if test="${useExcel}"><div class="btnType02 bg02" onclick="javascript:downloadExcel();">엑셀 출력</div></c:if>
 									<div class="btnType01" onclick="javascript:onClickReportUpdate();">기록지 수정</div>
 									<c:if test="${sessionInfo.role == 0}"><div class="btnType01 reportHistoryBtn" onclick="javascript:openReportHistory(1);">수정 이력</div></c:if>
@@ -3236,7 +3240,7 @@
 						</div>
 						<div class="tableCArea">
 							<c:choose>												 
-								<c:when test="${sessionInfo.role == 0 || sessionInfo.hiddenManager == true || sessionInfo.role == 3}">
+								<c:when test="${sessionInfo.role == 0 || sessionInfo.hiddenManager == true || sessionInfo.role == 3 || sessionScope.isRoleFive}">
 									<c:if test="${useExcel}"><div class="btnType02 bg02" onclick="javascript:downloadExcel();">엑셀 출력</div></c:if>
 									<div class="btnType01" onclick="javascript:onClickReportUpdate();">기록지 수정</div>
 									<c:if test="${sessionInfo.role == 0}"><div class="btnType01 reportHistoryBtn" onclick="javascript:openReportHistory(1);">수정 이력</div></c:if>
@@ -3260,7 +3264,7 @@
 				<table class="viewTh" style="table-layout: fixed;">
 					<tr>
 						<c:choose>
-							<c:when test="${sessionInfo.role == 0  || sessionInfo.hiddenManager == true  || sessionInfo.role == 3}">
+							<c:when test="${sessionInfo.role == 0  || sessionInfo.hiddenManager == true  || sessionInfo.role == 3 || sessionScope.isRoleFive}">
 								<td rowspan="2">
 									<input type="checkbox" id="chkAll" name="chkAll" onclick="javascript:onClickChkAll();">
 								</td>
@@ -3628,7 +3632,7 @@
 								</c:otherwise>
 							</c:choose>
 							<c:choose>
-								<c:when test="${sessionInfo.role == 0  || sessionInfo.hiddenManager == true  || sessionInfo.role == 3}">
+								<c:when test="${sessionInfo.role == 0  || sessionInfo.hiddenManager == true  || sessionInfo.role == 3 || sessionScope.isRoleFive}">
 									<td>
 										<input type="checkbox" id="selectOne" name="selectOne" onclick="doOpenCheck(this, this.parentNode.parentNode.rowIndex);">
 									</td>
@@ -3932,7 +3936,7 @@
 							<td><input type="text" id="managedStandard" name="managedStandard"  disabled="disabled" class="tdInput" value="${domain.managedStandard}"/></td>
 							
 							<c:choose>
-								<c:when test="${sessionInfo.role == 0}">
+								<c:when test="${sessionInfo.role == 0 and not sessionScope.isRoleFive}">
 									<c:choose>
 										<c:when test="${isBig > 0}">
 											<c:choose>
